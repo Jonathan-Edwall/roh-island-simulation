@@ -1,0 +1,510 @@
+---
+title: "Simulating traits - Exercise"
+author: "Alireza Ehsani, Jana Obšteter, and Gregor Gorjanc"
+date: "2022-06-22"
+---
+
+# Introduction
+
+In this exercise, you will simulate a population and analyse its trait variation in five steps:
+
+- Simulate founding genomes,
+- Define traits,
+- Inspect traits,
+- Create a population and phenotype it, and
+- Summarise genetic and phenotype values.
+  
+For each step, we have given you instructions with an `AlphaSimR` template code to complete (replace ??? with an appropriate code).
+
+This exercise deliberately goes beyond the material we have covered up to now. To help you on this pathway, we indicate which functions should be used and we point to their documentation. Embracing this growth mindset is important for mastering AlphaSimR and combining it with other R functionality.
+
+
+# Trait Definition
+
+# Simulate founding genomes
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+# Set the default plot layout
+par(mfrow = c(1, 1))
+
+library(AlphaSimR)
+
+# Use the following parameters:
+#   * 100 individuals (this simulation will need more time than before)
+#   * 10 chromosomes
+#   * 100 segregating loci (sites) per chromosomes
+#   * MAIZE species
+founderGenomes = runMacs(nInd = 50,
+                         nChr = 2,
+                         segSites = 10,
+                         species = "CATTLE")
+```
+
+```{r}
+# Create the simulation parameters object SP from founding genomes
+SP = SimParam$new(founderGenomes)
+
+# Allocate sex at random
+SP$setSexes("yes_rand")
+```
+
+# Trait Defintion
+
+So now that we have defined the genomes,
+let's define our trait.
+Written quite a bit of texts here for you.
+And I would like to guide you through that
+because it is important. Now to
+add the trait to the simulation
+via this `SimParam object`.
+And remember that we're now calling
+that internal object within an object name SP.
+We're going to use the function addTraitA on this object.
+Now you can get information about the trait
+trait A by running the help `SimParam`
+and going down all the way to `addTraitA()` function here.
+And if I click on it,
+`SimParam$addTraitA()`
+`
+
+I get information about
+all the arguments that I can specify for this function.
+Now this function simulates
+additive effects for the DNA loci
+that are affecting our traits.
+This function will only define
+genetic component of the trait,
+and we will later have to define
+an environmental component later.
+In the `addTraitA()` function,
+we must first specify
+how many DNA loci effect the trait.
+We do this by specifying
+the `nQTLPerChr()` argument.
+I would like to emphasise the QTL acronym
+here stands for quantitative trait loci.
+These are those loci,
+those loci that are affecting a quantitative trait.
+As mentioned before,
+these quantitative trait loci will have additive effects.
+What this means is that homozygous individual with
+a homozygous zero genotype will
+have a genetic value of mean plus a zero.
+Then individual with a genotype heterozygous,
+one will have genetic value of mean plus a.
+And individual with homozygous,
+homozygous two will have genetic value mean plus two a.
+This means that the effect of substituting
+ancestral allele with a mutation is additive.
+As just indicated, we also need to specify the mean
+for the trait and we're going to use mean argument.
+And we also have to specify genetic variance
+for the trait using the var argument.
+This variance, variance of genetic values
+will control the spread of
+genetic values around the mean.
+The higher this variances will be, the bigger the spread.
+And finally, we also need to specify
+a distribution from which we will
+sample this additive effects of our QTL.
+Usually we just work with a normal,
+or also called the Gaussian distribution
+for the additive effects.
+And that's the default option,
+so we don't really need to specify it.
+However.
+If we know that we want the simulation where
+some DNA loci are going to have large effects,
+which is not very common with the normal distribution.
+Then we can change that normal distribution
+to a Gamma distribution.
+We can do that by setting the gam argument to true.
+And also then we can control the shape of
+that gamma distribution with the shape argument.
+Alright, so if I look here on the right-hand side,
+you will see the gamma argument
+here and the shape argument.
+Now let's add a trait.
+For example, let's assume that the trait will be
+bodyweight of this cattle that we have simulated.
+And for simplicity, let's assume that this trait is
+only affected by five QTLs per chromosome.
+And that their effects are drawn
+from a normal distribution,
+which is a default setting.
+We will say the trait mean to 500 kilogrammes.
+And we're gonna specify
+genetic variants to 450 kg$^2$.
+
+And that's actually 450 kilogrammes, because variance has squared units.
+
+
+```{r}
+# Define four traits with additive genetic effects where:
+#   * Trait 1 has mean 10, genetic variance 1, and is affected by   1 QTL/chromosome
+#   * Trait 2 has mean 10, genetic variance 1, and is affected by  10 QTL/chromosome
+#   * Trait 3 has mean 10, genetic variance 1, and is affected by 100 QTL/chromosome
+#   * Trait 4 has mean 10, genetic variance 3, and is affected by 100 QTL/chromosome
+
+# Add trait 1
+SP$addTraitA(nQtlPerChr = 5,mean = 500, var = 450)
+
+
+# # Add trait 2
+# SP$addTraitA(mean = ???, var = ???, nQtlPerChr = ???)
+# 
+# # Add trait 3
+# SP$addTraitA(mean = ???, var = ???, nQtlPerChr = ???)
+# 
+# # Add trait 4
+# SP$addTraitA(mean = ???, var = ???, nQtlPerChr = ???)
+```
+## Inspecting the traits element of the SB object
+
+we don't get any particular output because that
+information is immediately stored in the SP object.
+And all that information will now be used
+in all downstream
+AlphaSimR populations that we will create.
+To show you this information,
+we can use the SP object and show its trait element.
+So if I highlight this piece of code and I run it,
+you're gonna get quite a bit of
+information about our trait.
+So we see that we have trait A
+which is trait with additive genetic architecture.
+These are the additive effects of our QTLs.
+We also have an intercept.
+We see that we have ten such QTLs.
+And we see that there is of this
+ten, five are on the first chromosome
+and the other five on the second chromosome.
+And these are the actual positions of
+these QTLs on individual chromosomes.
+So the first five on
+the first chromosome and the other
+five on the other chromosome.
+Now we have a name for this trait,
+which is trait one.
+
+
+[1] trait of our QTLs
+
+
+
+
+Slot "name":
+[1] "Trait1"
+```{r}
+SP$traits 
+
+```
+
+
+# Inspect traits
+
+```{r}
+# Number of traits
+SP$nTraits
+
+# # Distribution of additive QTL effects for each trait
+# # Replace ??? with trait numbers
+# par(mfrow = c(2, 2),
+#     mar = c(4, 4, 1, 1))
+# hist(SP$traits[[???]]@addEff, xlab = "Additive effects - trait 1", main = "")
+# hist(SP$traits[[???]]@addEff, xlab = "Additive effects - trait 2", main = "")
+# hist(SP$traits[[???]]@addEff, xlab = "Additive effects - trait 3", main = "")
+# hist(SP$traits[[???]]@addEff, xlab = "Additive effects - trait 4", main = "")
+# par(mfrow = c(1, 1))
+```
+
+# Create a population and phenotype it
+
+We can now create a base population. We're going to again call it as an object, the base pop.
+
+**And we're going to inspect genetic values of these individuals in a population**
+
+Namely, when we create a population with
+a defined trade AlphaSimR,
+
+-   Automatically calculated genetic values for all individuals in the population.
+
+This is done in such a way that we take the QTL effects that we have simulated in the SP object.
+**#1: ===> And we're going to apply these QTL effects to each QTL genotype.**
+
+** #2: And we will then sum these effects over the entire genome of each individual.**
+
+```{r}
+# Create a population of individuals from founding genomes
+basePop = newPop(founderGenomes)
+basePop
+
+```
+# Genotype values (Video part 1)
+
+## Inspecting the Genetic values of an individual (08:55)
+
+We can inspect the genetic values of
+individuals in the `basepop` object by,
+by extracting it's `gv element`
+
+Or we can also use equivalently the `gv()`-function.
+
+**They both do the same thing.**
+```{r}
+# Inspecting the genetic values of the first 10 individuals
+basePop@gv[1:10]
+
+
+gv(basePop)[1:10]
+```
+
+## Plot histogram of all genetic values in gv(basePop)
+
+Now, I can start to combine AlphaSimR,
+and R functionality.
+So here I'm going to extract
+genetic values from the base population.
+And then I'm going to plot a histogram of
+the genetics, the genetic values.
+And this histogram is shown here on the y-axis,
+here are the frequency, and on
+the x-axis we have the genetic values of our individuals.
+And we see this is the distribution of genetic values
+of the symbol of the individuals that we have simulated.
+```{r}
+# Plot histogram of all genetic values
+hist(gv(basePop))
+```
+## Calculate variance of the genetic values in the population
+
+We can also, for example,
+do some calculations on these genetic values.
+For example, I can calculate
+the variance of the genetic values.
+How variable are these genetic values in a population.
+That is actually by definition
+genetic variance in this population.
+And it's our particular case,
+this trait one has genetic variance
+of almost 460 kilogrammes squared.
+
+```{r}
+var(gv(basePop))
+```
+# Phenotype values (video part 2)
+`setPheno()`
+
+
+2:33 / 10:29Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.Speed 1.0xClick on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.Maximum Volume.Video transcript
+Start of transcript. Skip to the end.
+Now let's move from genetic values to phenotype values.
+And this is really important because in
+real life we never observe genetic values.
+This, what we're doing here is
+a simulation, we can simulate genetic values.
+And we can inspect genetic values.
+We can work with genetic values.
+But when we're doing next set simulation steps,
+we should usually never work
+with the genetic values we should work with
+the phenotype values because
+that's what is happening in the reality.
+As discussed elsewhere,
+phenotypes of complex traits are
+affected by both genes and the environment.
+To simulate such phenotype values
+in AlphaSimR, we will have to simulate
+environmental effects in addition to
+the QTL effects that we have simulated above.
+In AlphaSimR, we can simulate phenotype values for
+individuals in a population
+with this set Pheno function.
+When we call this function,
+we either have to specify
+variance of environmental effects.
+And we can do that through the varE argument.
+Or equivalently, we can specify
+the heritability through the h2 argument.
+Heritability is a very important parameter.
+And that parameter is essentially a ratio between
+genetic variance and phenotype variance.
+What I'm going to denote here,
+phenotype variants with v underscore P subscript p.
+And that phenotype variance is in
+effect a function of
+genetic variance and environmental variance.
+So therefore, we can calculate heritability simply as
+taking genetic variance and
+dividing it by the phenotype variance,
+which in, which in fact is
+the sum of the genetic variance and environment,
+environment variance.
+I would like to emphasise that this formula holds under
+the assumption there are
+no interaction between genotype and environment,
+and there are no other sources of phenotype variation.
+But that's suffices for now for our simulations.
+So let us now simulate phenotypes for our population.
+And we're going to assume
+that genetic and environmental variance
+are equal in size.
+So I'm going to be setting VG and VE
+to 450 kilogrammes squared.
+That means that the phenotype variants will
+be 900 kilogrammes squared.
+And if I then calculate the heritability,
+we will see that the heritability is 1/2 or
+0.5.
+
+
+## Phenotype of the basePop
+To achieve that.
+I'm now going to run these two lines of code where I'm
+using the set pheno function on
+the base pop population object.
+I'm going to specify heritability of 0.5.
+And I'm going to save the output
+into the same object called base pop,
+which means I'm going to take a base population.
+I'm going to add phenotypes to it.
+And then I'm going to overwrite
+this object.
+```{r}
+
+basePop = setPheno(basePop, h2 = 0.5)
+```
+
+### Inspect phenotype values
+Now, as we did before with the genetic values
+we can now also inspect the phenotype values.
+And we can get the phenotype values
+by looking directly at the element of this object.
+Or we can use the pheno function.
+
+```{r}
+pheno(basePop)[1:10]
+
+pheno(basePop)[1:10]
+```
+## Plot histogram of all phenotype values in gv(basePop)
+
+```{r}
+hist(pheno(basePop))
+```
+
+## Calculate variance of the phenotype values in the population
+
+And here I'm showing you
+the variance of the phenotype values,
+which is the phenotypic variance.
+
+**I would like to emphasise that even though we've assumed that phenotype variance is 900, because this is a stochastic simulation, sometimes the resulting variances will vary.**
+
+```{r}
+var(pheno(basePop))
+```
+## Plotting relationship between genetic values & phenotype values
+We can go one step further and we can start plotting
+one set of values against each other.
+So for example, we know that
+phenotype values are a function of genetic values.
+So we should see some positive correlation
+between these two sets of values.
+So what I'm going to use
+an R function plot so that on the x-axis
+I'm going to plot genetic values
+from our base population and on the y-axis.
+And I'm gonna, I'm gonna plot phenotype values.
+And I'm going to add some nice axes labels.
+
+
+
+And as you can see, this cloud of points showing that
+as I increase genetic value and on average,
+phenotype values also increase, increase.
+Which makes sense because
+phenotype value or a function of genetic value.
+
+
+```{r}
+plot(x = gv(basePop), y = pheno(basePop), 
+     xlab = "Genetic values", ylab = "Phenotype value")
+```
+
+## Correlation between genetic and phenotype values
+Just to quantify that a little bit,
+I can then use our function core,
+which is going to calculate correlation between
+genetic values and the phenotype values.
+And as we see, we have a positive correlation of about
+0.7 between the variation
+in genetic values and the phenotype values.
+Which means that as phenotypes values,
+as genetic values, increased,
+phenotype values also increase.
+```{r}
+cor(gv(basePop),pheno(basePop))
+```
+It's important to emphasise that phenotype values are
+a function of the genetic value
+and genetic value of individually is fixed.
+But they also function of the environmental effects
+which are not fixed for individual,
+they can vary over time or space.
+So if we repeat the call of
+set pheno on a particular population,
+we will get different values.
+```{r}
+pheno(setPheno(basePop,h2=0.5))[1:5]
+```
+
+
+
+## Simulate phenotypes with the following environmental variances:
+```{r}
+# 
+# #   * Trait 1 with varE = 0
+# #   * Trait 2 with varE = 1
+# #   * Trait 3 with varE = 1
+# #   * Trait 4 with varE = 2
+# maizePop = setPheno(maizePop, varE = c(???, ???, ???, ???))
+```
+
+
+
+# Summarise genetic and phenotype values
+
+# ```{r}
+# # Calculate mean and variance of genetic values for individuals in the maizePop
+# # using meanG() and varG() functions. Since we have multiple traits, these
+# # functions will return vectors and matrices (variances on diagonal and covariances
+# # on off-diagonal elements).
+# meanG(???)
+# varG(???)
+# 
+# # Calculate mean and variance of phenotype values for individuals in the maizePop
+# # using meanP() and varP() functions. Since we have multiple traits, these
+# # functions will return vectors and matrices (variances on diagonal and covariances
+# # on off-diagonal elements).
+# meanP(???)
+# varP(???)
+# 
+# # Calculate heritabilities for simulated phenotypes in the maizePop
+# # Note the use of diag() function to extract only variances from the matrices
+# VarG = varG(???)
+# VarP = varP(???)
+# diag(VarG) / diag(VarP)
+# 
+# # Plot phenotype values as a function of genetic values in the maizePop
+# par(mfrow = c(2, 2),
+#     mar = c(4, 4, 1, 1))
+# plot(x = ???(maizePop)[, 1], y = ???(maizePop)[, 1], xlab = "gv1", ylab = "pheno1")
+# plot(x = ???(maizePop)[, 2], y = ???(maizePop)[, 2], xlab = "gv2", ylab = "pheno2")
+# plot(x = ???(maizePop)[, 3], y = ???(maizePop)[, 3], xlab = "gv3", ylab = "pheno3")
+# plot(x = ???(maizePop)[, 4], y = ???(maizePop)[, 4], xlab = "gv4", ylab = "pheno4")
+# par(mfrow = c(1, 1))
+```

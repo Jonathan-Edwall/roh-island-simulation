@@ -6,6 +6,9 @@ library(purrr)
 library(tibble)
 
 
+# Clean the working environment
+rm(list = ls())
+
 founders <- runMacs2(nInd = 100,
                      nChr = 1,
                      Ne = 2500,
