@@ -19,7 +19,10 @@ simparam <- SimParam$new(founders)
 
 simparam$addTraitA(nQtlPerChr = 10)
 simparam$setSexes("yes_sys")
-simparam$setVarE(h2 = 0.2)
+simparam$setVarE(h2 = 0.2) 
+# Defines a default values for error variances used in setPheno. 
+#These defaults will be used to automatically generate phenotypes when new populations are created.
+#See the details section of setPheno for more information about each arguments and how they should be used.
 
 simparam$addSnpChip(nSnpPerChr = 1000)
 

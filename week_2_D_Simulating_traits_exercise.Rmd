@@ -396,7 +396,7 @@ pheno(basePop)[1:10]
 hist(pheno(basePop))
 ```
 
-## Calculate variance of the phenotype values in the population
+## Calculate variance of the phenotype values in the population - var()
 
 And here I'm showing you
 the variance of the phenotype values,
@@ -450,19 +450,106 @@ phenotype values also increase.
 cor(gv(basePop),pheno(basePop))
 ```
 It's important to emphasise that phenotype values are
-a function of the genetic value
-and genetic value of individually is fixed.
-But they also function of the environmental effects
-which are not fixed for individual,
-they can vary over time or space.
+a function of the genetic value **Phenotype(genetic value)=**
+
+-   And genetic value of individually is fixed.
+
+
+But they also function of the environmental effects *Phenotype(environmental effects)=**
+
+-   environmental effects are however NOT fixed for individual, they can vary over time or space.
+
 So if we repeat the call of
-set pheno on a particular population,
-we will get different values.
+`setPheno()` on a particular population,**we will get different values.**
 ```{r}
+# Phenotype for first 5 individuals
 pheno(setPheno(basePop,h2=0.5))[1:5]
 ```
 
+# Quantitative genetics - AlphaSimR-functions VS R-functions
 
+
+07:30 differnce between R: `var()` and AlphaSimR: `varG() or varP()`
+
+-   `var()` uses $n-1$ as denominator (nämnare), **to calculate saqmple variance**
+
+-   `varG() or varP()` use $n-1$ as denominator (nämnare) **to calculate population variance**
+
+**In most cases, the difference is not gonna be,it's not gonna be large. So you don't need to really worry about that**
+
+
+
+## R Functions
+
+### Calculate phenotype variance using the standard R functionality - `var()`
+
+```{r}
+
+var(pheno(basePop))
+```
+
+### calculate heritability using the standard R functionality - `var()`
+
+Ratio of the genotype and fenotype variance == heritability
+
+-   genotype variance: var(gv(basePop))
+
+-   Fenotype variance: var(pheno(basePop))
+
+```{r}
+# calculating realised heritability
+var(gv(basePop)) / var(pheno(basePop))
+```
+## AlphaSimR
+
+### Calculate phenotype variance using AlphaSimR - `varG() or varP()`
+
+```{r}
+varG(basePop)
+
+varP(basePop)
+
+help(varG)
+help(varP)
+
+```
+
+### calculate heritability using AlphaSimR - `varG() or varP()`
+```{r}
+varG(basePop) / varP(basePop)
+```
+### Calulate Mean - `meanG() or meanP()`
+```{r}
+help(meanP)
+help(meanG)
+```
+
+
+### Note about AlphaSimR: "Empiric heritability" differs from the simulated, "specified heritability"
+I would just like to emphasise again,
+and we've seen this already,
+that even though we have provided a heritability of
+0.5 to our simulation
+when we are calling set pheno call,
+we will quite likely see some variation from
+the actual heritability of
+the simulated phenotypes as you have seen,
+as you have seen above.
+And this is so because AlphaSimR
+simulations are stochastic.
+And what we will tend to see is a difference between the
+specified and the actual heritability will be very small,
+if anything, in large populations.
+
+
+
+# Viktig kommentar för mig!! val av varians-metod viktig om man har small populations!!
+However, if you are going to be simulating smaller population than the difference between:
+
+-   the input and
+-   The output
+
+**The difference can potentially be quite substantial**
 
 ## Simulate phenotypes with the following environmental variances:
 ```{r}

@@ -1,0 +1,203 @@
+---
+title: "Plant breeding programme"
+author: "Leticia Aparecida de Castro Lara and Gregor Gorjanc"
+date: "2022-07-18"
+---
+
+# Introduction
+
+In a selective breeding programme, the main goal is to improve the population for one or more traits. As we saw previously, to genetically improve a population we "just" need to identify the genetically best individuals, and use them as parents for the next generation. However, this identification is not straightforward since we can never observe the genetic value of individuals. We can only observe a phenotype value, which is a noisy version of the genetic value. In some species, we can observe multiple phenotype realisations under different environmental conditions for the same genotype. Plant breeders use this idea by conducting field trials with the same genotypes in multiple locations. However, plant breeders work with a large number of new genotypes every year so they need to balance the number of genotypes and locations. They usually reduce the number of genotypes in several successive stages, while they increase the amount of locations at which they phenotype the remaining genotypes.
+
+In this vignette, we will show how to simulate the wheat breeding programme described in Gaynor et al. (2017). In this breeding programme, there are several stages in a breeding cycle (Figure 1, left) and several breeding cycles running concurrently each year (Figure 1, right). The stages are represented with the following populations (and corresponding AlphaSimR `Pop` objects): *Parents* (`Parents`), *F1* (`F1`), *Headrows* (`HDRW`), *Preliminary yield trial* (`PYT`), *Advanced yield trial* (`AYT`), *Elite yield trial* (`EYT`), and finally *Variety* (`Variety`). In comparison to Gaynor et al. (2017), we have here reduced the number of individuals in each stage to speed up the simulation. We will divide the whole simulation into the following five steps:
+
+- Defining global simulation parameters,
+- Simulating founders,
+- Populating the breeding programme scheme,
+- Advancing populations through the breeding scheme over years, and
+- Summarising the genetic change.
+
+```{r, fig.align="center", fig.cap="Figure 1: Simulated wheat breeding programme with Parents, $F_{1}$ progeny (F1), Headrows (HDRW), Preliminary Yield Trial (PYT), Advanced Yield Trial (AYT), Elite Yield Trial (EYT) and a released Variety. Adapted from Gaynor et al. (2017).", echo=FALSE}
+knitr::include_graphics("images/wheat_scheme.png")
+```
+
+# Global parameters
+
+First we load the AlphaSimR package and define global parameters. These are:
+
+- 30 crosses per year (`nCrosses`),
+- 50 double haploid lines per cross (`nDH`), which give us a total of 1500 headrows (equivalent replicates of 1/4, `repHDRW`, to simulate a trait for visual selection with a heritability of 0.1),
+- maximum 10 double haploid lines per cross selected within family (`famMax`)
+- 300 lines will be evaluated in the preliminary yield trial (`nPYT`) in 1 location (`repPYT`),
+- 25 lines will be evaluated in the advanced yield trial (`nAYT`) in 4 locations (`repAYT`),
+- 5 lines will be evaluated in the elite yield trial (`nEYT`) in 8 locations (`repEYT`), and 
+- 50 causal sites (quantitative trait loci, QTLs) per each wheat chromosome.
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+# Set the default plot layout
+par(mfrow = c(1, 1))
+
+library(AlphaSimR)
+
+# Number of crosses per year
+nCrosses = 30
+
+# DH lines produced per cross
+nDH = 50
+
+# The maximum number of DH lines per cross to enter the PYT
+# nCrosses*famMax must be greater than or equal to nPYT
+famMax = 10
+
+# Genotypes (entries) per yield trial
+nPYT = 300
+nAYT = 25
+nEYT = 5
+
+# Effective replication of yield trials in terms of locations
+# (this concept will be used to increase the amount of phenotype information over
+#  the successive stages of the breeding programme)
+repHDRW = 1/4
+repPYT = 1
+repAYT = 4
+repEYT = 8
+
+# Number of QTLs per chromosome
+nQTLs = 50
+```
+
+# Founders
+
+To generate the founder genomes we call `runMacs()` with the `species` argument set to `"WHEAT"`. The number of founders is set to 30, the number of chromosomes to 21, and the number of segregating sites per chromosome is set to 50, the number of causal sites (QTL). 
+
+We call the `SimParam()` function to define a trait with additive genetic architecture with the defined number of QTLs per chromosome, mean genetic values of 4, variance of genetic values of 0.1, variance due to genotype-by-environment interactions of 0.2, and plot-level environmental variance of 0.4. Later we will use the plot-level environmental variance and the effective replication of yield trials to simulate phenotype values - specifically, we will simulate an average phenotype value (often called entry-mean) across multiple locations.
+
+Finally, we generate the founding `Parents` population.
+
+```{r}
+# Simulate founder genomes
+# (this will take some time ... - you can use quickHaplo() instead if you are in a rush!)
+founderGenomes = runMacs(nInd = 30, 
+                         nChr = 21, 
+                         segSites = nQTLs,
+                         inbred = TRUE, 
+                         species = "WHEAT")
+if (FALSE) {
+  founderGenomes = quickHaplo(nInd = 30,
+                              nChr = 21,
+                              segSites = nQTLs,
+                              inbred = TRUE)
+}
+
+# Set simulation parameters
+SP = SimParam$new(founderGenomes)
+SP$addTraitAG(nQtlPerChr = nQTLs, mean = 4, var = 0.1, varGxE = 0.2)
+VarE = 0.4
+
+# Founding parents
+Parents = newPop(founderGenomes)
+```
+
+# Populating the breeding programme
+
+To initiate the breeding programme, we will populate it with different groups of individuals according to their "age" within a breeding cycle. Here we generate the `F1` by randomly crossing the founding `Parents` - making the number of crosses as defined above. Then, we produce double haploid individuals who have a fully homozygous genome with the `makeDH()` function. In the headrows stage, we phenotype the double haploids. Those lines will be further selected within family using the function `selectWithinFam()` and between families using the function `selectInd()`, and they will finally be phenotyped in a preliminary yield trial. Next, some lines will be advanced to the advanced yield trial, and finally some lines will make it into the elite yield trial, that lasts two years. At the end this breeding cycle releases one variety. In this vignette, all selections are performed based on phenotype values.
+
+```{r}
+# Populate breeding programme
+for (year in 1:7) {
+  # F1
+  F1 = randCross(Parents, nCrosses)
+  if (year < 7) {
+    # Doubled Haploids
+    DH = makeDH(F1, nDH)
+  }
+  if (year < 6) {
+    # Headrows
+    HDRW = setPheno(DH, varE = VarE, reps = repHDRW)
+  }
+  if (year < 5) {
+    # Preliminary Yield Trial
+    PYT = selectWithinFam(HDRW, nInd = famMax, use = "pheno")
+    PYT = selectInd(PYT, nInd = nPYT, use = "pheno")
+    PYT = setPheno(PYT, varE = VarE, reps = repPYT)
+  }
+  if (year < 4) {
+    # Advanced Yield Trial
+    AYT = selectInd(PYT, nInd = nAYT, use = "pheno")
+    AYT = setPheno(AYT, varE = VarE, reps = repAYT)
+  }
+  if (year < 3) {
+    # Elite Yield Trial
+    EYT = selectInd(AYT, nEYT, use = "pheno")
+    EYT = setPheno(EYT, varE = VarE, reps = repEYT)
+  }
+  if (year < 2) {
+    # Selecting Variety
+    Variety = selectInd(EYT, nInd = 1, use = "pheno")
+  }
+}
+```
+
+# Advancing years
+
+Once we have all stages of a breeding programme populated, we can advance years of the breeding programme. As before, all selections are based on phenotype values. To track the progress of the breeding programme we will save genetic parameters at the preliminary yield trial stage. In this stage we have a first indication of yield performance. Also, the number of individuals is still considerable, so calculated parameters will give us a good indication of the trend over time.
+
+```{r}
+# Creating empty vectors to store genetic values
+nYears = 10
+output = data.frame(year = 1:nYears,
+                    meanG = numeric(nYears),
+                    varG = numeric(nYears))
+
+for (year in 1:nYears) {
+  # Select Variety
+  Variety = selectInd(EYT, nInd = 1, use = "pheno")
+
+  # Elite Yield Trial
+  EYT = selectInd(AYT, nInd = nEYT, use = "pheno")
+  EYT = setPheno(EYT, varE = VarE, reps = repEYT)
+
+  # Advanced Yield Trial
+  AYT = selectInd(PYT, nInd = nAYT, use = "pheno")
+  AYT = setPheno(AYT, varE = VarE, reps = repAYT)
+
+  # Preliminary Yield Trial
+  PYT = selectWithinFam(HDRW, nInd = famMax, use = "pheno")
+  PYT = selectInd(PYT, nInd = nPYT, use = "pheno")
+  PYT = setPheno(PYT, varE = VarE, reps = repPYT)
+
+  # Headrows
+  HDRW = setPheno(DH, varE = VarE, reps = repHDRW)
+
+  # Doubled Haploids
+  DH = makeDH(F1, nDH)
+
+  # F1 and Parents
+  Parents = c(EYT, AYT)
+  F1 = randCross(Parents, nCrosses)
+  
+  # Report results
+  output$meanG[year] = meanG(PYT)
+  output$varG[year] = varG(PYT)
+}  
+```
+
+# Summarising the genetic change
+
+As we can see from the below plots - and as expected - the genetic mean increased over time and genetic variance decreased somewhat. If you repeat this simulation multiple times, you will notice large variation between replicates in genetic variance trend - sometimes it decreases considerably, sometimes only a little.
+
+```{r}
+# Plot mean of genetic values over time
+plot(output$year, output$meanG, type = "l",
+     xlab = "Year", ylab = "Mean of genetic values")
+
+# Plot variance of genetic values over time
+plot(output$year, output$varG, type = "l",
+     xlab = "Year", ylab = "Variance of genetic values")
+```
+
+# References
+
+Gaynor R.C., Gorjanc G., Bentley A.R., Ober E.S, Howell P., Jackson R., Mackay I.J., Hickey, J.M. (2017) A two-part strategy for using genomic selection to develop inbred lines. Crop Science, 57:5, 2372--2386, https://doi.org/10.2135/cropsci2016.09.0742

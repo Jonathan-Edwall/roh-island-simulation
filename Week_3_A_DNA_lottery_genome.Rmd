@@ -1,0 +1,265 @@
+---
+title: 'DNA lottery: genome'
+author: "Gregor Gorjanc and Ivan Pocrnic"
+date: "2022-06-22"
+---
+
+# Introduction
+
+In this vignette, we will look at the randomness of DNA inheritance (the DNA lottery) between parents and progeny, and how this process drives variation and resemblance between genomes of relatives. We will do this by:
+
+- Simulating a base population,
+- Summarising variation in founder's genomes,
+- Summarising variation in progeny genomes, and
+- EXTRA: Summarising variation and resemblance between all individuals.
+
+# Base population
+
+We will start our simulation by simulating founder genomes. Here we are simulating maize genomes for just 3 founders, only 2 chromosomes (while real maize has 10 chromosomes), and only 10 loci per chromosome.
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+# Set the default plot layout
+par(mfrow = c(1, 1))
+
+# Load AlphaSimR, simulate founder genomes, and set the SP object
+library(AlphaSimR)
+founderGenomes = runMacs(nInd = 3,
+                         nChr = 2,
+                         segSites = 10,
+                         species = "MAIZE")
+SP = SimParam$new(founderGenomes)
+```
+
+With the simulated founder genomes we can now generate a base population.
+
+```{r}
+# Base population
+basePop = newPop(founderGenomes)
+```
+
+# Variation in founders' genomes
+
+Let's inspect genomes of these 3 founders.
+
+```{r}
+# Extract haplotypes
+basePopHaplo = pullSegSiteHaplo(basePop)
+```
+
+```{r}
+# View first five loci of the haplotypes
+basePopHaplo[, 1:5]
+```
+
+```{r}
+# View all loci of the haplotypes
+basePopHaplo
+```
+
+```{r}
+# Extract genotypes
+basePopGeno = pullSegSiteGeno(basePop)
+```
+
+```{r}
+# View first five loci of the genotypes
+basePopGeno[, 1:5]
+```
+
+```{r}
+# View all loci of the genotypes
+basePopGeno
+```
+
+There are many ways to look at variation and resemblance between genomes of different individuals. We will use a simple way to summarise such variation by simply counting the number of mutations each individual carries on their chromosomes (haplotypes) and consequently also their genotypes. Since we encode ancestral alleles as 0 and mutations as 1, we can get the number of mutations as the sum of allele dosages along each row (for haplotypes in `basePopHaplo` and genotypes in `basePopGeno`). To this end we will use the `rowSums()` function.
+
+```{r}
+# Count the number of mutations per haplotype
+rowSums(basePopHaplo)
+```
+
+```{r}
+# Count the number of mutations per genotype
+rowSums(basePopGeno)
+```
+
+For example, the individual 1 has `r rowSums(basePopHaplo)[c(1, 2)]` mutations on its haplotypes and therefore a total number of mutations of `r rowSums(basePopGeno)[1]` in its genotype. Hence, we have summarised the variation between individuals at the 20 segregating sites and within an individual's own genome across the sites (by counting the number of mutations per haplotype).
+
+# Variation in progeny genomes
+
+To show the extent of variation in progeny genomes due to DNA lottery of parental genomes, we will now create three crosses. We will create 100 progeny from each cross, to extensively sample possible realisations of the DNA lottery. The first cross will be between founders 1 and 2, the second cross will be between founders 1 and 3, and the third cross will be between founders 2 and 3. Progeny within each of these crosses share both parents and are hence full "sisters and brothers" (full-sibs). Progeny from two crosses that share only one parent (cross of 1 and 2 and cross of 1 and 3, etc.) are half "sisters and brothers" (half-sibs).
+
+To make a cross we will use the function `makeCross()`. You can read more about its documentation with `help(makeCross)`. For `makeCross()` we need to provide a parent population (in our case `basePop`), a crossing plan as a two-column matrix (for the cross between founders 1 and 2, this matrix will be `matrix(c(1, 2), ncol = 2)`), and the number of progeny per cross (`100`).
+
+```{r}
+# First cross - between founders 1 and 2
+cross12 = makeCross(pop = basePop,
+                    crossPlan = matrix(c(1, 2), ncol = 2),
+                    nProgeny = 100)
+
+# Second cross - between founders 1 and 3
+cross13 = makeCross(pop = basePop,
+                    crossPlan = matrix(c(1, 3), ncol = 2),
+                    nProgeny = 100)
+
+# Third cross - between founders 2 and 3
+cross23 = makeCross(pop = basePop,
+                    crossPlan = matrix(c(2, 3), ncol = 2),
+                    nProgeny = 100)
+```
+
+Let's inspect progeny population from the first cross.
+
+```{r}
+cross12
+```
+
+```{r}
+# Number of progeny
+nInd(cross12)
+```
+
+```{r}
+# Pedigree of the progeny
+# ... using cbind() to combine different variables
+# ... using head() to print only the first few rows
+head(cbind(id = cross12@id,
+           mother = cross12@mother,
+           father = cross12@father))
+```
+
+We will now summarise these progeny genomes with the number of mutations. Then we will look at how these numbers vary within crosses and across all crosses.
+
+```{r}
+# Extract progeny genotypes
+cross12Geno = pullSegSiteGeno(cross12)
+cross13Geno = pullSegSiteGeno(cross13)
+cross23Geno = pullSegSiteGeno(cross23)
+
+# Count the number of mutations in progeny genotypes
+nCross12 = rowSums(cross12Geno)
+nCross13 = rowSums(cross13Geno)
+nCross23 = rowSums(cross23Geno)
+
+# Count the number of mutations in parent genotypes
+(nPar = rowSums(basePopGeno))
+nPar1 = nPar[1]
+nPar2 = nPar[2]
+nPar3 = nPar[3]
+```
+
+Look at the range in the number of mutations in parents and progeny.
+
+```{r}
+c(nPar1, nPar2)
+range(nCross12)
+```
+
+```{r}
+c(nPar1, nPar3)
+range(nCross13)
+```
+
+```{r}
+c(nPar2, nPar3)
+range(nCross23)
+```
+
+There seems to be a lot of variation in the number of mutations within each cross! Furthermore, progeny can deviate from their parents substantially! Let us visualise these numbers with a histogram for each cross separately and across crosses. To aid appreciation for the possible variation among progeny relative to their parents, we will add vertical lines to the histograms for the number of mutations in parents and the average number of mutations between the two parents (the parent average). We will colour the parent 1 line as blue, parent 2 line as red, and parent 3 line as green. We will colour the parent average line as black. If parents have the same number of mutations, their lines will overlap.
+
+```{r}
+# Total range to set x-axis in the histograms below
+rangeN = range(c(nPar, nCross12, nCross13, nCross23))
+
+# First cross - between founders 1 and 2
+hist(nCross12,
+     xlim = rangeN, breaks = seq(from = rangeN[1], to = rangeN[2]),
+     xlab = "Number of mutations")
+abline(v = nPar1, col = "blue", lwd = 3)
+abline(v = nPar2, col = "red", lwd = 3)
+abline(v = (nPar1 + nPar2) / 2, col = "black", lwd = 3, lty = 2)
+
+# Second cross - between founders 1 and 3
+hist(nCross13,
+     xlim = rangeN, breaks = seq(from = rangeN[1], to = rangeN[2]),
+     xlab = "Number of mutations")
+abline(v = nPar1, col = "blue", lwd = 3)
+abline(v = nPar3, col = "green", lwd = 3)
+abline(v = (nPar1 + nPar3) / 2, col = "black", lwd = 3, lty = 2)
+
+# Third cross - between founders 2 and 3
+hist(nCross23,
+     xlim = rangeN, breaks = seq(from = rangeN[1], to = rangeN[2]),
+     xlab = "Number of mutations")
+abline(v = nPar2, col = "red", lwd = 3)
+abline(v = nPar3, col = "green", lwd = 3)
+abline(v = (nPar2 + nPar3) / 2, col = "black", lwd = 3, lty = 2)
+
+# All crosses together
+hist(c(nCross12, nCross13, nCross23),
+     xlim = rangeN, breaks = seq(from = rangeN[1], to = rangeN[2]),
+     xlab = "Number of mutations")
+abline(v = nPar1, col = "blue", lwd = 3)
+abline(v = nPar2, col = "red", lwd = 3)
+abline(v = nPar3, col = "green", lwd = 3)
+```
+
+These histograms shows substantial variation in the number of mutations within and across crosses. This means that progeny can deviate considerably from their parents due to the recombination and segregation of parental genomes. Another source of variation in progeny genomes compared to their parents are new mutations. There new mutations can be simulated in AlphaSimR with the `mutate()` function (see `help(mutate)`).
+
+# EXTRA: Variation and resemblance between all individuals
+
+Above we looked at variation between siblings within one cross or all crosses combined. We summarised the variation with the number of mutations in each individual. We can also summarise variation and resemblance between all individuals by correlating their genotypes. Previously we have correlated allele dosages between different loci to study linkage-disequilibrium. Now we will correlate allele dosages between individuals.
+
+```{r}
+# Combine genotypes of all individuals in one object
+allGeno = rbind(basePopGeno, cross12Geno, cross13Geno, cross23Geno)
+
+# Calculate correlation between allele dosages of individuals
+# (Note that allGeno is an nInd * nLoci matrix and calculating cor(allGeno) would
+# give an nLoci * nLoci matrix of linkage-disequilibrium correlations. Hence,
+# we are transposing the allGeno matrix with t() to get an nLoci * nInd matrix
+# and an nInd * nInd correlation matrix).
+dim(allGeno) # dimensions of the allGeno matrix
+```
+
+```{r}
+allGenoT = t(allGeno)
+dim(allGenoT) # dimensions of the transposed matrix
+```
+
+```{r}
+indCor = cor(allGenoT)
+dim(indCor)
+```
+
+```{r}
+indCor[1:5, 1:5]
+```
+
+The matrix `indCor` contains correlations between allele dosages of the individuals. The diagonal of this matrix will therefore contain 1s (correlation of an individual with itself) and off-diagonal parts of the matrix will be symmetric. Positive off-diagonal elements indicate positive correlation between allele dosages of two individuals, that is, if one individual has more mutations, so will the other individual (indicating close relatedness). Negative off-diagonal elements indicate negative correlation between allele dosages of two individuals, that is, if one individual has more mutations, the other individual will have less mutations (indicating no relatedness).
+
+To aid the interpretation, we will plot this matrix as an "image". Since correlations vary between -1 and 1, we will define a colour palette with 21 values spanning from blue (for negative (cold) values), over yellow (for zero value), to red (for positive (hot) values). We will also designate parents and crosses in this plot.
+
+```{r}
+# Colour pallete for correlations
+corCols = hcl.colors(n = 21, palette = "RdYlBu",rev = TRUE)
+
+# Plot the correlation matrix of allele dosages between individuals
+image(indCor, xlab = "Individual", ylab = "Individual", axes = FALSE,
+      col = corCols)
+# ... designate parents and crosses 
+pos = (c(3, 103, 203) - 0.5) / 303
+abline(h = pos, v = pos)
+pos = c(1, (103 - (103 - 4) / 2), (203 - (203 - 104) / 2), (303 - (303 - 203) / 2)) / 303
+axis(side = 1, at = pos, labels = c("Parents", "Cross 1-2", "Cross 1-3", "Cross 2-3"))
+axis(side = 2, at = pos, labels = c("Parents", "Cross 1-2", "Cross 1-3", "Cross 2-3"))
+```
+
+The image clearly shows variation and resemblance between:
+
+1) parents and progeny (inspect the narrow strips on the left and bottom margins),
+2) full-sibs within a cross (inspect blocks with more intense red colour along the diagonal), and
+3) half-sibs between crosses.
