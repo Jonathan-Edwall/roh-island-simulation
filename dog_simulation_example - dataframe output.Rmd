@@ -1,0 +1,363 @@
+---
+title: "dog_simulation_example.R"
+output: html_document
+date: "2024-01-31"
+---
+
+# Loading libraries
+
+```{r library()}
+library(AlphaSimR)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+library(purrr)
+library(tibble)
+
+# Clean the working environment
+rm(list = ls())
+
+```
+
+# Generating founder population - runMacs2()
+
+`runMacs2` Parameters:
+
+-   nInd = 100: 100 individuals in the founder population
+
+-   nChr = 1: Haplotypes are created for 1 chromosome per individual
+
+-   Ne = 2500: Effective population size: 2500 (Ne)
+
+-   HistNe = NULL: No effective population size defined from previous generations (histNe = NULL)
+
+-   histGen = NULL: If HistNe was defined, this parameter would define the number of generations ago we had the Ne defined in HistNe
+
+```{r runMacs2()}
+help(runMacs2)
+
+founderGenomes <- runMacs2(nInd = 100,
+                     nChr = 1,
+                     Ne = 2500,
+                     histNe = NULL,
+                     histGen = NULL)
+
+# Inspecting the founderGenomes object
+founderGenomes
+
+```
+
+# Setting Global Simulation Parameters - SimParam()
+
+```{r SimParam()}
+
+help(SimParam)
+
+# Creating a new Simparam object & Assigning the founder population population to it
+SP <- SimParam$new(founderGenomes) 
+# SP
+
+```
+
+##Adding trait - SimParam\$addTraitA()
+
+**nQtlPerChr:** Specifies the number of locis (QTLs) having an effect on this trait
+
+-   Qtl == Quantiative trait loci, meaning locis that have an additative effect on the quantiative trait.
+
+```{r  SimParam$addTraitA()}
+
+SP$addTraitA(nQtlPerChr = 10) # Trait 1 is affected by 10 QTL/chromosme
+
+# Inspecting the traits element of the SB object
+SP$traits
+
+```
+
+## Assigning Sexes to the population - SimParam\$setSexes()
+
+`SP$SetSexes()` assignes sexes.
+
+**yes_sys**-argument ensures that sexes will be systematically assigned in a sequence like:
+
+-   First male
+
+-   Then female
+
+-   Then male
+
+etc".
+
+```{r SimParam$setSexes()}
+SP$setSexes("yes_sys")
+
+```
+
+## Defining error variances used in setPheno - SimParam\$setVarE()
+
+`SP$setVarE()`defines default values for error variances used in setPheno.
+
+These defaults will be used to automatically generate phenotypes when new populations are created.
+
+The argument **h2()** defines a vector **of desired narrow-sense heritabilities**
+
+```{r SimParam$setVarE()}
+SP$setVarE(h2 = 0.2)
+```
+
+## Randomly assigns eligible SNPs to a SNP chip - SimParam\$addSnpChip()
+
+`SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip.
+
+**nSnpPerChr**-argument that assigns for each individuals n SNPs for each chromsome, where n is the user-specified number.
+
+```{r SimParam$addSnpChip()}
+SP$addSnpChip(nSnpPerChr = 1000)
+```
+
+## Setting on recombination tracking for the simulation - SimParam\$setTrackRec()
+
+Sets recombination tracking for the simulation. By default recombination tracking is turned off. **When turned on recombination tracking will also turn on pedigree tracking.**
+
+**Recombination tracking keeps records of all individuals created,** except those created by hybridCross, because their pedigree is not tracked.
+
+```{r SimParam$addSnpChip()}
+SP$setTrackRec(TRUE)
+```
+
+# Data recording setup
+
+To record data from multiple populations, we will define a data recording function `recordData()`. As an input, the function will accept:
+
+-   
+
+    1)  a data frame (`data` argument) that will collate the information from multiple AlphaSimR populations
+
+-   
+
+    2)  an AlphaSimR population (`pop` argument) whose data we will save,
+
+-   
+
+    3)  a year of use (`yearOfUse` argument) to denote parent usage.
+
+In this example, we will be storing animal identification (`id`), parents' identification's (`father` and `mother`), sex (`sex`), genetic value (`gv`), phenotype value (`pheno`), year of birth (`yearOfBirth`), and year of use for parents (`yearOfUse`).
+
+```{r}
+
+recordData <- function(data = NULL, pop, generationOfUse = NA) {
+  if (is.null(pop) || length(pop@id) == 0) {
+    warning("Invalid 'pop' input for generation ", generationOfUse)
+    return(data)
+  }
+
+  # Debugging statements
+  cat("Generation: ", generationOfUse, "\n")
+  cat("Number of individuals in pop: ", length(pop@id), "\n")
+  cat("Number of rows in data: ", nrow(data), "\n")
+
+  popData = data.frame(id = pop@id,
+                       father = pop@father,
+                       mother = pop@mother,
+                       sex = pop@sex,
+                       generation = unlist(getMisc(x = pop, node = "generation")),
+                       generation_progeny = generationOfUse
+  )
+
+  # Manage the first instance of calling this function when data is NULL
+  if (is.null(data)) {
+    ret = popData
+  } else {
+    ret = rbind(data, popData)
+  }
+
+  return(ret)
+}
+
+
+
+
+# # Function to record and collate data
+# recordData <- function(data = NULL, pop, generationOfUse = NA) {
+#   popData = data.frame(id          = pop@id,
+#                        father      = pop@father,
+#                        mother      = pop@mother,
+#                        sex         = pop@sex,
+#                        generation = unlist(getMisc(x = pop, node ="generation")),
+#                        # gv          = pop@gv[, "Trait1"],
+#                        # pheno       = pop@pheno[, "Trait1"],
+#                        # yearOfBirth = unlist(getMisc(x = pop, node ="yearOfBirth")),
+#                        generation_progeny   = generationOfUse
+#   )
+# 
+#   # Manage first instance of calling this function, when data is NULL
+#   if (is.null(data)) {
+#     ret = popData
+#   } else {
+#     ret = rbind(data, popData)
+#   }
+# 
+#   return(ret)
+# }
+
+```
+
+##Creating two separate populations for bottleneck event - newPop()
+
+```{r newPop()}
+# Generate the initial founder population
+founderpop <- newPop(founderGenomes, simParam = SP)
+# Set misc used for setting years of birth for the first individuals
+current_generation = 0
+founderpop = setMisc(x = founderpop,
+                   node = "generation",
+                   value = current_generation)
+head(getMisc(x = founderpop, node = "generation"))
+
+
+# Split the founder population into two breeding groups
+breed1_founders <- founderpop[1:50]
+breed1_founders
+
+breed2_founders <- founderpop[51:100]
+breed2_founders
+
+```
+# Simulation
+
+## Bottleneck Simulation for 10 Generations - randCross()
+
+`randCross()` simulates random mating.
+
+-   **nCrosses**-argument that specifies how many times an indivdiual in the population can be a parent. In this case, an individual can only be a parent once (random mating)
+
+-   **nProgeny**-argument specifies how many progenys each mating pair can have. In this case, this parameter is set at 1 progeny per mating pair.
+
+-   **simParam**-argument specifies the global simulation paremeters
+
+
+
+## Denna variant av random_mating nedan där jag försökt att skapa en dataframe av den sista generationen har jag inte fått att fungera än
+
+```{r randCross()}
+
+random_mating <- function(pop, SP, n_gen) {
+    n_ind <- pop@nInd # Extracting number of individuals in the current population
+    generations <- vector(length = n_gen + 1, mode = "list") 
+    generations[[1]] <- pop # The initial breeding group population gets stored as the first element
+    
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
+    # Each mating Progenys are generated using randcross
+    for (gen_ix in 2:(n_gen + 1)) {
+        generations[[gen_ix]] <- randCross(pop = generations[[gen_ix - 1]], nCrosses = n_ind, nProgeny = 1,
+                                            simParam = SP)
+    }
+    
+    last_generation <- generations[[n_gen + 1]]
+    
+    if (length(last_generation@id) > 0) {
+        last_generation <- data.frame(
+            id = last_generation@id,
+            father = last_generation@father,
+            mother = last_generation@mother,
+            sex = last_generation@sex,
+            generation = unlist(getMisc(x = last_generation, node = "generation")),
+            generation_progeny = n_gen
+        )
+    } else {
+        warning("No individuals in the last generation.")
+        last_generation <- data.frame() 
+    }
+    
+    return(last_generation)
+}
+
+
+
+
+
+
+# Example usage
+breed1_bottleneck <- random_mating(breed1_founders, SP, 5)
+breed2_bottleneck <- random_mating(breed2_founders, SP, 5)
+
+```
+## original random_mating funktion:
+```{r}
+random_mating <- function(pop, SP, n_gen) {
+    n_ind <- pop@nInd # Extracting number of individuals in the current population
+    generations <- vector(length = n_gen + 1,
+                          mode = "list") 
+    generations[[1]] <- pop # The initial breeding group population gets stored as the first element
+    
+    # Simulating randomm mating to perform simulation of the 2nd until the n+1:th generation
+    # Each mating Progenys are generated using randcross
+    for (gen_ix in 2:(n_gen + 1)) {
+        generations[[gen_ix]] <- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_ind, nProgeny = 1,
+                                           simParam = SP)
+    }
+    generations[-1] # all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
+}
+
+# Simulating random mating within each breeding group for 5 generations
+breed1_bottleneck <- random_mating(breed1_founders, SP, 5)
+breed2_bottleneck <- random_mating(breed2_founders, SP, 5)
+```
+
+
+
+
+### Viewing the output from the bottleneck simulation
+
+```{r}
+
+# founders
+founderpop
+breed1_bottleneck
+```
+
+```{r}
+# Data for breed1_bottleneck
+data4_breed1_bottleneck = recordData(pop = breed1_bottleneck[1:1])
+head(data4_breed1_bottleneck)
+```
+
+## Performing selection
+
+```{r}
+
+# breeding <- function(pop, SP, n_gen, n_sires, size) {
+#     generations <- vector(length = n_gen + 1,
+#                           mode = "list")
+#     generations[[1]] <- pop
+#     for (gen_ix in 2:(n_gen + 1)) {
+#         n_females <- generations[[gen_ix - 1]]@nInd/2
+#         generations[[gen_ix]] <- selectCross(generations[[gen_ix - 1]], 
+#                                              nMale = n_sires,
+#                                              nFemale = n_females,
+#                                              nCrosses = size,
+#                                              use = "pheno",
+#                                              nProgeny = 1,
+#                                              simParam = SP)
+#     }
+#     generations[-1]
+#     
+# }
+# 
+# # Selecting something.. 
+```
+
+```{r}
+# breed1_selection <- breeding(breed1_bottleneck[[5]],
+#                              SP = SP,
+#                              n_gen = 20,
+#                              n_sires = 20,
+#                              size = 200)
+# 
+# breed2_selection <- breeding(breed2_bottleneck[[5]], 
+#                              SP = SP,
+#                              n_gen = 20,
+#                              n_sires = 20,
+#                              size = 200)
+
+```

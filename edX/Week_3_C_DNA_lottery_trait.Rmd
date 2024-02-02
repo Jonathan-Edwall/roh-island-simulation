@@ -1,0 +1,226 @@
+---
+title: 'DNA lottery: trait'
+author: "Gregor Gorjanc and Ivan Pocrnic"
+date: "2022-06-22"
+---
+
+# Introduction
+
+In this vignette, we will look at the randomness of DNA inheritance (the DNA lottery) between parents and progeny, and how this process drives variation in genetic and phenotype values of relatives. We will do this by:
+
+- Simulating a base population,
+- Simulating and summarising variation in founder's genetic and phenotype values, and
+- Simulating and summarising variation in progeny genetic and phenotype values.
+
+# Base population
+
+We will expand our previous simulation with a trait that has a simple additive genetic architecture and is controlled by 10 loci on each chromosome. We will simulate 10 loci per chromosome in founder genomes and assume all these loci are causal QTL. We will set the mean of the trait to 10 units and genetic variance to 1 unit$^2$.
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+# Set the default plot layout
+par(mfrow = c(1, 1))
+
+# Load AlphaSimR, simulate founder genomes, and set the SP object
+library(AlphaSimR)
+founderGenomes = runMacs(nInd = 3,
+                         nChr = 2,
+                         segSites = 10,
+                         species = "MAIZE")
+SP = SimParam$new(founderGenomes)
+
+# Define the trait
+SP$addTraitA(nQtlPerChr = 10, mean = 10, var = 1)
+```
+
+# Founders and their values
+
+With the simulated founder genomes and the defined trait we will now generate a base population. We will also generate phenotypes for these individuals by assuming that heritability of these phenotypes is 0.2. We will save the heritability in a variable so we can reuse it later.
+
+```{r}
+# Create base population
+basePop = newPop(founderGenomes)
+
+# Phenotype base population individuals
+heritability = 0.2
+basePop = setPheno(pop = basePop, 
+                   h2 = heritability)
+```
+
+Genetic and phenotype values of the three founders are:
+
+```{r}
+# Genetic values
+gv(basePop)
+```
+
+```{r}
+# Phenotype values
+pheno(basePop)
+```
+
+# Progeny populations
+
+To show the extent of variation in progeny genetic and phenotype values due to DNA lottery of parental genomes, we will now create three crosses. We will create 100 progeny per each cross, to extensively sample possible realisations of the DNA lottery. The first cross will be between founders 1 and 2, the second cross will be between founders 1 and 3, and the third cross will be between founders 2 and 3. Progeny within each of these crosses share both parents and are hence full "sisters and brothers" (full-sibs). Progeny from two crosses that share only one parent (cross of 1 and 2 and cross of 1 and 3, etc.) are half "sisters and brothers" (half-sibs). All of this is the same as in the "DNA lottery of the genome", but now we will look at the variation in trait values, specifically genetic and phenotype values of progeny and their parents.
+
+As before, we will make a cross with the function `makeCross()`.
+
+```{r}
+# First cross - between founders 1 and 2
+cross12 = makeCross(pop = basePop,
+                    crossPlan = matrix(c(1, 2), ncol = 2),
+                    nProgeny = 100)
+cross12 = setPheno(pop = cross12, 
+                   h2 = heritability)
+
+# Second cross - between founders 1 and 3
+cross13 = makeCross(pop = basePop,
+                    crossPlan = matrix(c(1, 3), ncol = 2),
+                    nProgeny = 100)
+cross13 = setPheno(pop = cross13, 
+                   h2 = heritability)
+
+# Third cross - between founders 2 and 3
+cross23 = makeCross(pop = basePop,
+                    crossPlan = matrix(c(2, 3), ncol = 2),
+                    nProgeny = 100)
+cross23 = setPheno(pop = cross23, 
+                   h2 = heritability)
+```
+
+# Variation in progeny values
+
+We will now analyse variation within and across crosses, but instead of analysing the number of mutations, we will analyse genetic and phenotype values. First, we will save genetic and phenotype values of parents and their progeny.
+
+```{r}
+# Save genetic and phenotype values of parents
+gvPar = gv(basePop)
+gvPar1 = gvPar[1]
+gvPar2 = gvPar[2]
+gvPar3 = gvPar[3]
+
+phenoPar = pheno(basePop)
+phenoPar1 = phenoPar[1]
+phenoPar2 = phenoPar[2]
+phenoPar3 = phenoPar[3]
+
+# Save genetic and phenotype values of progeny in each cross
+gvCross12 = gv(cross12)
+gvCross13 = gv(cross13)
+gvCross23 = gv(cross23)
+
+phenoCross12 = pheno(cross12)
+phenoCross13 = pheno(cross13)
+phenoCross23 = pheno(cross23)
+```
+
+Look at the range of genetic and phenotype values in parents and progeny.
+
+```{r}
+c(gvPar1, gvPar2)
+range(gvCross12)
+
+c(phenoPar1, phenoPar2)
+range(phenoCross12)
+```
+
+```{r}
+c(gvPar1, gvPar3)
+range(gvCross13)
+
+c(phenoPar1, phenoPar3)
+range(phenoCross13)
+```
+
+```{r}
+c(gvPar2, gvPar3)
+range(gvCross23)
+
+c(phenoPar2, phenoPar3)
+range(phenoCross23)
+```
+
+There is variation between genetic and phenotype values in parents and among their progeny, but its hard to understand this variation looking just at the minimal and maximal values. We will rather visualise genetic and phenotype values with a histogram - within each cross and across crosses.
+
+For each cross we will show one histogram of genetic values and then another histogram of phenotype values. We will display histograms in a "column", so that you will appreciate additional variation in phenotype values compared to genetic values. Comparison between the histograms will show, how sometimes, phenotypes of parents can mislead us about their genetic values and hence also genetic values of their progeny. We will add vertical lines to the histograms for the values in parents and the average value between the two parents (the parent average). We will colour the parent 1 line as blue, parent 2 line as red, and parent 3 line as green. We will colour the parent average line as black.
+
+```{r}
+# Total range to set x-axis in the histograms below
+rangeGv = range(c(gvPar, gvCross12, gvCross13, gvCross23))
+rangePheno = range(c(phenoPar, phenoCross12, phenoCross13, phenoCross23))
+rangeVal = range(c(rangeGv, rangePheno))
+by = sqrt(SP$varA) / 2
+bins = seq(from = floor(rangeVal[1]) - by, to = ceiling(rangeVal[2]) + by, by = by)
+    
+# First cross - between founders 1 and 2
+par(mfrow = c(2, 1),
+    mar = c(4, 4, 2, 1))
+hist(gvCross12, 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Genetic value")
+abline(v = gvPar1, col = "blue", lwd = 3)
+abline(v = gvPar2, col = "red", lwd = 3)
+abline(v = (gvPar1 + gvPar2) / 2, col = "black", lwd = 3, lty = 2)
+
+hist(phenoCross12, 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Phenotype value")
+abline(v = phenoPar1, col = "blue", lwd = 3)
+abline(v = phenoPar2, col = "red", lwd = 3)
+abline(v = (phenoPar1 + phenoPar2) / 2, col = "black", lwd = 3, lty = 2)
+
+# Second cross - between founders 1 and 3
+par(mfrow = c(2, 1),
+    mar = c(4, 4, 2, 1))
+hist(gvCross13, 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Genetic value")
+abline(v = gvPar1, col = "blue", lwd = 3)
+abline(v = gvPar3, col = "green", lwd = 3)
+abline(v = (gvPar1 + gvPar3) / 2, col = "black", lwd = 3, lty = 2)
+
+hist(phenoCross13, 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Phenotype value")
+abline(v = phenoPar1, col = "blue", lwd = 3)
+abline(v = phenoPar3, col = "green", lwd = 3)
+abline(v = (phenoPar1 + phenoPar3) / 2, col = "black", lwd = 3, lty = 2)
+
+# Third cross - between founders 2 and 3
+par(mfrow = c(2, 1),
+    mar = c(4, 4, 2, 1))
+hist(gvCross23, 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Genetic value")
+abline(v = gvPar2, col = "red", lwd = 3)
+abline(v = gvPar3, col = "green", lwd = 3)
+abline(v = (gvPar2 + gvPar3) / 2, col = "black", lwd = 3, lty = 2)
+
+hist(phenoCross23, 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Phenotype value")
+abline(v = phenoPar2, col = "red", lwd = 3)
+abline(v = phenoPar3, col = "green", lwd = 3)
+abline(v = (phenoPar2 + phenoPar3) / 2, col = "black", lwd = 3, lty = 2)
+
+# All crosses together
+par(mfrow = c(2, 1),
+    mar = c(4, 4, 2, 1))
+hist(c(gvCross12, gvCross13, gvCross23), 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Genetic value")
+abline(v = gvPar1, col = "blue", lwd = 3)
+abline(v = gvPar2, col = "red", lwd = 3)
+abline(v = gvPar3, col = "green", lwd = 3)
+
+hist(c(phenoCross12, phenoCross13, phenoCross23), 
+     xlim = rangeVal, breaks = bins,
+     xlab = "Phenotype value")
+abline(v = phenoPar1, col = "blue", lwd = 3)
+abline(v = phenoPar2, col = "red", lwd = 3)
+abline(v = phenoPar3, col = "green", lwd = 3)
+```
+
+Variation of genetic values within each cross is substantial compared to the genetic values of parents. This large variation among progeny is caused by the DNA lottery of parental genomes as well as the QTL effects. While genetic values are not observable, phenotype values are. As shown in the above histograms, phenotype values vary even more than genetic values because of the additional source of variation from the environment.
