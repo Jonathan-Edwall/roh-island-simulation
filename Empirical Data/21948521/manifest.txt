@@ -1,0 +1,7 @@
+readme.txt (0.202 kB)
+
+#QC:ED DATASET USED FOR ASSOCIATION ANALYSIS
+
+PDM.bed (39.9 MB)
+PDM.bim (54.8 MB)
+PDM.fam (2 KB)

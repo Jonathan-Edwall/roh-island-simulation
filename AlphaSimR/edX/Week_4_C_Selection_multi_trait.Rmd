@@ -1,0 +1,438 @@
+---
+title: "Multi-trait selection"
+author: "Leticia Aparecida de Castro Lara, Nelson Lubanga, and Gregor Gorjanc"
+date: "2022-06-22"
+---
+
+# Introduction
+
+So far we have looked at selection on a single trait, but breeders are generally interested in multiple traits at the same time. An important observation here is that selection for one trait only (for example, yield) can lead to unexpected, even undesired, changes in other traits (for example, health or welfare of individuals). So, we need to pay attention to multiple traits to ensure our breeding programme will be sustainable in long-term. This correlated response to selection is ultimately affected by genetic correlations between the traits, but also correlations between the phenotypes (phenotype correlations), because we select based on phenotype information (Lande, 1979; Falconer and MacKay, 1996; Kelly, 2011). If two traits are positively correlated, selection on one-trait will at the same time change both traits in the same direction. However, when two traits are negatively correlated, selection on one trait will change the other trait in the opposite direction. Sometimes such a change (in the other direction for the correlated trait) might be desirable, other times not. Therefore, when we want to improve multiple traits with selection, we need to take into account at least three aspects:
+1) the breeding objective,
+2) the economic importance of a change in different traits,
+3) trait genetic and phenotype variation and correlations.
+
+In this vignette, we will highlight some of these aspects, by learning how selection on one trait can affect another trait. We will achieve this by:
+
+- Simulating a base population with two correlated traits,
+- Selecting on a single trait and inspecting multi-trait response to selection,
+- EXTRA: Analysing genetic change within and between generations, and
+- EXTRA: Evaluating selection over many generations.
+
+# Base population with two correlated traits
+
+We will start by simulating founder maize genomes with 10 chromosomes for 100 founders and capture 100 segregating sites per chromosome.
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+# Set the default plot layout
+par(mfrow = c(1, 1))
+
+# Load AlphaSimR, simulate founder genomes, and set the SP object
+library(AlphaSimR)
+# ... this runMacs() call will take quite a bit of time to run ...
+founderGenomes = runMacs(nInd = 100,
+                         nChr = 10,
+                         segSites = 100,
+                         species = "MAIZE")
+SP = SimParam$new(founderGenomes)
+```
+
+Now we will specify two traits that are genetically correlated. To this end, we have to provide a number of genetic parameters: two genetic means (we will use 10 for both traits), two genetic variances (we will use 1 and 2), a matrix of genetic correlations (we will use genetic correlation between traits equal to 0.6), and two heritabilities (we will use 0.5 for both traits). Also, we will define that the traits have a simple additive genetic architecture and each trait is controlled by the same 100 loci on each chromosome.
+
+```{r}
+# Genetic parameters for two traits
+means = c(10, 10)
+vars = c(1, 2)
+cors = matrix(data = c(1.0, 0.6,
+                       0.6, 1.0),
+                byrow = TRUE, nrow = 2, ncol = 2)
+h2s = c(0.5, 0.5)
+
+# Define the traits
+SP$addTraitA(nQtlPerChr = 100, mean = means, var = vars, corA = cors)
+str(SP$traits)
+```
+
+We can now create a base population and inspect that we have indeed generated two traits.
+
+```{r}
+# Base population
+basePop = newPop(founderGenomes)
+basePop
+```
+
+```{r}
+head(gv(basePop))
+```
+
+Let's explore genetic relationships between the two traits.
+
+```{r}
+# Explore genetic relationship between traits
+plot(x = gv(basePop),
+     xlab = "Genetic value - trait 1", ylab = "Genetic value - trait 2")
+```
+
+
+```{r}
+# Genetic covariance matrix (variances on diagonal and covariance on off-diagonal elements)
+(VarG = varG(basePop))
+```
+
+```{r}
+# Genetic correlation matrix (correlation off-diagonal on off-diagonal elements)
+cov2cor(VarG)
+```
+
+```{r}
+# Equivalent to the above
+cor(gv(basePop))
+```
+
+As expected, the traits show a genetic correlation close to the defined simulation parameters. The correlation is not exactly as defined in the input due to the stochastic nature of AlphaSimR simulations and our population is also quite small, just 100 individuals. 
+
+Now, we move to exploring relationship between phenotypes. But, first we need to generate phenotypes for the two traits. For this, we use the `setPheno()` function.
+
+```{r}
+# Phenotype the population
+basePop = setPheno(basePop, h2 = h2s)
+head(pheno(basePop))
+```
+
+```{r}
+# Explore phenotype relationship between traits
+plot(x = pheno(basePop),
+     xlab = "Phenotype value - trait 1", ylab = "Phenotype value - trait 2")
+```
+
+```{r}
+# Phenotype covariance matrix (variances on diagonal and covariance on off-diagonal elements)
+(VarP = varP(basePop))
+```
+
+```{r}
+# Phenotype correlation matrix (correlation off-diagonal on off-diagonal elements)
+cov2cor(VarP)
+```
+
+We could see above that correlation between phenotype values is smaller than between genetic values, which is due to the fact that we have implicitly assumed that the environmental components of the two traits are uncorrelated. See the argument `varE` in `setPheno()` or functions `SimParam$setVarE()` and `SimParam$setCorE()` to set the desired level of environmental correlation. These environmental correlations can have different magnitude or even different sign than genetic correlations.
+
+```{r}
+help(setPheno)
+```
+
+# Selection on a single trait and multi-trait response to selection
+
+We will now select the best 20 individuals based on their phenotype values for the first trait and evaluate response to this selection for both traits. Of note, we are selecting individuals that have a high phenotype value for the first trait. This direction of selection is obviously always important, but particularly with multiple traits, where we could be interested in selecting different traits in different directions (you will address this in exercises) - see help about the `selectInd()` function (use `help(selectInd)`) and check its argument `selectTop`.
+
+```{r}
+# Select individuals based on highest phenotypes for the first trait
+nSelected = 20
+basePopSelected = selectInd(pop = basePop,
+                            nInd = nSelected,
+                            use = "pheno",
+                            trait = 1)
+basePopSelected
+```
+Let's calculate selection differential for the two traits.
+
+```{r}
+# Average phenotype value for all individuals
+(meanPAll = meanP(basePop))
+```
+
+```{r}
+# Average phenotype value for selected individuals
+(meanPSel = meanP(basePopSelected))
+```
+
+```{r}
+# Selection differential for both traits
+(selDiff = meanPSel - meanPAll)
+```
+
+As expected, selection on the first trait generated a positive selection differential for the first trait. It *also* generated a positive selection differential for the second trait, which was driven by a positive genetic correlation between the traits. The magnitude of the indirect response to selection for correlated traits will depend on genetic and phenotype covariance matrices, that is, genetic and phenotype variances for the traits and genetic and phenotype correlations between traits (Lande, 1979; Falconer and MacKay, 1996; Kelly, 2011).
+
+To better understand this correlated response we can plot phenotype and genetic values for both traits against each other and inspect how selection on the first trait brings about correlated response in the second trait. In the plot below the purple full lines will show the mean of all individuals in the base population for both traits, while the purple dashed lines will show the mean of the selected individuals, again for both traits.
+
+```{r}
+pheno = pheno(basePop)
+gv = gv(basePop)
+gvSel = gv(basePopSelected)
+phenoSel = pheno(basePopSelected)
+
+phenoRange = range(pheno)
+gvRange = range(gv)
+ranges = range(phenoRange, gvRange)
+
+par(mfrow = c(1, 1))
+plot(x = pheno[, 1], y = pheno[, 2],
+     xlab = "Phenotype value - trait 1", ylab = "Phenotype value - trait 2",
+     xlim = ranges, ylim = ranges, col = "black")
+points(x = phenoSel[, 1], y = phenoSel[, 2], pch = 19, col = "purple")
+abline(v = meanP(basePop)[1], col = "purple", lwd = 3)
+abline(h = meanP(basePop)[2], col = "purple", lwd = 3) 
+abline(v = meanP(basePopSelected)[1], col = "purple", lwd = 3, lty =2)
+abline(h = meanP(basePopSelected)[2], col = "purple", lwd = 3, lty =2)
+
+plot(x = gv[, 1], y = gv[, 2],
+     xlab = "Genetic value - trait 1", ylab = "Genetic value - trait 2",
+     xlim = ranges, ylim = ranges, col = "black")
+points(x = gvSel[, 1], y = gvSel[, 2], pch = 19, col = "purple")
+abline(v = meanG(basePop)[1], col = "purple", lwd = 3)
+abline(h = meanG(basePop)[2], col = "purple", lwd = 3) 
+abline(v = meanG(basePopSelected)[1], col = "purple", lwd = 3, lty =2)
+abline(h = meanG(basePopSelected)[2], col = "purple", lwd = 3, lty =2)
+```
+
+Furthermore, selection does not only change the mean for the first and second trait, it also changes their variances and correlation between the traits.
+
+```{r}
+# Genetic covariances and correlation before selection (all individuals)
+print("VarGBasePop")
+(varGBasePop = varG(basePop))
+print("CorGBasePop")
+cov2cor(varGBasePop)
+```
+
+```{r}
+# Genetic covariances and correlation after selection (selected individuals)
+print("VarGBasePopSelected")
+(varGbasePopSelected = varG(basePopSelected))
+print("CorGBasePopSelected")
+cov2cor(varGbasePopSelected)
+```
+
+```{r}
+# Phenotype covariances and correlation before selection (all individuals)
+print("VarPBasePop")
+(varPBasePop = varP(basePop))
+print("CorPBasePop")
+cov2cor(varPBasePop)
+```
+
+```{r}
+# Phenotype covariances and correlation after selection (selected individuals)
+print("VarPBasePopSelected")
+(varPbasePopSelected = varP(basePopSelected))
+print("CorPBasePopSelected")
+cov2cor(varPbasePopSelected)
+```
+
+# EXTRA: Genetic change within and between generations
+
+As mentioned above, when traits are correlated, response to selection is a function of genetic and phenotype covariance matrices, selection direction, and selection pressure we put on the traits. Expected within-generation change in genetic values for $n$ traits ($\boldsymbol{\Delta G}$) can be predicted with a multi-trait version of the breeder's equation (Lande, 1979; Kelly, 2011) by multiplying the $n \times n$ genetic covariance matrix ($\boldsymbol{V}_G$) with the $n \times n$ inverse phenotype covariance matrix ($\boldsymbol{V}^{-1}_P$) and with the $n \times 1$ selection differential vector ($\boldsymbol{S}$):
+
+$$\boldsymbol{\Delta G} = \boldsymbol{V}_G \boldsymbol{V}^{-1}_P \boldsymbol{S}.$$
+
+
+```{r}
+# Genetic covariance matrix
+(Vg = varG(basePop))
+```
+
+```{r}
+# Phenotype covariance matrix
+(Vp = varP(basePop))
+```
+
+```{r}
+# Selection differential vector
+(selDiff = meanPSel - meanPAll)
+```
+
+```{r}
+# Expected genetic change (predicted from the multi-trait breeder's equation)
+(deltaGExpected = c(Vg %*% solve(Vp) %*% selDiff))
+```
+
+```{r}
+# Observed genetic change
+(deltaGObserved = meanG(basePopSelected) - meanG(basePop))
+```
+
+How accurately the breeder's equation predicts the response to selection will depend on how well the assumptions of the equation are met. Importantly, this equation only predicts the within-generation change in genetic means, that is, the change between the genetic mean of all individuals and the genetic mean of selected individuals.
+
+The between-generation change in genetic means will depend furthermore on recombination and segregation of the genomes of selected individuals and how these two processes impact the correlation between traits. To evaluate this, we will create a new generation by crossing the selected individuals at random and evaluate trait means and covariances in the new generation.
+
+```{r}
+# Cross the parents and phenotype progeny
+newPop = randCross(basePopSelected, nCrosses = nInd(basePop))
+newPop = setPheno(newPop, h2 = h2s)
+```
+
+```{r}
+# Observed genetic change WITHIN a generation
+(deltaGWithinGeneration = meanG(basePopSelected) - meanG(basePop))
+```
+
+```{r}
+# Observed genetic change BETWEEN generations
+(deltaGBetweenGeneration = meanG(newPop) - meanG(basePop))
+```
+
+```{r}
+# Evaluate trait covariances and correlatons
+# ... in the base population
+print("VarGBase")
+(VgBase = varG(basePop))
+print("CorGBase")
+cov2cor(VgBase)
+```
+
+```{r}
+# ... in the base population - selected
+print("VarGBaseSel")
+(VgBaseSel = varG(basePopSelected))
+print("CorGBaseSel")
+cov2cor(VgBaseSel)
+```
+
+```{r}
+# ... in the new population
+print("VarGNew")
+(VgNew = varG(newPop))
+print("CorGNew")
+cov2cor(VgNew)
+```
+Now, let's plot the phenotype and genetic values for both the base and new generation to inspect changes due to selection. Below the purple solid lines denote the average in the current population (all individuals), purple dashed lines denote the average of selected individuals, and black lines denote the average in the base population. 
+
+```{r}
+par(mfrow = c(2, 2),
+    mar = c(4, 4, 2, 1))
+
+pheno = pheno(basePop)
+phenoSel = pheno(basePopSelected)
+phenoNew = pheno(newPop)
+
+gv = gv(basePop)
+gvSel = gv(basePopSelected)
+gvNew = gv(newPop)
+
+phenoRange = range(c(pheno, phenoNew))
+gvRange = range(c(gv, gvNew))
+ranges = range(phenoRange, gvRange)
+
+plot(x = pheno[, 1], y = pheno[, 2],
+     xlab = "Phenotype value - trait 1", ylab = "Phenotype value - trait 2",
+     xlim = ranges, ylim = ranges, col = "black",
+     main = "Base population")
+points(x = phenoSel[, 1], y = phenoSel[, 2], pch = 19, col = "purple")
+abline(v = meanP(basePop)[1], col = "purple", lwd = 3)
+abline(h = meanP(basePop)[2], col = "purple", lwd = 3) 
+abline(v = meanP(basePopSelected)[1], col = "purple", lwd = 3, lty =2)
+abline(h = meanP(basePopSelected)[2], col = "purple", lwd = 3, lty =2)
+
+plot(x = gv[, 1], y = gv[, 2],
+     xlab = "Genetic value - trait 1", ylab = "Genetic value - trait 2",
+     xlim = ranges, ylim = ranges, col = "black",
+     main = "Base population")
+points(x = gvSel[, 1], y = gvSel[, 2], pch = 19, col = "purple")
+abline(v = meanG(basePop)[1], col = "purple", lwd = 3)
+abline(h = meanG(basePop)[2], col = "purple", lwd = 3) 
+abline(v = meanG(basePopSelected)[1], col = "purple", lwd = 3, lty =2)
+abline(h = meanG(basePopSelected)[2], col = "purple", lwd = 3, lty =2)
+
+plot(x = phenoNew[, 1], y = phenoNew[, 2],
+     xlab = "Phenotype value - trait 1", ylab = "Phenotype value - trait 2",
+     xlim = ranges, ylim = ranges, col = "black",
+     main = "New population")
+abline(v = meanP(basePop)[1], col = "black", lwd = 3)
+abline(h = meanP(basePop)[2], col = "black", lwd = 3)
+abline(v = meanP(newPop)[1], col = "purple", lwd = 3)
+abline(h = meanP(newPop)[2], col = "purple", lwd = 3)
+
+plot(x = gvNew[, 1], y = gvNew[, 2],
+     xlab = "Genetic value - trait 1", ylab = "Genetic value - trait 2",
+     xlim = ranges, ylim = ranges, col = "black",
+     main = "New population")
+abline(v = meanG(basePop)[1], col = "black", lwd = 3)
+abline(h = meanG(basePop)[2], col = "black", lwd = 3)
+abline(v = meanG(newPop)[1], col = "purple", lwd = 3)
+abline(h = meanG(newPop)[2], col = "purple", lwd = 3)
+```
+
+The above plots clearly show that selection on the first trait increases that trait, but also the second trait, due to positive genetic correlation between the two traits.
+
+# EXTRA: Selection over many generations
+
+Finally, we can perform selection on the first trait over many generations and track long-term changes in genetic means, variances, and covariances (or correlations) between the two traits. For example, let's evaluate response to selection over 10 generations. First, we need to allocate containers to store all these summaries. Since we will be storing summaries of different dimensions (vector for means, matrix for variances and covariances, and a scalar for correlation), we will use R's `list` data structure.
+
+```{r}
+# Allocate containers
+nGenerations = 10 + 1 # +1 to store starting generation
+meanGAll = vector("list", length = nGenerations)
+varGAll = vector("list", length = nGenerations)
+corGAll = numeric(nGenerations)
+
+# Save the starting values
+meanGAll[[1]] = meanG(basePop)
+varGAll[[1]] = varG(basePop)
+corGAll[1] = cov2cor(varGAll[[1]])[2, 1]
+```
+
+Now, we will repeat selection and crossing as we have done before between the `basePop` and `newPop`, but this time we will use R's `for` loop to simulate across many generations.
+
+```{r}
+# To make the for loop below simpler we will make a copy of the object basePopSelected
+newPopSelected = basePopSelected
+
+# Selection over many generations
+for (generation in 1:(nGenerations - 1)) {
+  # Cross parents, phenotype progeny, and select new parents
+  newPop = randCross(newPopSelected, nCrosses = nInd(basePop))
+  newPop = setPheno(newPop, h2 = h2s)
+  newPopSelected = selectInd(pop = newPop,
+                             nInd = nSelected,
+                             use = "pheno",
+                             trait = 1)
+  # Save summaries
+  meanGAll[[1 + generation]] = meanG(newPop)
+  varGAll[[1 + generation]] = varG(newPop)
+  corGAll[1 + generation] = cov2cor(varGAll[[1 + generation]])[2, 1]
+}
+```
+
+Let's now plot how the means, variances, and correlations changed over these generations.
+
+```{r}
+meanGTrait1 = sapply(meanGAll, function(x) x[1])
+meanGTrait2 = sapply(meanGAll, function(x) x[2])
+meanRanges = range(c(meanGTrait1, meanGTrait2))
+
+varGTrait1 = sapply(varGAll, function(x) x[1, 1])
+varGTrait2 = sapply(varGAll, function(x) x[2, 2])
+varRanges = range(c(varGTrait1, varGTrait2))
+
+par(mfrow = c(1, 1))
+
+# Plot mean of genetic values over generations
+plot(x = 1:nGenerations, y = meanGTrait1, type = "l", col = "black", lwd = 3,
+     xlab = "Generation", ylab = "Mean of genetic values", ylim = meanRanges)
+lines(x = 1:nGenerations, y = meanGTrait2, type = "l", col = "purple", lty = 2, lwd = 3)
+legend(x = "topleft", legend = c("1", "2"), title = "Trait",
+       lwd = 3, lty = c(1, 2), col = c("black", "purple"))
+
+# Plot variance of genetic values over generations
+plot(x = 1:nGenerations, y = varGTrait1, type = "l", col = "black", lwd = 3,
+     xlab = "Generation", ylab = "Variance of genetic values", ylim = varRanges)
+lines(x = 1:nGenerations, y = varGTrait2, type = "l", col = "purple", lty = 2, lwd = 3)
+legend(x = "topleft", legend = c("1", "2"), title = "Trait",
+       lwd = 3, lty = c(1, 2), col = c("black", "purple"))
+
+# Plot correlation between genetic values over generations
+plot(x = 1:nGenerations, y = corGAll, type = "l", col = "black", lwd = 3,
+     xlab = "Generation", ylab = "Genetic correlation", ylim = c(-1, 1))
+```
+
+As expected, we have seen a continued positive response to selection on both traits, even though we have selected on just the first trait. We have seen a decrease in genetic variance for both traits as well as change in correlation between the traits. The magnitude of these differences will depend on the type of selection we are performing, which we will evaluate in exercises.
+
+# References
+
+Falconer D.S., Mackay T.F.C. (1996) Introduction to quantitative genetics. 4th edition, Longman, https://www.pearson.com/uk/educators/higher-education-educators/program/Falconer-Introduction-to-Quantitative-Genetics-4th-Edition/PGM432132.html
+
+Kelly J.K. (2011) The breeder's equation. Nature Education Knowledge 4(5):5, https://www.nature.com/scitable/knowledge/library/the-breeder-s-equation-24204828
+
+Lande R. (1979) Quantitative genetic analysis of multivariate evolution applied to brain:body allometry. Evolution, 33, 402--416, https://doi.org/10.2307/2407630

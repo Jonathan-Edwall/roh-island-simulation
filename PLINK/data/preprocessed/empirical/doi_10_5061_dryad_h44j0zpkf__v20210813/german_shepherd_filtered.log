@@ -1,0 +1,43 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --dog
+  --file /home/jonathan/data/raw/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/Wang_HDGenetDogs_Genotypes_100621_UK
+  --geno 0.05
+  --make-bed
+  --mind 0.1
+  --out /home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Thu Feb 29 16:48:17 2024
+
+Random number seed: 1709225297
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (78088 variants, 324 dogs).
+--file:
+/home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered-temporary.bed
++
+/home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered-temporary.bim
++
+/home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered-temporary.fam
+written.
+78088 variants loaded from .bim file.
+324 dogs (143 males, 181 females) loaded from .fam.
+0 dogs removed due to missing genotype data (--mind).
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 0 founders and 324 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.998907.
+0 variants removed due to missing genotype data (--geno).
+78088 variants and 324 dogs pass filters and QC.
+Note: No phenotypes present.
+--make-bed to
+/home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered.bed
++
+/home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered.bim
++
+/home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered.fam
+... done.
+
+End time: Thu Feb 29 16:48:17 2024
