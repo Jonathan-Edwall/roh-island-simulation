@@ -2,3 +2,6 @@
 dog_simulation_example.Rmd
 Empirical Data/doi_10_5061_dryad_h44j0zpkf__v20210813/Wang_HDGenetDogs_Genotypes_100621_UK.ped
 Empirical Data/doi_10_5061_dryad_078nc__v20151111/FBD_UK_database.ped
+/PLINK/per_indiv_overlapping_rohs_merged
+/PLINK/results/PLINK/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/small_scale_individual_roh_20_ind
+/PLINK/small_scale_20_indv_per_indiv_overlapping_rohs_merged

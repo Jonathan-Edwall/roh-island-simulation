@@ -1,0 +1,59 @@
+---
+title: "PCA plots for identification of outliers to prune from the dataset"
+output: html_document
+date: "2024-03-01"
+---
+
+# Setting up the Working Directory of the .rmd script
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Defining the relative path in the repository
+repository_path <- "/Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations/PLINK"
+
+# Set the path to your GitHub folder
+YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
+
+# Set the root directory for notebook chunks
+knitr::opts_knit$set(root.dir = file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path))
+
+
+# # Verify the current working directory
+# getwd()
+
+```
+
+# PCA Plots
+Plots are created both for the preprocessed and the raw datasets
+
+```{r PCA_Plot}
+library(ggplot2) # If not already loaded
+
+# Read the .eigenvec file
+pca_preprocessed <- read.table("data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered.eigenvec", col.names = c("FID", "IID", "PC1", "PC2"))
+
+
+marker_type = "point"
+# marker_type = "label"
+
+
+# Plot using qplot
+qplot(x = PC1, y = PC2, geom = marker_type,label=IID, data = pca_preprocessed) +
+  geom_text(aes(label = IID), vjust = -0.2) +
+  labs(x = "PC1", y = "PC2", title = "Preprocessed data - PCA Plot")
+
+
+
+
+# Read the .eigenvec file
+pca_raw <- read.table("data/raw/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/PCA/Wang_HDGenetDogs_Genotypes_100621_UK_PCA.eigenvec", col.names = c("FID", "IID", "PC1", "PC2"))
+
+# Plot using qplot
+qplot(x = PC1, y = PC2, geom = marker_type,label=IID, data = pca_raw) +
+  geom_text(aes(label = IID), vjust = -0.2) +
+  labs(x = "PC1", y = "PC2", title = "Raw data - PCA Plot")
+
+
+
+
+```
