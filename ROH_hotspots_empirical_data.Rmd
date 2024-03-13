@@ -95,7 +95,7 @@ print(merged_top_1_percent_ROH)
 ```
 
 
-
+# ROH Hotspot plots
 
 ```{r}
 # Create scatter plots for each chromosome

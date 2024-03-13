@@ -101,7 +101,7 @@ var plot_spec = {
                 {
                     "field": "COUNT",
                     "type": "quantitative",
-                    "format": "0.2f",
+                    "format": "0.0f",
                     "alt": "Count"
                 },
                 {
@@ -176,7 +176,7 @@ var plot_spec = {
                 {
                     "field": "COUNT",
                     "type": "quantitative",
-                    "format": "0.2f",
+                    "format": "0.0f",
                     "alt": "ROH-Hotspot: Count"
                 },
 
@@ -186,6 +186,14 @@ var plot_spec = {
                     "format": "0.3f",
                     "alt": "ROH-Hotspot: Frequency"
                 },
+
+                {
+                    "field": "Length_kb",
+                    "type": "quantitative",
+                    "format": "0.0f",
+                    "alt": "ROH-Hotspot: Hotspot length (Kb)"
+                },
+
 
                 {
                     "field": "Hotspot_interval",
