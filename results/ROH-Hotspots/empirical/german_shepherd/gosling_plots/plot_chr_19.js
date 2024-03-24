@@ -1,6 +1,6 @@
 const current_chromosome = "Chromosome 19"
-const url_roh_segments_file = "http://127.0.0.1:5500/ROH-Frequency%20per%20chromosome/chr19_threshold_0.753086_ROH_data.tsv"
-const url_ROH_hotspots = "http://127.0.0.1:5500/ROH-hotspots/chr19_ROH_hotspot_data_split.tsv"
+const url_roh_segments_file = "http://127.0.0.1:5501/all_chr_roh_freq/chr19_ROH_freq_threshold_0.753086.tsv"
+const url_ROH_hotspots = "http://127.0.0.1:5501//roh_hotspots_freq/chr19_ROH_Hotspot_freq.tsv"
 const plot_title = current_chromosome +" - ROH-Hotspot 75 % Cutoff"
 
 const background_color="grey"
