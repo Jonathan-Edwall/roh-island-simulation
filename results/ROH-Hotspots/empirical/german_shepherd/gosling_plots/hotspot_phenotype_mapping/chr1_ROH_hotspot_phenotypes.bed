@@ -1,0 +1,2 @@
+#Chr	Pos1	Pos2	Phene	Phene_category	Considered_defect	Gene_symbol	Gene_description	Phene_url	Gene_details_url	Breeds
+chr1	14544736	14652948	Dyskinesia, paroxysmal, PIGN-related	Nervous system phene	yes	PIGN	phosphatidylinositol glycan anchor biosynthesis, class N	https://www.omia.org/OMIA002084/9615/	https://www.omia.org/gene388244722/	VBO_0201260

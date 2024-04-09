@@ -1,0 +1,259 @@
+---
+title: "Selective sweep test expected heterozygosity"
+output: html_document
+date: "2024-04-09"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# 0: Preparation
+
+## Defining the output directory & the chromosome to be simulated
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+knitr::opts_chunk$set(echo = TRUE)
+
+# Set the path to your GitHub folder
+YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
+
+# Defining the relative path in the repository
+repository_path <- "Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations"
+
+
+####################################  
+# Defining the input files
+#################################### 
+
+
+
+ROH_hotspot_allele_freq_dir <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"results/ROH-Hotspots/empirical/german_shepherd/gosling_plots/hotspots_allele_freq/")
+
+neutral_model_allele_freq_dir <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"results/PLINK/simulated/allele_freq")
+neutral_model_allele_freq <- file.path(neutral_model_allele_freq_dir,"neutral_model_chr_3_allele_freq.frq")
+
+
+####################################  
+# Defining the working directory
+#################################### 
+
+output_dir_sweep_test <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"results/Sweep_test/german_shepherd/")
+
+
+if (!dir.exists(output_dir_sweep_test)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_dir_sweep_test)
+}
+
+# Set the working directory for notebook chunks
+knitr::opts_knit$set(root.dir = output_dir_sweep_test)
+
+
+#################################### 
+# Defining the output files
+#################################### 
+
+# 
+# # Define the chromosome to be simulated
+# chr_simulated <- "chr3"
+# 
+# # Define the base name for the output .map & .ped PLINK files
+# output_sim_files_basename <- paste0("Neutral_simulation_", chr_simulated)
+
+
+# # Verify the current working directory
+#getwd()
+```
+
+## Loading libraries
+
+```{r library()}
+library(knitr)
+
+
+#library(dplyr)
+#library(ggplot2)
+#library(patchwork)
+#library(purrr)
+#library(tibble)
+
+```
+# 1: Loading the frequency files
+
+## 1.1: Empirical ROH hotspots - Loading the allele frequencies
+
+```{r}
+# Set the working directory to the directory containing .bed files
+setwd(ROH_hotspot_allele_freq_dir)
+
+# Get a list of all .bed files in the directory
+bed_files <- list.files(pattern = "\\.bed$")
+
+# Initialize an empty list to store empirical_hotspot_tables
+empirical_hotspot_tables <- list()
+
+# cat("\n\n","Showing the first 10 rows of the ROH-hotspot allele frequency files")
+
+# Loop through each .bed file
+for (file in bed_files) {
+  # Extract chromosome number and window number from file name
+  chromosome <- sub(".*chr([0-9]+)_.*", "\\1", file)
+  window <- sub(".*window_([0-9]+)_.*", "\\1", file)
+  
+  # Create table name
+  table_name <- paste("Hotspot_chr", chromosome, "_window_", window, "_allele_freq", sep = "")
+  
+  # Read the header line
+  con <- file(file, "r")
+  header <- readLines(con, n = 1)
+  close(con)
+  
+  # Remove "#" from the header and split it into column names
+  column_names <- sub("#", "", header)
+  column_names <- strsplit(column_names, "\t")[[1]]
+  
+  # Read the .bed file into a data frame, skipping commented lines
+  bed_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  
+  # Create a list with table name and corresponding data frame
+  table_info <- list(name = table_name, data = bed_data)
+  
+  # Append the table info to the list
+  empirical_hotspot_tables <- c(empirical_hotspot_tables, list(table_info))
+}
+
+# # Print the list of empirical_hotspot_tables
+# print(empirical_hotspot_tables)
+
+
+```
+## 1.2: Neutral model - Loading the allele frequencies 
+```{r}
+# Set the working directory to the directory containing .frq files
+setwd(neutral_model_allele_freq_dir)
+
+# Get a list of all .frq files in the directory
+frq_files <- list.files(pattern = "\\.frq$")
+
+# Initialize an empty list to store neutral model tables
+neutral_model_tables <- list()
+
+# Loop through each .frq file
+for (file in frq_files) {
+ 
+  # Extract the table name from the file name
+  table_name <- gsub(".frq$", "", file)
+  
+  # Read the .frq file into a data frame
+  frq_data <- read.table(file, header = TRUE)
+  
+  # Create a list with table name and corresponding data frame
+  table_info <- list(name = table_name, data = frq_data)
+  
+
+  
+  # Append the table info to the list
+  neutral_model_tables <- c(neutral_model_tables, list(table_info))
+}
+
+
+# # Read the file as a table
+# neutral_model_data <- read.table(neutral_model_allele_freq, header = TRUE)
+
+# # # View the structure of the data
+# # str(neutral_model_data)
+
+# cat("Showing the first 10 rows of neutral_model_data file:\n")
+# kable(head(neutral_model_data, 10))
+```
+# 2: Computing expected heterozygosity
+```{r}
+calculate_expected_heterozygosity <- function(p) {
+  # Calculate expected heterozygosity
+  heterozygosity <- 2 * p * (1 - p)
+  
+  # Return the result
+  return(heterozygosity)
+}
+
+```
+
+
+## 2.1: Empirical ROH hotspots
+```{r}
+
+for (i in seq_along(empirical_hotspot_tables)) {
+  # Extract table name and data frame
+  table_info <- empirical_hotspot_tables[[i]]
+  table_data <- table_info$data
+  
+  # Calculate expected heterozygosity for each window
+  window_H_e_list <- c()  # Initialize an empty list to store expected heterozygosity values
+  
+  # Loop through each row in the table data
+  for (j in 1:nrow(table_data)) {
+    # Extract the MAF (p value)
+    p <- table_data[j, "MAF"]
+    
+    # Calculate expected heterozygosity using the provided function
+    expected_heterozygosity <- calculate_expected_heterozygosity(p)
+    
+    # Append the calculated expected heterozygosity to the list
+    window_H_e_list <- c(window_H_e_list, expected_heterozygosity)
+  }
+  
+  # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
+  empirical_hotspot_tables[[i]]$H_e_list <- window_H_e_list
+  empirical_hotspot_tables[[i]]$Average_H_e <- mean(empirical_hotspot_tables[[i]]$H_e_list)
+}
+
+View(empirical_hotspot_tables)
+
+```
+
+## 2.2: Neutral model
+```{r}
+for (i in seq_along(neutral_model_tables)) {
+  # Extract table name and data frame
+  table_info <- neutral_model_tables[[i]]
+  table_data <- table_info$data
+  
+  # Calculate expected heterozygosity for each window
+  window_H_e_list <- c()  # Initialize an empty list to store expected heterozygosity values
+  
+  # Loop through each row in the table data
+  for (j in 1:nrow(table_data)) {
+    # Extract the MAF (p value)
+    p <- table_data[j, "MAF"]
+    
+    # Calculate expected heterozygosity using the provided function
+    expected_heterozygosity <- calculate_expected_heterozygosity(p)
+    
+    # Append the calculated expected heterozygosity to the list
+    window_H_e_list <- c(window_H_e_list, expected_heterozygosity)
+  }
+  
+  # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
+  neutral_model_tables[[i]]$H_e_list <- window_H_e_list
+  neutral_model_tables[[i]]$Average_H_e <- mean(neutral_model_tables[[i]]$H_e_list)
+}
+
+View(neutral_model_tables)
+
+```
+# 3: Sweep test
+```{r}
+calculate_expected_heterozygosity <- function(p) {
+  # Calculate expected heterozygosity
+  heterozygosity <- 2 * p * (1 - p)
+  
+  # Return the result
+  return(heterozygosity)
+}
+```
+
+
+
