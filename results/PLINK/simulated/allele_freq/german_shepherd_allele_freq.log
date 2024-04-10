@@ -1,0 +1,24 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --bfile /home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered
+  --dog
+  --freq counts
+  --out /home/jonathan/results/PLINK/empirical/german_shepherd/allele_freq/german_shepherd_allele_freq
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Thu Apr  4 11:28:33 2024
+
+Random number seed: 1712230113
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+78088 variants loaded from .bim file.
+324 dogs (143 males, 181 females) loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 0 founders and 324 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.998907.
+--freq counts: Allele frequencies (founders only) written to
+/home/jonathan/results/PLINK/empirical/german_shepherd/allele_freq/german_shepherd_allele_freq.frq.counts
+.
+
+End time: Thu Apr  4 11:28:33 2024
