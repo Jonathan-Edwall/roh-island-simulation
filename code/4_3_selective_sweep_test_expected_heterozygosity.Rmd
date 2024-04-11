@@ -109,6 +109,9 @@ for (file in bed_files) {
 ## 1.2: Neutral model - Loading the allele frequencies
 
 ```{r}
+
+
+
 # Set the working directory to the directory containing .frq files
 setwd(neutral_model_allele_freq_dir)
 
@@ -182,7 +185,7 @@ for (i in seq_along(empirical_hotspot_tables)) {
   empirical_hotspot_tables[[i]]$Average_H_e <- mean(empirical_hotspot_tables[[i]]$H_e_list)
 }
 
-#View(empirical_hotspot_tables)
+View(empirical_hotspot_tables)
 
 ```
 
@@ -214,9 +217,15 @@ for (i in seq_along(neutral_model_tables)) {
   neutral_model_tables[[i]]$Average_H_e <- mean(neutral_model_tables[[i]]$H_e_list)
 }
 
-#View(neutral_model_tables)
+View(neutral_model_tables)
 
 ```
+# 2.3: Neutral windows
+```{r}
+window_size = 100*10^3
+
+```
+
 
 # 3: Sweep test
 

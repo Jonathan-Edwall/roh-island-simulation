@@ -69,6 +69,27 @@ for simulation_file in $simulated_data_dir/*.map; do
     plink --file "${simulated_data_dir}/${simulation_name}" \
           --freq --dog --nonfounders --allow-no-sex \
           --out "${simulated_data_plink_output_dir}/${simulation_name}_allele_freq"
+          
+    #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+    # Adding POS to the outputfile
+    #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤          
+    
+    # Define the header of the outputfile
+    header="#CHR\tPOS\tSNP\tA1\tA2\tMAF\tNCHROBS"
+          
+    # Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
+    # Then performing join-operation to associate markers SNP-markers in the outputfile with their base-pair positions
+    join -1 2 -2 2 \
+    -o 1.1,2.4,1.2,1.3,1.4,1.5,1.6 \
+    <(sort -k2,2 "${simulated_data_plink_output_dir}/${simulation_name}_allele_freq.frq") \
+    <(sort -k2,2 "${simulated_data_dir}/${simulation_name}.map") | \
+    awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7}' | \
+    sort -k1,1n -k2,2n | \
+    sed '1i'"$header" > "${simulated_data_plink_output_dir}/${simulation_name}_allele_freq_w_positions.tsv"
+    
+    echo "Added physical positions for the markers in ${simulation_name}_allele_freq.frq"
+    echo "The output file is stored in: ${simulated_data_plink_output_dir}/${simulation_name}_allele_freq_w_positions.tsv"
+    
 done
 
 

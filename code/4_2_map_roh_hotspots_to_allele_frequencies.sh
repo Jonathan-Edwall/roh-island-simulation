@@ -44,13 +44,6 @@ ROH_hotspots_results_dir=$HOME/results/ROH-Hotspots
 german_shepherd_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/german_shepherd/gosling_plots
 
 
-#ROH_hotspots_results_dir=$HOME/results/ROH-Hotspots
-#german_shepherd_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/german_shepherd/gosling_plots
-#
-#echo "ROH hotspot directory: $german_shepherd_roh_hotspots_dir"
-#
-##$german_shepherd_roh_hotspots_dir/chr17_ROH_Hotspot_windows.bed
-
 #################################### 
 # Defining the output dirs
 #################################### 
@@ -76,21 +69,21 @@ allele_freq_w_positions_file="$german_shepherd_allele_freq_dir/german_shepherd_m
 #   * Column 4 from the .bim-file (Physical position of the marker)
 
 
-## Define the header of the outputfile
-#header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
-#
-## Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
-#join -1 2 -2 2 \
-#-o 1.1,1.2,1.3,1.4,1.5,1.6,2.4 \
-#<(sort -k2,2 "$german_shepherd_allele_freq_dir/german_shepherd_allele_freq.frq") \
-#<(sort -k2,2 "$preprocessed_german_shepherd_dir/german_shepherd_filtered.bim") | \
-#awk -v OFS='\t' '{print $1,$7,$7+1,$2,$3,$4,$5,$6}' | \
-#sort -k1,1n -k2,2n | \
-#awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7,$8}' | \
-#sed '1i'"$header" > "$allele_freq_w_positions_file"
-#
-#echo "Added physical positions for the markers in the .frq-file"
-#echo "The outputfile is stored in: $allele_freq_w_positions_file"
+# Define the header of the outputfile
+header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
+
+# Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
+join -1 2 -2 2 \
+-o 1.1,1.2,1.3,1.4,1.5,1.6,2.4 \
+<(sort -k2,2 "$german_shepherd_allele_freq_dir/german_shepherd_allele_freq.frq") \
+<(sort -k2,2 "$preprocessed_german_shepherd_dir/german_shepherd_filtered.bim") | \
+awk -v OFS='\t' '{print $1,$7,$7+1,$2,$3,$4,$5,$6}' | \
+sort -k1,1n -k2,2n | \
+awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7,$8}' | \
+sed '1i'"$header" > "$allele_freq_w_positions_file"
+
+echo "Added physical positions for the markers in the .frq-file"
+echo "The outputfile is stored in: $allele_freq_w_positions_file"
 
 
 #いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
