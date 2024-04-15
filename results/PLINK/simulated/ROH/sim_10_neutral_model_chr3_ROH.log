@@ -1,0 +1,50 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --dog
+  --file /home/jonathan/data/raw/simulated/sim_10_neutral_model_chr3
+  --homozyg
+  --homozyg-kb 1000
+  --homozyg-snp 100
+  --homozyg-window-het 1
+  --homozyg-window-missing 5
+  --homozyg-window-snp 50
+  --homozyg-window-threshold 0.05
+  --out /home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Mon Apr 15 10:20:40 2024
+
+Random number seed: 1713176440
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (3194 variants, 50 dogs).
+--file:
+/home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH-temporary.bed
++
+/home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH-temporary.bim
++
+/home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH-temporary.fam
+written.
+3194 variants loaded from .bim file.
+50 dogs (0 males, 0 females, 50 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH.nosex
+.
+50 phenotype values loaded from .fam.
+Warning: Ignoring phenotypes of missing-sex samples.  If you don't want those
+phenotypes to be ignored, use the --allow-no-sex flag.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 50 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+3194 variants and 50 dogs pass filters and QC.
+Note: No phenotypes present.
+--homozyg: Scan complete, found 16 ROH.
+Results saved to
+/home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH.hom +
+/home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH.hom.indiv
++
+/home/jonathan/results/PLINK/simulated/ROH/sim_10_neutral_model_chr3_ROH.hom.summary
+.
+
+End time: Mon Apr 15 10:20:40 2024
