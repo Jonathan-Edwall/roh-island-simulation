@@ -112,11 +112,12 @@ for (file in bed_files) {
 
 
 
-# Set the working directory to the directory containing .frq files
+# Set the working directory to the directory containing the frequency files for the simulated data
 setwd(neutral_model_allele_freq_dir)
 
-# Get a list of all .frq files in the directory
-frq_files <- list.files(pattern = "\\.frq$")
+# Get a list of all the .tsv frequency files in the current directory 
+# (these .tsv files are identical to the .frq files, but with a POS-column added, to associate the SNP-markers with a genomic position)
+frq_files <- list.files(pattern = "\\.tsv$")
 
 # Initialize an empty list to store neutral model tables
 neutral_model_tables <- list()
@@ -127,8 +128,18 @@ for (file in frq_files) {
   # Extract the table name from the file name
   table_name <- gsub(".frq$", "", file)
   
-  # Read the .frq file into a data frame
-  frq_data <- read.table(file, header = TRUE)
+  # Read the header line
+  con <- file(file, "r")
+  header <- readLines(con, n = 1)
+  close(con)
+  
+  # Remove "#" from the header and split it into column names
+  column_names <- sub("#", "", header)
+  column_names <- strsplit(column_names, "\t")[[1]]
+  
+  # Read the .tsv frequency file into a data frame
+  #frq_data <- read.table(file, header = TRUE)
+  frq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   
   # Create a list with table name and corresponding data frame
   table_info <- list(name = table_name, data = frq_data)
@@ -185,7 +196,7 @@ for (i in seq_along(empirical_hotspot_tables)) {
   empirical_hotspot_tables[[i]]$Average_H_e <- mean(empirical_hotspot_tables[[i]]$H_e_list)
 }
 
-View(empirical_hotspot_tables)
+#View(empirical_hotspot_tables)
 
 ```
 
@@ -217,19 +228,123 @@ for (i in seq_along(neutral_model_tables)) {
   neutral_model_tables[[i]]$Average_H_e <- mean(neutral_model_tables[[i]]$H_e_list)
 }
 
-View(neutral_model_tables)
+#View(neutral_model_tables)
 
 ```
-# 2.3: Neutral windows
+## 2.3: Neutral windows
 ```{r}
-window_size = 100*10^3
+
+
+# Define the window size
+window_size <- 100 * 10^3
+#window_size <- 2000 * 10^3
+
+# Initialize an empty list to store windows for each simulation
+simulation_windows <- list()
+
+# Iterating through each simulation
+for (sim_index in seq_along(neutral_model_tables)) {
+  # Get the SNP positions and H_e values for the current simulation
+  snp_positions <- neutral_model_tables[[sim_index]][["data"]][["POS"]]
+  he_values <- neutral_model_tables[[sim_index]][["H_e_list"]]
+  
+  # Determine the number of windows needed
+  num_windows <- ceiling(max(snp_positions) / window_size)
+  
+  # Initialize an empty list to store windows for the current simulation
+  sim_windows <- list()
+  
+  # Iterate through each window
+  for (window_index in seq_len(num_windows)) {
+    # Determine the start and end positions of the current window
+    window_start <- (window_index - 1) * window_size
+    window_end <- window_start + window_size
+    
+    # Find the indices of SNPs within the current window
+    snp_indices <- which(snp_positions >= window_start & snp_positions < window_end)
+    
+    # Extract the SNP positions and H_e values for the current window
+    window_snp_positions <- snp_positions[snp_indices]
+    window_he_values <- he_values[snp_indices]
+    
+    # Create a sub-table for the current window
+    window_data <- data.frame(POS = window_snp_positions, H_e = window_he_values)
+    
+    # Append the sub-table to the list of windows for the current simulation
+    sim_windows[[window_index]] <- window_data
+  }
+  
+  # Append the list of windows for the current simulation to the main list
+  simulation_windows[[sim_index]] <- sim_windows
+}
+
+
+#View(simulation_windows)
+
+
+# Create a list to store the average H_e values for each simulation
+Simulation_windows_avg_he <- list()
+
+# Iterate over each simulation
+for (i in seq_along(simulation_windows)) {
+    # Create a vector to store the average H_e values for each window in the current simulation
+    Simulation_windows_avg_he[[i]] <- numeric(length(simulation_windows[[i]]))
+    
+    # Iterate over each window in the current simulation
+    for (j in seq_along(simulation_windows[[i]])) {
+        # Calculate the average H_e value for the current window
+
+        # Using "na.rm = TRUE" To remove windows not having SNP-markers in them
+        
+        window_avg_he <- mean(simulation_windows[[i]][[j]][["H_e"]], na.rm = TRUE) 
+        
+        # Store the average H_e value for the current window
+        Simulation_windows_avg_he[[i]][j] <- window_avg_he
+    }
+    # Removing NaN values for the current simulation
+    # (Windows without any markers)
+    Simulation_windows_avg_he[[i]] <- Simulation_windows_avg_he[[i]][!is.na(Simulation_windows_avg_he[[i]])]
+
+}
+
+# Calculate the mean H_e value for each simulation
+simulations_mean_he_window_based <- sapply(Simulation_windows_avg_he, mean)
+
+
+
 
 ```
+
+##
 
 
 # 3: Sweep test
 
 ## 3.1: Neutral model - H_e distribution
+
+
+```{r}
+
+# Determine the number of bins you want
+num_bins <- 20  
+
+histogram_title <-  paste("H_e Distribution of the 20 simulations - Windowsize:",window_size,"bp")
+
+# Create a histogram with custom breaks
+hist(simulations_mean_he_window_based, breaks = num_bins, main = histogram_title, xlab = "H_e")
+
+# Calculate the 5th percentile
+percentile_5 <- quantile(simulations_mean_he_window_based, 0.05)
+
+# Add a vertical line at the 5th percentile
+abline(v = percentile_5, col = "red", lty = 2)
+
+# Add a legend
+legend("topright", legend = paste("5th percentile =", round(percentile_5, 4)), col = "red", lty = 2)
+```
+
+
+### SNP based averages
 
 ```{r}
 # Extract Average_H_e values from all tables in neutral_model_tables
@@ -239,16 +354,16 @@ sim_average_H_e_values <- sapply(neutral_model_tables, function(table) table[["A
 num_bins <- 20  
 
 # Create a histogram with custom breaks
-hist(sim_average_H_e_values, breaks = num_bins, main = "Distribution of Average H_e Values", xlab = "H_e")
+hist(sim_average_H_e_values, breaks = num_bins, main = "Average SNP H_e per simulation - Distribution", xlab = "H_e")
 
 # Calculate the 5th percentile
-percentile_5 <- quantile(sim_average_H_e_values, 0.05)
+percentile_5_SNP_based_average <- quantile(sim_average_H_e_values, 0.05)
 
 # Add a vertical line at the 5th percentile
-abline(v = percentile_5, col = "red", lty = 2)
+abline(v = percentile_5_SNP_based_average, col = "red", lty = 2)
 
 # Add a legend
-legend("topright", legend = paste("5th percentile =", round(percentile_5, 4)), col = "red", lty = 2)
+legend("topright", legend = paste("5th percentile =", round(percentile_5_SNP_based_average, 4)), col = "red", lty = 2)
 ```
 
 ## 3.2: ROH-Hotspots Selection testing
