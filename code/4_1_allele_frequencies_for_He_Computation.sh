@@ -20,46 +20,94 @@ cd $HOME
 
 # Defining input directory
 raw_data_dir=$HOME/data/raw
-#¤¤¤¤¤¤¤¤¤¤
-# Empirical
-#¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#ï¿½ï¿½ï¿½ï¿½ Empirical ï¿½ï¿½ï¿½ï¿½ 
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+# .bim file
 preprocessed_data_dir=$HOME/data/preprocessed
 preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
-#¤¤¤¤¤¤¤¤¤¤
-# Simulated
-#¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#ï¿½ï¿½ï¿½ï¿½ Simulated ï¿½ï¿½ï¿½ï¿½ 
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 simulated_data_dir=$raw_data_dir/simulated
 
 
 #################################### 
-# Defining the output dirs
+# Defining the output files
 #################################### 
 
 plink_output_dir=$HOME/results/PLINK
-#¤¤¤¤¤¤¤¤¤¤
-# Empirical
-#¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#ï¿½ï¿½ï¿½ï¿½ Empirical ï¿½ï¿½ï¿½ï¿½ 
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 german_shepherd_plink_output_dir=$plink_output_dir/empirical/german_shepherd/allele_freq
 mkdir -p $german_shepherd_plink_output_dir
-#¤¤¤¤¤¤¤¤¤¤¤
-# Simulated
-#¤¤¤¤¤¤¤¤¤¤¤
+empirical_allele_freq_output=$german_shepherd_plink_output_dir/german_shepherd_allele_freq
+
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#ï¿½ï¿½ï¿½ï¿½ Simulated ï¿½ï¿½ï¿½ï¿½ 
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+
+
+
+#######################################################  
+# RESULTS
+####################################################### 
 simulated_data_plink_output_dir=$plink_output_dir/simulated/allele_freq
 mkdir -p $simulated_data_plink_output_dir
 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # Function: bedtools freq
-#
 ###Input: .map and .ped files
-# 
-###Output:
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+###Output: .frq-files
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+
+
 
 # Calculating the allele frequencies
-plink --bfile $preprocessed_german_shepherd_dir/german_shepherd_filtered --freq --dog --nonfounders --allow-no-sex --out $german_shepherd_plink_output_dir/german_shepherd_allele_freq
+plink --bfile $preprocessed_german_shepherd_dir/german_shepherd_filtered \
+      --freq --dog --nonfounders --allow-no-sex \
+      --out $empirical_allele_freq_output
+
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+# Function: join
+#
+#
+###Input: .frq-file with allele frequencies at the different marker positions & .bim-file containing the physical positions of these markers
+# 
+###Output: A tsv-file with the contents of the .frq-file, combined with information about the physical positons of the markers from the .bim-file.
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+allele_freq_w_positions_file="${empirical_allele_freq_output}_with_marker_pos.bed"
+
+#Joins the .frq-file (File 1) and .bim-file (File 2) based on their 2nd column (SNP identifier)
+# The input files gets sorted temporarily based on the 2nd column (SNP identifier) using process substitution
+# The output file contains:
+#   * Column 1-6 from the .frq-file (all columns)
+#   * Column 4 from the .bim-file (Physical position of the marker)
 
 
-#plink --file $simulated_data_dir/Neutral_simulation_chr3 --freq --dog --nonfounders --allow-no-sex --out $simulated_data_plink_output_dir/neutral_model_chr_3_allele_freq
+# Define the header of the outputfile
+header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
+
+# Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
+join -1 2 -2 2 \
+-o 1.1,1.2,1.3,1.4,1.5,1.6,2.4 \
+<(sort -k2,2 "${empirical_allele_freq_output}.frq") \
+<(sort -k2,2 "$preprocessed_german_shepherd_dir/german_shepherd_filtered.bim") | \
+awk -v OFS='\t' '{print $1,$7,$7+1,$2,$3,$4,$5,$6}' | \
+sort -k1,1n -k2,2n | \
+awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7,$8}' | \
+sed '1i'"$header" > "$allele_freq_w_positions_file"
+
+echo "Added physical positions for the markers in the empirical .frq-file"
+echo "The outputfile is stored in: $allele_freq_w_positions_file"
+
+
+##ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+##ï¿½ï¿½ï¿½ï¿½ Simulated ï¿½ï¿½ï¿½ï¿½ 
+##ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#
+
 # Find any .map file in simulated_data_dir and use its basename as the simulation name
 for simulation_file in $simulated_data_dir/*.map; do
     # Extract simulation name from the filename (minus the .map extension)
@@ -70,9 +118,9 @@ for simulation_file in $simulated_data_dir/*.map; do
           --freq --dog --nonfounders --allow-no-sex \
           --out "${simulated_data_plink_output_dir}/${simulation_name}_allele_freq"
           
-    #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+    #?????????????????????????????
     # Adding POS to the outputfile
-    #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤          
+    #?????????????????????????????          
     
     # Define the header of the outputfile
     header="#CHR\tPOS\tSNP\tA1\tA2\tMAF\tNCHROBS"

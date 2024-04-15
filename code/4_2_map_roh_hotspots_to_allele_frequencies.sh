@@ -25,21 +25,17 @@ cd $HOME
 # Defining the input files
 #################################### 
 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # Allele frequency file
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 plink_output_dir=$HOME/results/PLINK
 german_shepherd_allele_freq_dir=$plink_output_dir/empirical/german_shepherd/allele_freq
-#¤¤¤¤¤¤¤¤¤¤¤
-# .bim file
-#¤¤¤¤¤¤¤¤¤¤¤
-preprocessed_data_dir=$HOME/data/preprocessed
-preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
 
+allele_freq_w_positions_file="$german_shepherd_allele_freq_dir/german_shepherd_allele_freq_with_marker_pos.bed"
 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # ROH-hotspot window-files
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ROH_hotspots_results_dir=$HOME/results/ROH-Hotspots
 german_shepherd_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/german_shepherd/gosling_plots
 
@@ -52,47 +48,13 @@ hotspots_allele_freq_output_dir=$german_shepherd_roh_hotspots_dir/hotspots_allel
 # Creating a directory to store the .BED-files in, if it does not already exist.
 mkdir -p $hotspots_allele_freq_output_dir
 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Function: join
-#
-#
-###Input: .frq-file with allele frequencies at the different marker positions & .bim-file containing the physical positions of these markers
-# 
-###Output: A tsv-file with the contents of the .frq-file, combined with information about the physical positons of the markers from the .bim-file.
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-allele_freq_w_positions_file="$german_shepherd_allele_freq_dir/german_shepherd_marker_pos_with_allele_freq.bed"
-
-#Joins the .frq-file (File 1) and .bim-file (File 2) based on their 2nd column (SNP identifier)
-# The input files gets sorted temporarily based on the 2nd column (SNP identifier) using process substitution
-# The output file contains:
-#   * Column 1-6 from the .frq-file (all columns)
-#   * Column 4 from the .bim-file (Physical position of the marker)
-
-
-# Define the header of the outputfile
-header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
-
-# Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
-join -1 2 -2 2 \
--o 1.1,1.2,1.3,1.4,1.5,1.6,2.4 \
-<(sort -k2,2 "$german_shepherd_allele_freq_dir/german_shepherd_allele_freq.frq") \
-<(sort -k2,2 "$preprocessed_german_shepherd_dir/german_shepherd_filtered.bim") | \
-awk -v OFS='\t' '{print $1,$7,$7+1,$2,$3,$4,$5,$6}' | \
-sort -k1,1n -k2,2n | \
-awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7,$8}' | \
-sed '1i'"$header" > "$allele_freq_w_positions_file"
-
-echo "Added physical positions for the markers in the .frq-file"
-echo "The outputfile is stored in: $allele_freq_w_positions_file"
-
-
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 # Function: bedtools intersect
 #
 ###Input:
 # 
 ###Output:
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 
