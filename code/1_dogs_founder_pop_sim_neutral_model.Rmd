@@ -1,7 +1,10 @@
 ---
 title: "Founder population simulation for Dogs (Neutral Model) in AlphaSimR"
-output: html_document
-date: "2024-04-08"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3  
+date: "2024-04-19"
 editor_options: 
   markdown: 
     wrap: 72
@@ -39,6 +42,12 @@ if (!dir.exists(output_dir_simulation)) {
 
 # Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir_simulation)
+
+#################################### 
+# Defining Input parameters
+#################################### 
+min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
+
 
 
 #################################### 
@@ -142,52 +151,9 @@ SP <- SimParam$new(founderGenomes)
 
 ```
 
-### 1.2.1: \$addSnpChip()
-
-#### 1.2.1.0 Single chromosome usage: Compute number of SNPs to use
-
-```{r}
-
-# Sum up the chromosome lengths to get the autosome length
-autosome_length <- sum(chromosome_lengths_mb)
-
-# Number of SNP markers from the empirical dataset
-# https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
-num_snp_markers <- 78088  
-
-# Calculate average SNP-autosome density
-average_snp_autosome_density <- num_snp_markers / autosome_length
-
-# Calculate the number of SNP markers to choose for the specific chromosome
-num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated]
 
 
-
-# Output results
-cat("autosome length:", autosome_length, "Mb\n")
-cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n")
-cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n")
-
-```
-
-```{r}
-average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb) 
-cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n")
-
-```
-
-#### 1.2.1.1: \$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip
-
-`SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip.
-
-**nSnpPerChr**-argument that assigns for each individuals n SNPs for
-each chromsome, where n is the user-specified number.
-
-```{r SimParam$addSnpChip()}
-SP$addSnpChip(nSnpPerChr = num_snp_markers_chr3) # 1000 was previously used
-```
-
-### 1.2.2: \$setTrackRec() - Setting on recombination tracking for the simulation
+### 1.2.1: \$setTrackRec() - Setting on recombination tracking for the simulation
 
 Sets recombination tracking for the simulation. By default recombination
 tracking is turned off. **When turned on recombination tracking will
@@ -201,7 +167,7 @@ tracked.
 SP$setTrackRec(TRUE)
 ```
 
-### 1.3: newPop() - Creating two separate populations for bottleneck event
+## 1.3: newPop() - Creating two separate populations for bottleneck event
 
 ```{r newPop()}
 # Generate the initial founder population
@@ -278,9 +244,62 @@ breed1_bottleneck
 # Extracting final generation:
 last_generation <- breed1_bottleneck[[n_generations]]
 last_generation
-    
+```
+## 2.3: Adding SNPs to the final generation ( SimParam$addSnpChip())
+
+### 2.3.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome
+
+```{r}
+
+# Sum up the chromosome lengths to get the autosome length
+autosome_length <- sum(chromosome_lengths_mb)
+
+# Number of SNP markers from the empirical dataset
+# https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
+num_snp_markers <- 78088  
+
+# Calculate average SNP-autosome density
+average_snp_autosome_density <- num_snp_markers / autosome_length
+
+# Calculate the number of SNP markers to choose for the specific chromosome
+num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated]
+
+
+
+# Output results
+cat("autosome length:", autosome_length, "Mb\n")
+cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n")
+cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n")
 
 ```
+
+```{r}
+average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb) 
+cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n")
+
+```
+
+### 2.3.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip
+
+`SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip.
+
+**nSnpPerChr**-argument that assigns for each individuals n SNPs for
+each chromsome, where n is the user-specified number. 
+
+**minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed for each marker.
+For instance, setting minSnpFreq = 0.05 ensures that all markers will have MAF >= 0.05 
+
+**refPop**-argument specifies which population will be genotyped.
+In this case, it will be the last_generation after the simulated population bottleneck scenario.
+
+```{r SimParam$addSnpChip()}
+SP$addSnpChip(
+  nSnpPerChr = num_snp_markers_chr3,
+  minSnpFreq = min_MAF,
+  refPop = last_generation
+  ) 
+```
+
 
 # 3: Export to PLINK Extracting data to PLINK
 

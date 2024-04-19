@@ -17,50 +17,46 @@ cd $HOME
 ####################################  
 # Defining the input files
 #################################### 
-
 # Defining input directory
 raw_data_dir=$HOME/data/raw
-#��������������������
-#���� Empirical ���� 
-#��������������������
+#�������������
+#� Empirical �
+#�������������
 # .bim file
 preprocessed_data_dir=$HOME/data/preprocessed
 preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
-#��������������������
-#���� Simulated ���� 
-#��������������������
+#�������������
+#� Simulated � 
+#�������������
 simulated_data_dir=$raw_data_dir/simulated
-
-
 #################################### 
 # Defining the output files
 #################################### 
-
 plink_output_dir=$HOME/results/PLINK
-#��������������������
-#���� Empirical ���� 
-#��������������������
+#�������������
+#� Empirical � 
+#�������������
 german_shepherd_plink_output_dir=$plink_output_dir/empirical/german_shepherd/allele_freq
 mkdir -p $german_shepherd_plink_output_dir
 empirical_allele_freq_output=$german_shepherd_plink_output_dir/german_shepherd_allele_freq
 
-#��������������������
-#���� Simulated ���� 
-#��������������������
-
+#�������������
+#� Simulated �
+#�������������
+simulated_data_plink_output_dir=$plink_output_dir/simulated/allele_freq
+mkdir -p $simulated_data_plink_output_dir
 
 
 #######################################################  
 # RESULTS
 ####################################################### 
-simulated_data_plink_output_dir=$plink_output_dir/simulated/allele_freq
-mkdir -p $simulated_data_plink_output_dir
 
-#����������������������������������������������������������������������������
+
+#?###########################################################################
 # Function: bedtools freq
 ###Input: .map and .ped files
 ###Output: .frq-files
-#����������������������������������������������������������������������������
+#############################################################################
 
 
 
@@ -69,14 +65,14 @@ plink --bfile $preprocessed_german_shepherd_dir/german_shepherd_filtered \
       --freq --dog --nonfounders --allow-no-sex \
       --out $empirical_allele_freq_output
 
-#����������������������������������������������������������������������������
+#############################################################################
 # Function: join
 #
 #
 ###Input: .frq-file with allele frequencies at the different marker positions & .bim-file containing the physical positions of these markers
 # 
 ###Output: A tsv-file with the contents of the .frq-file, combined with information about the physical positons of the markers from the .bim-file.
-#����������������������������������������������������������������������������
+#############################################################################
 allele_freq_w_positions_file="${empirical_allele_freq_output}_with_marker_pos.bed"
 
 #Joins the .frq-file (File 1) and .bim-file (File 2) based on their 2nd column (SNP identifier)
@@ -118,9 +114,9 @@ for simulation_file in $simulated_data_dir/*.map; do
           --freq --dog --nonfounders --allow-no-sex \
           --out "${simulated_data_plink_output_dir}/${simulation_name}_allele_freq"
           
-    #?????????????????????????????
+    ##############################
     # Adding POS to the outputfile
-    #?????????????????????????????          
+    ##############################          
     
     # Define the header of the outputfile
     header="#CHR\tPOS\tSNP\tA1\tA2\tMAF\tNCHROBS"

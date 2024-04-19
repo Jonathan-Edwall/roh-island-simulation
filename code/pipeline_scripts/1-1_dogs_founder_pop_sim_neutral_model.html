@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-04-08" />
+<meta name="date" content="2024-04-19" />
 
 <title>Founder population simulation for Dogs (Neutral Model) in AlphaSimR</title>
 
@@ -343,10 +343,40 @@ pre code {
 
 
 <h1 class="title toc-ignore">Founder population simulation for Dogs (Neutral Model) in AlphaSimR</h1>
-<h4 class="date">2024-04-08</h4>
+<h4 class="date">2024-04-19</h4>
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#preparation">0: Preparation</a><ul>
+<li><a href="#defining-the-output-directory-the-chromosome-to-be-simulated">Defining the output directory &amp; the chromosome to be simulated</a></li>
+<li><a href="#loading-libraries">Loading libraries</a></li>
+</ul></li>
+<li><a href="#creating-founder-haplotypes">1: Creating founder Haplotypes</a><ul>
+<li><a href="#defining-chromosome-lengths-of-model-species">1.0: Defining chromosome lengths of model species</a></li>
+<li><a href="#runmacs2---generating-founder-population">1.1: runMacs2() - Generating founder population</a></li>
+<li><a href="#simparam---setting-global-simulation-parameters">1.2: SimParam() - Setting Global Simulation Parameters</a><ul>
+<li><a href="#settrackrec---setting-on-recombination-tracking-for-the-simulation">1.2.1: $setTrackRec() - Setting on recombination tracking for the simulation</a></li>
+</ul></li>
+<li><a href="#newpop---creating-two-separate-populations-for-bottleneck-event">1.3: newPop() - Creating two separate populations for bottleneck event</a></li>
+</ul></li>
+<li><a href="#forward-in-time-simulation">2: Forward in time simulation</a><ul>
+<li><a href="#randcross---bottleneck-simulation-for-10-generations">2.1: randCross() - Bottleneck Simulation for 10 Generations</a></li>
+<li><a href="#extracting-the-final-generation">2.2 Extracting the final generation</a></li>
+<li><a href="#adding-snps-to-the-final-generation-simparamaddsnpchip">2.3: Adding SNPs to the final generation ( SimParam$addSnpChip())</a><ul>
+<li><a href="#single-chromosome-usage-computing-number-of-snps-to-assign-to-a-chromosome">2.3.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome</a></li>
+<li><a href="#simparamaddsnpchip---randomly-assigns-eligible-snps-to-a-snp-chip">2.3.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#export-to-plink-extracting-data-to-plink">3: Export to PLINK Extracting data to PLINK</a><ul>
+<li><a href="#optional-pullsnpgeno---retrieves-a-list-of-the-existing-marker-ids-snp-ids">3.0.1: Optional: pullSnpGeno() - Retrieves a list of the existing marker id:s (SNP id:s)</a></li>
+<li><a href="#optional-getsnpmap---retrieves-a-table-of-the-genetic-map">3.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map</a></li>
+<li><a href="#writeplink">3.1: writePlink()</a></li>
+</ul></li>
+<li><a href="#convert-distances-to-basepair-in-the-.map-file">4: Convert distances to basepair in the .map file</a></li>
+</ul>
+</div>
 
 <div id="preparation" class="section level1">
 <h1>0: Preparation</h1>
@@ -356,6 +386,14 @@ pre code {
 rm(list = ls())
 
 knitr::opts_chunk$set(echo = TRUE)
+
+
+#################################### 
+# Defining Input parameters
+#################################### 
+min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
+
+
 
 ## Define the output directory based on the parameter passed from the Bash script
 #output_dir_simulation &lt;- params$output_dir_simulation
@@ -440,7 +478,7 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 137293</code></pre>
+## Loci: 138374</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -449,51 +487,15 @@ founderGenomes</code></pre>
 # Creating a new Simparam object &amp; Assigning the founder population population to it
 SP &lt;- SimParam$new(founderGenomes) 
 # SP</code></pre>
-<div id="addsnpchip" class="section level3">
-<h3>1.2.1: $addSnpChip()</h3>
-<div id="single-chromosome-usage-compute-number-of-snps-to-use" class="section level4">
-<h4>1.2.1.0 Single chromosome usage: Compute number of SNPs to use</h4>
-<pre class="r"><code># Sum up the chromosome lengths to get the autosome length
-autosome_length &lt;- sum(chromosome_lengths_mb)
-
-# Number of SNP markers from the empirical dataset
-# https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
-num_snp_markers &lt;- 78088  
-
-# Calculate average SNP-autosome density
-average_snp_autosome_density &lt;- num_snp_markers / autosome_length
-
-# Calculate the number of SNP markers to choose for the specific chromosome
-num_snp_markers_chr3 &lt;- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated]
-
-
-
-# Output results
-cat(&quot;autosome length:&quot;, autosome_length, &quot;Mb\n&quot;)</code></pre>
-<pre><code>## autosome length: 2298 Mb</code></pre>
-<pre class="r"><code>cat(&quot;Average SNP-autosome density:&quot;, average_snp_autosome_density, &quot;SNPs/Mb\n&quot;)</code></pre>
-<pre><code>## Average SNP-autosome density: 33.98085 SNPs/Mb</code></pre>
-<pre class="r"><code>cat(&quot;Number of SNP markers for&quot;, chr_simulated, &quot;:&quot;, num_snp_markers_chr3, &quot;SNPs\n&quot;)</code></pre>
-<pre><code>## Number of SNP markers for chr3 : 3194.2 SNPs</code></pre>
-<pre class="r"><code>average_chr_SNP_density &lt;- num_snp_markers / length(chromosome_lengths_mb) 
-cat(&quot; Average Chr SNP density:&quot;, average_chr_SNP_density, &quot;SNPs/Chr\n&quot;)</code></pre>
-<pre><code>##  Average Chr SNP density: 2054.947 SNPs/Chr</code></pre>
-</div>
-<div id="addsnpchip---randomly-assigns-eligible-snps-to-a-snp-chip" class="section level4">
-<h4>1.2.1.1: $addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</h4>
-<p><code>SP$addSnpChip()</code>Randomly assigns eligible SNPs to a SNP chip.</p>
-<p><strong>nSnpPerChr</strong>-argument that assigns for each individuals n SNPs for each chromsome, where n is the user-specified number.</p>
-<pre class="r"><code>SP$addSnpChip(nSnpPerChr = num_snp_markers_chr3) # 1000 was previously used</code></pre>
-</div>
-</div>
 <div id="settrackrec---setting-on-recombination-tracking-for-the-simulation" class="section level3">
-<h3>1.2.2: $setTrackRec() - Setting on recombination tracking for the simulation</h3>
+<h3>1.2.1: $setTrackRec() - Setting on recombination tracking for the simulation</h3>
 <p>Sets recombination tracking for the simulation. By default recombination tracking is turned off. <strong>When turned on recombination tracking will also turn on pedigree tracking.</strong></p>
 <p><strong>Recombination tracking keeps records of all individuals created,</strong> except those created by hybridCross, because their pedigree is not tracked.</p>
 <pre class="r"><code>SP$setTrackRec(TRUE)</code></pre>
 </div>
-<div id="newpop---creating-two-separate-populations-for-bottleneck-event" class="section level3">
-<h3>1.3: newPop() - Creating two separate populations for bottleneck event</h3>
+</div>
+<div id="newpop---creating-two-separate-populations-for-bottleneck-event" class="section level2">
+<h2>1.3: newPop() - Creating two separate populations for bottleneck event</h2>
 <pre class="r"><code># Generate the initial founder population
 founderpop &lt;- newPop(founderGenomes, simParam = SP)
 # Set misc used for setting years of birth for the first individuals
@@ -526,7 +528,7 @@ breed1_founders</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed2_founders &lt;- founderpop[51:100]
 breed2_founders</code></pre>
@@ -534,9 +536,8 @@ breed2_founders</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0</code></pre>
-</div>
 </div>
 </div>
 <div id="forward-in-time-simulation" class="section level1">
@@ -577,7 +578,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed1_bottleneck</code></pre>
 <pre><code>## [[1]]
@@ -585,7 +586,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0 
 ## 
 ## [[2]]
@@ -593,7 +594,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0 
 ## 
 ## [[3]]
@@ -601,7 +602,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0 
 ## 
 ## [[4]]
@@ -609,7 +610,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0 
 ## 
 ## [[5]]
@@ -617,7 +618,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0</code></pre>
 </div>
 <div id="extracting-the-final-generation" class="section level2">
@@ -629,8 +630,51 @@ last_generation</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137293 
+## Loci: 138374 
 ## Traits: 0</code></pre>
+</div>
+<div id="adding-snps-to-the-final-generation-simparamaddsnpchip" class="section level2">
+<h2>2.3: Adding SNPs to the final generation ( SimParam$addSnpChip())</h2>
+<div id="single-chromosome-usage-computing-number-of-snps-to-assign-to-a-chromosome" class="section level3">
+<h3>2.3.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome</h3>
+<pre class="r"><code># Sum up the chromosome lengths to get the autosome length
+autosome_length &lt;- sum(chromosome_lengths_mb)
+
+# Number of SNP markers from the empirical dataset
+# https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
+num_snp_markers &lt;- 78088  
+
+# Calculate average SNP-autosome density
+average_snp_autosome_density &lt;- num_snp_markers / autosome_length
+
+# Calculate the number of SNP markers to choose for the specific chromosome
+num_snp_markers_chr3 &lt;- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated]
+
+
+
+# Output results
+cat(&quot;autosome length:&quot;, autosome_length, &quot;Mb\n&quot;)</code></pre>
+<pre><code>## autosome length: 2298 Mb</code></pre>
+<pre class="r"><code>cat(&quot;Average SNP-autosome density:&quot;, average_snp_autosome_density, &quot;SNPs/Mb\n&quot;)</code></pre>
+<pre><code>## Average SNP-autosome density: 33.98085 SNPs/Mb</code></pre>
+<pre class="r"><code>cat(&quot;Number of SNP markers for&quot;, chr_simulated, &quot;:&quot;, num_snp_markers_chr3, &quot;SNPs\n&quot;)</code></pre>
+<pre><code>## Number of SNP markers for chr3 : 3194.2 SNPs</code></pre>
+<pre class="r"><code>average_chr_SNP_density &lt;- num_snp_markers / length(chromosome_lengths_mb) 
+cat(&quot; Average Chr SNP density:&quot;, average_chr_SNP_density, &quot;SNPs/Chr\n&quot;)</code></pre>
+<pre><code>##  Average Chr SNP density: 2054.947 SNPs/Chr</code></pre>
+</div>
+<div id="simparamaddsnpchip---randomly-assigns-eligible-snps-to-a-snp-chip" class="section level3">
+<h3>2.3.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</h3>
+<p><code>SP$addSnpChip()</code>Randomly assigns eligible SNPs to a SNP chip.</p>
+<p><strong>nSnpPerChr</strong>-argument that assigns for each individuals n SNPs for each chromsome, where n is the user-specified number.</p>
+<p><strong>minSnpFreq</strong>-argument sets the Minimum Allele Frequency (MAF) allowed for each marker. For instance, setting minSnpFreq = 0.05 ensures that all markers will have MAF &gt;= 0.05</p>
+<p><strong>refPop</strong>-argument specifies which population will be genotyped. In this case, it will be the last_generation after the simulated population bottleneck scenario.</p>
+<pre class="r"><code>SP$addSnpChip(
+  nSnpPerChr = num_snp_markers_chr3,
+  minSnpFreq = min_MAF,
+  refPop = last_generation
+  ) </code></pre>
+</div>
 </div>
 </div>
 <div id="export-to-plink-extracting-data-to-plink" class="section level1">
@@ -668,74 +712,74 @@ cat(&quot;First 10 markers and their genetic map positions:\n&quot;)</code></pre
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1_68</td>
-<td align="left">1_68</td>
+<td align="left">1_4</td>
+<td align="left">1_4</td>
 <td align="left">1</td>
-<td align="right">68</td>
-<td align="right">0.0004447</td>
+<td align="right">4</td>
+<td align="right">0.0000076</td>
 </tr>
 <tr class="even">
-<td align="left">1_95</td>
-<td align="left">1_95</td>
+<td align="left">1_8</td>
+<td align="left">1_8</td>
 <td align="left">1</td>
-<td align="right">95</td>
-<td align="right">0.0007672</td>
+<td align="right">8</td>
+<td align="right">0.0000321</td>
 </tr>
 <tr class="odd">
-<td align="left">1_106</td>
-<td align="left">1_106</td>
+<td align="left">1_48</td>
+<td align="left">1_48</td>
 <td align="left">1</td>
-<td align="right">106</td>
-<td align="right">0.0008273</td>
+<td align="right">48</td>
+<td align="right">0.0004110</td>
 </tr>
 <tr class="even">
-<td align="left">1_118</td>
-<td align="left">1_118</td>
+<td align="left">1_70</td>
+<td align="left">1_70</td>
 <td align="left">1</td>
-<td align="right">118</td>
-<td align="right">0.0009079</td>
+<td align="right">70</td>
+<td align="right">0.0005732</td>
 </tr>
 <tr class="odd">
+<td align="left">1_80</td>
+<td align="left">1_80</td>
+<td align="left">1</td>
+<td align="right">80</td>
+<td align="right">0.0006170</td>
+</tr>
+<tr class="even">
 <td align="left">1_153</td>
 <td align="left">1_153</td>
 <td align="left">1</td>
 <td align="right">153</td>
-<td align="right">0.0011621</td>
-</tr>
-<tr class="even">
-<td align="left">1_252</td>
-<td align="left">1_252</td>
-<td align="left">1</td>
-<td align="right">252</td>
-<td align="right">0.0020802</td>
+<td align="right">0.0010544</td>
 </tr>
 <tr class="odd">
-<td align="left">1_283</td>
-<td align="left">1_283</td>
+<td align="left">1_155</td>
+<td align="left">1_155</td>
 <td align="left">1</td>
-<td align="right">283</td>
-<td align="right">0.0023002</td>
+<td align="right">155</td>
+<td align="right">0.0010666</td>
 </tr>
 <tr class="even">
-<td align="left">1_311</td>
-<td align="left">1_311</td>
+<td align="left">1_168</td>
+<td align="left">1_168</td>
 <td align="left">1</td>
-<td align="right">311</td>
-<td align="right">0.0025841</td>
+<td align="right">168</td>
+<td align="right">0.0012131</td>
 </tr>
 <tr class="odd">
-<td align="left">1_369</td>
-<td align="left">1_369</td>
+<td align="left">1_215</td>
+<td align="left">1_215</td>
 <td align="left">1</td>
-<td align="right">369</td>
-<td align="right">0.0029362</td>
+<td align="right">215</td>
+<td align="right">0.0014286</td>
 </tr>
 <tr class="even">
-<td align="left">1_453</td>
-<td align="left">1_453</td>
+<td align="left">1_292</td>
+<td align="left">1_292</td>
 <td align="left">1</td>
-<td align="right">453</td>
-<td align="right">0.0036577</td>
+<td align="right">292</td>
+<td align="right">0.0020496</td>
 </tr>
 </tbody>
 </table>
@@ -807,63 +851,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_68</td>
-<td align="right">0.0444696</td>
-<td align="right">41801</td>
+<td align="left">1_4</td>
+<td align="right">0.0007610</td>
+<td align="right">715</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_95</td>
-<td align="right">0.0767170</td>
-<td align="right">72114</td>
+<td align="left">1_8</td>
+<td align="right">0.0032143</td>
+<td align="right">3021</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_106</td>
-<td align="right">0.0827262</td>
-<td align="right">77763</td>
+<td align="left">1_48</td>
+<td align="right">0.0411037</td>
+<td align="right">38637</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_118</td>
-<td align="right">0.0907946</td>
-<td align="right">85347</td>
+<td align="left">1_70</td>
+<td align="right">0.0573242</td>
+<td align="right">53885</td>
 </tr>
 <tr class="odd">
+<td align="right">1</td>
+<td align="left">1_80</td>
+<td align="right">0.0616980</td>
+<td align="right">57996</td>
+</tr>
+<tr class="even">
 <td align="right">1</td>
 <td align="left">1_153</td>
-<td align="right">0.1162081</td>
-<td align="right">109236</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="left">1_252</td>
-<td align="right">0.2080240</td>
-<td align="right">195543</td>
+<td align="right">0.1054411</td>
+<td align="right">99115</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_283</td>
-<td align="right">0.2300199</td>
-<td align="right">216219</td>
+<td align="left">1_155</td>
+<td align="right">0.1066606</td>
+<td align="right">100261</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_311</td>
-<td align="right">0.2584132</td>
-<td align="right">242908</td>
+<td align="left">1_168</td>
+<td align="right">0.1213104</td>
+<td align="right">114032</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_369</td>
-<td align="right">0.2936199</td>
-<td align="right">276003</td>
+<td align="left">1_215</td>
+<td align="right">0.1428631</td>
+<td align="right">134291</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_453</td>
-<td align="right">0.3657668</td>
-<td align="right">343821</td>
+<td align="left">1_292</td>
+<td align="right">0.2049643</td>
+<td align="right">192666</td>
 </tr>
 </tbody>
 </table>

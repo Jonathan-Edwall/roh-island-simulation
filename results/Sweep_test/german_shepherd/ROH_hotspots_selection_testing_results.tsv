@@ -1,7 +1,7 @@
-Name	Under_selection	Average_H_e
-Hotspot_chr3_window_1_allele_freq	Yes	0.10912638339604
-Hotspot_chr17_window_2_allele_freq	Yes	0.12437646585
-Hotspot_chr3_window_3_allele_freq	Yes	0.125318110432558
-Hotspot_chr3_window_2_allele_freq	Yes	0.14462891341978
-Hotspot_chr17_window_1_allele_freq	Yes	0.145247374428125
-Hotspot_chr19_window_1_allele_freq	No	0.1605850856
+Name	Under_selection	Window_based_Average_H_e
+Hotspot_chr3_window_1_allele_freq	Yes	0.107881938309288
+Hotspot_chr3_window_3_allele_freq	Yes	0.123042630832857
+Hotspot_chr17_window_2_allele_freq	Yes	0.13251706866
+Hotspot_chr3_window_2_allele_freq	Yes	0.140687338312848
+Hotspot_chr17_window_1_allele_freq	No	0.151842472991373
+Hotspot_chr19_window_1_allele_freq	No	0.160211922882623
