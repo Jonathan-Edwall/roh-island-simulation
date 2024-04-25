@@ -32,7 +32,7 @@ YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
 # Defining the relative path in the repository
 repository_path <- "Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations"
 
-output_dir_simulation <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"data/raw/simulated")
+output_dir_simulation <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"data/raw/simulated/neutral_model")
 
 
 if (!dir.exists(output_dir_simulation)) {

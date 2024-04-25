@@ -15,7 +15,7 @@ echo "conda activated?"
 
 # Defining input directory
 raw_data_dir=$HOME/data/raw
-raw_simulated_dir=$raw_data_dir/simulated
+raw_simulated_dir=$raw_data_dir/simulated/neutral_model
 
 
 # Defining output directory

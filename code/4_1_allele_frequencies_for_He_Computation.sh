@@ -28,7 +28,7 @@ preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dr
 #�������������
 #� Simulated � 
 #�������������
-simulated_data_dir=$raw_data_dir/simulated
+simulated_data_dir=$raw_data_dir/simulated/neutral_model
 #################################### 
 # Defining the output files
 #################################### 
