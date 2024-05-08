@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-04-19" />
+<meta name="date" content="2024-05-03" />
 
 <title>Founder population simulation for Dogs (Neutral Model) in AlphaSimR</title>
 
@@ -343,7 +343,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Founder population simulation for Dogs (Neutral Model) in AlphaSimR</h1>
-<h4 class="date">2024-04-19</h4>
+<h4 class="date">2024-05-03</h4>
 
 </div>
 
@@ -362,11 +362,17 @@ pre code {
 <li><a href="#newpop---creating-two-separate-populations-for-bottleneck-event">1.3: newPop() - Creating two separate populations for bottleneck event</a></li>
 </ul></li>
 <li><a href="#forward-in-time-simulation">2: Forward in time simulation</a><ul>
-<li><a href="#randcross---bottleneck-simulation-for-10-generations">2.1: randCross() - Bottleneck Simulation for 10 Generations</a></li>
-<li><a href="#extracting-the-final-generation">2.2 Extracting the final generation</a></li>
-<li><a href="#adding-snps-to-the-final-generation-simparamaddsnpchip">2.3: Adding SNPs to the final generation ( SimParam$addSnpChip())</a><ul>
-<li><a href="#single-chromosome-usage-computing-number-of-snps-to-assign-to-a-chromosome">2.3.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome</a></li>
-<li><a href="#simparamaddsnpchip---randomly-assigns-eligible-snps-to-a-snp-chip">2.3.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</a></li>
+<li><a href="#defining-random-mating-function-random_mating---randcross">2.0: Defining Random Mating function (random_mating) - randCross()</a></li>
+<li><a href="#bottleneck-simulation">2.1: Bottleneck Simulation</a><ul>
+<li><a href="#simulating-5-generations-of-bottleneck-random-mating">2.1.1 Simulating 5 generations of bottleneck (Random Mating)</a></li>
+<li><a href="#extracting-the-final-bottleneck-generation">2.1.2 Extracting the final bottleneck generation</a></li>
+</ul></li>
+<li><a href="#adding-snps-to-the-final-bottleneck-generation-simparamaddsnpchip">2.2: Adding SNPs to the final bottleneck generation ( SimParam$addSnpChip())</a><ul>
+<li><a href="#single-chromosome-usage-computing-number-of-snps-to-assign-to-a-chromosome">2.2.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome</a></li>
+<li><a href="#simparamaddsnpchip---randomly-assigns-eligible-snps-to-a-snp-chip">2.1.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</a></li>
+</ul></li>
+<li><a href="#modern-dog-breed---ranom-mating-simulation">2.3 Modern dog breed - Ranom Mating Simulation</a><ul>
+<li><a href="#simulating-40-generations-of-random-mating-random-mating">2.3.1 Simulating 40 generations of Random Mating (Random Mating)</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#export-to-plink-extracting-data-to-plink">3: Export to PLINK Extracting data to PLINK</a><ul>
@@ -392,7 +398,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Defining Input parameters
 #################################### 
 min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
-
+n_generations_random_mating &lt;- 40 # The number of generations to simulate during the random mating scenario of modern dog breeds
 
 
 ## Define the output directory based on the parameter passed from the Bash script
@@ -400,7 +406,7 @@ min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 
 
 # Define the output directory based on the variable passed from the Bash script
-output_dir_simulation &lt;- Sys.getenv(&quot;output_dir_simulation&quot;)
+output_dir_simulation &lt;- Sys.getenv(&quot;output_dir_neutral_simulation&quot;)
 chr_simulated &lt;- Sys.getenv(&quot;chr_simulated&quot;)
 output_sim_files_basename &lt;- Sys.getenv(&quot;output_sim_files_basename&quot;)
 
@@ -478,7 +484,7 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 138374</code></pre>
+## Loci: 137933</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -528,7 +534,7 @@ breed1_founders</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 138374 
+## Loci: 137933 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed2_founders &lt;- founderpop[51:100]
 breed2_founders</code></pre>
@@ -536,14 +542,14 @@ breed2_founders</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 138374 
+## Loci: 137933 
 ## Traits: 0</code></pre>
 </div>
 </div>
 <div id="forward-in-time-simulation" class="section level1">
 <h1>2: Forward in time simulation</h1>
-<div id="randcross---bottleneck-simulation-for-10-generations" class="section level2">
-<h2>2.1: randCross() - Bottleneck Simulation for 10 Generations</h2>
+<div id="defining-random-mating-function-random_mating---randcross" class="section level2">
+<h2>2.0: Defining Random Mating function (random_mating) - randCross()</h2>
 <p><code>randCross()</code> simulates random mating.</p>
 <ul>
 <li><p><strong>nCrosses</strong>-argument specifies how many times an individual in the population can be a parent. In this case, an individual can only be a parent once (random mating)</p></li>
@@ -556,87 +562,48 @@ breed2_founders</code></pre>
                           mode = &quot;list&quot;) 
     generations[[1]] &lt;- pop # The initial breeding group population gets stored as the first element
     
-    # Simulating randomm mating to perform simulation of the 2nd until the n+1:th generation
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
     # Each mating Progenys are generated using randcross
     for (gen_ix in 2:(n_gen + 1)) {
         generations[[gen_ix]] &lt;- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_ind, nProgeny = 1,
                                            simParam = SP)
     }
-     bottleneck_generations &lt;- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
+     random_mating_generations &lt;- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
     
-    return(bottleneck_generations)
-}
-
-n_generations &lt;- 5
+    return(random_mating_generations)
+}</code></pre>
+</div>
+<div id="bottleneck-simulation" class="section level2">
+<h2>2.1: Bottleneck Simulation</h2>
+<div id="simulating-5-generations-of-bottleneck-random-mating" class="section level3">
+<h3>2.1.1 Simulating 5 generations of bottleneck (Random Mating)</h3>
+<pre class="r"><code>n_generations &lt;- 5
 # Simulating random mating within each breeding group for 5 generations
 breed1_bottleneck &lt;- random_mating(breed1_founders, SP, n_generations)
-breed2_bottleneck &lt;- random_mating(breed2_founders, SP, n_generations)</code></pre>
-<p>Viewing the output from the bottleneck simulation</p>
-<pre class="r"><code># founders
-founderpop</code></pre>
-<pre><code>## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 100 
-## Chromosomes: 1 
-## Loci: 138374 
-## Traits: 0</code></pre>
-<pre class="r"><code>breed1_bottleneck</code></pre>
-<pre><code>## [[1]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 50 
-## Chromosomes: 1 
-## Loci: 138374 
-## Traits: 0 
-## 
-## [[2]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 50 
-## Chromosomes: 1 
-## Loci: 138374 
-## Traits: 0 
-## 
-## [[3]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 50 
-## Chromosomes: 1 
-## Loci: 138374 
-## Traits: 0 
-## 
-## [[4]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 50 
-## Chromosomes: 1 
-## Loci: 138374 
-## Traits: 0 
-## 
-## [[5]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 50 
-## Chromosomes: 1 
-## Loci: 138374 
-## Traits: 0</code></pre>
+breed2_bottleneck &lt;- random_mating(breed2_founders, SP, n_generations)
+
+# #Viewing the output from the bottleneck simulation
+# # founders
+# founderpop
+# breed1_bottleneck</code></pre>
 </div>
-<div id="extracting-the-final-generation" class="section level2">
-<h2>2.2 Extracting the final generation</h2>
+<div id="extracting-the-final-bottleneck-generation" class="section level3">
+<h3>2.1.2 Extracting the final bottleneck generation</h3>
 <pre class="r"><code># Extracting final generation:
-last_generation &lt;- breed1_bottleneck[[n_generations]]
-last_generation</code></pre>
+last_bottleneck_generation &lt;- breed1_bottleneck[[n_generations]]
+last_bottleneck_generation</code></pre>
 <pre><code>## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 138374 
+## Loci: 137933 
 ## Traits: 0</code></pre>
 </div>
-<div id="adding-snps-to-the-final-generation-simparamaddsnpchip" class="section level2">
-<h2>2.3: Adding SNPs to the final generation ( SimParam$addSnpChip())</h2>
+</div>
+<div id="adding-snps-to-the-final-bottleneck-generation-simparamaddsnpchip" class="section level2">
+<h2>2.2: Adding SNPs to the final bottleneck generation ( SimParam$addSnpChip())</h2>
 <div id="single-chromosome-usage-computing-number-of-snps-to-assign-to-a-chromosome" class="section level3">
-<h3>2.3.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome</h3>
+<h3>2.2.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome</h3>
 <pre class="r"><code># Sum up the chromosome lengths to get the autosome length
 autosome_length &lt;- sum(chromosome_lengths_mb)
 
@@ -664,16 +631,33 @@ cat(&quot; Average Chr SNP density:&quot;, average_chr_SNP_density, &quot;SNPs/C
 <pre><code>##  Average Chr SNP density: 2054.947 SNPs/Chr</code></pre>
 </div>
 <div id="simparamaddsnpchip---randomly-assigns-eligible-snps-to-a-snp-chip" class="section level3">
-<h3>2.3.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</h3>
+<h3>2.1.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</h3>
 <p><code>SP$addSnpChip()</code>Randomly assigns eligible SNPs to a SNP chip.</p>
 <p><strong>nSnpPerChr</strong>-argument that assigns for each individuals n SNPs for each chromsome, where n is the user-specified number.</p>
 <p><strong>minSnpFreq</strong>-argument sets the Minimum Allele Frequency (MAF) allowed for each marker. For instance, setting minSnpFreq = 0.05 ensures that all markers will have MAF &gt;= 0.05</p>
-<p><strong>refPop</strong>-argument specifies which population will be genotyped. In this case, it will be the last_generation after the simulated population bottleneck scenario.</p>
+<p><strong>refPop</strong>-argument specifies which population will be genotyped. In this case, it will be the last_bottleneck_generation after the simulated population bottleneck scenario.</p>
 <pre class="r"><code>SP$addSnpChip(
   nSnpPerChr = num_snp_markers_chr3,
   minSnpFreq = min_MAF,
-  refPop = last_generation
+  refPop = last_bottleneck_generation
   ) </code></pre>
+</div>
+</div>
+<div id="modern-dog-breed---ranom-mating-simulation" class="section level2">
+<h2>2.3 Modern dog breed - Ranom Mating Simulation</h2>
+<div id="simulating-40-generations-of-random-mating-random-mating" class="section level3">
+<h3>2.3.1 Simulating 40 generations of Random Mating (Random Mating)</h3>
+<pre class="r"><code>random_mating_generations &lt;- random_mating(last_bottleneck_generation, SP, n_generations_random_mating)
+
+# Extracting the final random mating generation:
+last_random_mating_generation &lt;- random_mating_generations[[n_generations_random_mating]]
+last_random_mating_generation</code></pre>
+<pre><code>## An object of class &quot;Pop&quot; 
+## Ploidy: 2 
+## Individuals: 50 
+## Chromosomes: 1 
+## Loci: 137933 
+## Traits: 0</code></pre>
 </div>
 </div>
 </div>
@@ -712,74 +696,74 @@ cat(&quot;First 10 markers and their genetic map positions:\n&quot;)</code></pre
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1_4</td>
-<td align="left">1_4</td>
+<td align="left">1_45</td>
+<td align="left">1_45</td>
 <td align="left">1</td>
-<td align="right">4</td>
-<td align="right">0.0000076</td>
+<td align="right">45</td>
+<td align="right">0.0002846</td>
 </tr>
 <tr class="even">
-<td align="left">1_8</td>
-<td align="left">1_8</td>
+<td align="left">1_66</td>
+<td align="left">1_66</td>
 <td align="left">1</td>
-<td align="right">8</td>
-<td align="right">0.0000321</td>
+<td align="right">66</td>
+<td align="right">0.0004262</td>
 </tr>
 <tr class="odd">
-<td align="left">1_48</td>
-<td align="left">1_48</td>
-<td align="left">1</td>
-<td align="right">48</td>
-<td align="right">0.0004110</td>
-</tr>
-<tr class="even">
 <td align="left">1_70</td>
 <td align="left">1_70</td>
 <td align="left">1</td>
 <td align="right">70</td>
-<td align="right">0.0005732</td>
-</tr>
-<tr class="odd">
-<td align="left">1_80</td>
-<td align="left">1_80</td>
-<td align="left">1</td>
-<td align="right">80</td>
-<td align="right">0.0006170</td>
+<td align="right">0.0004520</td>
 </tr>
 <tr class="even">
-<td align="left">1_153</td>
-<td align="left">1_153</td>
+<td align="left">1_75</td>
+<td align="left">1_75</td>
 <td align="left">1</td>
-<td align="right">153</td>
-<td align="right">0.0010544</td>
+<td align="right">75</td>
+<td align="right">0.0004819</td>
 </tr>
 <tr class="odd">
-<td align="left">1_155</td>
-<td align="left">1_155</td>
+<td align="left">1_96</td>
+<td align="left">1_96</td>
 <td align="left">1</td>
-<td align="right">155</td>
-<td align="right">0.0010666</td>
+<td align="right">96</td>
+<td align="right">0.0007343</td>
 </tr>
 <tr class="even">
-<td align="left">1_168</td>
-<td align="left">1_168</td>
+<td align="left">1_128</td>
+<td align="left">1_128</td>
 <td align="left">1</td>
-<td align="right">168</td>
-<td align="right">0.0012131</td>
+<td align="right">128</td>
+<td align="right">0.0009621</td>
 </tr>
 <tr class="odd">
-<td align="left">1_215</td>
-<td align="left">1_215</td>
+<td align="left">1_184</td>
+<td align="left">1_184</td>
 <td align="left">1</td>
-<td align="right">215</td>
-<td align="right">0.0014286</td>
+<td align="right">184</td>
+<td align="right">0.0012741</td>
 </tr>
 <tr class="even">
-<td align="left">1_292</td>
-<td align="left">1_292</td>
+<td align="left">1_219</td>
+<td align="left">1_219</td>
 <td align="left">1</td>
-<td align="right">292</td>
-<td align="right">0.0020496</td>
+<td align="right">219</td>
+<td align="right">0.0015789</td>
+</tr>
+<tr class="odd">
+<td align="left">1_264</td>
+<td align="left">1_264</td>
+<td align="left">1</td>
+<td align="right">264</td>
+<td align="right">0.0019389</td>
+</tr>
+<tr class="even">
+<td align="left">1_296</td>
+<td align="left">1_296</td>
+<td align="left">1</td>
+<td align="right">296</td>
+<td align="right">0.0021897</td>
 </tr>
 </tbody>
 </table>
@@ -803,7 +787,7 @@ cat(&quot;First 10 markers and their genetic map positions:\n&quot;)</code></pre
 <pre class="r"><code># Setting the directory where the .map and .ped files will be stored in
 setwd(output_dir_simulation)
 
-writePlink(last_generation,simParam=SP, baseName=output_sim_files_basename,
+writePlink(last_random_mating_generation,simParam=SP, baseName=output_sim_files_basename,
            
             traits = 1,
            use = &quot;rand&quot;
@@ -851,63 +835,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_4</td>
-<td align="right">0.0007610</td>
-<td align="right">715</td>
+<td align="left">1_45</td>
+<td align="right">0.0284622</td>
+<td align="right">26754</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_8</td>
-<td align="right">0.0032143</td>
-<td align="right">3021</td>
+<td align="left">1_66</td>
+<td align="right">0.0426227</td>
+<td align="right">40065</td>
 </tr>
 <tr class="odd">
-<td align="right">1</td>
-<td align="left">1_48</td>
-<td align="right">0.0411037</td>
-<td align="right">38637</td>
-</tr>
-<tr class="even">
 <td align="right">1</td>
 <td align="left">1_70</td>
-<td align="right">0.0573242</td>
-<td align="right">53885</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">1_80</td>
-<td align="right">0.0616980</td>
-<td align="right">57996</td>
+<td align="right">0.0452048</td>
+<td align="right">42493</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_153</td>
-<td align="right">0.1054411</td>
-<td align="right">99115</td>
+<td align="left">1_75</td>
+<td align="right">0.0481930</td>
+<td align="right">45301</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_155</td>
-<td align="right">0.1066606</td>
-<td align="right">100261</td>
+<td align="left">1_96</td>
+<td align="right">0.0734313</td>
+<td align="right">69025</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_168</td>
-<td align="right">0.1213104</td>
-<td align="right">114032</td>
+<td align="left">1_128</td>
+<td align="right">0.0962125</td>
+<td align="right">90440</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_215</td>
-<td align="right">0.1428631</td>
-<td align="right">134291</td>
+<td align="left">1_184</td>
+<td align="right">0.1274109</td>
+<td align="right">119766</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_292</td>
-<td align="right">0.2049643</td>
-<td align="right">192666</td>
+<td align="left">1_219</td>
+<td align="right">0.1578859</td>
+<td align="right">148413</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">1_264</td>
+<td align="right">0.1938893</td>
+<td align="right">182256</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">1_296</td>
+<td align="right">0.2189710</td>
+<td align="right">205833</td>
 </tr>
 </tbody>
 </table>

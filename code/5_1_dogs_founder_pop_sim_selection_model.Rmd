@@ -304,7 +304,7 @@ for each marker. For instance, setting minSnpFreq = 0.05 ensures that
 all markers will have MAF \>= 0.05
 
 **refPop**-argument specifies which population will be genotyped. In
-this case, it will be the last_generation after the simulated population
+this case, it will be the last_bottleneck_generation after the simulated population
 bottleneck scenario.
 
 ```{r SimParam$addSnpChip()}
@@ -424,7 +424,7 @@ Function that retrieves SNP genotype data & returns a matrix of SNP
 genotypes
 
 ```{r pullSnpGeno(), echo = FALSE}
-#pullSnpGeno(last_generation,simParam=SP)
+#pullSnpGeno(last_bottleneck_generation,simParam=SP)
 ```
 
 ## 3.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map

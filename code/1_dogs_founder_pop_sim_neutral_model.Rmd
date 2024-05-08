@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-04-19"
+date: "2024-05-03"
 editor_options: 
   markdown: 
     wrap: 72
@@ -47,7 +47,7 @@ knitr::opts_knit$set(root.dir = output_dir_simulation)
 # Defining Input parameters
 #################################### 
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
-
+n_generations_random_mating <- 40 # The number of generations to simulate during the random mating scenario of modern dog breeds
 
 
 #################################### 
@@ -191,8 +191,7 @@ breed2_founders
 
 # 2: Forward in time simulation
 
-## 2.1: randCross() - Bottleneck Simulation for 10 Generations
-
+## 2.0: Defining Random Mating function (random_mating) - randCross()
 `randCross()` simulates random mating.
 
 -   **nCrosses**-argument specifies how many times an individual in the
@@ -204,7 +203,6 @@ breed2_founders
     mating pair.
 
 -   **simParam**-argument specifies the global simulation parameters
-
 ```{r}
 random_mating <- function(pop, SP, n_gen) {
     n_ind <- pop@nInd # Extracting number of individuals in the current population
@@ -212,42 +210,47 @@ random_mating <- function(pop, SP, n_gen) {
                           mode = "list") 
     generations[[1]] <- pop # The initial breeding group population gets stored as the first element
     
-    # Simulating randomm mating to perform simulation of the 2nd until the n+1:th generation
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
     # Each mating Progenys are generated using randcross
     for (gen_ix in 2:(n_gen + 1)) {
         generations[[gen_ix]] <- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_ind, nProgeny = 1,
                                            simParam = SP)
     }
-     bottleneck_generations <- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
+     random_mating_generations <- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
     
-    return(bottleneck_generations)
+    return(random_mating_generations)
 }
+```
+
+
+## 2.1: Bottleneck Simulation 
+
+### 2.1.1 Simulating 5 generations of bottleneck (Random Mating)
+
+```{r}
+
 
 n_generations <- 5
 # Simulating random mating within each breeding group for 5 generations
 breed1_bottleneck <- random_mating(breed1_founders, SP, n_generations)
 breed2_bottleneck <- random_mating(breed2_founders, SP, n_generations)
+
+# #Viewing the output from the bottleneck simulation
+# # founders
+# founderpop
+# breed1_bottleneck
+
 ```
 
-Viewing the output from the bottleneck simulation
-
-```{r}
-
-# founders
-founderpop
-breed1_bottleneck
-```
-
-## 2.2 Extracting the final generation
-
+### 2.1.2 Extracting the final bottleneck generation
 ```{r}
 # Extracting final generation:
-last_generation <- breed1_bottleneck[[n_generations]]
-last_generation
+last_bottleneck_generation <- breed1_bottleneck[[n_generations]]
+last_bottleneck_generation
 ```
-## 2.3: Adding SNPs to the final generation ( SimParam$addSnpChip())
+## 2.2: Adding SNPs to the final bottleneck generation ( SimParam\$addSnpChip())
 
-### 2.3.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome
+### 2.2.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome
 
 ```{r}
 
@@ -279,27 +282,42 @@ cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n")
 
 ```
 
-### 2.3.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip
+### 2.1.2: SimParam\$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip
 
 `SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip.
 
 **nSnpPerChr**-argument that assigns for each individuals n SNPs for
-each chromsome, where n is the user-specified number. 
+each chromsome, where n is the user-specified number.
 
-**minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed for each marker.
-For instance, setting minSnpFreq = 0.05 ensures that all markers will have MAF >= 0.05 
+**minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed
+for each marker. For instance, setting minSnpFreq = 0.05 ensures that
+all markers will have MAF \>= 0.05
 
-**refPop**-argument specifies which population will be genotyped.
-In this case, it will be the last_generation after the simulated population bottleneck scenario.
+**refPop**-argument specifies which population will be genotyped. In
+this case, it will be the last_bottleneck_generation after the simulated population
+bottleneck scenario.
 
 ```{r SimParam$addSnpChip()}
 SP$addSnpChip(
   nSnpPerChr = num_snp_markers_chr3,
   minSnpFreq = min_MAF,
-  refPop = last_generation
+  refPop = last_bottleneck_generation
   ) 
 ```
 
+
+
+## 2.3 Modern dog breed - Ranom Mating Simulation
+### 2.3.1 Simulating 40 generations of Random Mating (Random Mating)
+```{r}
+random_mating_generations <- random_mating(last_bottleneck_generation, SP, n_generations_random_mating)
+
+# Extracting the final random mating generation:
+last_random_mating_generation <- random_mating_generations[[n_generations_random_mating]]
+last_random_mating_generation
+
+
+```
 
 # 3: Export to PLINK Extracting data to PLINK
 
@@ -309,7 +327,7 @@ Function that retrieves SNP genotype data & returns a matrix of SNP
 genotypes
 
 ```{r pullSnpGeno(), echo = FALSE}
-#pullSnpGeno(last_generation,simParam=SP)
+#pullSnpGeno(last_random_mating_generation,simParam=SP)
 ```
 
 ## 3.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map
@@ -379,7 +397,7 @@ snpChip = 1, useQtl = FALSE, simParam = NULL, ... )
 # Setting the directory where the .map and .ped files will be stored in
 setwd(output_dir_simulation)
 
-writePlink(last_generation,simParam=SP, baseName=output_sim_files_basename,
+writePlink(last_random_mating_generation,simParam=SP, baseName=output_sim_files_basename,
            
             traits = 1,
            use = "rand"

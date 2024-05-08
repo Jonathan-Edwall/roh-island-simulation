@@ -28,16 +28,16 @@ cd $HOME
 #����������������������
 # Allele frequency file
 #����������������������
-plink_output_dir=$HOME/results/PLINK
-german_shepherd_allele_freq_dir=$plink_output_dir/empirical/german_shepherd/allele_freq
+plink_results_dir=$HOME/results/PLINK/allele_freq
+german_shepherd_allele_freq_plink_output_dir=$plink_results_dir/empirical/german_shepherd
 
-allele_freq_w_positions_file="$german_shepherd_allele_freq_dir/german_shepherd_allele_freq_with_marker_pos.bed"
+allele_freq_w_positions_file="$german_shepherd_allele_freq_plink_output_dir/german_shepherd_filtered_allele_freq_w_positions.bed"
 
 #�������������������������
 # ROH-hotspot window-files
 #�������������������������
 ROH_hotspots_results_dir=$HOME/results/ROH-Hotspots
-german_shepherd_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/german_shepherd/gosling_plots
+german_shepherd_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/german_shepherd
 
 
 #################################### 
