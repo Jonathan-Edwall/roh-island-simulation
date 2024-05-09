@@ -12,7 +12,6 @@ conda activate bedtools
 
 # bedtools intersect -h  # Documentation about the merge function
 
-echo "conda activated?"
 
 ####################################  
 # Defining the working directory
@@ -33,7 +32,7 @@ preprocessed_phenotype_file_dir=$preprocessed_data_dir/empirical/omia_dog_phenot
 
 
 ROH_hotspots_results_dir=$HOME/results/ROH-Hotspots
-german_shepherd_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/german_shepherd/gosling_plots
+german_shepherd_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/german_shepherd
 
 echo "ROH hotspot directory: $german_shepherd_roh_hotspots_dir"
 
@@ -47,69 +46,32 @@ phenotype_mapping_output_dir=$german_shepherd_roh_hotspots_dir/hotspot_phenotype
 # Creating a directory to store the .BED-files in, if it does not already exist.
 mkdir -p $phenotype_mapping_output_dir
 
-#いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
+#鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申
 # Function: bedtools intersect
 #
 ###Input:
 # 
 ###Output:
-#いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
+#鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申
 
-
+#phenotype_file=$preprocessed_phenotype_file_dir/ALL_dog_phenotypes.bed
+#phenotype_file=$preprocessed_phenotype_file_dir/ALL_phenotypes_german_shepherd.bed
+phenotype_file=$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_any_breed.bed
+#phenotype_file=$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_german_shepherd.bed
 
 # Running intersect command for every chromosome ROH-hotspot file.
 for roh_hotspot_file in $german_shepherd_roh_hotspots_dir/*.bed; do
     echo "Processing file: $roh_hotspot_file"
-    chromosome=$(basename "$roh_hotspot_file" .bed | cut -d'_' -f1) # Extracting chromosome from the file name
-    output_file="$phenotype_mapping_output_dir/${chromosome}_ROH_hotspot_phenotypes.bed"   
-    #awk 'BEGIN{FS="\t"; OFS="\t"} NF >= 3 {print $1,$2,$3}' "$preprocessed_phenotype_file_dir/all_dog_phenotypes.bed" > temp.bed 
-    awk 'BEGIN{FS="\t"; OFS="\t"} NF >= 3 {print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11}' "$preprocessed_phenotype_file_dir/ALL_phenotypes.bed" > temp.bed     
-      
+    prefix=$(basename "$roh_hotspot_file" .bed) # Extracting basename without the .bed extension
+    output_file="$phenotype_mapping_output_dir/${prefix}_phenotypes.bed"   
+
     # Run bedtools intersect-function        
     bedtools intersect \
     -wa -header \
-    -a "temp.bed" \
+    -a "$phenotype_file" \
     -b "$roh_hotspot_file" \
     > "$output_file"    
-#echo "Phenotype file: debug_all_dog_phenotypes.bed"
-    
-    
-    
-# # Extracting only the first three columns from debug_all_dog_phenotypes.bed
-#    awk 'BEGIN{FS="\t"; OFS="\t"} NF >= 3 {print $1,$2,$3}' "$preprocessed_phenotype_file_dir/debug_all_dog_phenotypes.bed" > temp.bed
-#
-#    # Filter out empty lines and lines with fewer than 3 columns
-#    sed -i '/^$/d' temp.bed
-#    sed -i '/^#/d' temp.bed
-#
-#    # Create a temporary copy of temp.bed for chromosome renaming
-#    cp temp.bed temp_renamed.bed
-#
-#    # Rename chromosome entries in temp_renamed.bed
-#    sed -i 's/^/chr/' temp_renamed.bed
-#
-#    echo "Content of temp_renamed.bed:"
-#    cat -A temp_renamed.bed
-#    
-#    echo "Content of /home/jonathan/results/ROH-Hotspots/empirical/german_shepherd/gosling_plots/chr17_ROH_Hotspot_windows.bed:"
-#    cat -A $roh_hotspot_file
-#
-#    # Check the content of roh_hotspot_file
-#    echo "Content of $roh_hotspot_file:"
-#    cat "$roh_hotspot_file"
-#    
-#    
-#     bedtools intersect -a "temp_renamed.bed" -b "$roh_hotspot_file" -wa > "$output_file"
-#
-##    # Run bedtools intersect-function
-##    bedtools intersect \
-##    -wa \
-##    -a "temp_renamed.bed" \
-##    -b "$roh_hotspot_file" \
-##    > "$output_file"
-#
-#    # Remove temporary files
-#    rm temp.bed temp_renamed.bed
+
 done
 
 

@@ -92,22 +92,22 @@ for file in $preprocessed_german_shepherd_dir/*.bim; do
     # Adding POS to the outputfile
     ##############################          
     
-    # Define the header of the outputfile
-    header="#CHR\tPOS\tSNP\tA1\tA2\tMAF\tNCHROBS"
-          
-    # Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
-    # Then performing join-operation to associate markers SNP-markers in the outputfile with their base-pair positions
+    header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
+
+    # Sorting the input files based on the 2nd column (SNP identifier) using process substitution
+    # Then performing a join operation (based on the 2nd column) to associate markers SNP-markers in the outputfile with their base-pair positions
+    # tail -n +2 is used on the .frq file since it involves a header line.
     join -1 2 -2 2 \
     -o 1.1,2.4,1.2,1.3,1.4,1.5,1.6 \
-    <(sort -k2,2 "${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq.frq") \
+    <(tail -n +2 "${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq.frq" | sort -k2,2) \
     <(sort -k2,2 "${preprocessed_german_shepherd_dir}/${population_name}.bim") | \
-    awk -v OFS='\t' '{print $1,$7,$7+1,$2,$3,$4,$5,$6}' | \
     sort -k1,1n -k2,2n | \
-    awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7,$8}' | \
-    sed '1i'"$header" > "${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq_w_positions.tsv"
-    
-    echo "Added physical positions for the markers in ${population_name}_allele_freq.frq"
-    echo "The output file is stored in: ${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq_w_positions.tsv"
+    awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7,$8}' | \
+    sed 's/[[:space:]]\+$//' |  # Remove trailing whitespace, including tabs
+    sed '1i'"$header" > "${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq.bed"
+
+echo "Added physical positions for the markers in ${population_name}_allele_freq.frq"
+echo "The output file is stored in: ${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq.bed"
     
 done
 

@@ -31,7 +31,7 @@ cd $HOME
 plink_results_dir=$HOME/results/PLINK/allele_freq
 german_shepherd_allele_freq_plink_output_dir=$plink_results_dir/empirical/german_shepherd
 
-allele_freq_w_positions_file="$german_shepherd_allele_freq_plink_output_dir/german_shepherd_filtered_allele_freq_w_positions.bed"
+allele_freq_w_positions_file="$german_shepherd_allele_freq_plink_output_dir/german_shepherd_filtered_allele_freq.bed"
 
 #�������������������������
 # ROH-hotspot window-files
@@ -56,30 +56,31 @@ mkdir -p $hotspots_allele_freq_output_dir
 ###Output:
 #����������������������������������������������������������������������������
 
-
-
-# Running intersect command for every chromosome ROH-hotspot file.
-for roh_hotspot_file in $german_shepherd_roh_hotspots_dir/*.bed; do
-    echo "Processing file: $roh_hotspot_file"
-    chromosome=$(basename "$roh_hotspot_file" .bed | cut -d'_' -f1) # Extracting chromosome from the file name
-    
+# Running intersect command for every ROH-hotspot file.
+for roh_hotspot_file in "$german_shepherd_roh_hotspots_dir"/*.bed; do
+    prefix=$(basename "$roh_hotspot_file" .bed) # Extracting basename without the .bed extension
     # Counter for ROH hotspot windows
-    counter=1
-    
-    # Loop through each ROH hotspot window for the current chromosome
-    while IFS=$'\t' read -r chrom start end; do
-        output_file="$hotspots_allele_freq_output_dir/${chromosome}_ROH_hotspot_window_${counter}_allele_freq.bed"
+    counter=1    
+   
+    # Loop through each ROH hotspot window for the current file
+    while IFS= read -r line; do
+        output_file="${hotspots_allele_freq_output_dir}/${prefix}_${counter}_allele_freq.bed"
+        # Create a temporary BED file for the current genomic interval
+        echo -e "$line" > temp.bed
         
         # Run bedtools intersect-function        
         bedtools intersect \
-        -wa -header \
-        -a "$allele_freq_w_positions_file" \
-        -b <(echo -e "$chrom\t$start\t$end") \
-        > "$output_file"
+            -wa -header \
+            -a <(tail -n +2 "$allele_freq_w_positions_file") \
+            -b temp.bed \
+            >> "$output_file"  # Append output to the file instead of overwriting
         
         ((counter++))
     done < "$roh_hotspot_file"
 done
+
+
+
 
 
 
