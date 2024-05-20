@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-05-03" />
+<meta name="date" content="2024-05-13" />
 
 <title>Founder population simulation for Dogs (Neutral Model) in AlphaSimR</title>
 
@@ -343,7 +343,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Founder population simulation for Dogs (Neutral Model) in AlphaSimR</h1>
-<h4 class="date">2024-05-03</h4>
+<h4 class="date">2024-05-13</h4>
 
 </div>
 
@@ -371,7 +371,7 @@ pre code {
 <li><a href="#single-chromosome-usage-computing-number-of-snps-to-assign-to-a-chromosome">2.2.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome</a></li>
 <li><a href="#simparamaddsnpchip---randomly-assigns-eligible-snps-to-a-snp-chip">2.1.2: SimParam$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip</a></li>
 </ul></li>
-<li><a href="#modern-dog-breed---ranom-mating-simulation">2.3 Modern dog breed - Ranom Mating Simulation</a><ul>
+<li><a href="#modern-dog-breed---random-mating-simulation">2.3 Modern dog breed - Random Mating Simulation</a><ul>
 <li><a href="#simulating-40-generations-of-random-mating-random-mating">2.3.1 Simulating 40 generations of Random Mating (Random Mating)</a></li>
 </ul></li>
 </ul></li>
@@ -399,7 +399,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 n_generations_random_mating &lt;- 40 # The number of generations to simulate during the random mating scenario of modern dog breeds
-
+N_e_burn_in &lt;- 2500 # Ancestral population
 
 ## Define the output directory based on the parameter passed from the Bash script
 #output_dir_simulation &lt;- params$output_dir_simulation
@@ -407,16 +407,22 @@ n_generations_random_mating &lt;- 40 # The number of generations to simulate dur
 
 # Define the output directory based on the variable passed from the Bash script
 output_dir_simulation &lt;- Sys.getenv(&quot;output_dir_neutral_simulation&quot;)
-chr_simulated &lt;- Sys.getenv(&quot;chr_simulated&quot;)
-output_sim_files_basename &lt;- Sys.getenv(&quot;output_sim_files_basename&quot;)
-
-
+output_dir_simulation</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/data/raw/simulated/neutral_model&quot;</code></pre>
+<pre class="r"><code>chr_simulated &lt;- Sys.getenv(&quot;chr_simulated&quot;)
+chr_simulated</code></pre>
+<pre><code>## [1] &quot;chr3&quot;</code></pre>
+<pre class="r"><code>output_sim_files_basename &lt;- Sys.getenv(&quot;output_sim_files_basename&quot;)
+output_sim_files_basename</code></pre>
+<pre><code>## [1] &quot;sim_20_neutral_model_chr3&quot;</code></pre>
+<pre class="r"><code>snp_density_Mb &lt;- as.numeric(Sys.getenv(&quot;selected_chr_snp_density_mb&quot;)) 
 # Ensure that output_dir_simulation is defined
 if (is.null(output_dir_simulation)) {
   stop(&quot;output_dir_simulation is not provided.&quot;)
 }
-
-#################################### 
+snp_density_Mb</code></pre>
+<pre><code>## [1] 56.21</code></pre>
+<pre class="r"><code>#################################### 
 # Defining the output files
 #################################### 
 
@@ -429,11 +435,6 @@ if (is.null(output_dir_simulation)) {
 <pre><code>## Loading required package: R6</code></pre>
 <pre class="r"><code>library(knitr)</code></pre>
 <pre><code>## Warning: package &#39;knitr&#39; was built under R version 4.3.2</code></pre>
-<pre class="r"><code>#library(dplyr)
-#library(ggplot2)
-#library(patchwork)
-#library(purrr)
-#library(tibble)</code></pre>
 </div>
 </div>
 <div id="creating-founder-haplotypes" class="section level1">
@@ -472,7 +473,7 @@ model_chromosome_bp_length &lt;- chromosome_lengths_mb[chr_simulated] * 10^6
 
 founderGenomes &lt;- runMacs2(nInd = 100,
                      nChr = 1,
-                     Ne = 2500,
+                     Ne = N_e_burn_in,
                      bp = model_chromosome_bp_length,
                      genLen = 1,
                      histNe = NULL,
@@ -484,7 +485,7 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 137933</code></pre>
+## Loci: 138420</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -534,7 +535,7 @@ breed1_founders</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137933 
+## Loci: 138420 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed2_founders &lt;- founderpop[51:100]
 breed2_founders</code></pre>
@@ -542,7 +543,7 @@ breed2_founders</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137933 
+## Loci: 138420 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -596,7 +597,7 @@ last_bottleneck_generation</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137933 
+## Loci: 138420 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -609,7 +610,7 @@ autosome_length &lt;- sum(chromosome_lengths_mb)
 
 # Number of SNP markers from the empirical dataset
 # https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
-num_snp_markers &lt;- 78088  
+num_snp_markers &lt;- 78088
 
 # Calculate average SNP-autosome density
 average_snp_autosome_density &lt;- num_snp_markers / autosome_length
@@ -626,7 +627,7 @@ cat(&quot;autosome length:&quot;, autosome_length, &quot;Mb\n&quot;)</code></pre
 <pre><code>## Average SNP-autosome density: 33.98085 SNPs/Mb</code></pre>
 <pre class="r"><code>cat(&quot;Number of SNP markers for&quot;, chr_simulated, &quot;:&quot;, num_snp_markers_chr3, &quot;SNPs\n&quot;)</code></pre>
 <pre><code>## Number of SNP markers for chr3 : 3194.2 SNPs</code></pre>
-<pre class="r"><code>average_chr_SNP_density &lt;- num_snp_markers / length(chromosome_lengths_mb) 
+<pre class="r"><code>average_chr_SNP_density &lt;- num_snp_markers / length(chromosome_lengths_mb)
 cat(&quot; Average Chr SNP density:&quot;, average_chr_SNP_density, &quot;SNPs/Chr\n&quot;)</code></pre>
 <pre><code>##  Average Chr SNP density: 2054.947 SNPs/Chr</code></pre>
 </div>
@@ -636,15 +637,20 @@ cat(&quot; Average Chr SNP density:&quot;, average_chr_SNP_density, &quot;SNPs/C
 <p><strong>nSnpPerChr</strong>-argument that assigns for each individuals n SNPs for each chromsome, where n is the user-specified number.</p>
 <p><strong>minSnpFreq</strong>-argument sets the Minimum Allele Frequency (MAF) allowed for each marker. For instance, setting minSnpFreq = 0.05 ensures that all markers will have MAF &gt;= 0.05</p>
 <p><strong>refPop</strong>-argument specifies which population will be genotyped. In this case, it will be the last_bottleneck_generation after the simulated population bottleneck scenario.</p>
+<pre class="r"><code>model_chromosome_Mb_length &lt;- chromosome_lengths_mb[chr_simulated] 
+num_snp_markers_simulated_chromosome &lt;- snp_density_Mb * model_chromosome_Mb_length
+num_snp_markers_simulated_chromosome</code></pre>
+<pre><code>##    chr3 
+## 5283.74</code></pre>
 <pre class="r"><code>SP$addSnpChip(
-  nSnpPerChr = num_snp_markers_chr3,
+  nSnpPerChr = num_snp_markers_simulated_chromosome,
   minSnpFreq = min_MAF,
   refPop = last_bottleneck_generation
-  ) </code></pre>
+  )</code></pre>
 </div>
 </div>
-<div id="modern-dog-breed---ranom-mating-simulation" class="section level2">
-<h2>2.3 Modern dog breed - Ranom Mating Simulation</h2>
+<div id="modern-dog-breed---random-mating-simulation" class="section level2">
+<h2>2.3 Modern dog breed - Random Mating Simulation</h2>
 <div id="simulating-40-generations-of-random-mating-random-mating" class="section level3">
 <h3>2.3.1 Simulating 40 generations of Random Mating (Random Mating)</h3>
 <pre class="r"><code>random_mating_generations &lt;- random_mating(last_bottleneck_generation, SP, n_generations_random_mating)
@@ -656,8 +662,46 @@ last_random_mating_generation</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 137933 
+## Loci: 138420 
 ## Traits: 0</code></pre>
+<!-- ## 2.4: Adding SNPs to the final bottleneck generation ( SimParam\$addSnpChip()) -->
+<!-- ### 2.4.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome -->
+<!-- ```{r} -->
+<!-- # Sum up the chromosome lengths to get the autosome length -->
+<!-- autosome_length <- sum(chromosome_lengths_mb) -->
+<!-- # Number of SNP markers from the empirical dataset -->
+<!-- # https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf -->
+<!-- num_snp_markers <- 78088 -->
+<!-- # Calculate average SNP-autosome density -->
+<!-- average_snp_autosome_density <- num_snp_markers / autosome_length -->
+<!-- # Calculate the number of SNP markers to choose for the specific chromosome -->
+<!-- num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated] -->
+<!-- # Output results -->
+<!-- cat("autosome length:", autosome_length, "Mb\n") -->
+<!-- cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n") -->
+<!-- cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb) -->
+<!-- cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n") -->
+<!-- ``` -->
+<!-- ### 2.4.2: SimParam\$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip -->
+<!-- `SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip. -->
+<!-- **nSnpPerChr**-argument that assigns for each individuals n SNPs for -->
+<!-- each chromsome, where n is the user-specified number. -->
+<!-- **minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed -->
+<!-- for each marker. For instance, setting minSnpFreq = 0.05 ensures that -->
+<!-- all markers will have MAF \>= 0.05 -->
+<!-- **refPop**-argument specifies which population will be genotyped. In -->
+<!-- this case, it will be the last_random_mating_generation after the simulated population -->
+<!-- bottleneck scenario. -->
+<!-- ```{r SimParam$addSnpChip()} -->
+<!-- SP$addSnpChip( -->
+<!--   nSnpPerChr = num_snp_markers_chr3, -->
+<!--   minSnpFreq = min_MAF, -->
+<!--   refPop = last_random_mating_generation -->
+<!--   ) -->
+<!-- ``` -->
 </div>
 </div>
 </div>
@@ -696,74 +740,74 @@ cat(&quot;First 10 markers and their genetic map positions:\n&quot;)</code></pre
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">1_17</td>
+<td align="left">1_17</td>
+<td align="left">1</td>
+<td align="right">17</td>
+<td align="right">0.0000992</td>
+</tr>
+<tr class="even">
+<td align="left">1_23</td>
+<td align="left">1_23</td>
+<td align="left">1</td>
+<td align="right">23</td>
+<td align="right">0.0001423</td>
+</tr>
+<tr class="odd">
 <td align="left">1_45</td>
 <td align="left">1_45</td>
 <td align="left">1</td>
 <td align="right">45</td>
-<td align="right">0.0002846</td>
+<td align="right">0.0002789</td>
 </tr>
 <tr class="even">
-<td align="left">1_66</td>
-<td align="left">1_66</td>
+<td align="left">1_50</td>
+<td align="left">1_50</td>
 <td align="left">1</td>
-<td align="right">66</td>
-<td align="right">0.0004262</td>
+<td align="right">50</td>
+<td align="right">0.0003474</td>
 </tr>
 <tr class="odd">
-<td align="left">1_70</td>
-<td align="left">1_70</td>
+<td align="left">1_81</td>
+<td align="left">1_81</td>
 <td align="left">1</td>
-<td align="right">70</td>
-<td align="right">0.0004520</td>
+<td align="right">81</td>
+<td align="right">0.0005366</td>
 </tr>
 <tr class="even">
-<td align="left">1_75</td>
-<td align="left">1_75</td>
+<td align="left">1_102</td>
+<td align="left">1_102</td>
 <td align="left">1</td>
-<td align="right">75</td>
-<td align="right">0.0004819</td>
+<td align="right">102</td>
+<td align="right">0.0007046</td>
 </tr>
 <tr class="odd">
-<td align="left">1_96</td>
-<td align="left">1_96</td>
+<td align="left">1_113</td>
+<td align="left">1_113</td>
 <td align="left">1</td>
-<td align="right">96</td>
-<td align="right">0.0007343</td>
+<td align="right">113</td>
+<td align="right">0.0007877</td>
 </tr>
 <tr class="even">
-<td align="left">1_128</td>
-<td align="left">1_128</td>
+<td align="left">1_132</td>
+<td align="left">1_132</td>
 <td align="left">1</td>
-<td align="right">128</td>
-<td align="right">0.0009621</td>
+<td align="right">132</td>
+<td align="right">0.0009108</td>
 </tr>
 <tr class="odd">
-<td align="left">1_184</td>
-<td align="left">1_184</td>
+<td align="left">1_137</td>
+<td align="left">1_137</td>
 <td align="left">1</td>
-<td align="right">184</td>
-<td align="right">0.0012741</td>
+<td align="right">137</td>
+<td align="right">0.0009361</td>
 </tr>
 <tr class="even">
-<td align="left">1_219</td>
-<td align="left">1_219</td>
+<td align="left">1_221</td>
+<td align="left">1_221</td>
 <td align="left">1</td>
-<td align="right">219</td>
-<td align="right">0.0015789</td>
-</tr>
-<tr class="odd">
-<td align="left">1_264</td>
-<td align="left">1_264</td>
-<td align="left">1</td>
-<td align="right">264</td>
-<td align="right">0.0019389</td>
-</tr>
-<tr class="even">
-<td align="left">1_296</td>
-<td align="left">1_296</td>
-<td align="left">1</td>
-<td align="right">296</td>
-<td align="right">0.0021897</td>
+<td align="right">221</td>
+<td align="right">0.0015583</td>
 </tr>
 </tbody>
 </table>
@@ -835,63 +879,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
+<td align="left">1_17</td>
+<td align="right">0.0099183</td>
+<td align="right">9323</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="left">1_23</td>
+<td align="right">0.0142338</td>
+<td align="right">13380</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
 <td align="left">1_45</td>
-<td align="right">0.0284622</td>
-<td align="right">26754</td>
+<td align="right">0.0278894</td>
+<td align="right">26216</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_66</td>
-<td align="right">0.0426227</td>
-<td align="right">40065</td>
+<td align="left">1_50</td>
+<td align="right">0.0347382</td>
+<td align="right">32654</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_70</td>
-<td align="right">0.0452048</td>
-<td align="right">42493</td>
+<td align="left">1_81</td>
+<td align="right">0.0536578</td>
+<td align="right">50438</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_75</td>
-<td align="right">0.0481930</td>
-<td align="right">45301</td>
+<td align="left">1_102</td>
+<td align="right">0.0704575</td>
+<td align="right">66230</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_96</td>
-<td align="right">0.0734313</td>
-<td align="right">69025</td>
+<td align="left">1_113</td>
+<td align="right">0.0787680</td>
+<td align="right">74042</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_128</td>
-<td align="right">0.0962125</td>
-<td align="right">90440</td>
+<td align="left">1_132</td>
+<td align="right">0.0910760</td>
+<td align="right">85611</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">1_184</td>
-<td align="right">0.1274109</td>
-<td align="right">119766</td>
+<td align="left">1_137</td>
+<td align="right">0.0936050</td>
+<td align="right">87989</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="left">1_219</td>
-<td align="right">0.1578859</td>
-<td align="right">148413</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">1_264</td>
-<td align="right">0.1938893</td>
-<td align="right">182256</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="left">1_296</td>
-<td align="right">0.2189710</td>
-<td align="right">205833</td>
+<td align="left">1_221</td>
+<td align="right">0.1558262</td>
+<td align="right">146477</td>
 </tr>
 </tbody>
 </table>

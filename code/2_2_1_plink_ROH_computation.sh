@@ -17,19 +17,19 @@ cd $HOME
 # Defining the input files
 #################################### 
 # Defining input directory
-raw_data_dir=$HOME/data/raw
-raw_simulated_dir=$raw_data_dir/simulated
+preprocessed_data_dir=$HOME/data/preprocessed
+
 #�������������
 #� Empirical �
 #�������������
-preprocessed_data_dir=$HOME/data/preprocessed
 preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
 
 #�������������
 #� Simulated � 
 #�������������
-raw_simulated_neutral_model_dir=$raw_simulated_dir/neutral_model
-raw_simulated_selection_model_dir=$raw_simulated_dir/selection_model
+preprocessed_simulated_data_dir=$preprocessed_data_dir/simulated
+preprocessed_neutral_model_dir=$preprocessed_simulated_data_dir/neutral_model
+preprocessed_selection_model_dir=$preprocessed_simulated_data_dir/selection_model
 
 #################################### 
 # Defining the output files
@@ -61,7 +61,7 @@ mkdir -p $simulated_selection_model_plink_output_dir
 
 ############################################################################
 # Function: plink --homozyg
-###Input: .map and .ped files
+###Input: .bim and .ped files
 ###Output: .frq-files
 
 ############ Window parameters (defining putative ROH-markers) 
@@ -98,15 +98,15 @@ echo "Outputfiles stored in: $german_shepherd_plink_output_dir"
 ##�������������������������
 ##���� Neutral Model (Simulated) ���� 
 ##�������������������������
-# Find any .map file in raw_simulated_neutral_model_dir and use its basename as the simulation name
-for simulation_file in $raw_simulated_neutral_model_dir/*.map; do
-    # Extract simulation name from the filename (minus the .map extension)
+# Find any .bim file in preprocessed_neutral_model_dir and use its basename as the simulation name
+for simulation_file in $preprocessed_neutral_model_dir/*.bim; do
+    # Extract simulation name from the filename (minus the .bim extension)
     simulation_name=$(basename "${simulation_file%.*}")    
     echo "$simulation_name"     
           
     # Running --homozyg command for ROH computation
     plink \
-     --file "${raw_simulated_neutral_model_dir}/${simulation_name}" \
+     --bfile "${preprocessed_neutral_model_dir}/${simulation_name}" \
      --out "${simulated_neutral_model_plink_output_dir}/${simulation_name}_ROH" \
      --dog \
      --homozyg \
@@ -126,15 +126,15 @@ echo "Outputfiles stored in: $simulated_neutral_model_plink_output_dir"
 ##���� Selection Model (Simulated) ���� 
 ##��������������������������
 
-# Find any .map file in raw_simulated_selection_model_dir and use its basename as the simulation name
-for simulation_file in $raw_simulated_selection_model_dir/*.map; do
-    # Extract simulation name from the filename (minus the .map extension)
+# Find any .bim file in preprocessed_selection_model_dir and use its basename as the simulation name
+for simulation_file in $preprocessed_selection_model_dir/*.bim; do
+    # Extract simulation name from the filename (minus the .bim extension)
     simulation_name=$(basename "${simulation_file%.*}")    
     echo "$simulation_name"     
           
     # Running --homozyg command for ROH computation
     plink \
-     --file "${raw_simulated_selection_model_dir}/${simulation_name}" \
+     --bfile "${preprocessed_selection_model_dir}/${simulation_name}" \
      --out "${simulated_selection_model_plink_output_dir}/${simulation_name}_ROH" \
      --dog \
      --homozyg \

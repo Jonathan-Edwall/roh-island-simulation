@@ -88,7 +88,10 @@ colnames(data) <- c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
 
 
 # Frequency Data is chosen
-values <- data$FREQUENCY
+# values <- data$FREQUENCY
+# Only windows associated with ROH-segments in the population, are allowed 
+# In other words, windows with frequency larger than 0
+values <- subset(data, FREQUENCY > 0)$FREQUENCY 
 
 # Sort the values in descending order to find the top 1%
 sorted_values <- sort(values, decreasing = TRUE)

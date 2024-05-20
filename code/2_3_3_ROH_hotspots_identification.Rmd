@@ -35,15 +35,7 @@ repository_path <- file.path(YOUR_GITHUB_ROOT_DIRECTORY,"Computational-modelling
 # Defining the input file
 #################################### 
 
-# input_file <- file.path(repository_path,"results/Bedtools/coverage/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/pop_roh_freq/german_shepherd_ROH_freq.bed")
-
-# input_file <- file.path(repository_path,"results/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_1_neutral_model_CHR3_ROH_freq.bed")
-
-input_file <- file.path(repository_path,"results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_1_selection_model_s01_chr3_ROH_freq.bed")
-
-
-
-
+input_file <- file.path(repository_path,"results/Bedtools/coverage/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/pop_roh_freq/german_shepherd_ROH_freq.bed")
 
 ## Extracting the prefix of the file used  
 # Extracting the basename (filename without extension) from the file path
@@ -59,10 +51,7 @@ print(prefix)
 # Defining the output dirs
 #################################### 
 
-#output_dir <- file.path(repository_path,"results/ROH-Hotspots/empirical/german_shepherd")
-#output_dir <- file.path(repository_path,"results/ROH-Hotspots/simulated/neutral_model")
-output_dir <- file.path(repository_path,"results/ROH-Hotspots/simulated/selection_model")
-
+output_dir <- file.path(repository_path,"results/ROH-Hotspots/empirical/german_shepherd")
 # Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir)
 
@@ -138,7 +127,7 @@ threshold_index <- ceiling(roh_hotspot_threshold_percentage * length(sorted_valu
 threshold <- sorted_values[threshold_index]
 
 # Identify genomic windows with ROH frequency above the threshold
-top_1_percent_ROH <- data[data$FREQUENCY >= threshold, ]
+top_1_percent_ROH <- data[data$FREQUENCY > threshold, ]
 
 # Print the top 1% of ROH regions
 print(top_1_percent_ROH)
@@ -187,8 +176,6 @@ merged_top_1_percent_ROH$Distance_to_next_kb <- c(diff(merged_top_1_percent_ROH$
 
 # Print the merged top 1% ROH data
 print(merged_top_1_percent_ROH)
-
-
 
 ```
 
@@ -311,7 +298,7 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   chr_split_data <- split_data_combined[split_data_combined$CHR == Chromosome, ]
   
   # Define the filename with the output directory path
-  filename <- file.path(output_dir_roh_hotspots_freq, paste(prefix,"_CHR", Chromosome, "_ROH_Hotspot_freq.tsv", sep = ""))
+  filename <- file.path(output_dir_roh_hotspots_freq, paste(prefix,"_chr", Chromosome, "_ROH_Hotspot_freq.tsv", sep = ""))
   # Create the directory if it doesn't exist
   dir.create(dirname(filename), recursive = TRUE, showWarnings = FALSE)
     
@@ -328,7 +315,7 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
 
 ## 2.2: ROH-frequency into .tsv files (For all chr)
 
-```{r Export ROH-frequency for the autosome}
+```{r Export ROH-frequency for all chromosomes}
 # Define a function to split each window into two rows
 split_window <- function(data) {
   # Create a new dataframe to store the split rows
@@ -349,20 +336,23 @@ for (Chromosome in unique(data$CHR)) {
   # Subset data for the current chromosome
   chr_data <- data[data$CHR == Chromosome, ]
   
-  # Check if any window has non-zero counts (If there exists any ROH-windows in the current chromosome)
-  if (any(chr_data$COUNT != 0)) {
-    # Split each window into two rows
-    split_data[[Chromosome]] <- split_window(chr_data)
-    
+  # Split each window into two rows
+  split_data[[Chromosome]] <- split_window(chr_data)
+}
+
+# Combine all split dataframes into one
+split_data_combined <- do.call(rbind, split_data)
+
+# Export the combined split dataframe to TSV files for each chromosome
+for (Chromosome in unique(data$CHR)) {
+  # Subset the split data for the current chromosome
+  chr_split_data <- split_data_combined[split_data_combined$CHR == Chromosome, ]   
+  
     # Define the filename with the output directory path
-    filename <- file.path(output_dir_autosome_roh_freq, paste(prefix, "_CHR", Chromosome, "_ROH_freq", "_threshold_", formatted_threshold, ".tsv", sep = ""))
-    
-    # Write data to TSV file without quotes and with tab separation
-    write.table(split_data[[Chromosome]], file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
-  } else {
-    # Print message indicating no non-zero counts for the chromosome
-    print(paste("Skipping chromosome",Chromosome,"due to no ROH-windows found on the chromosome"))
-  }
+  filename <- file.path(output_dir_autosome_roh_freq, paste(prefix,"_chr", Chromosome,"_ROH_freq", "_threshold_", formatted_threshold,".tsv", sep = ""))
+  
+  # Write data to TSV file without quotes and with tab separation
+  write.table(chr_split_data, file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
 }
 
 
@@ -372,7 +362,7 @@ for (Chromosome in unique(data$CHR)) {
 
 ## 3.2: Gapless ROH-hotspot windows 
 
-```{r Export Gapless ROH-hotspot windows }
+```{r Export ROH-hotpots to .bed-files}
 # Iterate over unique chromosomes
 
 for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
@@ -380,7 +370,7 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   chr_data <- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == Chromosome, c("CHR", "POS1", "POS2")]
   
   # Define the filename with the output directory path
-  filename <- file.path(output_dir_gapless_roh_hotspots, paste(prefix,"_CHR", Chromosome,"_ROH_Hotspot_gapless_windows.bed", sep = "")) 
+  filename <- file.path(output_dir_gapless_roh_hotspots, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_gapless_windows.bed", sep = "")) 
   
   # Write data to .bed file
   write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
@@ -392,14 +382,14 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
 ```
 
 ## 3.2: 2Mb ROH-hotspot windows
-```{r Export 2Mb ROH-hotspot windows}
+```{r Export ROH-hotpots to .bed-files}
 # Iterate over unique chromosomes
 for (Chromosome in unique(linked_hotspot_windows$CHR)) {
   # Subset data for the current chromosome
   chr_data <- linked_hotspot_windows[linked_hotspot_windows$CHR == Chromosome, c("CHR", "POS1", "POS2")]
   
   # Define the filename with the output directory path
-  filename <- file.path(output_dir, paste(prefix,"_CHR", Chromosome,"_ROH_Hotspot_windows.bed", sep = "")) 
+  filename <- file.path(output_dir, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_windows.bed", sep = "")) 
   
   # Write data to .bed file
   write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
@@ -409,5 +399,4 @@ for (Chromosome in unique(linked_hotspot_windows$CHR)) {
 }
 
 ```
-
 

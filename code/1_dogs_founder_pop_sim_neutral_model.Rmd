@@ -248,62 +248,62 @@ breed2_bottleneck <- random_mating(breed2_founders, SP, n_generations)
 last_bottleneck_generation <- breed1_bottleneck[[n_generations]]
 last_bottleneck_generation
 ```
-## 2.2: Adding SNPs to the final bottleneck generation ( SimParam\$addSnpChip())
+<!-- ## 2.2: Adding SNPs to the final bottleneck generation ( SimParam\$addSnpChip()) -->
 
-### 2.2.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome
+<!-- ### 2.2.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome -->
 
-```{r}
+<!-- ```{r} -->
 
-# Sum up the chromosome lengths to get the autosome length
-autosome_length <- sum(chromosome_lengths_mb)
+<!-- # Sum up the chromosome lengths to get the autosome length -->
+<!-- autosome_length <- sum(chromosome_lengths_mb) -->
 
-# Number of SNP markers from the empirical dataset
-# https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
-num_snp_markers <- 78088  
+<!-- # Number of SNP markers from the empirical dataset -->
+<!-- # https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf -->
+<!-- num_snp_markers <- 78088   -->
 
-# Calculate average SNP-autosome density
-average_snp_autosome_density <- num_snp_markers / autosome_length
+<!-- # Calculate average SNP-autosome density -->
+<!-- average_snp_autosome_density <- num_snp_markers / autosome_length -->
 
-# Calculate the number of SNP markers to choose for the specific chromosome
-num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated]
+<!-- # Calculate the number of SNP markers to choose for the specific chromosome -->
+<!-- num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated] -->
 
 
 
-# Output results
-cat("autosome length:", autosome_length, "Mb\n")
-cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n")
-cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n")
+<!-- # Output results -->
+<!-- cat("autosome length:", autosome_length, "Mb\n") -->
+<!-- cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n") -->
+<!-- cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n") -->
 
-```
+<!-- ``` -->
 
-```{r}
-average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb) 
-cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n")
+<!-- ```{r} -->
+<!-- average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb)  -->
+<!-- cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n") -->
 
-```
+<!-- ``` -->
 
-### 2.1.2: SimParam\$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip
+<!-- ### 2.1.2: SimParam\$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip -->
 
-`SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip.
+<!-- `SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip. -->
 
-**nSnpPerChr**-argument that assigns for each individuals n SNPs for
-each chromsome, where n is the user-specified number.
+<!-- **nSnpPerChr**-argument that assigns for each individuals n SNPs for -->
+<!-- each chromsome, where n is the user-specified number. -->
 
-**minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed
-for each marker. For instance, setting minSnpFreq = 0.05 ensures that
-all markers will have MAF \>= 0.05
+<!-- **minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed -->
+<!-- for each marker. For instance, setting minSnpFreq = 0.05 ensures that -->
+<!-- all markers will have MAF \>= 0.05 -->
 
-**refPop**-argument specifies which population will be genotyped. In
-this case, it will be the last_bottleneck_generation after the simulated population
-bottleneck scenario.
+<!-- **refPop**-argument specifies which population will be genotyped. In -->
+<!-- this case, it will be the last_bottleneck_generation after the simulated population -->
+<!-- bottleneck scenario. -->
 
-```{r SimParam$addSnpChip()}
-SP$addSnpChip(
-  nSnpPerChr = num_snp_markers_chr3,
-  minSnpFreq = min_MAF,
-  refPop = last_bottleneck_generation
-  ) 
-```
+<!-- ```{r SimParam$addSnpChip()} -->
+<!-- SP$addSnpChip( -->
+<!--   nSnpPerChr = num_snp_markers_chr3, -->
+<!--   minSnpFreq = min_MAF, -->
+<!--   refPop = last_bottleneck_generation -->
+<!--   )  -->
+<!-- ``` -->
 
 
 
@@ -318,6 +318,10 @@ last_random_mating_generation
 
 
 ```
+
+
+
+
 
 # 3: Export to PLINK Extracting data to PLINK
 

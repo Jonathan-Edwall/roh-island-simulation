@@ -12,14 +12,18 @@ conda activate bedtools
 
 # bedtools intersect -h  # Documentation about the merge function
 
-echo "conda activated?"
-
 ####################################  
 # Defining the working directory
 #################################### 
 
 HOME=/home/jonathan
 cd $HOME
+######################################  
+####### Defining parameter values #######
+######################################
+header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
+
+
 
 ####################################  
 # Defining the input files
@@ -73,7 +77,7 @@ for roh_hotspot_file in "$german_shepherd_roh_hotspots_dir"/*.bed; do
             -wa -header \
             -a <(tail -n +2 "$allele_freq_w_positions_file") \
             -b temp.bed \
-            >> "$output_file"  # Append output to the file instead of overwriting
+            | sed '1i'"$header" >> "$output_file"  # Append output to the file instead of overwriting
         
         ((counter++))
     done < "$roh_hotspot_file"

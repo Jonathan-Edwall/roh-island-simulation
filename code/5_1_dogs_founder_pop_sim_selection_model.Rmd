@@ -58,8 +58,9 @@ knitr::opts_knit$set(root.dir = output_dir_simulation)
 # Defining Input parameters
 #################################### 
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
+min_allowed_gen_before_variant_lost <- 10 # Pruning replicates where the causative variant gets lost within this timespan
 allele_copies_threshold <- 10 # 10 default (candidate_variants = less than 10)
-s <- 0.6 # Selection coefficient - 0.05 default
+s <- 0.05 # Selection coefficient - 0.05 default
 n_ind_per_selection_sim_generation <- 50 # 1000 default
 
 N_e_burn_in <- 2500 # Ancestral population
@@ -67,7 +68,7 @@ N_e_bottleneck <- 50
 N_e_mate_selection <- 50
 
 n_generations_bottleneck <- 5
-n_generations_mate_selection <- 40 # 300?
+n_generations_mate_selection <- 40 # 40
 
 
 #################################### 
@@ -315,76 +316,135 @@ SP$addSnpChip(
   ) 
 ```
 
-## 2.3 Choosing a causative variant for the Selection Scenario
-
-```{r}
-
-count <- colSums(pullSegSiteGeno(last_bottleneck_generation, simParam = SP))
-
-candidate_variants <- which(count < allele_copies_threshold) # less than 10
-#candidate_variants <- which(count == allele_copies_threshold) # equals 10
-
-#Randomly picking out one of the candidate variant as the causative variant to be studied
-causative_variant <- candidate_variants[sample(1:length(candidate_variants), 1)]
-
-paste("Variant chosen:",causative_variant )
-
-```
 
 ## 2.4 Simulating the selection scenario - makeCross()
 
 `makeCross()` Parameters:
 
-
-
-```{r  makeCross()}
-setwd(image_output_dir)
-
-# Creating a vector to store the allele frequency of the causative variant over the selection simulation generations
-f_causative <- numeric(n_generations_mate_selection)
-
-# Sets the initial population for the selection scenario to the last generation of the bottleneck simulation.
-selection_scenario_pop <- last_bottleneck_generation
-
-for (gen in 1:n_generations_mate_selection) {
+## 2.4.1 Choosing a causative variant for the Selection Scenario - find_causative_variant()
+```{r}
+find_causative_variant <- function(population,SP, allele_copies_threshold) {
+  # Count occurrences of each variant
+  count <- colSums(pullSegSiteGeno(population, simParam = SP))
   
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants <- which(count <= allele_copies_threshold)
+  
+  # Randomly pick one of the candidate variants as the causative variant
+  causative_variant <- candidate_variants[sample(1:length(candidate_variants), 1)]
+  
+  return(causative_variant)
+}
+```
+
+
+### 2.4.2 Defining the Mate selection function - Mate_Selection_scenario()
+
+```{r}
+
+Mate_Selection_scenario <- function(selection_scenario_pop, n_generations_mate_selection, causative_variant, s, n_ind_per_selection_sim_generation,SP) {
+  
+  # Creating a vector to store the allele frequency of the causative variant over the selection simulation generations
+  f_causative <- numeric(n_generations_mate_selection)
+    
+  # Loop through generations
+  for (gen in 1:n_generations_mate_selection) {
+    
     # Retrieves the genotype of the causative variant for each individual in the population  
     geno <- pullSegSiteGeno(selection_scenario_pop, simParam = SP)[, causative_variant]
+    # cat("\nGeneration", gen, "Geno:",geno)  
     
-    # Sets the fitness of individuals based on their genotype and the selection coefficient.
+    #     # Print out the genotype of each individual
+    # for (i in 1:length(geno)) {
+    #   if (geno[i] == 2) {
+    #     cat("Generation", gen, "- Individual", i, "is homozygous for the causative variant (AA)\n")
+    #   } else if (geno[i] == 1) {
+    #     cat("Generation", gen, "- Individual", i, "is heterozygous (Aa)\n")
+    #   } else if (geno[i] == 0) {
+    #     cat("Generation", gen, "- Individual", i, "is homozygous for the non-causative variant (aa)\n")
+    #   }
+    # }
+    
+    # Set fitness based on genotype
     fitness <- rep(1-s, length(geno))
     fitness[geno == 2] <- 1
     fitness[geno == 1] <- 1 - (s/2)
     
-    ## Biased sampling of parents based on their fitness.
-    # Sample with replacement is used to allow the possibility of multiple matings by the same parent within a generation
-    # The probability of picking a parent is equivalent to the relative fitness of the parent
+    # Biased sampling of parents based on fitness
     parent1 <- sample(1:selection_scenario_pop@nInd, n_ind_per_selection_sim_generation, replace = TRUE, prob = fitness)
     parent2 <- sample(1:selection_scenario_pop@nInd, n_ind_per_selection_sim_generation, replace = TRUE, prob = fitness)
     
-    
-    ## Crossing parent 1 with parent 2
-    # cbind(parent1, parent2) contains information about which parents to mate for each generation
-    # Each crossing give 1 offspring
-    
+    # Crossing parents to create next generation
     selection_scenario_pop <- makeCross(selection_scenario_pop,
-                     cbind(parent1, parent2),
-                     nProgeny = 1,
-                     simParam = SP)
+                                        cbind(parent1, parent2),
+                                        nProgeny = 1,
+                                        simParam = SP)
     
+    # Introduce mutations to the new generation
     selection_scenario_pop <- AlphaSimR::mutate(selection_scenario_pop, simParam = SP)
     
-    f_causative[gen] <- sum(geno)/length(geno)/2
+    # Calculate allele frequency of the causative variant
+    f_causative[gen] <- sum(geno) / length(geno) / 2
+  }
+  
+  return(list(f_causative,selection_scenario_pop))
+  
 }
 
+```
+
+### 2.4.2 Simulating the selection scenario - makeCross()
+```{r}
+# Create a counter for tracking the amount of pruned replicates 
+# due to the causatative variant getting lost within min_allowed_gen_before_variant_lost generations
+disappearance_counter <- 0
+
+# Define the rerun mechanism
+success <- FALSE
+while (!success) {
+  
+  # Function to randomly pick out a causative variant to be studied
+  causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold)
+  # Print the chosen causative variant
+  paste("Variant chosen:", causative_variant)
+
+  # Sets the initial population for the selection scenario to the last generation of the bottleneck simulation.
+  selection_scenario_pop <- last_bottleneck_generation
+  
+  # Run the simulation, starting with the last generation of the bottleneck simulation as 
+  # The initial population for the selection scenario
+  result <- Mate_Selection_scenario(selection_scenario_pop, n_generations_mate_selection, causative_variant, s, n_ind_per_selection_sim_generation, SP)
+  
+  f_causative <- result[[1]]
+    
+  # Check if the causative variant disappeared  
+  if (f_causative[min_allowed_gen_before_variant_lost] > 0) {
+    success <- TRUE
+    last_mate_selection_generation <- result[[2]]
+
+  } else {
+    cat("Causative variant disappeared, rerunning simulation...\n")
+    cat("f_causative:", f_causative, "\n")
+    
+    # Increment the pruned replicates counter
+    disappearance_counter <- disappearance_counter + 1
+  }
+  
+}
+
+# Print the number of times the causative variant disappeared
+cat("Number of times the causative variant disappeared:\n", disappearance_counter)
+
 f_causative
+
+# print(last_mate_selection_generation)
+
 # Open a PNG graphics device with the desired filename
 #png(paste0(output_sim_files_basename, '.png'))
 
-## Plot the resulting frequency trajectory for illustration
-
 # Set the plot title
-plot_title <- sprintf("Causative Variant Allele frequency plot - s=%g", s)
+plot_title <- sprintf("Causative-Variant Allele frequency plot - s=%g (%d replicates pruned) ", s, disappearance_counter)
+
 
 # Plot with customized axes labels and title
 plot(f_causative, 
@@ -400,13 +460,15 @@ plot(f_causative,
 # # Save the plot
 # dev.off()
 
+
+
 ```
 
 ```{r}
 #last_mate_selection_generation <- selection_scenario_pop[[n_generations_mate_selection]]
 
 
-last_mate_selection_generation <- selection_scenario_pop
+# last_mate_selection_generation <- selection_scenario_pop
 
 cat("Population before the selection scenario simulation:\n")
 last_bottleneck_generation

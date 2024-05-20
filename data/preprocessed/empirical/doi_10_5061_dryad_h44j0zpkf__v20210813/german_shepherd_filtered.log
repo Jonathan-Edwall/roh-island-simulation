@@ -3,6 +3,7 @@ Options in effect:
   --dog
   --file /home/jonathan/data/raw/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/Wang_HDGenetDogs_Genotypes_100621_UK
   --geno 0.05
+  --maf 0.05
   --make-bed
   --mind 0.1
   --out /home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered
@@ -10,9 +11,9 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Fri Mar  1 15:52:07 2024
+Start time: Sun May 19 17:30:24 2024
 
-Random number seed: 1709308327
+Random number seed: 1716139824
 385423 MB RAM detected; reserving 192711 MB for main workspace.
 Scanning .ped file... done.
 Performing single-pass .bed write (78088 variants, 324 dogs).
@@ -31,6 +32,8 @@ Before main variant filters, 0 founders and 324 nonfounders present.
 Calculating allele frequencies... done.
 Total genotyping rate is 0.998907.
 0 variants removed due to missing genotype data (--geno).
+0 variants removed due to minor allele threshold(s)
+(--maf/--max-maf/--mac/--max-mac).
 78088 variants and 324 dogs pass filters and QC.
 Note: No phenotypes present.
 Relationship matrix calculation complete.
@@ -47,4 +50,4 @@ and
 /home/jonathan/data/preprocessed/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_filtered.fam
 ... done.
 
-End time: Fri Mar  1 15:52:09 2024
+End time: Sun May 19 17:30:25 2024

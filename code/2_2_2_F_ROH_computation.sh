@@ -28,11 +28,11 @@ raw_data_dir=$HOME/data/raw
 
 
 plink_ROH_results_dir=$HOME/results/PLINK/ROH
-simulated_plink_dir=$plink_ROH_results_dir/simulated
+preprocessed_data_dir=$HOME/data/preprocessed
+
 #�������������
 #� Empirical �
 #�������������
-preprocessed_data_dir=$HOME/data/preprocessed
 preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
 
 german_shepherd_pop_hom_file_dir=$plink_ROH_results_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
@@ -40,9 +40,11 @@ german_shepherd_pop_hom_file_dir=$plink_ROH_results_dir/empirical/doi_10_5061_dr
 #�������������
 #� Simulated � 
 #�������������
-raw_simulated_dir=$raw_data_dir/simulated
-raw_simulated_neutral_model_dir=$raw_simulated_dir/neutral_model
-raw_simulated_selection_model_dir=$raw_simulated_dir/selection_model
+simulated_plink_dir=$plink_ROH_results_dir/simulated
+
+preprocessed_simulated_data_dir=$preprocessed_data_dir/simulated
+preprocessed_neutral_model_dir=$preprocessed_simulated_data_dir/neutral_model
+preprocessed_selection_model_dir=$preprocessed_simulated_data_dir/selection_model
 
 
 neutral_model_pop_hom_file_dir=$simulated_plink_dir/neutral_model
@@ -72,136 +74,6 @@ mkdir -p $selection_model_F_ROH_results
 # RESULTS
 ############################################################################################### 
 
-
-#########################################################
-##### Calculating Autosome Lengths #####
-#########################################################
-
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-#¤¤¤¤ Empirical Data (German Shepherd) ¤¤¤¤ 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Loop through each .bim file in the directory
-for bim_file in "$preprocessed_german_shepherd_dir"/*.bim; do
-    prefix=$(basename "$bim_file" .bim) # Extract the basename without the .bim extension
-    output_file="${preprocessed_german_shepherd_dir}/${prefix}_autosome_lengths.tsv"
-    # Remove the outputfile if it already exists
-    rm -f "${preprocessed_german_shepherd_dir}/${prefix}_autosome_lengths.tsv"
-    # Loop through each unique chromosome that isn't x, y, or mt
-    for unique_chr in $(awk '{print $1}' "$bim_file" | grep -v -E '^(x|y|mt)$' | sort -u); do
-        # Find max and min positions for the current chromosome
-        max_pos=$(awk -v chr="$unique_chr" '$1 == chr {print $4}' "$bim_file" | sort -nr | head -n1)
-        min_pos=$(awk -v chr="$unique_chr" '$1 == chr {print $4}' "$bim_file" | sort -n | head -n1 | awk '{printf "%.0f", $1}')
-
-        # Check if max_pos or min_pos are empty
-        if [ -z "$max_pos" ] || [ -z "$min_pos" ]; then
-            echo "Error: Unable to find max_pos or min_pos for $unique_chr"
-            continue
-        fi
-        # Compute chromosome length in base pairs
-        chr_length=$((max_pos - min_pos + 1))
-        # # Debug output
-        # echo "Debug: max_pos=$max_pos, min_pos=$min_pos, chr_length=$chr_length"
-        # Check if chr_length is a valid number
-        if [ "$chr_length" -le 0 ]; then
-            echo "Error: Invalid chromosome length for $unique_chr"
-            continue
-        fi
-        chr_length_KB=$(echo "scale=0; $chr_length / 1000" | bc)
-        # Append chromosome information to output file
-        echo -e "$unique_chr\t$chr_length\t$chr_length_KB" >> "$output_file"
-    done
-    
-    # Sort the output file by chromosomes
-    sort -o "$output_file" -k1,1n "$output_file"
-    # Add the header to the output file
-    sed -i "1i $autosome_lengths_header" "$output_file"
-done
-echo "Computed chromosome lengths for the empirical data, saved to: $preprocessed_german_shepherd_dir"
-
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-#¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Loop through each .map file in the directory
-for map_file in "$raw_simulated_neutral_model_dir"/*.map; do
-    prefix=$(basename "$map_file" .map) # Extract the basename without the .map extension
-    output_file="${raw_simulated_neutral_model_dir}/${prefix}_autosome_lengths.tsv"
-    # Remove the outputfile if it already exists
-    rm -f "${raw_simulated_neutral_model_dir}/${prefix}_autosome_lengths.tsv"
-    # Loop through each unique chromosome that isn't x, y, or mt
-    for unique_chr in $(awk '{print $1}' "$map_file" | grep -v -E '^(x|y|mt)$' | sort -u); do
-        # Find max and min positions for the current chromosome
-        max_pos=$(awk -v chr="$unique_chr" '$1 == chr {print $4}' "$map_file" | sort -nr | head -n1)
-        min_pos=$(awk -v chr="$unique_chr" '$1 == chr {print $4}' "$map_file" | sort -n | head -n1 | awk '{printf "%.0f", $1}')
-
-        # Check if max_pos or min_pos are empty
-        if [ -z "$max_pos" ] || [ -z "$min_pos" ]; then
-            echo "Error: Unable to find max_pos or min_pos for $unique_chr"
-            continue
-        fi
-        # Compute chromosome length in base pairs
-        chr_length=$((max_pos - min_pos + 1))
-        # # Debug output
-        # echo "Debug: max_pos=$max_pos, min_pos=$min_pos, chr_length=$chr_length"
-        # Check if chr_length is a valid number
-        if [ "$chr_length" -le 0 ]; then
-            echo "Error: Invalid chromosome length for $unique_chr"
-            continue
-        fi
-        chr_length_KB=$(echo "scale=0; $chr_length / 1000" | bc)
-        # Append chromosome information to output file
-        echo -e "$unique_chr\t$chr_length\t$chr_length_KB" >> "$output_file"
-    done
-    
-    # Sort the output file by chromosomes
-    sort -o "$output_file" -k1,1n "$output_file"
-    # Add the header to the output file
-    sed -i "1i $autosome_lengths_header" "$output_file"
-done
-echo "Computed chromosome lengths for the neutral model data, saved to: $raw_simulated_neutral_model_dir"
-
-
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-#¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-
-# Loop through each .map file in the directory
-for map_file in "$raw_simulated_selection_model_dir"/*.map; do
-    prefix=$(basename "$map_file" .map) # Extract the basename without the .map extension
-    output_file="${raw_simulated_selection_model_dir}/${prefix}_autosome_lengths.tsv"
-    # Remove the outputfile if it already exists
-    rm -f "${raw_simulated_selection_model_dir}/${prefix}_autosome_lengths.tsv"
-    # Loop through each unique chromosome that isn't x, y, or mt
-    for unique_chr in $(awk '{print $1}' "$map_file" | grep -v -E '^(x|y|mt)$' | sort -u); do
-        # Find max and min positions for the current chromosome
-        max_pos=$(awk -v chr="$unique_chr" '$1 == chr {print $4}' "$map_file" | sort -nr | head -n1)
-        min_pos=$(awk -v chr="$unique_chr" '$1 == chr {print $4}' "$map_file" | sort -n | head -n1 | awk '{printf "%.0f", $1}')
-
-        # Check if max_pos or min_pos are empty
-        if [ -z "$max_pos" ] || [ -z "$min_pos" ]; then
-            echo "Error: Unable to find max_pos or min_pos for $unique_chr"
-            continue
-        fi
-        # Compute chromosome length in base pairs
-        chr_length=$((max_pos - min_pos + 1))
-        # # Debug output
-        # echo "Debug: max_pos=$max_pos, min_pos=$min_pos, chr_length=$chr_length"
-        # Check if chr_length is a valid number
-        if [ "$chr_length" -le 0 ]; then
-            echo "Error: Invalid chromosome length for $unique_chr"
-            continue
-        fi
-        chr_length_KB=$(echo "scale=0; $chr_length / 1000" | bc)
-        # Append chromosome information to output file
-        echo -e "$unique_chr\t$chr_length\t$chr_length_KB" >> "$output_file"
-    done
-    
-    # Sort the output file by chromosomes
-    sort -o "$output_file" -k1,1n "$output_file"
-    # Add the header to the output file
-    sed -i "1i $autosome_lengths_header" "$output_file"
-done
-echo "Computed chromosome lengths for the selection model data, saved to: $raw_simulated_selection_model_dir"
-
 #########################################################
 ##### Computing F_ROH #####
 #########################################################
@@ -215,10 +87,10 @@ for hom_file in "$german_shepherd_pop_hom_file_dir"/*.hom.indiv; do
     # Define the output file
     output_file="$german_shepherd_F_ROH_results/${prefix}_F_ROH.tsv"
     # Find autosome lengths file for the current .hom file
-    autosome_lengths_file="${preprocessed_german_shepherd_dir}/${prefix}_filtered_autosome_lengths.tsv"
+    autosome_lengths_file="${preprocessed_german_shepherd_dir}/${prefix}_filtered_autosome_lengths_and_marker_density.tsv"
     # Check if the corresponding autosome lengths file is found
     if [ ! -f "$autosome_lengths_file" ]; then
-        echo "Error: Autosome lengths file not found for $hom_file"
+        echo "Error: $autosome_lengths_file: Autosome lengths file not found for $hom_file"
         continue
     fi
 
@@ -265,7 +137,7 @@ for hom_file in "$neutral_model_pop_hom_file_dir"/*.hom.indiv; do
     # Define the output file
     output_file="$neutral_model_F_ROH_results/${prefix}_F_ROH.tsv"
     # Find autosome lengths file for the current .hom file
-    autosome_lengths_file="${raw_simulated_neutral_model_dir}/${prefix}_autosome_lengths.tsv"
+    autosome_lengths_file="${preprocessed_neutral_model_dir}/${prefix}_autosome_lengths_and_marker_density.tsv"
     # Check if the corresponding autosome lengths file is found
     if [ ! -f "$autosome_lengths_file" ]; then
         echo "Error: Autosome lengths file not found for $hom_file"
@@ -313,7 +185,7 @@ for hom_file in "$selection_model_pop_hom_file_dir"/*.hom.indiv; do
     # Define the output file
     output_file="$selection_model_F_ROH_results/${prefix}_F_ROH.tsv"
     # Find autosome lengths file for the current .hom file
-    autosome_lengths_file="${raw_simulated_selection_model_dir}/${prefix}_autosome_lengths.tsv"
+    autosome_lengths_file="${preprocessed_selection_model_dir}/${prefix}_autosome_lengths_and_marker_density.tsv"
     # Check if the corresponding autosome lengths file is found
     if [ ! -f "$autosome_lengths_file" ]; then
         echo "Error: Autosome lengths file not found for $hom_file"

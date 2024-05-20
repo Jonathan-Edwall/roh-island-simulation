@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-05-03"
+date: "2024-05-13"
 editor_options: 
   markdown: 
     wrap: 72
@@ -26,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 n_generations_random_mating <- 40 # The number of generations to simulate during the random mating scenario of modern dog breeds
-
+N_e_burn_in <- 2500 # Ancestral population
 
 ## Define the output directory based on the parameter passed from the Bash script
 #output_dir_simulation <- params$output_dir_simulation
@@ -34,14 +34,18 @@ n_generations_random_mating <- 40 # The number of generations to simulate during
 
 # Define the output directory based on the variable passed from the Bash script
 output_dir_simulation <- Sys.getenv("output_dir_neutral_simulation")
+output_dir_simulation
 chr_simulated <- Sys.getenv("chr_simulated")
+chr_simulated
 output_sim_files_basename <- Sys.getenv("output_sim_files_basename")
+output_sim_files_basename
 
-
+snp_density_Mb <- as.numeric(Sys.getenv("selected_chr_snp_density_mb")) 
 # Ensure that output_dir_simulation is defined
 if (is.null(output_dir_simulation)) {
   stop("output_dir_simulation is not provided.")
 }
+snp_density_Mb
 
 #################################### 
 # Defining the output files
@@ -59,13 +63,6 @@ if (is.null(output_dir_simulation)) {
 ```{r library()}
 library(AlphaSimR)
 library(knitr)
-
-
-#library(dplyr)
-#library(ggplot2)
-#library(patchwork)
-#library(purrr)
-#library(tibble)
 
 ```
 
@@ -116,7 +113,7 @@ model_chromosome_bp_length <- chromosome_lengths_mb[chr_simulated] * 10^6
 
 founderGenomes <- runMacs2(nInd = 100,
                      nChr = 1,
-                     Ne = 2500,
+                     Ne = N_e_burn_in,
                      bp = model_chromosome_bp_length,
                      genLen = 1,
                      histNe = NULL,
@@ -245,7 +242,7 @@ autosome_length <- sum(chromosome_lengths_mb)
 
 # Number of SNP markers from the empirical dataset
 # https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
-num_snp_markers <- 78088  
+num_snp_markers <- 78088
 
 # Calculate average SNP-autosome density
 average_snp_autosome_density <- num_snp_markers / autosome_length
@@ -263,7 +260,7 @@ cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs
 ```
 
 ```{r}
-average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb) 
+average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb)
 cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n")
 
 ```
@@ -284,16 +281,21 @@ this case, it will be the last_bottleneck_generation after the simulated populat
 bottleneck scenario.
 
 ```{r SimParam$addSnpChip()}
+
+model_chromosome_Mb_length <- chromosome_lengths_mb[chr_simulated] 
+num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
+num_snp_markers_simulated_chromosome
+
 SP$addSnpChip(
-  nSnpPerChr = num_snp_markers_chr3,
+  nSnpPerChr = num_snp_markers_simulated_chromosome,
   minSnpFreq = min_MAF,
   refPop = last_bottleneck_generation
-  ) 
+  )
 ```
 
 
 
-## 2.3 Modern dog breed - Ranom Mating Simulation
+## 2.3 Modern dog breed - Random Mating Simulation
 ### 2.3.1 Simulating 40 generations of Random Mating (Random Mating)
 ```{r}
 random_mating_generations <- random_mating(last_bottleneck_generation, SP, n_generations_random_mating)
@@ -304,6 +306,62 @@ last_random_mating_generation
 
 
 ```
+<!-- ## 2.4: Adding SNPs to the final bottleneck generation ( SimParam\$addSnpChip()) -->
+
+<!-- ### 2.4.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome -->
+
+<!-- ```{r} -->
+
+<!-- # Sum up the chromosome lengths to get the autosome length -->
+<!-- autosome_length <- sum(chromosome_lengths_mb) -->
+
+<!-- # Number of SNP markers from the empirical dataset -->
+<!-- # https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf -->
+<!-- num_snp_markers <- 78088 -->
+
+<!-- # Calculate average SNP-autosome density -->
+<!-- average_snp_autosome_density <- num_snp_markers / autosome_length -->
+
+<!-- # Calculate the number of SNP markers to choose for the specific chromosome -->
+<!-- num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated] -->
+
+
+
+<!-- # Output results -->
+<!-- cat("autosome length:", autosome_length, "Mb\n") -->
+<!-- cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n") -->
+<!-- cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n") -->
+
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb) -->
+<!-- cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n") -->
+
+<!-- ``` -->
+
+<!-- ### 2.4.2: SimParam\$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip -->
+
+<!-- `SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip. -->
+
+<!-- **nSnpPerChr**-argument that assigns for each individuals n SNPs for -->
+<!-- each chromsome, where n is the user-specified number. -->
+
+<!-- **minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed -->
+<!-- for each marker. For instance, setting minSnpFreq = 0.05 ensures that -->
+<!-- all markers will have MAF \>= 0.05 -->
+
+<!-- **refPop**-argument specifies which population will be genotyped. In -->
+<!-- this case, it will be the last_random_mating_generation after the simulated population -->
+<!-- bottleneck scenario. -->
+
+<!-- ```{r SimParam$addSnpChip()} -->
+<!-- SP$addSnpChip( -->
+<!--   nSnpPerChr = num_snp_markers_chr3, -->
+<!--   minSnpFreq = min_MAF, -->
+<!--   refPop = last_random_mating_generation -->
+<!--   ) -->
+<!-- ``` -->
 
 # 3: Export to PLINK Extracting data to PLINK
 

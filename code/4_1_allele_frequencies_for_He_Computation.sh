@@ -14,24 +14,29 @@ conda activate plink
 HOME=/home/jonathan
 cd $HOME
 
+######################################  
+####### Defining parameter values #######
+######################################
+header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
+
+
 ####################################  
 # Defining the input files
 #################################### 
 # Defining input directory
-raw_data_dir=$HOME/data/raw
+preprocessed_data_dir=$HOME/data/preprocessed
+
 #�������������
 #� Empirical �
 #�������������
-preprocessed_data_dir=$HOME/data/preprocessed
 preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
 
 #�������������
 #� Simulated � 
 #�������������
-raw_simulated_dir=$raw_data_dir/simulated
-
-raw_simulated_neutral_model_dir=$raw_simulated_dir/neutral_model
-raw_simulated_selection_model_dir=$raw_simulated_dir/selection_model
+preprocessed_simulated_data_dir=$preprocessed_data_dir/simulated
+preprocessed_neutral_model_dir=$preprocessed_simulated_data_dir/neutral_model
+preprocessed_selection_model_dir=$preprocessed_simulated_data_dir/selection_model
 
 #################################### 
 # Defining the output files
@@ -77,9 +82,9 @@ mkdir -p $simulated_selection_model_allele_freq_plink_output_dir
 #¤¤¤¤ Empirical Data (German Shepherd) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
-# Find any .map file in simulated_data_dir and use its basename as the population name
+# Find any .bim file in simulated_data_dir and use its basename as the population name
 for file in $preprocessed_german_shepherd_dir/*.bim; do
-    # Extract population name from the filename (minus the .map extension)
+    # Extract population name from the filename (minus the .bim extension)
     population_name=$(basename "${file%.*}")
     echo "population_name"
     
@@ -92,8 +97,6 @@ for file in $preprocessed_german_shepherd_dir/*.bim; do
     # Adding POS to the outputfile
     ##############################          
     
-    header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
-
     # Sorting the input files based on the 2nd column (SNP identifier) using process substitution
     # Then performing a join operation (based on the 2nd column) to associate markers SNP-markers in the outputfile with their base-pair positions
     # tail -n +2 is used on the .frq file since it involves a header line.
@@ -102,7 +105,7 @@ for file in $preprocessed_german_shepherd_dir/*.bim; do
     <(tail -n +2 "${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq.frq" | sort -k2,2) \
     <(sort -k2,2 "${preprocessed_german_shepherd_dir}/${population_name}.bim") | \
     sort -k1,1n -k2,2n | \
-    awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7,$8}' | \
+    awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7}' | \
     sed 's/[[:space:]]\+$//' |  # Remove trailing whitespace, including tabs
     sed '1i'"$header" > "${german_shepherd_allele_freq_plink_output_dir}/${population_name}_allele_freq.bed"
 
@@ -116,35 +119,33 @@ done
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
-# Find any .map file in simulated_data_dir and use its basename as the simulation name
-for simulation_file in $raw_simulated_neutral_model_dir/*.map; do
-    # Extract simulation name from the filename (minus the .map extension)
+# Find any .bim file in simulated_data_dir and use its basename as the simulation name
+for simulation_file in $preprocessed_neutral_model_dir/*.bim; do
+    # Extract simulation name from the filename (minus the .bim extension)
     simulation_name=$(basename "${simulation_file%.*}")
     
     # Run plink command for the current simulation
-    plink --file "${raw_simulated_neutral_model_dir}/${simulation_name}" \
+    plink --bfile "${preprocessed_neutral_model_dir}/${simulation_name}" \
           --freq --dog --nonfounders --allow-no-sex \
           --out "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq"
           
     ##############################
     # Adding POS to the outputfile
     ##############################          
-    
-    # Define the header of the outputfile
-    header="#CHR\tPOS\tSNP\tA1\tA2\tMAF\tNCHROBS"
-          
+              
     # Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
     # Then performing join-operation to associate markers SNP-markers in the outputfile with their base-pair positions
     join -1 2 -2 2 \
     -o 1.1,2.4,1.2,1.3,1.4,1.5,1.6 \
-    <(sort -k2,2 "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq") \
-    <(sort -k2,2 "${raw_simulated_neutral_model_dir}/${simulation_name}.map") | \
-    awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7}' | \
+    <(tail -n +2 "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq" | sort -k2,2) \
+    <(sort -k2,2 "${preprocessed_neutral_model_dir}/${simulation_name}.bim") | \
     sort -k1,1n -k2,2n | \
-    sed '1i'"$header" > "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq_w_positions.tsv"
+    awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7}' | \
+    sed 's/[[:space:]]\+$//' |  # Remove trailing whitespace, including tabs
+    sed '1i'"$header" > "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
     
     echo "Added physical positions for the markers in ${simulation_name}_allele_freq.frq"
-    echo "The output file is stored in: ${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq_w_positions.tsv"
+    echo "The output file is stored in: ${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
     
 done
 
@@ -152,35 +153,33 @@ done
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
-# Find any .map file in simulated_data_dir and use its basename as the simulation name
-for simulation_file in $raw_simulated_selection_model_dir/*.map; do
-    # Extract simulation name from the filename (minus the .map extension)
+# Find any .bim file in simulated_data_dir and use its basename as the simulation name
+for simulation_file in $preprocessed_selection_model_dir/*.bim; do
+    # Extract simulation name from the filename (minus the .bim extension)
     simulation_name=$(basename "${simulation_file%.*}")
     
     # Run plink command for the current simulation
-    plink --file "${raw_simulated_selection_model_dir}/${simulation_name}" \
+    plink --bfile "${preprocessed_selection_model_dir}/${simulation_name}" \
           --freq --dog --nonfounders --allow-no-sex \
           --out "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq"
           
     ##############################
     # Adding POS to the outputfile
     ##############################          
-    
-    # Define the header of the outputfile
-    header="#CHR\tPOS\tSNP\tA1\tA2\tMAF\tNCHROBS"
           
     # Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
     # Then performing join-operation to associate markers SNP-markers in the outputfile with their base-pair positions
     join -1 2 -2 2 \
     -o 1.1,2.4,1.2,1.3,1.4,1.5,1.6 \
-    <(sort -k2,2 "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq") \
-    <(sort -k2,2 "${raw_simulated_selection_model_dir}/${simulation_name}.map") | \
-    awk -v OFS='\t' '{print "chr"$1,$2,$3,$4,$5,$6,$7}' | \
+    <(tail -n +2 "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq" | sort -k2,2) \
+    <(sort -k2,2 "${preprocessed_selection_model_dir}/${simulation_name}.bim") | \
     sort -k1,1n -k2,2n | \
-    sed '1i'"$header" > "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq_w_positions.tsv"
+    awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7}' | \
+    sed 's/[[:space:]]\+$//' |  # Remove trailing whitespace, including tabs
+    sed '1i'"$header" > "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
     
     echo "Added physical positions for the markers in ${simulation_name}_allele_freq.frq"
-    echo "The output file is stored in: ${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq_w_positions.tsv"
+    echo "The output file is stored in: ${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
     
 done
 

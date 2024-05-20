@@ -11,12 +11,12 @@ start=$(date +%s)
 HOME=/home/jonathan
 #cd $HOME
 
-script_dir=$HOME/code/pipeline_scripts
+pipeline_script_dir=$HOME/code/pipeline_scripts
 
 #################################### 
 # Defining Simulation parameters
 #################################### 
-export output_dir_neutral_simulation=$HOME/data/raw/simulated/neutral_model
+output_dir_neutral_simulation=$HOME/data/raw/simulated/neutral_model
 
 export chr_simulated="chr3"
 n_simulation_replicates=20 #20
@@ -38,14 +38,15 @@ cd $output_dir_neutral_simulation
 # Running the simulation 20 times
 for ((counter=1; counter<=$n_simulation_replicates; counter++))
 do
+    # Define the parameters to be used in the .Rmd-script:
+
     export output_sim_files_basename="sim_${counter}_neutral_model_${chr_simulated}"
+    export output_dir_neutral_simulation="$output_dir_neutral_simulation"
+    export chr_simulated="$chr_simulated" #Variable defined in run_pipeline.sh
+    export selected_chr_snp_density_mb="$selected_chr_snp_density_mb" #Variable defined in run_pipeline.sh
         
 
-    Rscript -e "rmarkdown::render('$script_dir/1-1_dogs_founder_pop_sim_neutral_model.Rmd', params = list(output_dir_neutral_simulation = '$output_dir_neutral_simulation', output_sim_files_basename = '$output_sim_files_basename', chr_simulated = '$chr_simulated'))"
-    
-    
-    #Rscript "$script_dir/1-1_dogs_founder_pop_sim_neutral_model.R" "$output_dir_neutral_simulation" "$output_sim_files_basename" "$chr_simulated"
-    
+    Rscript -e "rmarkdown::render('$pipeline_script_dir/1-1_dogs_founder_pop_sim_neutral_model.Rmd')"     
     
     
       
