@@ -69,7 +69,7 @@ neutral_model_color <- "blue"
 selection_model_color <- "purple"
 
 
-Sys.getenv()  
+# Sys.getenv()  
 
 # # Set the working directory for notebook chunks
 # knitr::opts_knit$set(root.dir = output_dir_sweep_test)
@@ -81,8 +81,8 @@ Sys.getenv()
 
 ```{r library()}
 library(knitr)
+library(ggplot2)
 ```
-
 #1: ROH-Hotspots
 
 ## 1.1 : Autosome ROH-frequencies
@@ -94,6 +94,8 @@ setwd(Empirical_data_autosome_ROH_freq_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- ".*ROH_freq.*\\.tsv$"
 population_ROH_freq_files <- list.files(pattern = pattern)
+# population_ROH_freq_files <- list.files(path = Empirical_data_autosome_ROH_freq_dir, pattern = pattern)
+
 
 #population_ROH_freq_files
 # Extracting the ROH-hotspot threshold value from the suffix of the filename
@@ -101,8 +103,6 @@ parts <- unlist(strsplit(population_ROH_freq_files[1], "threshold_")) # Split th
 # Extract the decimal number using regular expressions
 Empirical_data_ROH_hotspot_threshold <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
 
-# Combine population name, number, and file name
-chr_roh_frequencies <- data.frame(file_name = population_ROH_freq_files)
 
 # Extract chromosome numbers from filenames
 chr_numbers <- as.numeric(gsub(".*CHR(\\d+)_.*", "\\1", population_ROH_freq_files))
@@ -144,7 +144,8 @@ for (file in sorted_population_ROH_freq_files) {
 
 ROH_freq_table_Empirical_Data$ROH_hotspot_threshold <- Empirical_data_ROH_hotspot_threshold
 
-#View(ROH_freq_table_Empirical_Data)
+# ROH_freq_table_Empirical_Data
+#View(ROH_freq_table_Empirical_Data) 
 
 ```
 
@@ -154,12 +155,13 @@ ROH_freq_table_Empirical_Data$ROH_hotspot_threshold <- Empirical_data_ROH_hotspo
 setwd(Neutral_model_autosome_ROH_freq_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- ".*ROH_freq.*\\.tsv$"
-neutral_model_ROH_freq_files <- list.files(pattern = pattern)
+
+# neutral_model_ROH_freq_files <- list.files(pattern = pattern)
+neutral_model_ROH_freq_files <- list.files(path = Neutral_model_autosome_ROH_freq_dir, pattern = pattern)
+
 
 # # Extract the population name from the file names
 # empirical_population_name <- sub("^(.*?)_CHR(0-9)_ROH_freq.*", "//1", population_F_ROH_file)
-# Combine population name, number, and file name
-chr_roh_frequencies <- data.frame(file_name = neutral_model_ROH_freq_files)
 
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
@@ -183,7 +185,6 @@ for (file in sorted_neutral_model_ROH_freq_files) {
   
   # # Print the extracted values
   # cat("Threshold Values:", threshold_values, "\n")
-
   
   # Read the header line
   con <- file(file, "r")
@@ -216,7 +217,7 @@ all_ROH_hotspot_thresholds <- unlist(lapply(ROH_freq_tables_Neutral_Model, funct
 Avg_ROH_hotspot_threshold <- mean(all_ROH_hotspot_thresholds)
 ROH_freq_tables_Neutral_Model$Avg_ROH_hotspot_threshold <- Avg_ROH_hotspot_threshold
 
-
+# ROH_freq_tables_Neutral_Model
 
 #View(ROH_freq_tables_Neutral_Model)
 ```
@@ -802,7 +803,7 @@ setwd(Empirical_data_H_e_dir)
 ## 3.2 Neutral Model
 
 ```{r Expected Heterozygosity - Neutral Model }
-setwd(Neutral_model_H_e_dir)
+# setwd(Neutral_model_H_e_dir)
 # # Set the working directory to the directory containing the H_e files for the Neutral Model
 # new_dir <- file.path(Neutral_model_H_e_dir,"test")
 # #setwd(Neutral_model_H_e_dir)
@@ -998,8 +999,6 @@ View(hotspot_under_selection_H_e_table)
 ```
 
 ```{r}
-library(ggplot2)
-
 # H_e_hotspot_visualization creates a visualization of the H_e distribution of the different selection coefficients, in comparison to each ROH-hotspot 
 H_e_hotspot_visualization <- function(hotspot_name, hotspot_data) {
 
@@ -1065,4 +1064,4 @@ for (hotspot_name in names(hotspot_under_selection_H_e_table)) {
 # plot
 
 
-```
+``` 

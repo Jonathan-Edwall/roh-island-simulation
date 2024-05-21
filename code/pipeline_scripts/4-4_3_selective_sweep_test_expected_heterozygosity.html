@@ -436,7 +436,9 @@ Sys.getenv()  </code></pre>
 ## CONDA_SHLVL             2
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:10.0
+## disappearance_threshold_value_to_terminate_script
+##                         20
+## DISPLAY                 localhost:12.0
 ## EDITOR                  vi
 ## empirical_allele_frequency_dir
 ##                         /home/jonathan/results/PLINK/allele_freq/empirical/german_shepherd
@@ -490,7 +492,7 @@ Sys.getenv()  </code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmp1lnqBI
+## R_SESSION_TMPDIR        /tmp/RtmpyFtEUB
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -511,9 +513,9 @@ Sys.getenv()  </code></pre>
 ##                         /home/jonathan/results/PLINK/allele_freq/simulated/selection_model
 ## simulation_prune_count_file
 ##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s_0.8.tsv
-## SSH_CLIENT              172.21.30.153 55857 22
-## SSH_CONNECTION          172.21.30.153 55857 77.235.253.16 22
-## SSH_TTY                 /dev/pts/0
+## SSH_CLIENT              172.21.30.66 55766 22
+## SSH_CONNECTION          172.21.30.66 55766 77.235.253.16 22
+## SSH_TTY                 /dev/pts/14
 ## sweep_test_type         Selection_Strength_testing
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
@@ -521,7 +523,7 @@ Sys.getenv()  </code></pre>
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          8398
+## XDG_SESSION_ID          8581
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir_sweep_test)</code></pre>
@@ -822,26 +824,26 @@ if (length(rows_to_remove) &gt; 0) {  # Check if rows_to_remove is not empty
 }
 
 paste(&quot;Snps for each simulation, before the pruning:&quot;,datapoints_before_MAF_filtering)</code></pre>
-<pre><code>##  [1] &quot;Snps for each simulation, before the pruning: 2682&quot;
-##  [2] &quot;Snps for each simulation, before the pruning: 2909&quot;
-##  [3] &quot;Snps for each simulation, before the pruning: 2600&quot;
-##  [4] &quot;Snps for each simulation, before the pruning: 2133&quot;
-##  [5] &quot;Snps for each simulation, before the pruning: 2323&quot;
-##  [6] &quot;Snps for each simulation, before the pruning: 2553&quot;
-##  [7] &quot;Snps for each simulation, before the pruning: 2555&quot;
-##  [8] &quot;Snps for each simulation, before the pruning: 2580&quot;
-##  [9] &quot;Snps for each simulation, before the pruning: 1150&quot;
-## [10] &quot;Snps for each simulation, before the pruning: 2868&quot;
-## [11] &quot;Snps for each simulation, before the pruning: 2454&quot;
-## [12] &quot;Snps for each simulation, before the pruning: 2851&quot;
-## [13] &quot;Snps for each simulation, before the pruning: 2423&quot;
-## [14] &quot;Snps for each simulation, before the pruning: 2323&quot;
-## [15] &quot;Snps for each simulation, before the pruning: 2739&quot;
-## [16] &quot;Snps for each simulation, before the pruning: 2526&quot;
-## [17] &quot;Snps for each simulation, before the pruning: 2725&quot;
-## [18] &quot;Snps for each simulation, before the pruning: 2882&quot;
-## [19] &quot;Snps for each simulation, before the pruning: 2540&quot;
-## [20] &quot;Snps for each simulation, before the pruning: 2402&quot;</code></pre>
+<pre><code>##  [1] &quot;Snps for each simulation, before the pruning: 2865&quot;
+##  [2] &quot;Snps for each simulation, before the pruning: 2698&quot;
+##  [3] &quot;Snps for each simulation, before the pruning: 2696&quot;
+##  [4] &quot;Snps for each simulation, before the pruning: 2150&quot;
+##  [5] &quot;Snps for each simulation, before the pruning: 1982&quot;
+##  [6] &quot;Snps for each simulation, before the pruning: 2650&quot;
+##  [7] &quot;Snps for each simulation, before the pruning: 2684&quot;
+##  [8] &quot;Snps for each simulation, before the pruning: 2748&quot;
+##  [9] &quot;Snps for each simulation, before the pruning: 2388&quot;
+## [10] &quot;Snps for each simulation, before the pruning: 2208&quot;
+## [11] &quot;Snps for each simulation, before the pruning: 2153&quot;
+## [12] &quot;Snps for each simulation, before the pruning: 2073&quot;
+## [13] &quot;Snps for each simulation, before the pruning: 2253&quot;
+## [14] &quot;Snps for each simulation, before the pruning: 2263&quot;
+## [15] &quot;Snps for each simulation, before the pruning: 1826&quot;
+## [16] &quot;Snps for each simulation, before the pruning: 2434&quot;
+## [17] &quot;Snps for each simulation, before the pruning: 1688&quot;
+## [18] &quot;Snps for each simulation, before the pruning: 2913&quot;
+## [19] &quot;Snps for each simulation, before the pruning: 2416&quot;
+## [20] &quot;Snps for each simulation, before the pruning: 2662&quot;</code></pre>
 <pre class="r"><code>paste(&quot;Pruned SNPs:&quot;,pruned_counts)</code></pre>
 <pre><code>##  [1] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
 ##  [5] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
@@ -1145,9 +1147,9 @@ simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mea
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>##  [1] 0.3338323 0.3413648 0.3491817 0.3451768 0.3548927 0.3430052 0.3679880
-##  [8] 0.3796555 0.3108486 0.3493255 0.3594277 0.3524039 0.3563725 0.3631994
-## [15] 0.3460893 0.3566213 0.3398293 0.3665660 0.3250203 0.3339925</code></pre>
+<pre><code>##  [1] 0.3591104 0.3537252 0.3506953 0.3382447 0.3514652 0.3641216 0.3670637
+##  [8] 0.3676596 0.3623724 0.3446158 0.3475960 0.3700507 0.3344713 0.3563081
+## [15] 0.3156217 0.3577604 0.3061546 0.3481357 0.3364148 0.3485192</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1241,35 +1243,43 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Simulation 1</td>
+<td align="left">Simulation 13</td>
+<td align="right">0.1162800</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 2</td>
+<td align="right">0.1302000</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 4</td>
+<td align="right">0.1302000</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 10</td>
+<td align="right">0.1302000</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 15</td>
+<td align="right">0.1302000</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 17</td>
+<td align="right">0.1302000</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 19</td>
 <td align="right">0.1302000</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 9</td>
-<td align="right">0.1302000</td>
+<td align="right">0.1425200</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 10</td>
-<td align="right">0.1302000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 15</td>
-<td align="right">0.1302000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 20</td>
-<td align="right">0.1302000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 19</td>
-<td align="right">0.1454000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 4</td>
+<td align="left">Simulation 11</td>
 <td align="right">0.1472000</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 13</td>
+<td align="left">Simulation 14</td>
 <td align="right">0.1472000</td>
 </tr>
 <tr class="odd">
@@ -1277,48 +1287,40 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 <td align="right">0.1472000</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 17</td>
-<td align="right">0.1479933</td>
+<td align="left">Simulation 18</td>
+<td align="right">0.1472000</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 2</td>
-<td align="right">0.1550533</td>
+<td align="left">Simulation 20</td>
+<td align="right">0.1472000</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 5</td>
-<td align="right">0.1568833</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 6</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 11</td>
-<td align="right">0.1638000</td>
+<td align="left">Simulation 1</td>
+<td align="right">0.1589583</td>
 </tr>
 <tr class="odd">
 <td align="left">Simulation 3</td>
-<td align="right">0.1679960</td>
+<td align="right">0.1638000</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 12</td>
-<td align="right">0.1748786</td>
+<td align="left">Simulation 5</td>
+<td align="right">0.1638000</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 14</td>
-<td align="right">0.1754000</td>
+<td align="left">Simulation 12</td>
+<td align="right">0.1649840</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 6</td>
+<td align="right">0.1670750</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 8</td>
+<td align="right">0.1800000</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 7</td>
-<td align="right">0.1800000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 18</td>
-<td align="right">0.1800000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 8</td>
-<td align="right">0.2070467</td>
+<td align="right">0.1875850</td>
 </tr>
 </tbody>
 </table>
@@ -1416,7 +1418,7 @@ dev.off()</code></pre>
 </tr>
 <tr class="even">
 <td align="left">Hotspot_chr3_window_3_allele_freq</td>
-<td align="left">Yes</td>
+<td align="left">No</td>
 <td align="right">0.1230482</td>
 </tr>
 <tr class="odd">

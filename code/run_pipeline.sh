@@ -19,6 +19,15 @@ runtime_log="$script_dir/pipeline_runtime.txt"
 echo "Pipeline Runtimes:" > $runtime_log
 
 
+# Function to handle user interruption
+handle_interrupt() {
+    echo "Pipeline interrupted. Exiting."
+    # Could potentially clean up the files created up until the script termination here
+    exit 1
+}
+
+# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
+trap 'handle_interrupt' SIGINT
 
 ######################################  
 ####### Defining parameter values #######

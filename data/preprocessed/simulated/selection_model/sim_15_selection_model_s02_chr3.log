@@ -13,9 +13,9 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Sun May 19 18:14:56 2024
+Start time: Mon May 20 18:38:16 2024
 
-Random number seed: 1716142496
+Random number seed: 1716230296
 385423 MB RAM detected; reserving 192711 MB for main workspace.
 Scanning .ped file... done.
 Performing single-pass .bed write (5283 variants, 50 dogs).
@@ -37,9 +37,9 @@ Using up to 31 threads (change this with --threads).
 Before main variant filters, 50 founders and 0 nonfounders present.
 Calculating allele frequencies... done.
 0 variants removed due to missing genotype data (--geno).
-2844 variants removed due to minor allele threshold(s)
+2511 variants removed due to minor allele threshold(s)
 (--maf/--max-maf/--mac/--max-mac).
-2439 variants and 50 dogs pass filters and QC.
+2772 variants and 50 dogs pass filters and QC.
 Phenotype data is quantitative.
 Relationship matrix calculation complete.
 --pca: Results saved to
@@ -55,4 +55,4 @@ and
 /home/jonathan/data/preprocessed/simulated/selection_model/sim_15_selection_model_s02_chr3.fam
 ... done.
 
-End time: Sun May 19 18:14:56 2024
+End time: Mon May 20 18:38:16 2024
