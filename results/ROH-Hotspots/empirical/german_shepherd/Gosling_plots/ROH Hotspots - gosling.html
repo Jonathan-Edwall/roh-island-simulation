@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gosling Visualization</title>
+    <link rel="stylesheet" href="https://esm.sh/higlass@1.13/dist/hglib.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "react": "https://esm.sh/react@18",
+                "react-dom": "https://esm.sh/react-dom@18",
+                "pixi": "https://esm.sh/pixi.js@6",
+                "higlass": "https://esm.sh/higlass@1.13?external=react,react-dom,pixi",
+                "gosling.js": "https://esm.sh/gosling.js@0.11.0?external=react,react-dom,pixi,higlass"            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="plots-container"></div>
+    <script type="module">
+        import { embed } from 'gosling.js';
+        import { plot_spec as plot_chr_3_Spec } from './plot_chr_3.js';
+        import { plot_spec as plot_chr_17_Spec } from './plot_chr_17.js';
+        import { plot_spec as plot_chr_19_Spec } from './plot_chr_19.js';
+
+const combinedSpec = {
+            "arrangement": "parallel",
+            "views": [
+            plot_chr_3_Spec,
+            plot_chr_17_Spec,
+            plot_chr_19_Spec
+            ]
+        };        
+        embed(document.getElementById('plots-container'), combinedSpec); // Embed the combined specifications into the container
+
+    // // Define the view config
+    // const viewConfig = { layout: 'linear', tracks };
+
+    // // Create the visualization
+    // const view = new gosling.View(document.getElementById('gosling'), viewConfig);
+  </script>
+</body>
+</html>
