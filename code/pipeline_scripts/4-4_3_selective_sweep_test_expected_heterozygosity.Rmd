@@ -246,7 +246,7 @@ for (i in seq_along(empirical_hotspot_tables)) {
     # Extract the MAF (p value)
     p <- table_data[j, "MAF"]
     
-    # Calculate expected heterozygosity using the provided function
+    # Calculate expected heterozygosity 
     expected_heterozygosity <- calculate_expected_heterozygosity(p)
     
     # Append the calculated expected heterozygosity to the list
@@ -779,6 +779,7 @@ ROH_hotspots_selection_testing <- data.frame(
 
 threshold_value <- min(sim_5th_percentiles_df$Fifth_Percentile)
 
+
 for (i in seq_along(empirical_hotspot_tables)) {
   # Check if Window_based_Average_H_e is <= percentile_5 for the current table (ROH-hotspot)
   if (empirical_hotspot_tables[[i]][["Window_based_Average_H_e"]] <= threshold_value) {
@@ -835,9 +836,11 @@ cat("ROH-hotspot selection testing results:\n")
 kable(ROH_hotspots_selection_testing, row.names = FALSE)
 
 
+# Formatting the threshold value for the output file, to 5 decimals
+formatted_H_e_threshold_value <- format(threshold_value, nsmall = 5)
 
 # Define the filename with the output directory path
-filename <- file.path(output_dir_sweep_test, paste("ROH_hotspots_", sweep_test_type,"_",sim_scenario_id,"_H_E_threshold_", threshold_value, ".tsv", sep = ""))
+filename <- file.path(output_dir_sweep_test, paste("ROH_hotspots_", sweep_test_type,"_",sim_scenario_id,"_H_E_threshold_", formatted_H_e_threshold_value, ".tsv", sep = ""))
 
 
 # # Saving the results in a .tsv-file

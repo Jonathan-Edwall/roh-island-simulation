@@ -868,13 +868,19 @@ knitr::kable(F_ROH_values_sorted, row.names = FALSE)
 setwd(Sweep_test_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- "^.*neutral_model.*.tsv$"
-selection_testing_file <- list.files(pattern = pattern)
+selection_testing_files <- list.files(pattern = pattern)
 # selection_testing_file
 
 # Extracting the ROH-hotspot threshold value from the suffix of the filename
 parts <- unlist(strsplit(selection_testing_file[1], "threshold_")) # Split the string by "threshold_"
 # Extract the decimal number using regular expressions
 fifth_percentile_H_e_neutral_model <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
+
+# Loop through each sorted .tsv file
+for (file in sorted_population_ROH_freq_files) {
+
+  file_name <- file
+
 
   # Read the header line
   con <- file(selection_testing_file, "r")

@@ -86,19 +86,23 @@ library(knitr)
 ## 1.0: Defining chromosome lengths of model species
 
 ```{r}
-# Chromosome lengths of Dogs in Mb, derived from Table 1 in this article:
-# https://www-ncbi-nlm-nih-gov.ezproxy.its.uu.se/pmc/articles/PMC2564286/
+# Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
+# which can be found through this link:
+# https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
 
-chromosome_lengths_mb <- c(
-    "chr1" = 125, "chr2" = 88, "chr3" = 94, "chr4" = 91, "chr5" = 91,
-    "chr6" = 80, "chr7" = 83, "chr8" = 77, "chr9" = 64, "chr10" = 72,
-    "chr11" = 77, "chr12" = 75, "chr13" = 66, "chr14" = 63, "chr15" = 67,
-    "chr16" = 62, "chr17" = 67, "chr18" = 58, "chr19" = 56, "chr20" = 61,
-    "chr21" = 54, "chr22" = 64, "chr23" = 55, "chr24" = 50, "chr25" = 54,
-    "chr26" = 42, "chr27" = 48, "chr28" = 44, "chr29" = 44, "chr30" = 43,
-    "chr31" = 42, "chr32" = 41, "chr33" = 34, "chr34" = 45, "chr35" = 29,
-    "chr36" = 33, "chr37" = 33, "chr38" = 26
+chromosome_lengths_bp <- c(
+"chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178	, "chr5" = 89562946, 
+"chr6" = 78113029	, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054, 
+"chr11" = 74805798, "chr12" = 72970719, "chr13" = 64299765, "chr14" = 61112200, "chr15" = 64676183, 
+"chr16" = 60362399, "chr17" = 65088165, "chr18" = 56472973, "chr19" = 55516201, "chr20" = 58627490, 
+"chr21" = 51742555, "chr22" = 61573679, "chr23" = 53134997, "chr24" = 48566227, "chr25" = 51730745, 
+"chr26" = 39257614, "chr27" = 46662488, "chr28" = 41733330, "chr29" = 42517134, "chr30" = 40643782, 
+"chr31" = 39901454, "chr32" = 40225481, "chr33" = 32139216, "chr34" = 42397973, "chr35" = 28051305, 
+"chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098	
 )
+
+
+
 ```
 
 ## 1.1: runMacs2() - Generating founder population
@@ -124,7 +128,7 @@ chromosome_lengths_mb <- c(
 ```{r runMacs2()}
 help(runMacs2)
 
-model_chromosome_bp_length <- chromosome_lengths_mb[chr_simulated] * 10^6
+model_chromosome_bp_length <- chromosome_lengths_bp[chr_simulated] 
 
 founderGenomes <- runMacs2(nInd = 100,
                      nChr = 1,

@@ -16,6 +16,12 @@ script_dir=$HOME/code
 
 runtime_log="$script_dir/pipeline_runtime.txt"
 
+# Remove the existing runtime logfile if it exists
+if [ -e "$runtime_log" ]; then
+    rm "$runtime_log"
+fi
+
+
 echo "Pipeline Runtimes:" > $runtime_log
 
 
@@ -32,7 +38,7 @@ trap 'handle_interrupt' SIGINT
 ######################################  
 ####### Defining parameter values #######
 ######################################
-export chr_simulated=3
+export chr_simulated="chr3"
 
 ####################################  
 # Defining the input files
@@ -61,7 +67,7 @@ echo "Step $step: $script_name Runtime: $runtime_step1 seconds" >> $runtime_log
 # Hardcoding an approximate value of how much more SNP dense the raw simulated datasets have to be,
 # So that the preprocessed simulated datasets will have a similar SNP density as the preprocessed empirical german shepherd dataset
 
-num_markers_raw_empirical_dataset_scaling_factor=1.75 
+num_markers_raw_empirical_dataset_scaling_factor=1.85 
 
 # echo "num_markers_raw_empirical_dataset_scaling_factor: $num_markers_raw_empirical_dataset_scaling_factor"
 
@@ -123,14 +129,9 @@ runtime_step7=$((end_step7-end_step6))
 echo "Step $step: $script_name Runtime: $runtime_step7 seconds" >> $runtime_log
 ((step++))
 
-### Lägg till skapandet av genomic window files här!!!!
-## Måste lägga till omia någonstans också!!
-
-
-
 
 # Step 8
-script_name="2_3_2_ROH_Coverage.sh"
+script_name="2_3_1_Window_file_creator_for_ROH_frequency_computation.sh"
 echo "Step $step: Running $script_name"
 bash "$script_dir/$script_name"
 end_step8=$(date +%s)
@@ -139,25 +140,27 @@ echo "Step $step: $script_name Runtime: $runtime_step8 seconds" >> $runtime_log
 ((step++))
 
 # Step 9
-script_name="3_pipeline_ROH_hotspot.sh"
+script_name="2_3_2_ROH_Coverage.sh"
 echo "Step $step: Running $script_name"
-bash "$script_dir/pipeline_scripts/$script_name"
+bash "$script_dir/$script_name"
 end_step9=$(date +%s)
 runtime_step9=$((end_step9-end_step8))
 echo "Step $step: $script_name Runtime: $runtime_step9 seconds" >> $runtime_log
 ((step++))
 
+
 # Step 10
-script_name="4_1_allele_frequencies_for_He_Computation.sh"
+script_name="3_pipeline_ROH_hotspot.sh"
 echo "Step $step: Running $script_name"
-bash "$script_dir/$script_name"
+bash "$script_dir/pipeline_scripts/$script_name"
 end_step10=$(date +%s)
 runtime_step10=$((end_step10-end_step9))
 echo "Step $step: $script_name Runtime: $runtime_step10 seconds" >> $runtime_log
 ((step++))
 
+
 # Step 11
-script_name="4_2_map_roh_hotspots_to_allele_frequencies.sh"
+script_name="3_1_map_roh_hotspots_to_phenotypes.sh"
 echo "Step $step: Running $script_name"
 bash "$script_dir/$script_name"
 end_step11=$(date +%s)
@@ -166,9 +169,9 @@ echo "Step $step: $script_name Runtime: $runtime_step11 seconds" >> $runtime_log
 ((step++))
 
 # Step 12
-script_name="4_pipeline_Sweep_test.sh"
+script_name="4_1_allele_frequencies_for_He_Computation.sh"
 echo "Step $step: Running $script_name"
-bash "$script_dir/pipeline_scripts/$script_name"
+bash "$script_dir/$script_name"
 end_step12=$(date +%s)
 runtime_step12=$((end_step12-end_step11))
 echo "Step $step: $script_name Runtime: $runtime_step12 seconds" >> $runtime_log
@@ -176,18 +179,40 @@ echo "Step $step: $script_name Runtime: $runtime_step12 seconds" >> $runtime_log
 
 
 # Step 13
-script_name="13_pipeline_result_summary.sh"
+script_name="4_2_map_roh_hotspots_to_allele_frequencies.sh"
 echo "Step $step: Running $script_name"
-bash "$script_dir/pipeline_scripts/$script_name"
+bash "$script_dir/$script_name"
 end_step13=$(date +%s)
 runtime_step13=$((end_step13-end_step12))
 echo "Step $step: $script_name Runtime: $runtime_step13 seconds" >> $runtime_log
 ((step++))
 
 
+# Step 14
+script_name="4_pipeline_Sweep_test.sh"
+echo "Step $step: Running $script_name"
+bash "$script_dir/pipeline_scripts/$script_name"
+end_step14=$(date +%s)
+runtime_step14=$((end_step14-end_step13))
+echo "Step $step: $script_name Runtime: $runtime_step14 seconds" >> $runtime_log
+((step++))
+
+# Step 15
+script_name="15_pipeline_result_summary.sh"
+echo "Step $step: Running $script_name"
+bash "$script_dir/pipeline_scripts/$script_name"
+end_step15=$(date +%s)
+runtime_step15=$((end_step15-end_step14))
+echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
+((step++))
+
+
+
+
+
 
 # Calculate total runtime
-total_runtime=$((end_step13-start))
+total_runtime=$((end_step15-start))
 echo "Total Pipeline Runtime: $total_runtime seconds" >> $runtime_log
 
 # Print runtimes

@@ -188,9 +188,12 @@ if [ -f "$output_file" ]; then
     # Sum the values in the 4th column using awk
     export num_markers_preprocessed_empirical_dataset=$(awk '{sum += $4} END {print sum}' "$output_file")
 
+    # Remove "chr" prefix from the simulated chromosome (i.e chr3 becomes 3)
+    chr_number=$(echo "$chr_simulated" | sed 's/chr//')
+
     ### Extracting the SNP Density of the selected chromosome that will be simulated ###
-    # Step 1: Find the row where column 1 is equal to $chr_simulated
-    selected_row=$(awk -v chr="$chr_simulated" '$1 == chr' "$output_file")
+    # Step 1: Find the row where column 1 is equal to the chromosome number in $chr_number
+    selected_row=$(awk -v chr="$chr_number" '$1 == chr' "$output_file")
     echo "selected_row: $selected_row"
     # Step 2: Extract the SNP density value from the selected row
     export selected_chr_preprocessed_snp_density_mb=$(echo "$selected_row" | awk '{print $5}')

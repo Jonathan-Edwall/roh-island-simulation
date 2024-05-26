@@ -17,3 +17,6 @@ code/500 generations, 1000 indviduals test.RData
 /results - 14 Maj (no pruned selection replicates)
 /data/raw/simulated 14 Maj (no pruned selection replicates)
 /data/raw/simulated 19 maj (pruned replicates after loss within 10 gen)
+/results - innan 24 maj
+code/.Rhistory
+code/.RData

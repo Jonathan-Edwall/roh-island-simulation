@@ -13,11 +13,11 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Mon May 20 18:38:44 2024
+Start time: Fri May 24 19:12:19 2024
 
-Random number seed: 1716230324
+Random number seed: 1716577939
 385423 MB RAM detected; reserving 192711 MB for main workspace.
-3108 variants loaded from .bim file.
+3104 variants loaded from .bim file.
 50 dogs (0 males, 0 females, 50 ambiguous) loaded from .fam.
 Ambiguous sex IDs written to
 /home/jonathan/results/PLINK/ROH/simulated/neutral_model/sim_4_neutral_model_chr3_ROH.nosex
@@ -28,9 +28,9 @@ phenotypes to be ignored, use the --allow-no-sex flag.
 Using 1 thread (no multithreaded calculations invoked).
 Before main variant filters, 50 founders and 0 nonfounders present.
 Calculating allele frequencies... done.
-3108 variants and 50 dogs pass filters and QC.
+3104 variants and 50 dogs pass filters and QC.
 Note: No phenotypes present.
---homozyg: Scan complete, found 176 ROH.
+--homozyg: Scan complete, found 191 ROH.
 Results saved to
 /home/jonathan/results/PLINK/ROH/simulated/neutral_model/sim_4_neutral_model_chr3_ROH.hom
 +
@@ -39,4 +39,4 @@ Results saved to
 /home/jonathan/results/PLINK/ROH/simulated/neutral_model/sim_4_neutral_model_chr3_ROH.hom.summary
 .
 
-End time: Mon May 20 18:38:44 2024
+End time: Fri May 24 19:12:19 2024

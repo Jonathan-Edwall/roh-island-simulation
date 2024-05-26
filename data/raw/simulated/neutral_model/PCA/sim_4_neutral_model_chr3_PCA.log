@@ -9,12 +9,12 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Mon May 20 18:38:11 2024
+Start time: Fri May 24 19:11:48 2024
 
-Random number seed: 1716230291
+Random number seed: 1716577908
 385423 MB RAM detected; reserving 192711 MB for main workspace.
 Scanning .ped file... done.
-Performing single-pass .bed write (5283 variants, 50 dogs).
+Performing single-pass .bed write (5495 variants, 50 dogs).
 --file:
 /home/jonathan/data/raw/simulated/neutral_model/PCA/sim_4_neutral_model_chr3_PCA-temporary.bed
 +
@@ -22,7 +22,7 @@ Performing single-pass .bed write (5283 variants, 50 dogs).
 +
 /home/jonathan/data/raw/simulated/neutral_model/PCA/sim_4_neutral_model_chr3_PCA-temporary.fam
 written.
-5283 variants loaded from .bim file.
+5495 variants loaded from .bim file.
 50 dogs (0 males, 0 females, 50 ambiguous) loaded from .fam.
 Ambiguous sex IDs written to
 /home/jonathan/data/raw/simulated/neutral_model/PCA/sim_4_neutral_model_chr3_PCA.nosex
@@ -31,7 +31,7 @@ Ambiguous sex IDs written to
 Using up to 31 threads (change this with --threads).
 Before main variant filters, 50 founders and 0 nonfounders present.
 Calculating allele frequencies... done.
-5283 variants and 50 dogs pass filters and QC.
+5495 variants and 50 dogs pass filters and QC.
 Phenotype data is quantitative.
 Relationship matrix calculation complete.
 --pca: Results saved to
@@ -40,4 +40,4 @@ and
 /home/jonathan/data/raw/simulated/neutral_model/PCA/sim_4_neutral_model_chr3_PCA.eigenvec
 .
 
-End time: Mon May 20 18:38:11 2024
+End time: Fri May 24 19:11:48 2024

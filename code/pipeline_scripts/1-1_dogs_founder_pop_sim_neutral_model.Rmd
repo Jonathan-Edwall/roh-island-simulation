@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-05-13"
+date: "2024-05-24"
 editor_options: 
   markdown: 
     wrap: 72
@@ -27,7 +27,8 @@ knitr::opts_chunk$set(echo = TRUE)
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 n_generations_random_mating <- 40 # The number of generations to simulate during the random mating scenario of modern dog breeds
 N_e_burn_in <- 2500 # Ancestral population
-
+n_generations_bottleneck <- 5
+N_e_bottleneck <- 50
 ## Define the output directory based on the parameter passed from the Bash script
 #output_dir_simulation <- params$output_dir_simulation
 
@@ -37,6 +38,10 @@ output_dir_simulation <- Sys.getenv("output_dir_neutral_simulation")
 output_dir_simulation
 chr_simulated <- Sys.getenv("chr_simulated")
 chr_simulated
+
+# Extract the chromosome number and convert and convert it to numeric
+chr_number <- as.numeric(sub("chr", "", chr_simulated))
+
 output_sim_files_basename <- Sys.getenv("output_sim_files_basename")
 output_sim_files_basename
 
@@ -71,19 +76,20 @@ library(knitr)
 ## 1.0: Defining chromosome lengths of model species
 
 ```{r}
-# Chromosome lengths of Dogs in Mb, derived from Table 1 in this article:
-# https://www-ncbi-nlm-nih-gov.ezproxy.its.uu.se/pmc/articles/PMC2564286/
+# Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
+# which can be found through this link:
+# https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
 
-chromosome_lengths_mb <- c(
-    "chr1" = 125, "chr2" = 88, "chr3" = 94, "chr4" = 91, "chr5" = 91,
-    "chr6" = 80, "chr7" = 83, "chr8" = 77, "chr9" = 64, "chr10" = 72,
-    "chr11" = 77, "chr12" = 75, "chr13" = 66, "chr14" = 63, "chr15" = 67,
-    "chr16" = 62, "chr17" = 67, "chr18" = 58, "chr19" = 56, "chr20" = 61,
-    "chr21" = 54, "chr22" = 64, "chr23" = 55, "chr24" = 50, "chr25" = 54,
-    "chr26" = 42, "chr27" = 48, "chr28" = 44, "chr29" = 44, "chr30" = 43,
-    "chr31" = 42, "chr32" = 41, "chr33" = 34, "chr34" = 45, "chr35" = 29,
-    "chr36" = 33, "chr37" = 33, "chr38" = 26
-)
+chromosome_lengths_bp <- c(
+"chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178, "chr5" = 89562946, 
+"chr6" = 78113029, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054, 
+"chr11" = 74805798, "chr12" = 72970719, "chr13" = 64299765, "chr14" = 61112200, "chr15" = 64676183, 
+"chr16" = 60362399, "chr17" = 65088165, "chr18" = 56472973, "chr19" = 55516201, "chr20" = 58627490, 
+"chr21" = 51742555, "chr22" = 61573679, "chr23" = 53134997, "chr24" = 48566227, "chr25" = 51730745, 
+"chr26" = 39257614, "chr27" = 46662488, "chr28" = 41733330, "chr29" = 42517134, "chr30" = 40643782, 
+"chr31" = 39901454, "chr32" = 40225481, "chr33" = 32139216, "chr34" = 42397973, "chr35" = 28051305, 
+"chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098)
+
 ```
 
 ## 1.1: runMacs2() - Generating founder population
@@ -109,7 +115,7 @@ chromosome_lengths_mb <- c(
 ```{r runMacs2()}
 #help(runMacs2)
 
-model_chromosome_bp_length <- chromosome_lengths_mb[chr_simulated] * 10^6
+model_chromosome_bp_length <- chromosome_lengths_bp[chr_simulated]
 
 founderGenomes <- runMacs2(nInd = 100,
                      nChr = 1,
@@ -156,18 +162,20 @@ SP$setTrackRec(TRUE)
 # Generate the initial founder population
 founderpop <- newPop(founderGenomes, simParam = SP)
 # Set misc used for setting years of birth for the first individuals
-current_generation = 0
-founderpop = setMisc(x = founderpop,
-                   node = "generation",
-                   value = current_generation)
-head(getMisc(x = founderpop, node = "generation"))
+# current_generation <- 0
+# founderpop <- setMisc(x = founderpop,
+#                    node = "generation",
+#                    value = current_generation)
+# head(getMisc(x = founderpop, node = "generation"))
 
 
 # Split the founder population into two breeding groups
-breed1_founders <- founderpop[1:50]
+breed1_founders <- founderpop[1:N_e_bottleneck] # 1:50
+cat("Population 1:\n")
 breed1_founders
 
-breed2_founders <- founderpop[51:100]
+breed2_founders <- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
+cat("Population 2:\n")
 breed2_founders
 
 ```
@@ -212,62 +220,30 @@ random_mating <- function(pop, SP, n_gen) {
 
 ```{r}
 
-
-n_generations <- 5
 # Simulating random mating within each breeding group for 5 generations
-breed1_bottleneck <- random_mating(breed1_founders, SP, n_generations)
-breed2_bottleneck <- random_mating(breed2_founders, SP, n_generations)
+breed1_bottleneck <- random_mating(breed1_founders, SP, n_generations_bottleneck)
+breed2_bottleneck <- random_mating(breed2_founders, SP, n_generations_bottleneck)
 
-# #Viewing the output from the bottleneck simulation
-# # founders
-# founderpop
-# breed1_bottleneck
 
 ```
 
 ### 2.1.2 Extracting the final bottleneck generation
 ```{r}
+# Viewing the output
+
+# founders
+founderpop
+breed1_bottleneck
+
+
 # Extracting final generation:
-last_bottleneck_generation <- breed1_bottleneck[[n_generations]]
+last_bottleneck_generation <- breed1_bottleneck[[n_generations_bottleneck]]
+
+cat("Extracting the final generation from the Bottleneck Scenario")
 last_bottleneck_generation
 ```
-## 2.2: Adding SNPs to the final bottleneck generation ( SimParam\$addSnpChip())
-
-### 2.2.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome
-
-```{r}
-
-# Sum up the chromosome lengths to get the autosome length
-autosome_length <- sum(chromosome_lengths_mb)
-
-# Number of SNP markers from the empirical dataset
-# https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf
-num_snp_markers <- 78088
-
-# Calculate average SNP-autosome density
-average_snp_autosome_density <- num_snp_markers / autosome_length
-
-# Calculate the number of SNP markers to choose for the specific chromosome
-num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated]
-
-
-
-# Output results
-cat("autosome length:", autosome_length, "Mb\n")
-cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n")
-cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n")
-
-```
-
-```{r}
-average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb)
-cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n")
-
-```
-
-### 2.1.2: SimParam\$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip
-
-`SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip.
+## 2.2: Adding SNPs to the last bottleneck generation - SimParam\$addSnpChip() 
+`SP$addSnpChip()` Randomly assigns eligible SNPs to a SNP chip.
 
 **nSnpPerChr**-argument that assigns for each individuals n SNPs for
 each chromsome, where n is the user-specified number.
@@ -282,7 +258,8 @@ bottleneck scenario.
 
 ```{r SimParam$addSnpChip()}
 
-model_chromosome_Mb_length <- chromosome_lengths_mb[chr_simulated] 
+model_chromosome_Mb_length <- model_chromosome_bp_length / (10^6)
+
 num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
 num_snp_markers_simulated_chromosome
 
@@ -306,62 +283,6 @@ last_random_mating_generation
 
 
 ```
-<!-- ## 2.4: Adding SNPs to the final bottleneck generation ( SimParam\$addSnpChip()) -->
-
-<!-- ### 2.4.1 Single chromosome usage: Computing number of SNPs to assign to a chromosome -->
-
-<!-- ```{r} -->
-
-<!-- # Sum up the chromosome lengths to get the autosome length -->
-<!-- autosome_length <- sum(chromosome_lengths_mb) -->
-
-<!-- # Number of SNP markers from the empirical dataset -->
-<!-- # https://datadryad.org/stash/dataset/doi:10.5061/dryad.h44j0zpkf -->
-<!-- num_snp_markers <- 78088 -->
-
-<!-- # Calculate average SNP-autosome density -->
-<!-- average_snp_autosome_density <- num_snp_markers / autosome_length -->
-
-<!-- # Calculate the number of SNP markers to choose for the specific chromosome -->
-<!-- num_snp_markers_chr3 <- average_snp_autosome_density * chromosome_lengths_mb[chr_simulated] -->
-
-
-
-<!-- # Output results -->
-<!-- cat("autosome length:", autosome_length, "Mb\n") -->
-<!-- cat("Average SNP-autosome density:", average_snp_autosome_density, "SNPs/Mb\n") -->
-<!-- cat("Number of SNP markers for", chr_simulated, ":", num_snp_markers_chr3, "SNPs\n") -->
-
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- average_chr_SNP_density <- num_snp_markers / length(chromosome_lengths_mb) -->
-<!-- cat(" Average Chr SNP density:", average_chr_SNP_density, "SNPs/Chr\n") -->
-
-<!-- ``` -->
-
-<!-- ### 2.4.2: SimParam\$addSnpChip() - Randomly assigns eligible SNPs to a SNP chip -->
-
-<!-- `SP$addSnpChip()`Randomly assigns eligible SNPs to a SNP chip. -->
-
-<!-- **nSnpPerChr**-argument that assigns for each individuals n SNPs for -->
-<!-- each chromsome, where n is the user-specified number. -->
-
-<!-- **minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed -->
-<!-- for each marker. For instance, setting minSnpFreq = 0.05 ensures that -->
-<!-- all markers will have MAF \>= 0.05 -->
-
-<!-- **refPop**-argument specifies which population will be genotyped. In -->
-<!-- this case, it will be the last_random_mating_generation after the simulated population -->
-<!-- bottleneck scenario. -->
-
-<!-- ```{r SimParam$addSnpChip()} -->
-<!-- SP$addSnpChip( -->
-<!--   nSnpPerChr = num_snp_markers_chr3, -->
-<!--   minSnpFreq = min_MAF, -->
-<!--   refPop = last_random_mating_generation -->
-<!--   ) -->
-<!-- ``` -->
 
 # 3: Export to PLINK Extracting data to PLINK
 
@@ -444,8 +365,7 @@ setwd(output_dir_simulation)
 writePlink(last_random_mating_generation,simParam=SP, baseName=output_sim_files_basename,
            
             traits = 1,
-           use = "rand"
-           
+           use = "rand"          
            
            )
 ```
@@ -461,6 +381,10 @@ ped_file <- paste0(output_sim_files_basename, '.ped')
 map_file <- paste0(output_sim_files_basename, '.map')
 ped_data <- read.table(ped_file)
 map_data <- read.table(map_file)
+
+
+# Change the first column of the .map file to ensure that the correct chromosome number is used
+map_data$V1 <- chr_number
 
 
 genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column) 

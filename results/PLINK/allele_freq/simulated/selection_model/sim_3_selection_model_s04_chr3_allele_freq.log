@@ -9,11 +9,11 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Mon May 20 20:19:55 2024
+Start time: Fri May 24 20:52:57 2024
 
-Random number seed: 1716236395
+Random number seed: 1716583977
 385423 MB RAM detected; reserving 192711 MB for main workspace.
-2896 variants loaded from .bim file.
+3318 variants loaded from .bim file.
 50 dogs (0 males, 0 females, 50 ambiguous) loaded from .fam.
 Ambiguous sex IDs written to
 /home/jonathan/results/PLINK/allele_freq/simulated/selection_model/sim_3_selection_model_s04_chr3_allele_freq.nosex
@@ -26,4 +26,4 @@ Calculating allele frequencies... done.
 /home/jonathan/results/PLINK/allele_freq/simulated/selection_model/sim_3_selection_model_s04_chr3_allele_freq.frq
 .
 
-End time: Mon May 20 20:19:55 2024
+End time: Fri May 24 20:52:57 2024

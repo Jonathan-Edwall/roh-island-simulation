@@ -1,0 +1,11 @@
+Model	Avg_ROH_hotspot_threshold
+Neutral	0.322
+selection_model_s04_chr3	0.337
+selection_model_s02_chr3	0.339
+selection_model_s01_chr3	0.345
+selection_model_s08_chr3	0.348
+selection_model_s05_chr3	0.353
+selection_model_s07_chr3	0.353
+selection_model_s03_chr3	0.361
+selection_model_s06_chr3	0.370
+Empirical	0.750

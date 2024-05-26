@@ -9,7 +9,7 @@ start=$(date +%s)
 #################################### 
 
 HOME=/home/jonathan
-#cd $HOME
+cd $HOME
 
 pipeline_script_dir=$HOME/code/pipeline_scripts
 
@@ -33,7 +33,7 @@ mkdir -p $output_dir_selection_simulation/variant_freq_plots # Also creating a s
 mkdir -p $output_dir_selection_simulation/pruned_counts  # Creating a subdirectory for storing the disappearance counter values
 
 
-chr_simulated="chr3"
+# chr_simulated="chr3"
 n_generations_selection_sim=40 # 40 default
 n_ind_per_selection_sim_generation=50
 selection_coefficient_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)

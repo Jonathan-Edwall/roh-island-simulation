@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-05-07"
+date: "2024-05-24"
 editor_options: 
   markdown: 
     wrap: 72
@@ -87,11 +87,13 @@ data <- read.table(input_file, header = TRUE, sep = "\t", comment.char = "")
 colnames(data) <- c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
 
 
-# Frequency Data is chosen
-# values <- data$FREQUENCY
-# Only windows associated with ROH-segments in the population, are allowed 
-# In other words, windows with frequency larger than 0
-values <- subset(data, FREQUENCY > 0)$FREQUENCY 
+# Extracting the frequency data for the genomic windows
+values <- data$FREQUENCY
+
+## Uncomment the code below if you want to find ROH-hotspots relative to other ROH-windows.
+#Only windows associated with ROH-segments in the population, are allowed
+# # In other words, windows with frequency larger than 0
+# values <- subset(data, FREQUENCY > 0)$FREQUENCY 
 
 # Sort the values in descending order to find the top 1%
 sorted_values <- sort(values, decreasing = TRUE)

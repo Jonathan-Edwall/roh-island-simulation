@@ -45,12 +45,13 @@ German_shepherd_H_e_dir=$expected_heterozygosity_dir/empirical/german_shepherd
 #�������������
 #� Simulated � 
 #�������������
+simulated_roh_hotspots_dir=$ROH_hotspots_dir/simulated
 
 ### ROH hotspots ###
-Neutral_model_ROH_hotspots_dir=$ROH_hotspots_dir/simulated/neutral_model
+Neutral_model_ROH_hotspots_dir=$ROH_hotspots_dir/simulated/neutral
 Neutral_model_autosome_ROH_freq_dir=$Neutral_model_ROH_hotspots_dir/Gosling_plots/autosome_roh_freq
 
-Selection_model_ROH_hotspots_dir=$ROH_hotspots_dir/simulated/selection_model
+Selection_model_ROH_hotspots_dir=$ROH_hotspots_dir/simulated/selection
 Selection_model_autosome_ROH_freq_dir=$Selection_model_ROH_hotspots_dir/Gosling_plots/autosome_roh_freq
 
 ### Inbreeding coefficient ###

@@ -36,6 +36,8 @@ cd $HOME
 plink_results_dir=$HOME/results/PLINK/ROH
 simulated_plink_dir=$plink_results_dir/simulated
 
+
+
 #�����������������
 #�100kbp window files of�
 #� the dog autosome   �
@@ -139,7 +141,7 @@ for indv_roh_file in $german_shepherd_indv_bed_files_dir/*.bed; do
     # Run bedtools coverage-function 
     # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
     bedtools coverage \
-    -a "$window_files_dir/all_autosomes_windows_100kB_window_sizes.bed" \
+    -a "$window_files_dir/german_shepherd_autosome_windows_100kB_window_sizes.bed" \
     -b <(tail -n +2 "$indv_roh_file") \
     -counts \
     -f $overlap_fraction \
@@ -160,7 +162,7 @@ for indv_roh_file in $neutral_model_indv_bed_files_dir/*.bed; do
     # Run bedtools coverage-function 
     # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
     bedtools coverage \
-    -a "$window_files_dir/all_autosomes_windows_100kB_window_sizes.bed" \
+    -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
     -b <(tail -n +2 "$indv_roh_file") \
     -counts \
     -f $overlap_fraction \
@@ -180,7 +182,7 @@ for indv_roh_file in $selection_model_indv_bed_files_dir/*.bed; do
     # Run bedtools coverage-function 
     # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
     bedtools coverage \
-    -a "$window_files_dir/all_autosomes_windows_100kB_window_sizes.bed" \
+    -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
     -b <(tail -n +2 "$indv_roh_file") \
     -counts \
     -f $overlap_fraction \
