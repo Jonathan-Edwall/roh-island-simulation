@@ -1237,15 +1237,18 @@ for (file in selection_testing_files) {
 paste0("Selection test results")
 paste0("ROH-hotspot windows with an mean H_e Value lower or equal to the fifth percentile of the neutral models average H_e are classified as being under selection")
 paste0("5th percentile of the neutral model is: ",fifth_percentile_H_e_neutral_model)
-Selection_testing_results
- 
+# Print the table using knitr::kable()
+knitr::kable(Selection_testing_results, row.names = FALSE) 
+
   
 
 # Subset the dataframe to extract rows where Under_selection is "Yes"
 under_selection_rows <- subset(Selection_testing_results, Under_selection == "Yes")
 paste0("ROH-hotspots under selection:")
-under_selection_rows
+knitr::kable(under_selection_rows, row.names = FALSE) 
 #View(Selection_testing_results)
+
+
 
 ```
 
