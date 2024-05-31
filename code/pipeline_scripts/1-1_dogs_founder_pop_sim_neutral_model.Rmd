@@ -162,12 +162,11 @@ SP$setTrackRec(TRUE)
 # Generate the initial founder population
 founderpop <- newPop(founderGenomes, simParam = SP)
 # Set misc used for setting years of birth for the first individuals
-# current_generation <- 0
-# founderpop <- setMisc(x = founderpop,
-#                    node = "generation",
-#                    value = current_generation)
-# head(getMisc(x = founderpop, node = "generation"))
-
+current_generation <- 0
+founderpop <- setMisc(x = founderpop,
+                   node = "generation",
+                   value = current_generation)
+head(getMisc(x = founderpop, node = "generation"))
 
 # Split the founder population into two breeding groups
 breed1_founders <- founderpop[1:N_e_bottleneck] # 1:50
@@ -263,11 +262,18 @@ model_chromosome_Mb_length <- model_chromosome_bp_length / (10^6)
 num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
 num_snp_markers_simulated_chromosome
 
-SP$addSnpChip(
-  nSnpPerChr = num_snp_markers_simulated_chromosome,
-  minSnpFreq = min_MAF,
-  refPop = last_bottleneck_generation
-  )
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_bottleneck_generation
+#   )
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   refPop = last_bottleneck_generation
+#   )
+
+
 ```
 
 
@@ -279,7 +285,20 @@ random_mating_generations <- random_mating(last_bottleneck_generation, SP, n_gen
 
 # Extracting the final random mating generation:
 last_random_mating_generation <- random_mating_generations[[n_generations_random_mating]]
-last_random_mating_generation
+
+SP$addSnpChip(
+  nSnpPerChr = num_snp_markers_simulated_chromosome,
+  refPop = last_random_mating_generation
+  )
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_random_mating_generation
+#   )
+
+
+
 
 
 ```
@@ -292,7 +311,9 @@ Function that retrieves SNP genotype data & returns a matrix of SNP
 genotypes
 
 ```{r pullSnpGeno(), echo = FALSE}
-#pullSnpGeno(last_random_mating_generation,simParam=SP)
+#pullSnpGeno(last_mate_selection_generation,simParam=SP)
+#snp_chip_genotypes <- pullSnpGeno(last_mate_selection_generation)
+#View(snp_chip_genotypes)
 ```
 
 ## 3.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map
@@ -309,15 +330,11 @@ data.frame with:
 -   **pos:** Genetic map position
 
 ```{r getSnPMap()}
-# SP$addSnpChip(5)
-# getSnpMap(snpChip=1,simParam=SP) 
+snp_chip_map <- getSnpMap(simParam=SP)
+# View(snp_chip_map)
 
-#getSnpMap(simParam=SP)
-
-cat("First 10 markers and their genetic map positions:\n")
-kable(head(getSnpMap(simParam = SP), 10))
-#head(getSnpMap(simParam = SP), 10)
-
+cat("First 10 markers of the SNP chip and their genetic map positions:\n")
+kable(head(snp_chip_map,10))
 
 ```
 
@@ -382,16 +399,24 @@ map_file <- paste0(output_sim_files_basename, '.map')
 ped_data <- read.table(ped_file)
 map_data <- read.table(map_file)
 
-
+# ¤¤¤¤¤ .map-file Column 1: Changing to correct chromosome ¤¤¤¤¤
 # Change the first column of the .map file to ensure that the correct chromosome number is used
 map_data$V1 <- chr_number
 
+# ¤¤¤¤¤ .map-file Column 2: Changing the SNP IDs to refer to correct chromosome ¤¤¤¤¤
+# Changing the SNP_Ids (second column) so their prefix indicate the correct chromosome number, otherwise 
+# It  will seem like they all belong to chromosome 1, like "1_21".
+# (will be useful if you would simulate more chromosomes in the future)
+map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
 
+
+# ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
 genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column) 
 base_pair_position_column <- round(genetic_distance_morgan_column * (model_chromosome_bp_length / 100))
-
 # Redefining the physical position column (4th column) with the new values defined in base_pair_position_column
 map_data$V4 <- base_pair_position_column
+
+
 
 write.table(map_data, file = map_file, sep = "\t", row.names = FALSE, col.names = FALSE,quote = FALSE)
 

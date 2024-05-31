@@ -39,6 +39,7 @@ trap 'handle_interrupt' SIGINT
 ####### Defining parameter values #######
 ######################################
 export chr_simulated="chr3"
+export n_simulation_replicates=5
 
 ####################################  
 # Defining the input files
@@ -67,7 +68,11 @@ echo "Step $step: $script_name Runtime: $runtime_step1 seconds" >> $runtime_log
 # Hardcoding an approximate value of how much more SNP dense the raw simulated datasets have to be,
 # So that the preprocessed simulated datasets will have a similar SNP density as the preprocessed empirical german shepherd dataset
 
-num_markers_raw_empirical_dataset_scaling_factor=1.85 
+#num_markers_raw_empirical_dataset_scaling_factor=3.5 # Works good if minSnpFreq is used for the SNP chip in alphasimr
+
+num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is used for the SNP chip in alphasimr
+
+# num_markers_raw_empirical_dataset_scaling_factor=1.85 # Works good if minSnpFreq is used for the SNP chip in alphasimr 
 
 # echo "num_markers_raw_empirical_dataset_scaling_factor: $num_markers_raw_empirical_dataset_scaling_factor"
 
@@ -158,7 +163,6 @@ runtime_step10=$((end_step10-end_step9))
 echo "Step $step: $script_name Runtime: $runtime_step10 seconds" >> $runtime_log
 ((step++))
 
-
 # Step 11
 script_name="3_1_map_roh_hotspots_to_phenotypes.sh"
 echo "Step $step: Running $script_name"
@@ -168,10 +172,11 @@ runtime_step11=$((end_step11-end_step10))
 echo "Step $step: $script_name Runtime: $runtime_step11 seconds" >> $runtime_log
 ((step++))
 
+
 # Step 12
-script_name="4_1_allele_frequencies_for_He_Computation.sh"
+script_name="3_pipeline_Selection_Causative_Variant_window_detection.sh"
 echo "Step $step: Running $script_name"
-bash "$script_dir/$script_name"
+bash "$script_dir/pipeline_scripts/$script_name"
 end_step12=$(date +%s)
 runtime_step12=$((end_step12-end_step11))
 echo "Step $step: $script_name Runtime: $runtime_step12 seconds" >> $runtime_log
@@ -179,7 +184,7 @@ echo "Step $step: $script_name Runtime: $runtime_step12 seconds" >> $runtime_log
 
 
 # Step 13
-script_name="4_2_map_roh_hotspots_to_allele_frequencies.sh"
+script_name="4_1_allele_frequencies_for_He_Computation.sh"
 echo "Step $step: Running $script_name"
 bash "$script_dir/$script_name"
 end_step13=$(date +%s)
@@ -189,16 +194,16 @@ echo "Step $step: $script_name Runtime: $runtime_step13 seconds" >> $runtime_log
 
 
 # Step 14
-script_name="4_pipeline_Sweep_test.sh"
+script_name="4_2_map_roh_hotspots_to_allele_frequencies.sh"
 echo "Step $step: Running $script_name"
-bash "$script_dir/pipeline_scripts/$script_name"
+bash "$script_dir/$script_name"
 end_step14=$(date +%s)
 runtime_step14=$((end_step14-end_step13))
 echo "Step $step: $script_name Runtime: $runtime_step14 seconds" >> $runtime_log
 ((step++))
 
 # Step 15
-script_name="15_pipeline_result_summary.sh"
+script_name="4_pipeline_Sweep_test.sh"
 echo "Step $step: Running $script_name"
 bash "$script_dir/pipeline_scripts/$script_name"
 end_step15=$(date +%s)
@@ -206,8 +211,14 @@ runtime_step15=$((end_step15-end_step14))
 echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
 ((step++))
 
-
-
+# Step 16
+script_name="pipeline_result_summary.sh"
+echo "Step $step: Running $script_name"
+bash "$script_dir/pipeline_scripts/$script_name"
+end_step16=$(date +%s)
+runtime_step16=$((end_step16-end_step15))
+echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
+((step++))
 
 
 

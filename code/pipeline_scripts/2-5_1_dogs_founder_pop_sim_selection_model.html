@@ -369,7 +369,6 @@ pre code {
 </ul></li>
 <li><a href="#adding-snps-to-the-last-bottleneck-generation---simparamaddsnpchip">2.2: Adding SNPs to the last bottleneck generation - SimParam$addSnpChip()</a></li>
 <li><a href="#simulating-the-selection-scenario---makecross">2.3 Simulating the selection scenario - makeCross()</a><ul>
-<li><a href="#choosing-a-causative-variant-for-the-selection-scenario---find_causative_variant">2.3.1 Choosing a causative variant for the Selection Scenario - find_causative_variant()</a></li>
 <li><a href="#defining-the-mate-selection-function---mate_selection_scenario">2.3.2 Defining the Mate selection function - Mate_Selection_scenario()</a></li>
 <li><a href="#simulating-the-selection-scenario---makecross-1">2.3.3 Simulating the selection scenario - makeCross()</a></li>
 </ul></li>
@@ -377,11 +376,15 @@ pre code {
 <li><a href="#export-files">3: Export files</a><ul>
 <li><a href="#export-to-plink-extracting-data-to-plink">3.1: Export to PLINK (Extracting data to PLINK)</a><ul>
 <li><a href="#optional-pullsnpgeno---retrieves-a-list-of-the-existing-marker-ids-snp-ids">3.1.0.1: Optional: pullSnpGeno() - Retrieves a list of the existing marker id:s (SNP id:s) –&gt;</a></li>
+<li><a href="#optional-getsnpmap---retrieves-a-table-of-the-genetic-map-for-the-snp-chip">3.1.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map for the SNP chip</a></li>
 <li><a href="#writeplink">3.1.1: writePlink()</a></li>
 <li><a href="#convert-distances-to-basepair-in-the-.map-file">3.1.2: Convert distances to basepair in the .map file</a></li>
 </ul></li>
-<li><a href="#export-pruned-replicates-information">3.2: Export pruned replicates information</a></li>
+</ul></li>
+<li><a href="#causative-variant">3.2 Causative variant</a><ul>
+<li><a href="#export-information-about-the-location-of-the-causative-variant">3.2.1 Export information about the location of the causative variant</a></li>
 <li><a href="#export-an-allele-frequency-plot-for-the-causative-variant">3.3: Export an allele frequency plot for the causative variant</a></li>
+<li><a href="#export-pruned-replicates-information">3.2: Export pruned replicates information</a></li>
 </ul></li>
 </ul>
 </div>
@@ -443,9 +446,11 @@ chr_number &lt;- as.numeric(sub(&quot;chr&quot;, &quot;&quot;, chr_simulated))
 
 output_sim_files_basename &lt;- Sys.getenv(&quot;output_sim_files_basename&quot;)
 simulation_prune_count_file &lt;- Sys.getenv(&quot;simulation_prune_count_file&quot;)
+variant_positions_file &lt;- Sys.getenv(&quot;variant_positions_file&quot;)
+
 snp_density_Mb &lt;- as.numeric(Sys.getenv(&quot;selected_chr_snp_density_mb&quot;)) 
 snp_density_Mb</code></pre>
-<pre><code>## [1] 59.42</code></pre>
+<pre><code>## [1] 32.12</code></pre>
 <pre class="r"><code>disappearance_threshold_value_to_terminate_script &lt;- as.numeric(Sys.getenv(&quot;disappearance_threshold_value_to_terminate_script&quot;))
 
 # Ensure that output_dir_simulation is defined
@@ -470,7 +475,7 @@ Sys.getenv()</code></pre>
 ##                         unix:path=/run/user/1008/bus
 ## disappearance_threshold_value_to_terminate_script
 ##                         20
-## DISPLAY                 localhost:13.0
+## DISPLAY                 localhost:12.0
 ## EDITOR                  vi
 ## HOME                    /home/jonathan
 ## LANG                    en_US.UTF-8
@@ -486,6 +491,8 @@ Sys.getenv()</code></pre>
 ##                         40
 ## n_ind_per_selection_sim_generation
 ##                         50
+## n_simulation_replicates
+##                         5
 ## num_markers_preprocessed_empirical_dataset
 ##                         78088
 ## num_markers_raw_empirical_dataset
@@ -496,7 +503,7 @@ Sys.getenv()</code></pre>
 ## output_dir_selection_simulation
 ##                         /home/jonathan/data/raw/simulated/selection_model
 ## output_sim_files_basename
-##                         sim_20_selection_model_s08_chr3
+##                         sim_5_selection_model_s08_chr3
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/plink/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ## PWD                     /home/jonathan/data/raw/simulated/selection_model
@@ -515,7 +522,7 @@ Sys.getenv()</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmp3OL4kv
+## R_SESSION_TMPDIR        /tmp/Rtmpq449nf
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -527,22 +534,24 @@ Sys.getenv()</code></pre>
 ## selected_chr_preprocessed_snp_density_mb
 ##                         32.12
 ## selected_chr_snp_density_mb
-##                         59.42
+##                         32.12
 ## selection_coefficient   0.8
 ## SHELL                   /bin/bash
 ## SHLVL                   2
 ## simulation_prune_count_file
 ##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s_0.8.tsv
-## SSH_CLIENT              172.21.30.251 52564 22
-## SSH_CONNECTION          172.21.30.251 52564 77.235.253.16 22
+## SSH_CLIENT              172.21.30.45 56054 22
+## SSH_CONNECTION          172.21.30.45 56054 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/15
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
+## variant_positions_file
+##                         /home/jonathan/data/raw/simulated/selection_model/variant_position/variant_position_s_0.8.tsv
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          8954
+## XDG_SESSION_ID          9360
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># # Verify the current working directory
 #getwd()</code></pre>
@@ -604,7 +613,7 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 136299</code></pre>
+## Loci: 135499</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -656,7 +665,7 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed2_founders &lt;- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
 cat(&quot;Population 2:\n&quot;)</code></pre>
@@ -666,7 +675,7 @@ cat(&quot;Population 2:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -716,7 +725,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed1_bottleneck</code></pre>
 <pre><code>## [[1]]
@@ -724,7 +733,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0 
 ## 
 ## [[2]]
@@ -732,7 +741,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0 
 ## 
 ## [[3]]
@@ -740,7 +749,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0 
 ## 
 ## [[4]]
@@ -748,7 +757,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0 
 ## 
 ## [[5]]
@@ -756,7 +765,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Extracting final generation:
 last_bottleneck_generation &lt;- breed1_bottleneck[[n_generations_bottleneck]]
@@ -768,7 +777,7 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -783,18 +792,21 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 num_snp_markers_simulated_chromosome &lt;- snp_density_Mb * model_chromosome_Mb_length
 num_snp_markers_simulated_chromosome</code></pre>
 <pre><code>##     chr3 
-## 5495.106</code></pre>
-<pre class="r"><code>SP$addSnpChip(
-  nSnpPerChr = num_snp_markers_simulated_chromosome,
-  minSnpFreq = min_MAF,
-  refPop = last_bottleneck_generation
-  )</code></pre>
+## 2970.427</code></pre>
+<pre class="r"><code># SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_bottleneck_generation
+#   )
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   refPop = last_bottleneck_generation
+#   )</code></pre>
 </div>
 <div id="simulating-the-selection-scenario---makecross" class="section level2">
 <h2>2.3 Simulating the selection scenario - makeCross()</h2>
 <p><code>makeCross()</code> Parameters:</p>
-<div id="choosing-a-causative-variant-for-the-selection-scenario---find_causative_variant" class="section level3">
-<h3>2.3.1 Choosing a causative variant for the Selection Scenario - find_causative_variant()</h3>
 <pre class="r"><code>find_causative_variant &lt;- function(population,SP, allele_copies_threshold) {
   # Count occurrences of each variant
   count &lt;- colSums(pullSegSiteGeno(population, simParam = SP))
@@ -807,7 +819,6 @@ num_snp_markers_simulated_chromosome</code></pre>
   
   return(causative_variant)
 }</code></pre>
-</div>
 <div id="defining-the-mate-selection-function---mate_selection_scenario" class="section level3">
 <h3>2.3.2 Defining the Mate selection function - Mate_Selection_scenario()</h3>
 <pre class="r"><code>Mate_Selection_scenario &lt;- function(selection_scenario_pop, n_generations_mate_selection, causative_variant, s, n_ind_per_selection_sim_generation,SP) {
@@ -869,7 +880,7 @@ while (!success) {
   # Function to randomly pick out a causative variant to be studied
   causative_variant &lt;- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold)
   # Print the chosen causative variant
-  paste(&quot;Variant chosen:&quot;, causative_variant)
+  cat(&quot;Variant chosen:&quot;, causative_variant)
 
   # Sets the initial population for the selection scenario to the last generation of the bottleneck simulation.
   selection_scenario_pop &lt;- last_bottleneck_generation
@@ -886,6 +897,9 @@ while (!success) {
   if (max(f_causative) &gt;= causative_variant_prune_threshold) {
     success &lt;- TRUE
     last_mate_selection_generation &lt;- result[[2]]
+    causative_variant_SNP_ID &lt;- names(causative_variant)
+    # SP$addSnpChipByName(causative_variant_SNP_ID) # Creating a SNP chip only consisting of this causative variant
+    # Future change?: create a new snp chip that includes the markers from the original snp chip + this causative variant SNPdes the causative variant
 
   } else { 
     # Increment the pruned replicates counter
@@ -906,8 +920,9 @@ while (!success) {
   }
   
 }</code></pre>
-<pre><code>## Causative variant disappeared, rerunning simulation...
-## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</code></pre>
+<pre><code>## Variant chosen: 12118Causative variant disappeared, rerunning simulation...
+## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+## Variant chosen: 77154</code></pre>
 <pre class="r"><code>#last_mate_selection_generation &lt;- selection_scenario_pop[[n_generations_mate_selection]]
 
 cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></pre>
@@ -917,7 +932,7 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0</code></pre>
 <pre class="r"><code>cat(&quot;\nPopulation after&quot;,n_generations_mate_selection,&quot;generations of selection scenario simulation:\n&quot;)</code></pre>
 <pre><code>## 
@@ -927,8 +942,19 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136299 
+## Loci: 135499 
 ## Traits: 0</code></pre>
+<pre class="r"><code>SP$addSnpChip(
+  nSnpPerChr = num_snp_markers_simulated_chromosome,
+  refPop = last_mate_selection_generation
+  )
+
+# 
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_mate_selection_generation
+#   )</code></pre>
 </div>
 </div>
 </div>
@@ -938,26 +964,106 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 <h2>3.1: Export to PLINK (Extracting data to PLINK)</h2>
 <div id="optional-pullsnpgeno---retrieves-a-list-of-the-existing-marker-ids-snp-ids" class="section level3">
 <h3>3.1.0.1: Optional: pullSnpGeno() - Retrieves a list of the existing marker id:s (SNP id:s) –&gt;</h3>
-<!-- Function that retrieves SNP genotype data & returns a matrix of SNP
-<!-- genotypes -->
-<!-- ```{r pullSnpGeno(), echo = FALSE} -->
-<!-- #pullSnpGeno(last_generation,simParam=SP) -->
-<!-- ``` -->
-<!-- ### 3.1.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map -->
-<!-- Function that retrieves the genetic map for a given SNP chip & returns a -->
-<!-- data.frame with: -->
-<!-- -   **id:** Unique identifier for the marker (SNP) -->
-<!-- -   **chr:** Chromosome containing the SNP -->
-<!-- -   **site:** Segregating site on the chromosome -->
-<!-- -   **pos:** Genetic map position -->
-<!-- ```{r getSnPMap()} -->
-<!-- # SP$addSnpChip(5) -->
-<!-- # getSnpMap(snpChip=1,simParam=SP) -->
-<!-- #getSnpMap(simParam=SP) -->
-<!-- cat("First 10 markers and their genetic map positions:\n") -->
-<!-- kable(head(getSnpMap(simParam = SP), 10)) -->
-<!-- #head(getSnpMap(simParam = SP), 10) -->
-<!-- ``` -->
+<p>Function that retrieves SNP genotype data &amp; returns a matrix of SNPgenotypes</p>
+</div>
+<div id="optional-getsnpmap---retrieves-a-table-of-the-genetic-map-for-the-snp-chip" class="section level3">
+<h3>3.1.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map for the SNP chip</h3>
+<p>Function that retrieves the genetic map for a given SNP chip &amp; returns a data.frame with:</p>
+<ul>
+<li><p><strong>id:</strong> Unique identifier for the marker (SNP)</p></li>
+<li><p><strong>chr:</strong> Chromosome containing the SNP</p></li>
+<li><p><strong>site:</strong> Segregating site on the chromosome</p></li>
+<li><p><strong>pos:</strong> Genetic map position</p></li>
+</ul>
+<pre class="r"><code>snp_chip_map &lt;- getSnpMap(simParam=SP)
+# View(snp_chip_map)
+
+cat(&quot;First 10 markers of the SNP chip and their genetic map positions:\n&quot;)</code></pre>
+<pre><code>## First 10 markers of the SNP chip and their genetic map positions:</code></pre>
+<pre class="r"><code>kable(head(snp_chip_map,10))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">id</th>
+<th align="left">chr</th>
+<th align="right">site</th>
+<th align="right">pos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1_83</td>
+<td align="left">1_83</td>
+<td align="left">1</td>
+<td align="right">83</td>
+<td align="right">0.0006178</td>
+</tr>
+<tr class="even">
+<td align="left">1_211</td>
+<td align="left">1_211</td>
+<td align="left">1</td>
+<td align="right">211</td>
+<td align="right">0.0018222</td>
+</tr>
+<tr class="odd">
+<td align="left">1_220</td>
+<td align="left">1_220</td>
+<td align="left">1</td>
+<td align="right">220</td>
+<td align="right">0.0019266</td>
+</tr>
+<tr class="even">
+<td align="left">1_228</td>
+<td align="left">1_228</td>
+<td align="left">1</td>
+<td align="right">228</td>
+<td align="right">0.0020105</td>
+</tr>
+<tr class="odd">
+<td align="left">1_233</td>
+<td align="left">1_233</td>
+<td align="left">1</td>
+<td align="right">233</td>
+<td align="right">0.0020611</td>
+</tr>
+<tr class="even">
+<td align="left">1_256</td>
+<td align="left">1_256</td>
+<td align="left">1</td>
+<td align="right">256</td>
+<td align="right">0.0022110</td>
+</tr>
+<tr class="odd">
+<td align="left">1_289</td>
+<td align="left">1_289</td>
+<td align="left">1</td>
+<td align="right">289</td>
+<td align="right">0.0024179</td>
+</tr>
+<tr class="even">
+<td align="left">1_293</td>
+<td align="left">1_293</td>
+<td align="left">1</td>
+<td align="right">293</td>
+<td align="right">0.0024233</td>
+</tr>
+<tr class="odd">
+<td align="left">1_299</td>
+<td align="left">1_299</td>
+<td align="left">1</td>
+<td align="right">299</td>
+<td align="right">0.0024825</td>
+</tr>
+<tr class="even">
+<td align="left">1_329</td>
+<td align="left">1_329</td>
+<td align="left">1</td>
+<td align="right">329</td>
+<td align="right">0.0027294</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="writeplink" class="section level3">
 <h3>3.1.1: writePlink()</h3>
@@ -971,18 +1077,39 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 <li><p><strong>traits</strong> an integer indicating the trait to write, a trait name, or a function of the traits returning a single value.</p></li>
 <li><p><strong>use</strong> what to use for PLINK’s phenotype field. Either phenotypes “pheno”, genetic values “gv”, estimated breeding values “ebv”, breeding values “bv”, or random values “rand”.</p></li>
 <li><p><strong>snpChip</strong> an integer indicating which SNP chip genotype to use useQtl should QTL genotypes be used instead of a SNP chip.</p>
-<pre><code>   -    If TRUE, snpChip specifies which trait’s QTL to use, and thus these QTL may not match the QTL underlying the phenotype supplied in traits.</code></pre></li>
+<ul>
+<li>If TRUE, snpChip specifies which trait’s QTL to use, and thus these QTL may not match the QTL underlying the phenotype supplied in traits.</li>
+</ul></li>
 <li><p><strong>simParam</strong> an object of SimParam … additional arguments if using a function for traits</p></li>
 </ul>
 <pre class="r"><code># Setting the directory where the .map and .ped files will be stored in
 setwd(output_dir_simulation)
 
-writePlink(last_mate_selection_generation,simParam=SP, baseName=output_sim_files_basename,
+writePlink(last_mate_selection_generation,snpChip = 1,simParam=SP, baseName=output_sim_files_basename,
 
             traits = 1,
            use = &quot;rand&quot;
 
-           )</code></pre>
+           )
+
+
+# writePlink(last_mate_selection_generation,snpChip = 2, baseName=output_sim_files_basename,
+# 
+#             traits = 1,
+#            use = &quot;rand&quot;
+# 
+# 
+#            )
+
+
+
+# writePlink(last_mate_selection_generation,simParam=SP, baseName=output_sim_files_basename,
+# 
+#             traits = 1,
+#            use = &quot;rand&quot;
+# 
+# 
+#            )</code></pre>
 </div>
 <div id="convert-distances-to-basepair-in-the-.map-file" class="section level3">
 <h3>3.1.2: Convert distances to basepair in the .map file</h3>
@@ -994,21 +1121,29 @@ ped_file &lt;- paste0(output_sim_files_basename, &#39;.ped&#39;)
 map_file &lt;- paste0(output_sim_files_basename, &#39;.map&#39;)
 ped_data &lt;- read.table(ped_file)
 map_data &lt;- read.table(map_file)
-
+ 
+# ¤¤¤¤¤ .map-file Column 1: Changing to correct chromosome ¤¤¤¤¤
 # Change the first column of the .map file to ensure that the correct chromosome number is used
 map_data$V1 &lt;- chr_number
 
+# ¤¤¤¤¤ .map-file Column 2: Changing the SNP IDs to refer to correct chromosome ¤¤¤¤¤
+# Changing the SNP_Ids (second column) so their prefix indicate the correct chromosome number, otherwise 
+# It  will seem like they all belong to chromosome 1, like &quot;1_21&quot;.
+# (will be useful if you would simulate more chromosomes in the future)
+map_data$V2 &lt;- gsub(&quot;^\\d+_&quot;, paste0(chr_number, &quot;_&quot;), map_data$V2)
+
+# ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
 genetic_distance_morgan_column &lt;- map_data$V3 # Extracting the genetic distance column of map_data (3rd column)
 base_pair_position_column &lt;- round(genetic_distance_morgan_column * (model_chromosome_bp_length / 100))
-
 # Redefining the physical position column (4th column) with the new values defined in base_pair_position_column
 map_data$V4 &lt;- base_pair_position_column
 
-write.table(map_data, file = map_file, sep = &quot;\t&quot;, row.names = FALSE, col.names = FALSE,quote = FALSE)
+
+
 
 #col.names = FALSE: Removes the header.
 #quote = FALSE: Removes quotation marks from values.
-
+write.table(map_data, file = map_file, sep = &quot;\t&quot;, row.names = FALSE, col.names = FALSE,quote = FALSE)
 
 cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <pre><code>## Showing the first 10 rows of the new .map file:</code></pre>
@@ -1025,75 +1160,161 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">1_15</td>
-<td align="right">0.0086879</td>
-<td align="right">8035</td>
+<td align="left">3_83</td>
+<td align="right">0.0617796</td>
+<td align="right">57133</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">1_44</td>
-<td align="right">0.0285996</td>
-<td align="right">26449</td>
+<td align="left">3_211</td>
+<td align="right">0.1822228</td>
+<td align="right">168518</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">1_49</td>
-<td align="right">0.0317845</td>
-<td align="right">29394</td>
+<td align="left">3_220</td>
+<td align="right">0.1926632</td>
+<td align="right">178173</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">1_52</td>
-<td align="right">0.0334183</td>
-<td align="right">30905</td>
+<td align="left">3_228</td>
+<td align="right">0.2010464</td>
+<td align="right">185926</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">1_95</td>
-<td align="right">0.0839243</td>
-<td align="right">77612</td>
+<td align="left">3_233</td>
+<td align="right">0.2061146</td>
+<td align="right">190613</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">1_130</td>
-<td align="right">0.1120908</td>
-<td align="right">103660</td>
+<td align="left">3_256</td>
+<td align="right">0.2210981</td>
+<td align="right">204469</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">1_175</td>
-<td align="right">0.1377666</td>
-<td align="right">127405</td>
+<td align="left">3_289</td>
+<td align="right">0.2417900</td>
+<td align="right">223605</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">1_233</td>
-<td align="right">0.1746803</td>
-<td align="right">161543</td>
+<td align="left">3_293</td>
+<td align="right">0.2423254</td>
+<td align="right">224100</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">1_291</td>
-<td align="right">0.2152748</td>
-<td align="right">199084</td>
+<td align="left">3_299</td>
+<td align="right">0.2482482</td>
+<td align="right">229578</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">1_295</td>
-<td align="right">0.2211597</td>
-<td align="right">204526</td>
+<td align="left">3_329</td>
+<td align="right">0.2729425</td>
+<td align="right">252415</td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</div>
+<div id="causative-variant" class="section level1">
+<h1>3.2 Causative variant</h1>
+<div id="export-information-about-the-location-of-the-causative-variant" class="section level2">
+<h2>3.2.1 Export information about the location of the causative variant</h2>
+<pre class="r"><code>#selection_scenario_pop
+gen_map &lt;- getGenMap(founderGenomes)
+#View(gen_map)
+causative_variant_relative_SNP_POS &lt;- gen_map[gen_map$id == causative_variant_SNP_ID, ]
+cat(&quot;Causative variant:\n&quot;,causative_variant_SNP_ID)</code></pre>
+<pre><code>## Causative variant:
+##  1_77154</code></pre>
+<pre class="r"><code>causative_variant_relative_SNP_POS</code></pre>
+<pre><code>##            id chr       pos
+## 77154 1_77154   1 0.5677533</code></pre>
+<pre class="r"><code>cat(&quot;\n Relative postions of the causative variant:\n&quot;,causative_variant_relative_SNP_POS$pos)</code></pre>
+<pre><code>## 
+##  Relative postions of the causative variant:
+##  0.5677533</code></pre>
+<pre class="r"><code>causative_variant_SNP_pos_in_bp &lt;- round(causative_variant_relative_SNP_POS$pos * (model_chromosome_bp_length))
+cat(&quot;\n BP position of the causative variant:\n&quot;,causative_variant_SNP_pos_in_bp)</code></pre>
+<pre><code>## 
+##  BP position of the causative variant:
+##  52505286</code></pre>
+<pre class="r"><code># Check if the file exists
+if (file.exists(variant_positions_file)) {
+    # Read the existing data from the file
+    causative_variant_positions_table &lt;- read.table(variant_positions_file, header = FALSE, sep = &quot;\t&quot;)
+} else {
+    # Create an empty data frame if the file does not exist
+    causative_variant_positions_table &lt;- data.frame(V1 = character(), V2 = integer())
+}
+
+# Check if the output_sim_files_basename already exists in the file
+existing_row_index &lt;- which(causative_variant_positions_table$V1 == output_sim_files_basename)
+
+if (length(existing_row_index) &gt; 0) {
+    causative_variant_positions_table$V2[existing_row_index] &lt;- causative_variant_SNP_pos_in_bp
+} else {
+    # Create a new row with the output_sim_files_basename and disappearance_counter
+    new_row &lt;- data.frame(V1 = output_sim_files_basename, V2 = causative_variant_SNP_pos_in_bp)
+    # Append the new row to the existing data
+    causative_variant_positions_table &lt;- rbind(causative_variant_positions_table, new_row)
+}
+
+# Write the updated data back to the file
+write.table(causative_variant_positions_table, file = variant_positions_file, sep = &quot;\t&quot;, row.names = FALSE, col.names = FALSE, quote = FALSE)</code></pre>
+</div>
+<div id="export-an-allele-frequency-plot-for-the-causative-variant" class="section level2">
+<h2>3.3: Export an allele frequency plot for the causative variant</h2>
+<pre class="r"><code>setwd(image_output_dir)
+
+# Format the bp position nicely
+formatted_bp_pos &lt;- format(causative_variant_SNP_pos_in_bp, big.mark = &quot; &quot;)
+
+#f_causative
+
+# Plotting the allele frequency of the causative variant during the mate selection scenario
+
+# Open a PNG graphics device with the desired filename
+png(paste0(output_sim_files_basename, &#39;.png&#39;))
+
+# Set the plot title
+plot_title &lt;- sprintf(&quot;Causative-Variant Frequency Plot - s=%g (%d replicates pruned) &quot;, s, disappearance_counter)
+
+
+# Plot with customized axes labels and title
+plot(f_causative,
+     type = &quot;p&quot;,
+     xlab = &quot;Generation&quot;,
+     ylab = &quot;Allele Frequency &quot;,
+     main = plot_title,
+     ylim = c(0, 1)
+     )
+
+# Add text for the bp position of the studied marker inside the plot
+text(x = max(seq_along(f_causative)), y = 0.05, labels = paste(&quot;SNP Pos on&quot;, chr_simulated, &quot;(bp):&quot;, formatted_bp_pos, &quot;bp&quot;), adj = c(1, 0))
+
+
+# # Save the plot
+dev.off()</code></pre>
+<pre><code>## png 
+##   2</code></pre>
+<pre class="r"><code># Saving the plot-data as a .txtfile
+write.table(f_causative, file = paste0(output_sim_files_basename, &#39;.txt&#39;), sep = &quot;\t&quot;, row.names = FALSE, col.names = FALSE,quote = FALSE)</code></pre>
+</div>
+<div id="export-pruned-replicates-information" class="section level2">
+<h2>3.2: Export pruned replicates information</h2>
 <pre class="r"><code># Print the number of times the causative variant disappeared
 cat(&quot;Number of times the causative variant disappeared:\n&quot;)</code></pre>
 <pre><code>## Number of times the causative variant disappeared:</code></pre>
 <pre class="r"><code>cat(&quot;Disappearance Counter:&quot;, disappearance_counter, &quot;\n&quot;)  # Print disappearance_counter value to standard output</code></pre>
 <pre><code>## Disappearance Counter: 1</code></pre>
-</div>
-</div>
-<div id="export-pruned-replicates-information" class="section level2">
-<h2>3.2: Export pruned replicates information</h2>
 <pre class="r"><code># Check if the file exists
 if (file.exists(simulation_prune_count_file)) {
     # Read the existing data from the file
@@ -1119,39 +1340,6 @@ if (length(existing_row_index) &gt; 0) {
 
 # Write the updated data back to the file
 write.table(prune_count_data, file = simulation_prune_count_file, sep = &quot;\t&quot;, row.names = FALSE, col.names = FALSE, quote = FALSE)</code></pre>
-</div>
-<div id="export-an-allele-frequency-plot-for-the-causative-variant" class="section level2">
-<h2>3.3: Export an allele frequency plot for the causative variant</h2>
-<pre class="r"><code>setwd(image_output_dir)
-
-f_causative</code></pre>
-<pre><code>##  [1] 0.07 0.11 0.27 0.39 0.62 0.75 0.88 0.95 0.95 0.98 0.98 0.98 0.98 0.99 1.00
-## [16] 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
-## [31] 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00</code></pre>
-<pre class="r"><code># Plotting the allele frequency of the causative variant during the mate selection scenario
-
-# Open a PNG graphics device with the desired filename
-png(paste0(output_sim_files_basename, &#39;.png&#39;))
-
-# Set the plot title
-plot_title &lt;- sprintf(&quot;Causative-Variant Frequency Plot - s=%g (%d replicates pruned) &quot;, s, disappearance_counter)
-
-
-# Plot with customized axes labels and title
-plot(f_causative,
-     type = &quot;p&quot;,
-     xlab = &quot;Generation&quot;,
-     ylab = &quot;Allele Frequency &quot;,
-     main = plot_title,
-     ylim = c(0, 1)
-     )
-
-
-
-# # Save the plot
-dev.off()</code></pre>
-<pre><code>## png 
-##   2</code></pre>
 </div>
 </div>
 

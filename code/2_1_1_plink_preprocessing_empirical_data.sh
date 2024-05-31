@@ -56,16 +56,29 @@ mkdir -p $raw_german_shepherd_PCA_dir
 #--mind 0.1: maximum threshold for allowed non-genotyped markers per individual (10%). Individuals with more non-genotyped markers than this threshold, will be pruned away.
 # --pca 2: Performing PCA analysis to identify outliers in the dataset by calculating 2 principal components (PCA1,PCA2) that captures the major sources of variation in the dataset while reducing the dimensionality of the data.
 
+# plink \
+# --file $raw_german_shepherd_dir/Wang_HDGenetDogs_Genotypes_100621_UK \
+# --out $preprocessed_german_shepherd_dir/german_shepherd_filtered \
+# --make-bed \
+# --dog \
+# --geno 0.05 --mind 0.1 \
+# --maf 0.05 \
+# --pca 2
+ 
+# echo "PLINK preprocessing completed"
+
 plink \
 --file $raw_german_shepherd_dir/Wang_HDGenetDogs_Genotypes_100621_UK \
 --out $preprocessed_german_shepherd_dir/german_shepherd_filtered \
 --make-bed \
 --dog \
 --geno 0.05 --mind 0.1 \
---maf 0.05 \
 --pca 2
  
 echo "PLINK preprocessing completed"
+
+
+
 
 
 

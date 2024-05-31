@@ -75,6 +75,17 @@ for map_file in $raw_simulated_neutral_model_dir/*.map; do
     simulation_name=$(basename "$map_file" .map) # Extract the basename without the .map extension
 
 echo "$simulation_name"     
+# # Running --homozyg command for ROH computation
+# plink \
+# --file $raw_simulated_neutral_model_dir/$simulation_name \
+# --out $preprocessed_neutral_model_dir/$simulation_name \
+# --make-bed \
+# --nonfounders --allow-no-sex \
+# --dog \
+# --geno 0.05 --mind 0.1 \
+# --maf 0.05 \
+# --pca 2
+
 # Running --homozyg command for ROH computation
 plink \
 --file $raw_simulated_neutral_model_dir/$simulation_name \
@@ -83,8 +94,9 @@ plink \
 --nonfounders --allow-no-sex \
 --dog \
 --geno 0.05 --mind 0.1 \
---maf 0.05 \
 --pca 2
+
+
     
 done
 
@@ -118,7 +130,19 @@ for map_file in $raw_simulated_selection_model_dir/*.map; do
     # simulation_name=$(basename "${simulation_file%.*}")    
     # echo "$simulation_name"     
     simulation_name=$(basename "$map_file" .map) # Extract the basename without the .map extension
-    # Running --homozyg command for ROH computation
+
+    # # Running --homozyg command for ROH computation
+    # plink \
+    #  --file $raw_simulated_selection_model_dir/$simulation_name \
+    #  --out $preprocessed_selection_model_dir/$simulation_name \
+    #  --make-bed \
+    #  --nonfounders --allow-no-sex \
+    #  --dog \
+    #  --geno 0.05 --mind 0.1 \
+    #  --maf 0.05 \
+    #  --pca 2    
+
+        # Running --homozyg command for ROH computation
     plink \
      --file $raw_simulated_selection_model_dir/$simulation_name \
      --out $preprocessed_selection_model_dir/$simulation_name \
@@ -126,8 +150,8 @@ for map_file in $raw_simulated_selection_model_dir/*.map; do
      --nonfounders --allow-no-sex \
      --dog \
      --geno 0.05 --mind 0.1 \
-     --maf 0.05 \
-     --pca 2    
+     --pca 2  
+
 done
 
 echo "Pre-processing of the Selection Model completed"

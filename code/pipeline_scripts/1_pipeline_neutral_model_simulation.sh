@@ -19,7 +19,7 @@ pipeline_script_dir=$HOME/code/pipeline_scripts
 output_dir_neutral_simulation=$HOME/data/raw/simulated/neutral_model
 
 # export chr_simulated="chr3"
-n_simulation_replicates=20 #20
+# n_simulation_replicates=20 #20
 
 mkdir -p $output_dir_neutral_simulation
 

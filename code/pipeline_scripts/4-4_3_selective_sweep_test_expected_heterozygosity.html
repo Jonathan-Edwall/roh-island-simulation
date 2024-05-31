@@ -432,7 +432,7 @@ Sys.getenv()  </code></pre>
 ##                         unix:path=/run/user/1008/bus
 ## disappearance_threshold_value_to_terminate_script
 ##                         20
-## DISPLAY                 localhost:13.0
+## DISPLAY                 localhost:12.0
 ## EDITOR                  vi
 ## empirical_allele_frequency_dir
 ##                         /home/jonathan/results/PLINK/allele_freq/empirical/german_shepherd
@@ -452,6 +452,8 @@ Sys.getenv()  </code></pre>
 ##                         40
 ## n_ind_per_selection_sim_generation
 ##                         50
+## n_simulation_replicates
+##                         5
 ## num_markers_preprocessed_empirical_dataset
 ##                         78088
 ## num_markers_raw_empirical_dataset
@@ -465,7 +467,7 @@ Sys.getenv()  </code></pre>
 ## output_empirical_H_e_dir
 ##                         /home/jonathan/results/expected_heterozygosity/empirical/german_shepherd
 ## output_sim_files_basename
-##                         sim_20_selection_model_s08_chr3
+##                         sim_5_selection_model_s08_chr3
 ## output_simulated_model_H_e_dir
 ##                         /home/jonathan/results/expected_heterozygosity/simulated/selection_model
 ## PAGER                   /usr/bin/pager
@@ -486,7 +488,7 @@ Sys.getenv()  </code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmpidn8VA
+## R_SESSION_TMPDIR        /tmp/RtmpBTExKh
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -498,7 +500,7 @@ Sys.getenv()  </code></pre>
 ## selected_chr_preprocessed_snp_density_mb
 ##                         32.12
 ## selected_chr_snp_density_mb
-##                         59.42
+##                         32.12
 ## selection_coefficient   0.8
 ## SHELL                   /bin/bash
 ## SHLVL                   3
@@ -507,17 +509,19 @@ Sys.getenv()  </code></pre>
 ##                         /home/jonathan/results/PLINK/allele_freq/simulated/selection_model
 ## simulation_prune_count_file
 ##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s_0.8.tsv
-## SSH_CLIENT              172.21.30.251 52564 22
-## SSH_CONNECTION          172.21.30.251 52564 77.235.253.16 22
+## SSH_CLIENT              172.21.30.45 56054 22
+## SSH_CONNECTION          172.21.30.45 56054 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/15
 ## sweep_test_type         Selection_Strength_testing
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
+## variant_positions_file
+##                         /home/jonathan/data/raw/simulated/selection_model/variant_position/variant_position_s_0.8.tsv
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          8954
+## XDG_SESSION_ID          9360
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir_sweep_test)</code></pre>
@@ -631,26 +635,11 @@ frq_bed_files &lt;- list.files(pattern = pattern)
 
 # Display the found files
 print(frq_bed_files)</code></pre>
-<pre><code>##  [1] &quot;sim_1_selection_model_s08_chr3_allele_freq.bed&quot; 
-##  [2] &quot;sim_10_selection_model_s08_chr3_allele_freq.bed&quot;
-##  [3] &quot;sim_11_selection_model_s08_chr3_allele_freq.bed&quot;
-##  [4] &quot;sim_12_selection_model_s08_chr3_allele_freq.bed&quot;
-##  [5] &quot;sim_13_selection_model_s08_chr3_allele_freq.bed&quot;
-##  [6] &quot;sim_14_selection_model_s08_chr3_allele_freq.bed&quot;
-##  [7] &quot;sim_15_selection_model_s08_chr3_allele_freq.bed&quot;
-##  [8] &quot;sim_16_selection_model_s08_chr3_allele_freq.bed&quot;
-##  [9] &quot;sim_17_selection_model_s08_chr3_allele_freq.bed&quot;
-## [10] &quot;sim_18_selection_model_s08_chr3_allele_freq.bed&quot;
-## [11] &quot;sim_19_selection_model_s08_chr3_allele_freq.bed&quot;
-## [12] &quot;sim_2_selection_model_s08_chr3_allele_freq.bed&quot; 
-## [13] &quot;sim_20_selection_model_s08_chr3_allele_freq.bed&quot;
-## [14] &quot;sim_3_selection_model_s08_chr3_allele_freq.bed&quot; 
-## [15] &quot;sim_4_selection_model_s08_chr3_allele_freq.bed&quot; 
-## [16] &quot;sim_5_selection_model_s08_chr3_allele_freq.bed&quot; 
-## [17] &quot;sim_6_selection_model_s08_chr3_allele_freq.bed&quot; 
-## [18] &quot;sim_7_selection_model_s08_chr3_allele_freq.bed&quot; 
-## [19] &quot;sim_8_selection_model_s08_chr3_allele_freq.bed&quot; 
-## [20] &quot;sim_9_selection_model_s08_chr3_allele_freq.bed&quot;</code></pre>
+<pre><code>## [1] &quot;sim_1_selection_model_s08_chr3_allele_freq.bed&quot;
+## [2] &quot;sim_2_selection_model_s08_chr3_allele_freq.bed&quot;
+## [3] &quot;sim_3_selection_model_s08_chr3_allele_freq.bed&quot;
+## [4] &quot;sim_4_selection_model_s08_chr3_allele_freq.bed&quot;
+## [5] &quot;sim_5_selection_model_s08_chr3_allele_freq.bed&quot;</code></pre>
 <pre class="r"><code># Extract the simulation number after &quot;sim_&quot;
 simulation_numbers &lt;- as.integer(sub(&quot;^sim_(\\d+)_.*&quot;, &quot;\\1&quot;, frq_bed_files))
 # Sort the simulation-files based on the simulation number
@@ -818,32 +807,14 @@ if (length(rows_to_remove) &gt; 0) {  # Check if rows_to_remove is not empty
 }
 
 paste(&quot;Snps for each simulation, before the pruning:&quot;,datapoints_before_MAF_filtering)</code></pre>
-<pre><code>##  [1] &quot;Snps for each simulation, before the pruning: 1973&quot;
-##  [2] &quot;Snps for each simulation, before the pruning: 2648&quot;
-##  [3] &quot;Snps for each simulation, before the pruning: 2730&quot;
-##  [4] &quot;Snps for each simulation, before the pruning: 2431&quot;
-##  [5] &quot;Snps for each simulation, before the pruning: 2127&quot;
-##  [6] &quot;Snps for each simulation, before the pruning: 2020&quot;
-##  [7] &quot;Snps for each simulation, before the pruning: 2761&quot;
-##  [8] &quot;Snps for each simulation, before the pruning: 2692&quot;
-##  [9] &quot;Snps for each simulation, before the pruning: 2096&quot;
-## [10] &quot;Snps for each simulation, before the pruning: 2816&quot;
-## [11] &quot;Snps for each simulation, before the pruning: 2486&quot;
-## [12] &quot;Snps for each simulation, before the pruning: 2721&quot;
-## [13] &quot;Snps for each simulation, before the pruning: 2674&quot;
-## [14] &quot;Snps for each simulation, before the pruning: 2841&quot;
-## [15] &quot;Snps for each simulation, before the pruning: 3058&quot;
-## [16] &quot;Snps for each simulation, before the pruning: 2848&quot;
-## [17] &quot;Snps for each simulation, before the pruning: 2411&quot;
-## [18] &quot;Snps for each simulation, before the pruning: 2372&quot;
-## [19] &quot;Snps for each simulation, before the pruning: 2559&quot;
-## [20] &quot;Snps for each simulation, before the pruning: 2551&quot;</code></pre>
+<pre><code>## [1] &quot;Snps for each simulation, before the pruning: 2970&quot;
+## [2] &quot;Snps for each simulation, before the pruning: 2970&quot;
+## [3] &quot;Snps for each simulation, before the pruning: 2970&quot;
+## [4] &quot;Snps for each simulation, before the pruning: 2970&quot;
+## [5] &quot;Snps for each simulation, before the pruning: 2970&quot;</code></pre>
 <pre class="r"><code>paste(&quot;Pruned SNPs:&quot;,pruned_counts)</code></pre>
-<pre><code>##  [1] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-##  [5] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-##  [9] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-## [13] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-## [17] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;</code></pre>
+<pre><code>## [1] &quot;Pruned SNPs: 2199&quot; &quot;Pruned SNPs: 2183&quot; &quot;Pruned SNPs: 2355&quot;
+## [4] &quot;Pruned SNPs: 2258&quot; &quot;Pruned SNPs: 2307&quot;</code></pre>
 <pre class="r"><code># View(simulated_model_tables)</code></pre>
 <p>#3: Computing window-based average expected heterozygosity Step 1: Create genomic windows Step 2: Compute the average H_e for each genomic window individually</p>
 <pre class="r"><code># Define the window size to be used
@@ -1141,9 +1112,7 @@ simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mea
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>##  [1] 0.3099448 0.3601143 0.3806007 0.3596334 0.3178459 0.3419408 0.3526072
-##  [8] 0.3830687 0.3695565 0.3254309 0.3575446 0.3691983 0.3575612 0.3564202
-## [15] 0.3680992 0.3490673 0.3400080 0.3312797 0.3500960 0.3764552</code></pre>
+<pre><code>## [1] 0.3750560 0.3422601 0.3537195 0.3609737 0.3382489</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1237,84 +1206,24 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Simulation 1</td>
-<td align="right">0.1128000</td>
+<td align="left">Simulation 2</td>
+<td align="right">0.10028</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 5</td>
-<td align="right">0.1128000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 6</td>
-<td align="right">0.1302000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 17</td>
-<td align="right">0.1302000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 19</td>
-<td align="right">0.1455846</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 10</td>
-<td align="right">0.1472000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 11</td>
-<td align="right">0.1472000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 18</td>
-<td align="right">0.1472000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 20</td>
-<td align="right">0.1472000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 7</td>
-<td align="right">0.1487500</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 16</td>
-<td align="right">0.1572240</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 13</td>
-<td align="right">0.1625175</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 15</td>
-<td align="right">0.1636133</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 2</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 4</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 14</td>
-<td align="right">0.1745067</td>
+<td align="right">0.11280</td>
 </tr>
 <tr class="odd">
 <td align="left">Simulation 3</td>
-<td align="right">0.1839375</td>
+<td align="right">0.13020</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 8</td>
-<td align="right">0.1869500</td>
+<td align="left">Simulation 4</td>
+<td align="right">0.13020</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 12</td>
-<td align="right">0.1958000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 9</td>
-<td align="right">0.2063700</td>
+<td align="left">Simulation 1</td>
+<td align="right">0.14720</td>
 </tr>
 </tbody>
 </table>
@@ -1408,7 +1317,7 @@ dev.off()</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">Hotspot_chr3_window_1_allele_freq</td>
-<td align="left">Yes</td>
+<td align="left">No</td>
 <td align="right">0.1082216</td>
 </tr>
 <tr class="even">

@@ -68,6 +68,8 @@ chr_number <- as.numeric(sub("chr", "", chr_simulated))
 
 output_sim_files_basename <- Sys.getenv("output_sim_files_basename")
 simulation_prune_count_file <- Sys.getenv("simulation_prune_count_file")
+variant_positions_file <- Sys.getenv("variant_positions_file")
+
 snp_density_Mb <- as.numeric(Sys.getenv("selected_chr_snp_density_mb")) 
 snp_density_Mb
 disappearance_threshold_value_to_terminate_script <- as.numeric(Sys.getenv("disappearance_threshold_value_to_terminate_script"))
@@ -286,18 +288,23 @@ model_chromosome_Mb_length <- model_chromosome_bp_length / (10^6)
 num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
 num_snp_markers_simulated_chromosome
 
-SP$addSnpChip(
-  nSnpPerChr = num_snp_markers_simulated_chromosome,
-  minSnpFreq = min_MAF,
-  refPop = last_bottleneck_generation
-  )
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_bottleneck_generation
+#   )
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   refPop = last_bottleneck_generation
+#   )
+
 ```
 
 ## 2.3 Simulating the selection scenario - makeCross()
 
 `makeCross()` Parameters:
 
-### 2.3.1 Choosing a causative variant for the Selection Scenario - find_causative_variant()
 ```{r Finding Causative variant}
 find_causative_variant <- function(population,SP, allele_copies_threshold) {
   # Count occurrences of each variant
@@ -378,7 +385,7 @@ while (!success) {
   # Function to randomly pick out a causative variant to be studied
   causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold)
   # Print the chosen causative variant
-  paste("Variant chosen:", causative_variant)
+  cat("Variant chosen:", causative_variant)
 
   # Sets the initial population for the selection scenario to the last generation of the bottleneck simulation.
   selection_scenario_pop <- last_bottleneck_generation
@@ -395,6 +402,9 @@ while (!success) {
   if (max(f_causative) >= causative_variant_prune_threshold) {
     success <- TRUE
     last_mate_selection_generation <- result[[2]]
+    causative_variant_SNP_ID <- names(causative_variant)
+    # SP$addSnpChipByName(causative_variant_SNP_ID) # Creating a SNP chip only consisting of this causative variant
+    # Future change?: create a new snp chip that includes the markers from the original snp chip + this causative variant SNPdes the causative variant
 
   } else { 
     # Increment the pruned replicates counter
@@ -427,6 +437,21 @@ last_bottleneck_generation
 cat("\nPopulation after",n_generations_mate_selection,"generations of selection scenario simulation:\n")
 last_mate_selection_generation
 
+SP$addSnpChip(
+  nSnpPerChr = num_snp_markers_simulated_chromosome,
+  refPop = last_mate_selection_generation
+  )
+
+# 
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_mate_selection_generation
+#   )
+
+
+
+
 ```
 
 
@@ -436,38 +461,38 @@ last_mate_selection_generation
 
 ### 3.1.0.1: Optional: pullSnpGeno() - Retrieves a list of the existing marker id:s (SNP id:s) -->
 
-<!-- Function that retrieves SNP genotype data & returns a matrix of SNP
-<!-- genotypes -->
+Function that retrieves SNP genotype data & returns a matrix of SNPgenotypes
 
-<!-- ```{r pullSnpGeno(), echo = FALSE} -->
-<!-- #pullSnpGeno(last_generation,simParam=SP) -->
-<!-- ``` -->
+```{r pullSnpGeno(), echo = FALSE}
+#pullSnpGeno(last_mate_selection_generation,simParam=SP)
+#snp_chip_genotypes <- pullSnpGeno(last_mate_selection_generation)
+#View(snp_chip_genotypes)
 
-<!-- ### 3.1.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map -->
+```
 
-<!-- Function that retrieves the genetic map for a given SNP chip & returns a -->
-<!-- data.frame with: -->
+### 3.1.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map for the SNP chip
 
-<!-- -   **id:** Unique identifier for the marker (SNP) -->
+Function that retrieves the genetic map for a given SNP chip & returns a
+data.frame with:
 
-<!-- -   **chr:** Chromosome containing the SNP -->
+-   **id:** Unique identifier for the marker (SNP)
 
-<!-- -   **site:** Segregating site on the chromosome -->
+-   **chr:** Chromosome containing the SNP
 
-<!-- -   **pos:** Genetic map position -->
+-   **site:** Segregating site on the chromosome
 
-<!-- ```{r getSnPMap()} -->
-<!-- # SP$addSnpChip(5) -->
-<!-- # getSnpMap(snpChip=1,simParam=SP) -->
+-   **pos:** Genetic map position
 
-<!-- #getSnpMap(simParam=SP) -->
+```{r getSnPMap()}
 
-<!-- cat("First 10 markers and their genetic map positions:\n") -->
-<!-- kable(head(getSnpMap(simParam = SP), 10)) -->
-<!-- #head(getSnpMap(simParam = SP), 10) -->
+snp_chip_map <- getSnpMap(simParam=SP)
+# View(snp_chip_map)
 
+cat("First 10 markers of the SNP chip and their genetic map positions:\n")
+kable(head(snp_chip_map,10))
 
-<!-- ``` -->
+```
+
 
 ### 3.1.1: writePlink()
 
@@ -499,9 +524,9 @@ snpChip = 1, useQtl = FALSE, simParam = NULL, ... )
 -   **snpChip** an integer indicating which SNP chip genotype to use
     useQtl should QTL genotypes be used instead of a SNP chip.
 
-    ```
+    
        -    If TRUE, snpChip specifies which trait’s QTL to use, and thus these QTL may not match the QTL underlying the phenotype supplied in traits.
-    ```
+  
 
 -   **simParam** an object of SimParam ... additional arguments if using
     a function for traits
@@ -510,13 +535,32 @@ snpChip = 1, useQtl = FALSE, simParam = NULL, ... )
 # Setting the directory where the .map and .ped files will be stored in
 setwd(output_dir_simulation)
 
-writePlink(last_mate_selection_generation,simParam=SP, baseName=output_sim_files_basename,
+writePlink(last_mate_selection_generation,snpChip = 1,simParam=SP, baseName=output_sim_files_basename,
 
             traits = 1,
            use = "rand"
 
 
            )
+
+
+# writePlink(last_mate_selection_generation,snpChip = 2, baseName=output_sim_files_basename,
+# 
+#             traits = 1,
+#            use = "rand"
+# 
+# 
+#            )
+
+
+
+# writePlink(last_mate_selection_generation,simParam=SP, baseName=output_sim_files_basename,
+# 
+#             traits = 1,
+#            use = "rand"
+# 
+# 
+#            )
 ```
 ### 3.1.2: Convert distances to basepair in the .map file
 
@@ -529,34 +573,126 @@ ped_file <- paste0(output_sim_files_basename, '.ped')
 map_file <- paste0(output_sim_files_basename, '.map')
 ped_data <- read.table(ped_file)
 map_data <- read.table(map_file)
-
+ 
+# ¤¤¤¤¤ .map-file Column 1: Changing to correct chromosome ¤¤¤¤¤
 # Change the first column of the .map file to ensure that the correct chromosome number is used
 map_data$V1 <- chr_number
 
+# ¤¤¤¤¤ .map-file Column 2: Changing the SNP IDs to refer to correct chromosome ¤¤¤¤¤
+# Changing the SNP_Ids (second column) so their prefix indicate the correct chromosome number, otherwise 
+# It  will seem like they all belong to chromosome 1, like "1_21".
+# (will be useful if you would simulate more chromosomes in the future)
+map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
+
+# ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
 genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column)
 base_pair_position_column <- round(genetic_distance_morgan_column * (model_chromosome_bp_length / 100))
-
 # Redefining the physical position column (4th column) with the new values defined in base_pair_position_column
 map_data$V4 <- base_pair_position_column
 
-write.table(map_data, file = map_file, sep = "\t", row.names = FALSE, col.names = FALSE,quote = FALSE)
+
+
 
 #col.names = FALSE: Removes the header.
 #quote = FALSE: Removes quotation marks from values.
-
+write.table(map_data, file = map_file, sep = "\t", row.names = FALSE, col.names = FALSE,quote = FALSE)
 
 cat("Showing the first 10 rows of the new .map file:\n")
 kable(head(map_data, 10))
+
+```
+# 3.2 Causative variant
+## 3.2.1 Export information about the location of the causative variant
+```{r}
+
+#selection_scenario_pop
+gen_map <- getGenMap(founderGenomes)
+#View(gen_map)
+causative_variant_relative_SNP_POS <- gen_map[gen_map$id == causative_variant_SNP_ID, ]
+cat("Causative variant:\n",causative_variant_SNP_ID)
+causative_variant_relative_SNP_POS
+cat("\n Relative postions of the causative variant:\n",causative_variant_relative_SNP_POS$pos)
+
+
+causative_variant_SNP_pos_in_bp <- round(causative_variant_relative_SNP_POS$pos * (model_chromosome_bp_length))
+cat("\n BP position of the causative variant:\n",causative_variant_SNP_pos_in_bp)
+
+
+# Check if the file exists
+if (file.exists(variant_positions_file)) {
+    # Read the existing data from the file
+    causative_variant_positions_table <- read.table(variant_positions_file, header = FALSE, sep = "\t")
+} else {
+    # Create an empty data frame if the file does not exist
+    causative_variant_positions_table <- data.frame(V1 = character(), V2 = integer())
+}
+
+# Check if the output_sim_files_basename already exists in the file
+existing_row_index <- which(causative_variant_positions_table$V1 == output_sim_files_basename)
+
+if (length(existing_row_index) > 0) {
+    causative_variant_positions_table$V2[existing_row_index] <- causative_variant_SNP_pos_in_bp
+} else {
+    # Create a new row with the output_sim_files_basename and disappearance_counter
+    new_row <- data.frame(V1 = output_sim_files_basename, V2 = causative_variant_SNP_pos_in_bp)
+    # Append the new row to the existing data
+    causative_variant_positions_table <- rbind(causative_variant_positions_table, new_row)
+}
+
+# Write the updated data back to the file
+write.table(causative_variant_positions_table, file = variant_positions_file, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+
+
+```
+## 3.3: Export an allele frequency plot for the causative variant
+```{r causative variant - allele frequency plot }
+
+setwd(image_output_dir)
+
+# Format the bp position nicely
+formatted_bp_pos <- format(causative_variant_SNP_pos_in_bp, big.mark = " ")
+
+#f_causative
+
+# Plotting the allele frequency of the causative variant during the mate selection scenario
+
+# Open a PNG graphics device with the desired filename
+png(paste0(output_sim_files_basename, '.png'))
+
+# Set the plot title
+plot_title <- sprintf("Causative-Variant Frequency Plot - s=%g (%d replicates pruned) ", s, disappearance_counter)
+
+
+# Plot with customized axes labels and title
+plot(f_causative,
+     type = "p",
+     xlab = "Generation",
+     ylab = "Allele Frequency ",
+     main = plot_title,
+     ylim = c(0, 1)
+     )
+
+# Add text for the bp position of the studied marker inside the plot
+text(x = max(seq_along(f_causative)), y = 0.05, labels = paste("SNP Pos on", chr_simulated, "(bp):", formatted_bp_pos, "bp"), adj = c(1, 0))
+
+
+# # Save the plot
+dev.off()
+
+# Saving the plot-data as a .txtfile
+write.table(f_causative, file = paste0(output_sim_files_basename, '.txt'), sep = "\t", row.names = FALSE, col.names = FALSE,quote = FALSE)
+
+
+```
+
+## 3.2: Export pruned replicates information
+```{r}
 
 # Print the number of times the causative variant disappeared
 cat("Number of times the causative variant disappeared:\n")
 
 cat("Disappearance Counter:", disappearance_counter, "\n")  # Print disappearance_counter value to standard output
 
-```
-
-## 3.2: Export pruned replicates information
-```{r}
 
 # Check if the file exists
 if (file.exists(simulation_prune_count_file)) {
@@ -584,33 +720,4 @@ if (length(existing_row_index) > 0) {
 # Write the updated data back to the file
 write.table(prune_count_data, file = simulation_prune_count_file, sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
 
-```
-## 3.3: Export an allele frequency plot for the causative variant
-```{r causative variant - allele frequency plot }
-setwd(image_output_dir)
-
-f_causative
-
-# Plotting the allele frequency of the causative variant during the mate selection scenario
-
-# Open a PNG graphics device with the desired filename
-png(paste0(output_sim_files_basename, '.png'))
-
-# Set the plot title
-plot_title <- sprintf("Causative-Variant Frequency Plot - s=%g (%d replicates pruned) ", s, disappearance_counter)
-
-
-# Plot with customized axes labels and title
-plot(f_causative,
-     type = "p",
-     xlab = "Generation",
-     ylab = "Allele Frequency ",
-     main = plot_title,
-     ylim = c(0, 1)
-     )
-
-
-
-# # Save the plot
-dev.off()
 ```

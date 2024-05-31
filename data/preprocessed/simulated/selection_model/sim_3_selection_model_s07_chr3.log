@@ -4,7 +4,6 @@ Options in effect:
   --dog
   --file /home/jonathan/data/raw/simulated/selection_model/sim_3_selection_model_s07_chr3
   --geno 0.05
-  --maf 0.05
   --make-bed
   --mind 0.1
   --nonfounders
@@ -13,12 +12,12 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Fri May 24 19:11:58 2024
+Start time: Wed May 29 22:01:06 2024
 
-Random number seed: 1716577918
+Random number seed: 1717020066
 385423 MB RAM detected; reserving 192711 MB for main workspace.
 Scanning .ped file... done.
-Performing single-pass .bed write (5495 variants, 50 dogs).
+Performing single-pass .bed write (2970 variants, 50 dogs).
 --file:
 /home/jonathan/data/preprocessed/simulated/selection_model/sim_3_selection_model_s07_chr3-temporary.bed
 +
@@ -26,7 +25,7 @@ Performing single-pass .bed write (5495 variants, 50 dogs).
 +
 /home/jonathan/data/preprocessed/simulated/selection_model/sim_3_selection_model_s07_chr3-temporary.fam
 written.
-5495 variants loaded from .bim file.
+2970 variants loaded from .bim file.
 50 dogs (0 males, 0 females, 50 ambiguous) loaded from .fam.
 Ambiguous sex IDs written to
 /home/jonathan/data/preprocessed/simulated/selection_model/sim_3_selection_model_s07_chr3.nosex
@@ -37,9 +36,7 @@ Using up to 31 threads (change this with --threads).
 Before main variant filters, 50 founders and 0 nonfounders present.
 Calculating allele frequencies... done.
 0 variants removed due to missing genotype data (--geno).
-2845 variants removed due to minor allele threshold(s)
-(--maf/--max-maf/--mac/--max-mac).
-2650 variants and 50 dogs pass filters and QC.
+2970 variants and 50 dogs pass filters and QC.
 Phenotype data is quantitative.
 Relationship matrix calculation complete.
 --pca: Results saved to
@@ -55,4 +52,4 @@ and
 /home/jonathan/data/preprocessed/simulated/selection_model/sim_3_selection_model_s07_chr3.fam
 ... done.
 
-End time: Fri May 24 19:11:58 2024
+End time: Wed May 29 22:01:06 2024

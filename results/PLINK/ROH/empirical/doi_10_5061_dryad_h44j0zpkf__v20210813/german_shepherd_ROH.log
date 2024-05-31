@@ -13,9 +13,9 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Fri May 24 19:12:19 2024
+Start time: Wed May 29 22:01:12 2024
 
-Random number seed: 1716577939
+Random number seed: 1717020072
 385423 MB RAM detected; reserving 192711 MB for main workspace.
 78088 variants loaded from .bim file.
 324 dogs (143 males, 181 females) loaded from .fam.
@@ -34,4 +34,4 @@ Results saved to
 /home/jonathan/results/PLINK/ROH/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/german_shepherd_ROH.hom.summary
 .
 
-End time: Fri May 24 19:12:19 2024
+End time: Wed May 29 22:01:12 2024
