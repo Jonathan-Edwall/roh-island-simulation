@@ -136,7 +136,7 @@ for (i in 1:length(sim_info$sim_name)) {
   # Split the cleaned header into column names
   column_names <- c("allele_frequency")
   
-  # Read the .tsv file into a data frame, using the cleaned column names
+  # Read the .txt file into a data frame, using the cleaned column names
   allele_freq_data <- read.table(file, header = FALSE, comment.char = "", stringsAsFactors = FALSE, col.names = column_names, sep = " ")
   
   # Adding a "generation" column
@@ -401,8 +401,8 @@ for (i in 1:length(sim_info$sim_name)) {
   # Remove "#" from the header
   clean_header <- gsub("^#", "", header)
   
-  separator_causative_variant_window_file <- " "
-  # separator_causative_variant_window_file <- "\t"
+  #separator_causative_variant_window_file <- " "
+  separator_causative_variant_window_file <- "\t"
 
   
   # Split the cleaned header into column names
