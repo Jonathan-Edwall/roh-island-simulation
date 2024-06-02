@@ -34,11 +34,9 @@ mkdir -p $output_dir_selection_simulation/pruned_counts  # Creating a subdirecto
 mkdir -p $output_dir_selection_simulation/variant_position  # Creating a subdirectory for storing the position of the selected causative variant
 
 
-
-n_generations_selection_sim=40 # 40 default
-n_ind_per_selection_sim_generation=50
 # selection_coefficient_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
-selection_coefficient_list=(0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+# selection_coefficient_list=(0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
 
 # selection_coefficient_list=(0.6 0.7)
 # selection_coefficient_list=(0.8)
@@ -78,9 +76,9 @@ do
         export selection_coefficient="$selection_coefficient"
         export output_dir_selection_simulation="$output_dir_selection_simulation"
         export chr_simulated="$chr_simulated"
-        export n_generations_selection_sim="$n_generations_selection_sim"
+        export n_simulated_generations_breed_formation="$n_simulated_generations_breed_formation" #Variable defined in run_pipeline.sh
+        export n_individuals_breed_formation="$n_individuals_breed_formation" #Variable defined in run_pipeline.sh
         export selection_coefficient="$selection_coefficient"
-        export n_ind_per_selection_sim_generation="$n_ind_per_selection_sim_generation"
         export selected_chr_snp_density_mb="$selected_chr_snp_density_mb" # Variable defined in run_pipeline.sh
         export simulation_prune_count_file="$output_dir_selection_simulation/pruned_counts/pruned_replicates_count_s$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}.tsv"
         export variant_positions_file="$output_dir_selection_simulation/variant_position/variant_position_s$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}.tsv"        

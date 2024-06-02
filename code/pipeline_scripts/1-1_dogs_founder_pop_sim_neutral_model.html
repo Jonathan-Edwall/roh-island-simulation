@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-05-24" />
+<meta name="date" content="2024-05-31" />
 
 <title>Founder population simulation for Dogs (Neutral Model) in AlphaSimR</title>
 
@@ -343,7 +343,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Founder population simulation for Dogs (Neutral Model) in AlphaSimR</h1>
-<h4 class="date">2024-05-24</h4>
+<h4 class="date">2024-05-31</h4>
 
 </div>
 
@@ -394,11 +394,22 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
+
+
 min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
-n_generations_random_mating &lt;- 40 # The number of generations to simulate during the random mating scenario of modern dog breeds
-N_e_burn_in &lt;- 2500 # Ancestral population
+
+
+n_generations_random_mating &lt;- as.numeric(Sys.getenv(&quot;n_simulated_generations_breed_formation&quot;)) # The number of generations to simulate during the random mating scenario of modern dog breeds
+n_generations_random_mating</code></pre>
+<pre><code>## [1] 40</code></pre>
+<pre class="r"><code>n_indv_breed_formation &lt;- as.numeric(Sys.getenv(&quot;n_individuals_breed_formation&quot;))
+n_indv_breed_formation</code></pre>
+<pre><code>## [1] 70</code></pre>
+<pre class="r"><code>N_e_burn_in &lt;- 2500 # Ancestral population
 n_generations_bottleneck &lt;- 5
 N_e_bottleneck &lt;- 50
+
+
 ## Define the output directory based on the parameter passed from the Bash script
 #output_dir_simulation &lt;- params$output_dir_simulation
 
@@ -486,7 +497,7 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 136102</code></pre>
+## Loci: 134950</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -538,7 +549,7 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed2_founders &lt;- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
 cat(&quot;Population 2:\n&quot;)</code></pre>
@@ -548,7 +559,7 @@ cat(&quot;Population 2:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -562,7 +573,7 @@ cat(&quot;Population 2:\n&quot;)</code></pre>
 <li><p><strong>nProgeny</strong>-argument specifies how many progeny’s each mating pair can have. In this case, this parameter is set at 1 progeny per mating pair.</p></li>
 <li><p><strong>simParam</strong>-argument specifies the global simulation parameters</p></li>
 </ul>
-<pre class="r"><code>random_mating &lt;- function(pop, SP, n_gen) {
+<pre class="r"><code>random_mating_bottleneck &lt;- function(pop, SP, n_gen) {
     n_ind &lt;- pop@nInd # Extracting number of individuals in the current population
     generations &lt;- vector(length = n_gen + 1,
                           mode = &quot;list&quot;) 
@@ -577,6 +588,23 @@ cat(&quot;Population 2:\n&quot;)</code></pre>
      random_mating_generations &lt;- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
     
     return(random_mating_generations)
+}
+
+random_mating_breed_formation &lt;- function(pop, SP, n_gen,n_indv_breed_formation) {
+    # n_indv_breed_formation &lt;- pop@nInd # Extracting number of individuals in the current population    
+    generations &lt;- vector(length = n_gen + 1,
+                          mode = &quot;list&quot;) 
+    generations[[1]] &lt;- pop # The initial breeding group population gets stored as the first element
+    
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
+    # Each mating Progenys are generated using randcross
+    for (gen_ix in 2:(n_gen + 1)) {
+        generations[[gen_ix]] &lt;- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_indv_breed_formation, nProgeny = 1,
+                                           simParam = SP)
+    }
+     random_mating_generations &lt;- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
+    
+    return(random_mating_generations)
 }</code></pre>
 </div>
 <div id="bottleneck-simulation" class="section level2">
@@ -584,8 +612,8 @@ cat(&quot;Population 2:\n&quot;)</code></pre>
 <div id="simulating-5-generations-of-bottleneck-random-mating" class="section level3">
 <h3>2.1.1 Simulating 5 generations of bottleneck (Random Mating)</h3>
 <pre class="r"><code># Simulating random mating within each breeding group for 5 generations
-breed1_bottleneck &lt;- random_mating(breed1_founders, SP, n_generations_bottleneck)
-breed2_bottleneck &lt;- random_mating(breed2_founders, SP, n_generations_bottleneck)</code></pre>
+breed1_bottleneck &lt;- random_mating_bottleneck(breed1_founders, SP, n_generations_bottleneck)
+breed2_bottleneck &lt;- random_mating_bottleneck(breed2_founders, SP, n_generations_bottleneck)</code></pre>
 </div>
 <div id="extracting-the-final-bottleneck-generation" class="section level3">
 <h3>2.1.2 Extracting the final bottleneck generation</h3>
@@ -597,7 +625,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed1_bottleneck</code></pre>
 <pre><code>## [[1]]
@@ -605,7 +633,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0 
 ## 
 ## [[2]]
@@ -613,7 +641,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0 
 ## 
 ## [[3]]
@@ -621,7 +649,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0 
 ## 
 ## [[4]]
@@ -629,7 +657,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0 
 ## 
 ## [[5]]
@@ -637,7 +665,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Extracting final generation:
 last_bottleneck_generation &lt;- breed1_bottleneck[[n_generations_bottleneck]]
@@ -649,7 +677,7 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136102 
+## Loci: 134950 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -680,7 +708,7 @@ num_snp_markers_simulated_chromosome</code></pre>
 <h2>2.3 Modern dog breed - Random Mating Simulation</h2>
 <div id="simulating-40-generations-of-random-mating-random-mating" class="section level3">
 <h3>2.3.1 Simulating 40 generations of Random Mating (Random Mating)</h3>
-<pre class="r"><code>random_mating_generations &lt;- random_mating(last_bottleneck_generation, SP, n_generations_random_mating)
+<pre class="r"><code>random_mating_generations &lt;- random_mating_breed_formation(last_bottleneck_generation, SP, n_generations_random_mating,n_indv_breed_formation)
 
 # Extracting the final random mating generation:
 last_random_mating_generation &lt;- random_mating_generations[[n_generations_random_mating]]
@@ -731,74 +759,74 @@ cat(&quot;First 10 markers of the SNP chip and their genetic map positions:\n&qu
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1_94</td>
-<td align="left">1_94</td>
+<td align="left">1_6</td>
+<td align="left">1_6</td>
 <td align="left">1</td>
-<td align="right">94</td>
-<td align="right">0.0007595</td>
+<td align="right">6</td>
+<td align="right">0.0000982</td>
 </tr>
 <tr class="even">
-<td align="left">1_106</td>
-<td align="left">1_106</td>
+<td align="left">1_17</td>
+<td align="left">1_17</td>
 <td align="left">1</td>
-<td align="right">106</td>
-<td align="right">0.0008620</td>
+<td align="right">17</td>
+<td align="right">0.0001717</td>
 </tr>
 <tr class="odd">
-<td align="left">1_197</td>
-<td align="left">1_197</td>
+<td align="left">1_23</td>
+<td align="left">1_23</td>
 <td align="left">1</td>
-<td align="right">197</td>
-<td align="right">0.0013314</td>
+<td align="right">23</td>
+<td align="right">0.0002115</td>
 </tr>
 <tr class="even">
-<td align="left">1_333</td>
-<td align="left">1_333</td>
+<td align="left">1_63</td>
+<td align="left">1_63</td>
 <td align="left">1</td>
-<td align="right">333</td>
-<td align="right">0.0022856</td>
+<td align="right">63</td>
+<td align="right">0.0005002</td>
 </tr>
 <tr class="odd">
-<td align="left">1_334</td>
-<td align="left">1_334</td>
+<td align="left">1_149</td>
+<td align="left">1_149</td>
 <td align="left">1</td>
-<td align="right">334</td>
-<td align="right">0.0022999</td>
+<td align="right">149</td>
+<td align="right">0.0009647</td>
 </tr>
 <tr class="even">
-<td align="left">1_340</td>
-<td align="left">1_340</td>
+<td align="left">1_238</td>
+<td align="left">1_238</td>
 <td align="left">1</td>
-<td align="right">340</td>
-<td align="right">0.0023118</td>
+<td align="right">238</td>
+<td align="right">0.0014378</td>
 </tr>
 <tr class="odd">
-<td align="left">1_455</td>
-<td align="left">1_455</td>
+<td align="left">1_242</td>
+<td align="left">1_242</td>
 <td align="left">1</td>
-<td align="right">455</td>
-<td align="right">0.0031177</td>
+<td align="right">242</td>
+<td align="right">0.0014456</td>
 </tr>
 <tr class="even">
-<td align="left">1_501</td>
-<td align="left">1_501</td>
+<td align="left">1_274</td>
+<td align="left">1_274</td>
 <td align="left">1</td>
-<td align="right">501</td>
-<td align="right">0.0034814</td>
+<td align="right">274</td>
+<td align="right">0.0016538</td>
 </tr>
 <tr class="odd">
-<td align="left">1_508</td>
-<td align="left">1_508</td>
+<td align="left">1_322</td>
+<td align="left">1_322</td>
 <td align="left">1</td>
-<td align="right">508</td>
-<td align="right">0.0035229</td>
+<td align="right">322</td>
+<td align="right">0.0020033</td>
 </tr>
 <tr class="even">
-<td align="left">1_512</td>
-<td align="left">1_512</td>
+<td align="left">1_331</td>
+<td align="left">1_331</td>
 <td align="left">1</td>
-<td align="right">512</td>
-<td align="right">0.0035396</td>
+<td align="right">331</td>
+<td align="right">0.0020842</td>
 </tr>
 </tbody>
 </table>
@@ -880,63 +908,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_94</td>
-<td align="right">0.0759524</td>
-<td align="right">70240</td>
+<td align="left">3_6</td>
+<td align="right">0.0098191</td>
+<td align="right">9081</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_106</td>
-<td align="right">0.0861978</td>
-<td align="right">79715</td>
+<td align="left">3_17</td>
+<td align="right">0.0171710</td>
+<td align="right">15880</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_197</td>
-<td align="right">0.1331417</td>
-<td align="right">123128</td>
+<td align="left">3_23</td>
+<td align="right">0.0211451</td>
+<td align="right">19555</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_333</td>
-<td align="right">0.2285617</td>
-<td align="right">211372</td>
+<td align="left">3_63</td>
+<td align="right">0.0500186</td>
+<td align="right">46257</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_334</td>
-<td align="right">0.2299867</td>
-<td align="right">212690</td>
+<td align="left">3_149</td>
+<td align="right">0.0964666</td>
+<td align="right">89211</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_340</td>
-<td align="right">0.2311828</td>
-<td align="right">213796</td>
+<td align="left">3_238</td>
+<td align="right">0.1437766</td>
+<td align="right">132963</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_455</td>
-<td align="right">0.3117656</td>
-<td align="right">288318</td>
+<td align="left">3_242</td>
+<td align="right">0.1445593</td>
+<td align="right">133687</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_501</td>
-<td align="right">0.3481414</td>
-<td align="right">321958</td>
+<td align="left">3_274</td>
+<td align="right">0.1653770</td>
+<td align="right">152939</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_508</td>
-<td align="right">0.3522947</td>
-<td align="right">325799</td>
+<td align="left">3_322</td>
+<td align="right">0.2003321</td>
+<td align="right">185265</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_512</td>
-<td align="right">0.3539625</td>
-<td align="right">327341</td>
+<td align="left">3_331</td>
+<td align="right">0.2084203</td>
+<td align="right">192745</td>
 </tr>
 </tbody>
 </table>

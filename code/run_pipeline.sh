@@ -40,6 +40,9 @@ trap 'handle_interrupt' SIGINT
 ######################################
 export chr_simulated="chr3"
 export n_simulation_replicates=5
+export n_simulated_generations_breed_formation=40
+export n_individuals_breed_formation=70
+
 
 ####################################  
 # Defining the input files
@@ -147,7 +150,7 @@ echo "Step $step: $script_name Runtime: $runtime_step8 seconds" >> $runtime_log
 # Step 9
 script_name="2_3_2_ROH_Coverage.sh"
 echo "Step $step: Running $script_name"
-bash "$script_dir/$script_name"
+source "$script_dir/$script_name"
 end_step9=$(date +%s)
 runtime_step9=$((end_step9-end_step8))
 echo "Step $step: $script_name Runtime: $runtime_step9 seconds" >> $runtime_log
@@ -223,7 +226,7 @@ echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
 
 
 # Calculate total runtime
-total_runtime=$((end_step15-start))
+total_runtime=$((end_step16-start))
 echo "Total Pipeline Runtime: $total_runtime seconds" >> $runtime_log
 
 # Print runtimes

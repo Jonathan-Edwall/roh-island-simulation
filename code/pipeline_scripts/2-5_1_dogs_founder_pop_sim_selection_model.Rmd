@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-05-24"
+date: "2024-06-02"
 editor_options: 
   markdown: 
     wrap: 72
@@ -24,6 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Defining Input parameters
 #################################### 
 
+chromosome_end_margin <- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 allele_copies_threshold <- 10 # 10 default (candidate_variants = less than 10)
 min_allowed_gen_before_variant_lost <- 10 # Pruning replicates where the causative variant gets lost within this timespan
@@ -50,11 +51,14 @@ cat("Selection Coefficient:", s, "\n")
 #print(Sys.getenv("selection_coefficient"))
 
 
-n_generations_mate_selection <-  as.numeric(Sys.getenv("n_generations_selection_sim"))  # using as.numeric, otherwise class(n_generations_selection_sim) = "character"
+n_generations_mate_selection <-  as.numeric(Sys.getenv("n_simulated_generations_breed_formation"))  # The number of generations to simulate during the mate selection scenario of modern dog breeds
 n_generations_mate_selection
 
-n_ind_per_selection_sim_generation <- as.numeric(Sys.getenv("n_ind_per_selection_sim_generation")) # using as.numeric, otherwise class(n_ind_per_selection_sim_generation) = "character"
 
+
+
+n_ind_per_selection_sim_generation <- as.numeric(Sys.getenv("n_individuals_breed_formation")) # using as.numeric, otherwise class(n_ind_per_selection_sim_generation) = "character"
+n_ind_per_selection_sim_generation
 
 # Define the output directory based on the variable passed from the Bash script
 output_dir_simulation <- Sys.getenv("output_dir_selection_simulation")
@@ -305,17 +309,46 @@ num_snp_markers_simulated_chromosome
 
 `makeCross()` Parameters:
 
+### 2.3.1 find_causative_variant() - Function for finding the causative variant
+
 ```{r Finding Causative variant}
-find_causative_variant <- function(population,SP, allele_copies_threshold) {
+
+find_causative_variant <- function(population,SP, allele_copies_threshold,chromosome_end_margin) {
+  upper_boundary_chromosome_margin <- 1 - chromosome_end_margin
+
+  lower_boundary_chromosome_margin <- chromosome_end_margin
+  
+  # Extract the genetic map 
+  gen_map <- getGenMap(founderGenomes)
+  
   # Count occurrences of each variant
-  count <- colSums(pullSegSiteGeno(population, simParam = SP))
+  count <- colSums(pullSegSiteGeno(last_bottleneck_generation, simParam = SP))
   
   # Find candidate variants (less than or equal to the threshold)
   candidate_variants <- which(count <= allele_copies_threshold)
   
-  # Randomly pick one of the candidate variants as the causative variant
-  causative_variant <- candidate_variants[sample(1:length(candidate_variants), 1)]
+  # Find a candidate variant within 
+  success <- FALSE
+  while (!success) {
+    # Randomly pick one of the candidate variants as the causative variant
+    variant <- candidate_variants[sample(1:length(candidate_variants), 1)]
+    variant_SNP_ID <- names(variant)
+    
+    # Determine the position of the variant on the genetic map 
+    variant_relative_SNP_POS <- gen_map[gen_map$id == variant_SNP_ID, ]
   
+  
+    # Check if the causative variant has been fixated  
+    if (variant_relative_SNP_POS$pos >= lower_boundary_chromosome_margin &&  variant_relative_SNP_POS$pos <= upper_boundary_chromosome_margin) {
+      success <- TRUE
+      causative_variant <- variant
+    }    
+    
+  }
+
+  
+  
+
   return(causative_variant)
 }
 ```
@@ -378,12 +411,15 @@ Mate_Selection_scenario <- function(selection_scenario_pop, n_generations_mate_s
 # due to the causatative variant getting lost within min_allowed_gen_before_variant_lost generations
 disappearance_counter <- 0
 
+# # Extract the highest IID in the population from the post bottleneck scenario
+# last_bottleneck_IID <- max(last_bottleneck_generation@id)
+
 # Define the rerun mechanism
 success <- FALSE
 while (!success) {
   
   # Function to randomly pick out a causative variant to be studied
-  causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold)
+  causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold,chromosome_end_margin)
   # Print the chosen causative variant
   cat("Variant chosen:", causative_variant)
 
@@ -403,12 +439,15 @@ while (!success) {
     success <- TRUE
     last_mate_selection_generation <- result[[2]]
     causative_variant_SNP_ID <- names(causative_variant)
-    # SP$addSnpChipByName(causative_variant_SNP_ID) # Creating a SNP chip only consisting of this causative variant
+    #SP$addSnpChipByName(causative_variant_SNP_ID) # Creating a SNP chip only consisting of this causative variant
     # Future change?: create a new snp chip that includes the markers from the original snp chip + this causative variant SNPdes the causative variant
 
   } else { 
     # Increment the pruned replicates counter
     disappearance_counter <- disappearance_counter + 1
+    #SP$resetPed(lastId = last_bottleneck_IID)
+    #SP$resetPed()
+
 
     if  (disappearance_counter >= disappearance_threshold_value_to_terminate_script ) {  
       # knitr::knit_exit(fully = TRUE) 
@@ -437,20 +476,29 @@ last_bottleneck_generation
 cat("\nPopulation after",n_generations_mate_selection,"generations of selection scenario simulation:\n")
 last_mate_selection_generation
 
+
+
 SP$addSnpChip(
+
   nSnpPerChr = num_snp_markers_simulated_chromosome,
+
   refPop = last_mate_selection_generation
+
   )
 
+
+
 # 
+
 # SP$addSnpChip(
+
 #   nSnpPerChr = num_snp_markers_simulated_chromosome,
+
 #   minSnpFreq = min_MAF,
+
 #   refPop = last_mate_selection_generation
+
 #   )
-
-
-
 
 ```
 
@@ -583,7 +631,6 @@ map_data$V1 <- chr_number
 # It  will seem like they all belong to chromosome 1, like "1_21".
 # (will be useful if you would simulate more chromosomes in the future)
 map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
-
 # ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
 genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column)
 base_pair_position_column <- round(genetic_distance_morgan_column * (model_chromosome_bp_length / 100))

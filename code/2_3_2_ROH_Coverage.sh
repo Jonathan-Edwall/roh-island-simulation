@@ -14,12 +14,13 @@ conda activate bedtools
 ####### Defining parameter values #######
 ######################################
 overlap_fraction=1.0 # 100 % of the genomic 100k bp-window ("a-file") needs to be overlapping with the roh-segment ("b-file") 
-
+# $n_individuals_breed_formation is imported from the main script!
 
 
 # Hardcoding the number of individual within a simulated population, to calculate the ROH-frequency correctly.
 # This is required since not all individuals might have ROH-segments resulting in that the number of individual ROH-files and the amount of individuals in the population could differ
-num_individuals_simulation=50 
+
+
 # Defining the header of the output file
 header="#CHR\tPOS1\tPOS2\tCOUNT\tFREQUENCY"
 
@@ -269,7 +270,7 @@ for prefix in $simulation_prefixes; do
     #
     # Using awk to calculate the sum of counts for each window and add a frequency column. 
     # Then the file is sorted by genomic coordinates
-    awk -v num_indiv="$num_individuals_simulation" -v header="$header" '{
+    awk -v num_indiv="$n_individuals_breed_formation" -v header="$header" '{
         window_counts[$1"\t"$2"\t"$3]+=$4
     } 
     END {
@@ -312,7 +313,7 @@ for prefix in $simulation_prefixes; do
     
     # Using awk to calculate the sum of counts for each window and add a frequency column. 
     # Then the file is sorted by genomic coordinates
-    awk -v num_indiv="$num_individuals_simulation" -v header="$header" '{
+    awk -v num_indiv="$n_individuals_breed_formation" -v header="$header" '{
         window_counts[$1"\t"$2"\t"$3]+=$4
     } 
     END{

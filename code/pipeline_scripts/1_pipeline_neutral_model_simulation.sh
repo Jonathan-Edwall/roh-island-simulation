@@ -43,7 +43,9 @@ do
     export output_sim_files_basename="sim_${counter}_neutral_model_${chr_simulated}"
     export output_dir_neutral_simulation="$output_dir_neutral_simulation"
     export chr_simulated="$chr_simulated" #Variable defined in run_pipeline.sh
+    export n_individuals_breed_formation="$n_individuals_breed_formation" #Variable defined in run_pipeline.sh
     export selected_chr_snp_density_mb="$selected_chr_snp_density_mb" #Variable defined in run_pipeline.sh
+    export n_simulated_generations_breed_formation="$n_simulated_generations_breed_formation" #Variable defined in run_pipeline.sh
         
 
     Rscript -e "rmarkdown::render('$pipeline_script_dir/1-1_dogs_founder_pop_sim_neutral_model.Rmd')"     

@@ -1,10 +1,10 @@
 ---
-title: "Pipeline Summary - No Maf used - N_e 50"
+title: "Pipeline Summary - No MAF-pruning - N_e 50"
 output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-05-31"
+date: "2024-06-02"
 editor_options: 
   markdown: 
     wrap: 72
@@ -136,7 +136,7 @@ for (i in 1:length(sim_info$sim_name)) {
   # Split the cleaned header into column names
   column_names <- c("allele_frequency")
   
-  # Read the .txt file into a data frame, using the cleaned column names
+  # Read the .tsv file into a data frame, using the cleaned column names
   allele_freq_data <- read.table(file, header = FALSE, comment.char = "", stringsAsFactors = FALSE, col.names = column_names, sep = " ")
   
   # Adding a "generation" column
@@ -218,7 +218,7 @@ for (selection_scenario in names(fixation_data_causative_variant_tables)) {
 # Sort the data frame based on average fixation time, in descending order
 result_df_sorted <- result_df[order(-result_df$Avg_Fixation_time), ]
 
-# View(fixation_data_causative_variant_tables)
+#View(fixation_data_causative_variant_tables)
 
 
 # Print the table using kable
@@ -282,7 +282,7 @@ for (i in 1:length(sim_info$sim_name)) {
   position_causative_variant_tables[[selection_coefficient]] <- rbind(position_causative_variant_tables[[selection_coefficient]], causative_variant_position_data)
 }
 
-# View(position_causative_variant_tables)
+#View(position_causative_variant_tables)
 ```
 
 
@@ -320,10 +320,14 @@ for (i in 1:length(sim_info$sim_name)) {
   clean_header <- gsub("^#", "", header)
   
   # Split the cleaned header into column names
-  column_names <- strsplit(clean_header, "\t")[[1]]
+  column_names <- strsplit(sub("#", "", header), "\t")[[1]]
   
   # Read the .tsv file into a data frame, using the cleaned column names
-  causative_variant_window_lengths_data <- read.table(file, header = TRUE, comment.char = "", stringsAsFactors = FALSE, col.names = column_names, sep = "\t")
+  causative_variant_window_lengths_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
+  
+
+  # Alter the column names manually
+  colnames(causative_variant_window_lengths_data) <- c("Simulation_name", "Length_bp")
   
   # Add simulation_number as an attribute to the data frame
   sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
@@ -342,7 +346,7 @@ for (i in 1:length(sim_info$sim_name)) {
   window_lengths_causative_variant_tables[[selection_coefficient]] <- rbind(window_lengths_causative_variant_tables[[selection_coefficient]], causative_variant_window_lengths_data)
 }
 
-# View(window_lengths_causative_variant_tables)
+#View(window_lengths_causative_variant_tables)
 
 ```
 ## Causative variant Summary
@@ -410,7 +414,7 @@ for (i in 1:length(sim_info$sim_name)) {
 
   
   # # Read the .tsv frequency file into a data frame
-  causative_variant_window_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names,sep = separator_causative_variant_window_file)
+  causative_variant_window_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names,sep = separator_causative_variant_window_file)
   
   min_freq <- min(causative_variant_window_data[["FREQUENCY"]])
   max_freq <- max(causative_variant_window_data[["FREQUENCY"]])
@@ -438,34 +442,39 @@ for (i in 1:length(sim_info$sim_name)) {
   
   ###### Find the window_lengths of the causative variant in this window!! ######
   # Directly find the row where Simulation.name matches simname_from_file
-  matching_row <- window_lengths_causative_variant_tables[[selection_coefficient]][window_lengths_causative_variant_tables[[selection_coefficient]]$Simulation.name == simname_from_file, ]
+  matching_causative_variant_window_row <- window_lengths_causative_variant_tables[[selection_coefficient]][window_lengths_causative_variant_tables[[selection_coefficient]]$Simulation_name == simname_from_file, ]
   
-  # Extract the Length..bp value
-  length_bp_value <- matching_row$Length..bp.
-
+    # Extract the Variant_Position for the matching row
+  if (nrow(matching_causative_variant_window_row) > 0) {
+    length_bp_value <- matching_causative_variant_window_row$Length_bp
+    # print(variant_position)
+  } else {
+    print("No matching row found for matching_causative_variant_window_row ")
+  }
+  
 
   ###### Find the position of the causative variant  ######
   # Find the row that matches simname_from_file
-  matching_row <- position_causative_variant_tables[[selection_coefficient]][
+  matching_causative_variant_position_row <- position_causative_variant_tables[[selection_coefficient]][
     position_causative_variant_tables[[selection_coefficient]]$Sim_name == simname_from_file, ]
   
   # Extract the Variant_Position for the matching row
-  if (nrow(matching_row) > 0) {
-    variant_position <- matching_row$Variant_Position
+  if (nrow(matching_causative_variant_position_row) > 0) {
+    variant_position <- matching_causative_variant_position_row$Variant_Position
     # print(variant_position)
   } else {
-    print("No matching row found")
+    print("No matching row found for matching_causative_variant_position_row")
   }
   
   ###### Find the frequency of the window the causative variant lies in  ######
   
   # Find the row where POS1 <= variant_position <= POS2
-  matching_row <- causative_variant_window_data[
+  matching_row_causative_variant_freq <- causative_variant_window_data[
     causative_variant_window_data$POS1 <= variant_position & causative_variant_window_data$POS2 >= variant_position, ]
   
   # Extract the FREQUENCY of the matching row
-  if (nrow(matching_row) > 0) {
-    variant_100k_window_frequency <- matching_row$FREQUENCY
+  if (nrow(matching_row_causative_variant_freq) > 0) {
+    variant_100k_window_frequency <- matching_row_causative_variant_freq$FREQUENCY
   } else {
     print("No matching row found")
   }
@@ -487,7 +496,7 @@ abline(h = variant_100k_window_frequency, col = "red")
 #        col = "red", lwd = 1, text.font = 2)
 
 # Add a point for the causative variant window
-points(matching_row$POS1, variant_100k_window_frequency, col = "cyan", pch = 16)
+points(matching_row_causative_variant_freq$POS1, variant_100k_window_frequency, col = "cyan", pch = 16)
 
 # # Add a legend for the causative variant window
 # legend("topright",legend = paste("Causative Variant 100k Window Freq:", variant_100k_window_frequency),
@@ -584,7 +593,7 @@ for (selection_scenario in names(causative_variant_window_tables_Selection_Model
                                            ))
 }
 
-# View(causative_variant_window_tables_Selection_Model)
+#View(causative_variant_window_tables_Selection_Model)
 
 
 # Sort the data frame based on Inbreeding coefficient column
@@ -661,18 +670,19 @@ ROH_freq_table_Empirical_Data <- list()
 for (file in sorted_population_ROH_freq_files) {
 
   file_name <- file
-  file_name
+
+  # # Read the header line
+  # con <- file(file, "r")
+  # header <- readLines(con, n = 1)
+  # close(con)
+  # 
+  # # Remove "#" from the header and split it into column names
+  # column_names <- strsplit(sub("#", "", header), "\t")[[1]]
+  # 
+  # # Read the .tsv frequency file into a data frame
+  # ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   
-  # Read the header line
-  con <- file(file, "r")
-  header <- readLines(con, n = 1)
-  close(con)
-  
-  # Remove "#" from the header and split it into column names
-  column_names <- strsplit(sub("#", "", header), "\t")[[1]]
-  
-  # Read the .tsv frequency file into a data frame
-  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
   
   # Add chromosome_name as an attribute to the data frame
   chr_num <- as.numeric(gsub(".*CHR(\\d+)_.*", "\\1", file))
@@ -687,7 +697,7 @@ for (file in sorted_population_ROH_freq_files) {
 
 ROH_freq_table_Empirical_Data$ROH_hotspot_threshold <- Empirical_data_ROH_hotspot_threshold
 
-# View(ROH_freq_table_Empirical_Data)
+##View(ROH_freq_table_Empirical_Data)
 
 ```
 
@@ -725,16 +735,21 @@ for (file in sorted_neutral_model_ROH_freq_files) {
   # cat("Threshold Values:", threshold_values, "\n")
 
   
-  # Read the header line
-  con <- file(file, "r")
-  header <- readLines(con, n = 1)
-  close(con)
+  # # Read the header line
+  # con <- file(file, "r")
+  # header <- readLines(con, n = 1)
+  # close(con)
+  # 
+  # # Remove "#" from the header and split it into column names
+  # column_names <- strsplit(sub("#", "", header), "\t")[[1]]
+  # 
+  # # Read the .tsv frequency file into a data frame
+  # ROH_freq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   
-  # Remove "#" from the header and split it into column names
-  column_names <- strsplit(sub("#", "", header), "\t")[[1]]
+  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
   
-  # Read the .tsv frequency file into a data frame
-  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  
+  
   
   # Add chromosome_name as an attribute to the data frame
   sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
@@ -827,8 +842,9 @@ for (i in 1:length(sim_info$sim_name)) {
   # column_names <- strsplit(sub("#", "", header), "\t")[[1]]
   # 
   # # Read the .tsv frequency file into a data frame
-  # ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  # ROH_freq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   # 
+  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
   
   
   # Add simulation_number as an attribute to the data frame
@@ -844,9 +860,11 @@ for (i in 1:length(sim_info$sim_name)) {
     ROH_freq_tables_Selection_Model[[selection_coefficient]] <- list()
   }
   
+  table_info
+  
 
   # Create a list with table name and corresponding data frame
-  table_info <- list(Simulation_number = sim_num, filename = file,ROH_Hotspot_threshold =    simulation_ROH_hotspot_threshold)  # Added ROH_Hotspot_threshold here
+  table_info <- list(Simulation_number = sim_num, filename = file,ROH_Hotspot_threshold =    simulation_ROH_hotspot_threshold, data = ROH_freq_data)  # Added ROH_Hotspot_threshold here
   
   # Append the table info to the list under selection_coefficient
   ROH_freq_tables_Selection_Model[[selection_coefficient]] <- c(ROH_freq_tables_Selection_Model[[selection_coefficient]], list(table_info))
@@ -861,7 +879,7 @@ for (selection_coefficient in names(ROH_freq_tables_Selection_Model)) {
 }
 
 # View the resulting nested structure
-# View(ROH_freq_tables_Selection_Model)
+#View(ROH_freq_tables_Selection_Model)
 
 ```
 
@@ -953,7 +971,7 @@ for (i in 1:length(population_info$empirical_population_name)) {
   column_names <- strsplit(column_names, "\t")[[1]]
 
   # Read the .tsv frequency file into a data frame
-  F_ROH_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  F_ROH_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
 
   # Add empirical_population_name as an attribute to the data frame
   attr(F_ROH_data, "empirical_population_name") <- population_info$empirical_population_name[i]
@@ -991,7 +1009,7 @@ cat("Overall Average Avg_F_ROH for ",empirical_population_name,":",F_ROH_table_E
 
 
 # View the modified data structure
-# View(F_ROH_table_Empirical_Data)
+#View(F_ROH_table_Empirical_Data)
 
 ```
 
@@ -1276,7 +1294,7 @@ for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
 }
 
 
-# View(F_ROH_tables_Selection_Model)
+#View(F_ROH_tables_Selection_Model)
 ```
 
 ## 2.4 F_ROH summary
@@ -1441,7 +1459,7 @@ H_e_5th_percentiles_Neutral_model$Estimated_Mean_H_e_5th_percentile <- mean(H_e_
 # Store the bootstrap confidence interval in the F_ROH_tables_Neutral_Model
 H_e_5th_percentiles_Neutral_model$Bootstrap_CI_Estimated_Mean_H_e_5th_percentile <- bootstrap_confidence_interval_fun(H_e_5th_percentiles_Neutral_model[["results"]][["Fifth_Percentile"]])
 
-#View(H_e_5th_percentiles_Neutral_model)
+##View(H_e_5th_percentiles_Neutral_model)
 
 
 ```
@@ -1544,7 +1562,7 @@ for (selection_coefficient in names(H_e_5th_percentiles_Selection_models)) {
 }
 
 # # View the dataframe
-# View(H_e_5th_percentiles_Selection_models)
+# #View(H_e_5th_percentiles_Selection_models)
 
 
 ```
@@ -1729,7 +1747,7 @@ for (i in seq_along(selection_strength_testing_files)) {
 
 
 # View the dataframe
-# View(Selection_Strength_test_results_tables)
+# #View(Selection_Strength_test_results_tables)
 #(Selection_Strength_test_df)
 
 
@@ -1778,7 +1796,7 @@ for (i in 1:nrow(under_selection_rows)) {
 
 
 # View the new table
-# View(hotspot_under_selection_H_e_table)
+# #View(hotspot_under_selection_H_e_table)
 ```
 
 # 5 Visualizing Expected Heterozygoisty 

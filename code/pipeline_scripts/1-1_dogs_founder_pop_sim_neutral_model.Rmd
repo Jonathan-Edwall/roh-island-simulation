@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-05-24"
+date: "2024-05-31"
 editor_options: 
   markdown: 
     wrap: 72
@@ -24,11 +24,21 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
+
+
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
-n_generations_random_mating <- 40 # The number of generations to simulate during the random mating scenario of modern dog breeds
+
+
+n_generations_random_mating <- as.numeric(Sys.getenv("n_simulated_generations_breed_formation")) # The number of generations to simulate during the random mating scenario of modern dog breeds
+n_generations_random_mating
+n_indv_breed_formation <- as.numeric(Sys.getenv("n_individuals_breed_formation"))
+n_indv_breed_formation
+
 N_e_burn_in <- 2500 # Ancestral population
 n_generations_bottleneck <- 5
 N_e_bottleneck <- 50
+
+
 ## Define the output directory based on the parameter passed from the Bash script
 #output_dir_simulation <- params$output_dir_simulation
 
@@ -194,7 +204,7 @@ breed2_founders
 
 -   **simParam**-argument specifies the global simulation parameters
 ```{r}
-random_mating <- function(pop, SP, n_gen) {
+random_mating_bottleneck <- function(pop, SP, n_gen) {
     n_ind <- pop@nInd # Extracting number of individuals in the current population
     generations <- vector(length = n_gen + 1,
                           mode = "list") 
@@ -210,6 +220,26 @@ random_mating <- function(pop, SP, n_gen) {
     
     return(random_mating_generations)
 }
+
+random_mating_breed_formation <- function(pop, SP, n_gen,n_indv_breed_formation) {
+    # n_indv_breed_formation <- pop@nInd # Extracting number of individuals in the current population    
+    generations <- vector(length = n_gen + 1,
+                          mode = "list") 
+    generations[[1]] <- pop # The initial breeding group population gets stored as the first element
+    
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
+    # Each mating Progenys are generated using randcross
+    for (gen_ix in 2:(n_gen + 1)) {
+        generations[[gen_ix]] <- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_indv_breed_formation, nProgeny = 1,
+                                           simParam = SP)
+    }
+     random_mating_generations <- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
+    
+    return(random_mating_generations)
+}
+
+
+
 ```
 
 
@@ -220,8 +250,8 @@ random_mating <- function(pop, SP, n_gen) {
 ```{r}
 
 # Simulating random mating within each breeding group for 5 generations
-breed1_bottleneck <- random_mating(breed1_founders, SP, n_generations_bottleneck)
-breed2_bottleneck <- random_mating(breed2_founders, SP, n_generations_bottleneck)
+breed1_bottleneck <- random_mating_bottleneck(breed1_founders, SP, n_generations_bottleneck)
+breed2_bottleneck <- random_mating_bottleneck(breed2_founders, SP, n_generations_bottleneck)
 
 
 ```
@@ -281,7 +311,7 @@ num_snp_markers_simulated_chromosome
 ## 2.3 Modern dog breed - Random Mating Simulation
 ### 2.3.1 Simulating 40 generations of Random Mating (Random Mating)
 ```{r}
-random_mating_generations <- random_mating(last_bottleneck_generation, SP, n_generations_random_mating)
+random_mating_generations <- random_mating_breed_formation(last_bottleneck_generation, SP, n_generations_random_mating,n_indv_breed_formation)
 
 # Extracting the final random mating generation:
 last_random_mating_generation <- random_mating_generations[[n_generations_random_mating]]

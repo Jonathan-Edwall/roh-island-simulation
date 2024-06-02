@@ -1,11 +1,11 @@
 ---
-title: "ROH-hotspot identification"
+title: "Causative Variant Window Detection"
 output:
   html_document:
     toc: true
     toc_depth: 3  
     output_dir: output_dir
-date: "2024-05-07"
+date: "2024-06-02"
 editor_options: 
   markdown: 
     wrap: 72
@@ -51,7 +51,8 @@ selection_pop_roh_freq_dir <- file.path(results_dir,"Bedtools/coverage/simulated
 # Defining the input file
 #################################### 
 
-input_pop_roh_freq_file <- file.path(selection_pop_roh_freq_dir,"sim_5_selection_model_s08_chr3_ROH_freq.bed")
+#input_pop_roh_freq_file <- file.path(selection_pop_roh_freq_dir,"sim_5_selection_model_s08_chr3_ROH_freq.bed")
+input_pop_roh_freq_file <- file.path(selection_pop_roh_freq_dir,"sim_5_selection_model_s03_chr3_ROH_freq.bed")
 
 ## Extracting the prefix of the file used  
 # Extracting the basename (filename without extension) from the file path
@@ -62,9 +63,8 @@ prefix <- strsplit(filename, "_ROH_freq.bed")[[1]][1]
 print(prefix)
 
 
-input_selection_coefficient_variant_positions_file <- file.path(variant_position_dir,"variant_position_s_0.8.tsv")
-
-input_variant_freq_data <- file.path(variant_freq_plots_dir,"sim_5_selection_model_s08_chr3.txt")
+#input_selection_coefficient_variant_positions_file <- file.path(variant_position_dir,"variant_position_s_0.8.tsv")
+input_selection_coefficient_variant_positions_file <- file.path(variant_position_dir,"variant_position_s03_chr3.tsv")
 
 chr_simulated="chr3"
 # Extract the chromosome number and convert and convert it to numeric
@@ -76,7 +76,8 @@ chr_number <- as.numeric(sub("chr", "", chr_simulated))
 # Defining the output dirs
 #################################### 
 
-output_variant_window_lengths_file <- file.path(output_dir,"causative_variant_window_lengths_s_0.8.tsv") 
+#output_variant_window_lengths_file <- file.path(output_dir,"causative_variant_window_lengths_s_0.8.tsv") 
+output_variant_window_lengths_file <- file.path(output_dir,"causative_variant_window_lengths_s_0.3.tsv") 
 
 
 
@@ -114,8 +115,6 @@ library(knitr)
 
 # 1: Locate variant position
 ```{r}
-setwd(variant_position_dir)
-
 
 # Read the data without treating "#" as a comment
 Variant_positions_table <- read.table(input_selection_coefficient_variant_positions_file, header = FALSE, sep = "\t", comment.char = "")
@@ -150,7 +149,10 @@ colnames(Pop_roh_freq_table) <- c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
 row_with_variant_chr <- Pop_roh_freq_table[Pop_roh_freq_table$POS1 <= variant_position_bp &
                                            variant_position_bp <= Pop_roh_freq_table$POS2 &
                                            Pop_roh_freq_table$CHR == chr_number, ]
-
+# If no such row is found, stop the script
+if (nrow(row_with_variant_chr) == 0) {
+  stop("No row found with the specified variant position and chromosome number.")
+}
 
 # Display the row
 print(row_with_variant_chr)
@@ -159,10 +161,7 @@ print(row_with_variant_chr)
 ```
 # 3: Find Causative variant window
 ```{r}
-# If no such row is found, stop
-if (nrow(row_with_variant_chr) == 0) {
-  stop("No row found with the specified variant position and chromosome number.")
-}
+
 
 # Get the index of the row_with_variant_chr in the original table
 variant_row_index <- which(Pop_roh_freq_table$POS1 == row_with_variant_chr$POS1 &
@@ -170,21 +169,23 @@ variant_row_index <- which(Pop_roh_freq_table$POS1 == row_with_variant_chr$POS1 
                            Pop_roh_freq_table$CHR == row_with_variant_chr$CHR)
 
 # Initialize the variant window table with the row_with_variant_chr
-variant_window_table <- row_with_variant_chr
+causative_variant_window_table <- row_with_variant_chr
 
 # Define the frequency threshold
-frequency_threshold <- row_with_variant_chr$FREQUENCY - dropoff_from_causative_variant_percentage
+lower_boundary_frequency_threshold <- row_with_variant_chr$FREQUENCY - dropoff_from_causative_variant_percentage
+
+upper_boundary_frequency_threshold <- row_with_variant_chr$FREQUENCY + dropoff_from_causative_variant_percentage
 
 # Function to incorporate rows into the variant window table
-incorporate_rows <- function(start_index, direction) {
+incorporate_windows_to_causative_window <- function(start_index, direction) {
   i <- start_index
   while (TRUE) {
     i <- i + direction
     if (i < 1 || i > nrow(Pop_roh_freq_table)) break
     
     current_row <- Pop_roh_freq_table[i, ]
-    if (current_row$FREQUENCY >= frequency_threshold) {
-      variant_window_table <<- rbind(variant_window_table, current_row)
+    if (current_row$CHR == chr_number && current_row$FREQUENCY >= lower_boundary_frequency_threshold && current_row$FREQUENCY <= upper_boundary_frequency_threshold ) {
+      causative_variant_window_table <<- rbind(causative_variant_window_table, current_row)
     } else {
       break
     }
@@ -192,29 +193,48 @@ incorporate_rows <- function(start_index, direction) {
 }
 
 # Incorporate rows before and after the row_with_variant_chr
-incorporate_rows(variant_row_index, -1)  # Look backwards
-incorporate_rows(variant_row_index, 1)   # Look forwards
+incorporate_windows_to_causative_window(variant_row_index, -1)  # Look backwards
+incorporate_windows_to_causative_window(variant_row_index, 1)   # Look forwards
 
-View(variant_window_table)
+View(causative_variant_window_table)
 
 # Sort the data frame based on F_ROH column
-variant_window_table_sorted <- variant_window_table[order(as.numeric(variant_window_table$POS1)), ]
+causative_variant_window_table_sorted <- causative_variant_window_table[order(as.numeric(causative_variant_window_table$POS1)), ]
 
 
 # Display the variant window table
-print(variant_window_table_sorted)
+print(causative_variant_window_table_sorted)
 
-View(variant_window_table_sorted)
+View(causative_variant_window_table_sorted)
 
-length_window <- max(variant_window_table_sorted$POS2) - min(variant_window_table_sorted$POS1) + 1
+length_window <- max(causative_variant_window_table_sorted$POS2) - min(causative_variant_window_table_sorted$POS1) + 1
 length_window_MB <- length_window / (10^6)
 length_window_MB
 
-    # Define the filename with the output directory path
-  filename <- file.path(output_dir, paste(prefix,"_causative_variant_window_", length_window_MB,"_MB",".bed", sep = ""))
+# Define column names for the table
+
+column_names <- c("#CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
+
+
+
+# Set the column names of the table
+
+colnames(causative_variant_window_table_sorted) <- column_names
+
+
+
+filename <- file.path(output_dir, paste(prefix, "_causative_variant_window_", length_window_MB, "_MB", ".bed", sep = ""))
   
-  # Write data to TSV file without quotes and with tab separation
-  write.table(variant_window_table_sorted, file = filename, quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+# Set the column names of the table
+
+colnames(causative_variant_window_table_sorted) <- column_names
+
+
+
+# Write data to TSV file without quotes and with tab separation
+
+write.table(causative_variant_window_table_sorted, file = filename, quote = FALSE, col.names = TRUE, row.names = FALSE, sep = "\t")
 
 ```
 
