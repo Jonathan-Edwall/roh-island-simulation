@@ -478,27 +478,27 @@ last_mate_selection_generation
 
 
 
-SP$addSnpChip(
-
-  nSnpPerChr = num_snp_markers_simulated_chromosome,
-
-  refPop = last_mate_selection_generation
-
-  )
+# SP$addSnpChip(
+# 
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+# 
+#   refPop = last_mate_selection_generation
+# 
+#   )
 
 
 
 # 
 
-# SP$addSnpChip(
+SP$addSnpChip(
 
-#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+nSnpPerChr = num_snp_markers_simulated_chromosome,
 
-#   minSnpFreq = min_MAF,
+ minSnpFreq = min_MAF,
 
-#   refPop = last_mate_selection_generation
+refPop = last_mate_selection_generation
 
-#   )
+ )
 
 ```
 

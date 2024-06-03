@@ -450,7 +450,7 @@ Sys.getenv()  </code></pre>
 ## MAKE                    make
 ## MOTD_SHOWN              pam
 ## n_individuals_breed_formation
-##                         90
+##                         50
 ## n_simulated_generations_breed_formation
 ##                         40
 ## n_simulation_replicates
@@ -489,7 +489,7 @@ Sys.getenv()  </code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmp0QunzH
+## R_SESSION_TMPDIR        /tmp/RtmpvtQzvj
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -814,8 +814,8 @@ paste(&quot;Snps for each simulation, before the pruning:&quot;,datapoints_befor
 ## [4] &quot;Snps for each simulation, before the pruning: 2970&quot;
 ## [5] &quot;Snps for each simulation, before the pruning: 2970&quot;</code></pre>
 <pre class="r"><code>paste(&quot;Pruned SNPs:&quot;,pruned_counts)</code></pre>
-<pre><code>## [1] &quot;Pruned SNPs: 2085&quot; &quot;Pruned SNPs: 2240&quot; &quot;Pruned SNPs: 2094&quot;
-## [4] &quot;Pruned SNPs: 2028&quot; &quot;Pruned SNPs: 2105&quot;</code></pre>
+<pre><code>## [1] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
+## [5] &quot;Pruned SNPs: 0&quot;</code></pre>
 <pre class="r"><code># View(simulated_model_tables)</code></pre>
 <p>#3: Computing window-based average expected heterozygosity Step 1: Create genomic windows Step 2: Compute the average H_e for each genomic window individually</p>
 <pre class="r"><code># Define the window size to be used
@@ -1113,7 +1113,7 @@ simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mea
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>## [1] 0.3231299 0.3517266 0.3418479 0.3240762 0.3481339</code></pre>
+<pre><code>## [1] 0.3665064 0.3660894 0.3887243 0.3485843 0.3723452</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1207,24 +1207,24 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Simulation 2</td>
-<td align="right">0.1244502</td>
+<td align="left">Simulation 1</td>
+<td align="right">0.1638000</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 4</td>
-<td align="right">0.1244502</td>
+<td align="right">0.1638000</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 1</td>
-<td align="right">0.1340085</td>
+<td align="left">Simulation 2</td>
+<td align="right">0.1800000</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 3</td>
-<td align="right">0.1340085</td>
+<td align="left">Simulation 5</td>
+<td align="right">0.1800000</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 5</td>
-<td align="right">0.1410975</td>
+<td align="left">Simulation 3</td>
+<td align="right">0.1958843</td>
 </tr>
 </tbody>
 </table>
@@ -1328,22 +1328,22 @@ dev.off()</code></pre>
 </tr>
 <tr class="odd">
 <td align="left">Hotspot_chr3_window_2_allele_freq</td>
-<td align="left">No</td>
+<td align="left">Yes</td>
 <td align="right">0.1445314</td>
 </tr>
 <tr class="even">
 <td align="left">Hotspot_chr17_window_1_allele_freq</td>
-<td align="left">No</td>
+<td align="left">Yes</td>
 <td align="right">0.1449621</td>
 </tr>
 <tr class="odd">
 <td align="left">Hotspot_chr17_window_2_allele_freq</td>
-<td align="left">No</td>
+<td align="left">Yes</td>
 <td align="right">0.1486567</td>
 </tr>
 <tr class="even">
 <td align="left">Hotspot_chr19_window_1_allele_freq</td>
-<td align="left">No</td>
+<td align="left">Yes</td>
 <td align="right">0.1603723</td>
 </tr>
 </tbody>
