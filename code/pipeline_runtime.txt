@@ -1,18 +1,18 @@
 Pipeline Runtimes:
 Step 1: 2_1_1_plink_preprocessing_empirical_data.sh Runtime: 10 seconds
-Step 2: 1_pipeline_neutral_model_simulation.sh Runtime: 25 seconds
-Step 3: 2_pipeline_selection_model_simulation.sh Runtime: 557 seconds
+Step 2: 1_pipeline_neutral_model_simulation.sh Runtime: 23 seconds
+Step 3: 2_pipeline_selection_model_simulation.sh Runtime: 579 seconds
 Step 4: 2_1_1_plink_preprocessing_simulated_data.sh Runtime: 5 seconds
-Step 5: 2_2_1_plink_ROH_computation.sh Runtime: 1 seconds
-Step 6: 2_2_2_F_ROH_computation.sh Runtime: 55 seconds
-Step 7: 2_2_3_create_indv_ROH_bed_file.sh Runtime: 198 seconds
+Step 5: 2_2_1_plink_ROH_computation.sh Runtime: 0 seconds
+Step 6: 2_2_2_F_ROH_computation.sh Runtime: 41 seconds
+Step 7: 2_2_3_create_indv_ROH_bed_file.sh Runtime: 182 seconds
 Step 8: 2_3_1_Window_file_creator_for_ROH_frequency_computation.sh Runtime: 1 seconds
-Step 9: 2_3_2_ROH_Coverage.sh Runtime: 1116 seconds
-Step 10: 3_pipeline_ROH_hotspot.sh Runtime: 500 seconds
+Step 9: 2_3_2_ROH_Coverage.sh Runtime: 859 seconds
+Step 10: 3_pipeline_ROH_hotspot.sh Runtime: 498 seconds
 Step 11: 3_1_map_roh_hotspots_to_phenotypes.sh Runtime: 0 seconds
-Step 12: 3_pipeline_Selection_Causative_Variant_window_detection.sh Runtime: 315 seconds
+Step 12: 3_pipeline_Selection_Causative_Variant_window_detection.sh Runtime: 323 seconds
 Step 13: 4_1_allele_frequencies_for_He_Computation.sh Runtime: 2 seconds
-Step 14: 4_2_map_roh_hotspots_to_allele_frequencies.sh Runtime: 0 seconds
-Step 15: 4_pipeline_Sweep_test.sh Runtime: 115 seconds
-Step 16: pipeline_result_summary.sh Runtime: 9 seconds
-Total Pipeline Runtime: 2057 seconds
+Step 14: 4_2_map_roh_hotspots_to_allele_frequencies.sh Runtime: 1 seconds
+Step 15: 4_pipeline_Sweep_test.sh Runtime: 114 seconds
+Step 16: pipeline_result_summary.sh Runtime: 8 seconds
+Total Pipeline Runtime: 1805 seconds

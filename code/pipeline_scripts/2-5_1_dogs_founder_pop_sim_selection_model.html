@@ -434,7 +434,7 @@ n_generations_mate_selection</code></pre>
 <pre><code>## [1] 40</code></pre>
 <pre class="r"><code>n_ind_per_selection_sim_generation &lt;- as.numeric(Sys.getenv(&quot;n_individuals_breed_formation&quot;)) # using as.numeric, otherwise class(n_ind_per_selection_sim_generation) = &quot;character&quot;
 n_ind_per_selection_sim_generation</code></pre>
-<pre><code>## [1] 70</code></pre>
+<pre><code>## [1] 50</code></pre>
 <pre class="r"><code># Define the output directory based on the variable passed from the Bash script
 output_dir_simulation &lt;- Sys.getenv(&quot;output_dir_selection_simulation&quot;)
 output_dir_simulation</code></pre>
@@ -490,7 +490,7 @@ Sys.getenv()</code></pre>
 ## MAKE                    make
 ## MOTD_SHOWN              pam
 ## n_individuals_breed_formation
-##                         70
+##                         50
 ## n_simulated_generations_breed_formation
 ##                         40
 ## n_simulation_replicates
@@ -524,7 +524,7 @@ Sys.getenv()</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpkY7hRn
+## R_SESSION_TMPDIR        /tmp/RtmpGsWBru
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -542,8 +542,8 @@ Sys.getenv()</code></pre>
 ## SHLVL                   2
 ## simulation_prune_count_file
 ##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s08_chr3.tsv
-## SSH_CLIENT              172.21.30.58 54500 22
-## SSH_CONNECTION          172.21.30.58 54500 77.235.253.16 22
+## SSH_CLIENT              172.21.30.58 59306 22
+## SSH_CONNECTION          172.21.30.58 59306 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/15
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
@@ -553,7 +553,7 @@ Sys.getenv()</code></pre>
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          9698
+## XDG_SESSION_ID          9710
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># # Verify the current working directory
 #getwd()</code></pre>
@@ -615,7 +615,7 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 136066</code></pre>
+## Loci: 134269</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -667,7 +667,7 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed2_founders &lt;- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
 cat(&quot;Population 2:\n&quot;)</code></pre>
@@ -677,7 +677,7 @@ cat(&quot;Population 2:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -727,7 +727,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed1_bottleneck</code></pre>
 <pre><code>## [[1]]
@@ -735,7 +735,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0 
 ## 
 ## [[2]]
@@ -743,7 +743,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0 
 ## 
 ## [[3]]
@@ -751,7 +751,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0 
 ## 
 ## [[4]]
@@ -759,7 +759,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0 
 ## 
 ## [[5]]
@@ -767,7 +767,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Extracting final generation:
 last_bottleneck_generation &lt;- breed1_bottleneck[[n_generations_bottleneck]]
@@ -779,7 +779,7 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -956,17 +956,7 @@ while (!success) {
   }
   
 }</code></pre>
-<pre><code>## Variant chosen: 21608Causative variant disappeared, rerunning simulation...
-## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-## Variant chosen: 106747Causative variant disappeared, rerunning simulation...
-## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-## Variant chosen: 22086Causative variant disappeared, rerunning simulation...
-## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-## Variant chosen: 84464Causative variant disappeared, rerunning simulation...
-## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-## Variant chosen: 35245Causative variant disappeared, rerunning simulation...
-## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-## Variant chosen: 114936</code></pre>
+<pre><code>## Variant chosen: 47725</code></pre>
 <pre class="r"><code>#last_mate_selection_generation &lt;- selection_scenario_pop[[n_generations_mate_selection]]
 
 cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></pre>
@@ -976,7 +966,7 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0</code></pre>
 <pre class="r"><code>cat(&quot;\nPopulation after&quot;,n_generations_mate_selection,&quot;generations of selection scenario simulation:\n&quot;)</code></pre>
 <pre><code>## 
@@ -984,9 +974,9 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 <pre class="r"><code>last_mate_selection_generation</code></pre>
 <pre><code>## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 70 
+## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 136066 
+## Loci: 134269 
 ## Traits: 0</code></pre>
 <pre class="r"><code>SP$addSnpChip(
 
@@ -1047,74 +1037,74 @@ cat(&quot;First 10 markers of the SNP chip and their genetic map positions:\n&qu
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1_71</td>
-<td align="left">1_71</td>
+<td align="left">1_25</td>
+<td align="left">1_25</td>
 <td align="left">1</td>
-<td align="right">71</td>
-<td align="right">0.0005864</td>
+<td align="right">25</td>
+<td align="right">0.0001453</td>
 </tr>
 <tr class="even">
-<td align="left">1_118</td>
-<td align="left">1_118</td>
+<td align="left">1_167</td>
+<td align="left">1_167</td>
 <td align="left">1</td>
-<td align="right">118</td>
-<td align="right">0.0009445</td>
+<td align="right">167</td>
+<td align="right">0.0010932</td>
 </tr>
 <tr class="odd">
-<td align="left">1_189</td>
-<td align="left">1_189</td>
+<td align="left">1_216</td>
+<td align="left">1_216</td>
 <td align="left">1</td>
-<td align="right">189</td>
-<td align="right">0.0015178</td>
+<td align="right">216</td>
+<td align="right">0.0015615</td>
 </tr>
 <tr class="even">
-<td align="left">1_191</td>
-<td align="left">1_191</td>
+<td align="left">1_294</td>
+<td align="left">1_294</td>
 <td align="left">1</td>
-<td align="right">191</td>
-<td align="right">0.0015233</td>
+<td align="right">294</td>
+<td align="right">0.0021702</td>
 </tr>
 <tr class="odd">
-<td align="left">1_226</td>
-<td align="left">1_226</td>
+<td align="left">1_339</td>
+<td align="left">1_339</td>
 <td align="left">1</td>
-<td align="right">226</td>
-<td align="right">0.0018126</td>
+<td align="right">339</td>
+<td align="right">0.0023856</td>
 </tr>
 <tr class="even">
-<td align="left">1_419</td>
-<td align="left">1_419</td>
+<td align="left">1_355</td>
+<td align="left">1_355</td>
 <td align="left">1</td>
-<td align="right">419</td>
-<td align="right">0.0030662</td>
+<td align="right">355</td>
+<td align="right">0.0025403</td>
 </tr>
 <tr class="odd">
-<td align="left">1_500</td>
-<td align="left">1_500</td>
+<td align="left">1_450</td>
+<td align="left">1_450</td>
 <td align="left">1</td>
-<td align="right">500</td>
-<td align="right">0.0036962</td>
+<td align="right">450</td>
+<td align="right">0.0036107</td>
 </tr>
 <tr class="even">
-<td align="left">1_594</td>
-<td align="left">1_594</td>
+<td align="left">1_461</td>
+<td align="left">1_461</td>
 <td align="left">1</td>
-<td align="right">594</td>
-<td align="right">0.0045313</td>
+<td align="right">461</td>
+<td align="right">0.0037137</td>
 </tr>
 <tr class="odd">
-<td align="left">1_602</td>
-<td align="left">1_602</td>
+<td align="left">1_470</td>
+<td align="left">1_470</td>
 <td align="left">1</td>
-<td align="right">602</td>
-<td align="right">0.0045674</td>
+<td align="right">470</td>
+<td align="right">0.0037891</td>
 </tr>
 <tr class="even">
-<td align="left">1_654</td>
-<td align="left">1_654</td>
+<td align="left">1_490</td>
+<td align="left">1_490</td>
 <td align="left">1</td>
-<td align="right">654</td>
-<td align="right">0.0050183</td>
+<td align="right">490</td>
+<td align="right">0.0039016</td>
 </tr>
 </tbody>
 </table>
@@ -1213,63 +1203,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_71</td>
-<td align="right">0.0586380</td>
-<td align="right">54228</td>
+<td align="left">3_25</td>
+<td align="right">0.0145345</td>
+<td align="right">13441</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_118</td>
-<td align="right">0.0944520</td>
-<td align="right">87348</td>
+<td align="left">3_167</td>
+<td align="right">0.1093166</td>
+<td align="right">101095</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_189</td>
-<td align="right">0.1517801</td>
-<td align="right">140365</td>
+<td align="left">3_216</td>
+<td align="right">0.1561533</td>
+<td align="right">144409</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_191</td>
-<td align="right">0.1523287</td>
-<td align="right">140872</td>
+<td align="left">3_294</td>
+<td align="right">0.2170221</td>
+<td align="right">200700</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_226</td>
-<td align="right">0.1812570</td>
-<td align="right">167625</td>
+<td align="left">3_339</td>
+<td align="right">0.2385614</td>
+<td align="right">220619</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_419</td>
-<td align="right">0.3066242</td>
-<td align="right">283563</td>
+<td align="left">3_355</td>
+<td align="right">0.2540340</td>
+<td align="right">234928</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_500</td>
-<td align="right">0.3696167</td>
-<td align="right">341818</td>
+<td align="left">3_450</td>
+<td align="right">0.3610657</td>
+<td align="right">333910</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_594</td>
-<td align="right">0.4531337</td>
-<td align="right">419054</td>
+<td align="left">3_461</td>
+<td align="right">0.3713734</td>
+<td align="right">343443</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_602</td>
-<td align="right">0.4567368</td>
-<td align="right">422386</td>
+<td align="left">3_470</td>
+<td align="right">0.3789090</td>
+<td align="right">350411</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_654</td>
-<td align="right">0.5018262</td>
-<td align="right">464084</td>
+<td align="left">3_490</td>
+<td align="right">0.3901631</td>
+<td align="right">360819</td>
 </tr>
 </tbody>
 </table>
@@ -1286,19 +1276,19 @@ gen_map &lt;- getGenMap(founderGenomes)
 causative_variant_relative_SNP_POS &lt;- gen_map[gen_map$id == causative_variant_SNP_ID, ]
 cat(&quot;Causative variant:\n&quot;,causative_variant_SNP_ID)</code></pre>
 <pre><code>## Causative variant:
-##  1_114936</code></pre>
+##  1_47725</code></pre>
 <pre class="r"><code>causative_variant_relative_SNP_POS</code></pre>
-<pre><code>##              id chr       pos
-## 114936 1_114936   1 0.8424352</code></pre>
+<pre><code>##            id chr       pos
+## 47725 1_47725   1 0.3596182</code></pre>
 <pre class="r"><code>cat(&quot;\n Relative postions of the causative variant:\n&quot;,causative_variant_relative_SNP_POS$pos)</code></pre>
 <pre><code>## 
 ##  Relative postions of the causative variant:
-##  0.8424352</code></pre>
+##  0.3596182</code></pre>
 <pre class="r"><code>causative_variant_SNP_pos_in_bp &lt;- round(causative_variant_relative_SNP_POS$pos * (model_chromosome_bp_length))
 cat(&quot;\n BP position of the causative variant:\n&quot;,causative_variant_SNP_pos_in_bp)</code></pre>
 <pre><code>## 
 ##  BP position of the causative variant:
-##  77907614</code></pre>
+##  33257151</code></pre>
 <pre class="r"><code># Check if the file exists
 if (file.exists(variant_positions_file)) {
     # Read the existing data from the file
@@ -1367,7 +1357,7 @@ write.table(f_causative, file = paste0(output_sim_files_basename, &#39;.txt&#39;
 cat(&quot;Number of times the causative variant disappeared:\n&quot;)</code></pre>
 <pre><code>## Number of times the causative variant disappeared:</code></pre>
 <pre class="r"><code>cat(&quot;Disappearance Counter:&quot;, disappearance_counter, &quot;\n&quot;)  # Print disappearance_counter value to standard output</code></pre>
-<pre><code>## Disappearance Counter: 5</code></pre>
+<pre><code>## Disappearance Counter: 0</code></pre>
 <pre class="r"><code># Check if the file exists
 if (file.exists(simulation_prune_count_file)) {
     # Read the existing data from the file

@@ -404,7 +404,7 @@ n_generations_random_mating</code></pre>
 <pre><code>## [1] 40</code></pre>
 <pre class="r"><code>n_indv_breed_formation &lt;- as.numeric(Sys.getenv(&quot;n_individuals_breed_formation&quot;))
 n_indv_breed_formation</code></pre>
-<pre><code>## [1] 70</code></pre>
+<pre><code>## [1] 50</code></pre>
 <pre class="r"><code>N_e_burn_in &lt;- 2500 # Ancestral population
 n_generations_bottleneck &lt;- 5
 N_e_bottleneck &lt;- 50
@@ -497,7 +497,7 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 134950</code></pre>
+## Loci: 135252</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -549,7 +549,7 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed2_founders &lt;- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
 cat(&quot;Population 2:\n&quot;)</code></pre>
@@ -559,7 +559,7 @@ cat(&quot;Population 2:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -625,7 +625,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 100 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed1_bottleneck</code></pre>
 <pre><code>## [[1]]
@@ -633,7 +633,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0 
 ## 
 ## [[2]]
@@ -641,7 +641,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0 
 ## 
 ## [[3]]
@@ -649,7 +649,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0 
 ## 
 ## [[4]]
@@ -657,7 +657,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0 
 ## 
 ## [[5]]
@@ -665,7 +665,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Extracting final generation:
 last_bottleneck_generation &lt;- breed1_bottleneck[[n_generations_bottleneck]]
@@ -677,7 +677,7 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 ## Ploidy: 2 
 ## Individuals: 50 
 ## Chromosomes: 1 
-## Loci: 134950 
+## Loci: 135252 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -759,74 +759,74 @@ cat(&quot;First 10 markers of the SNP chip and their genetic map positions:\n&qu
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1_6</td>
-<td align="left">1_6</td>
+<td align="left">1_32</td>
+<td align="left">1_32</td>
 <td align="left">1</td>
-<td align="right">6</td>
-<td align="right">0.0000982</td>
+<td align="right">32</td>
+<td align="right">0.0002682</td>
 </tr>
 <tr class="even">
-<td align="left">1_17</td>
-<td align="left">1_17</td>
+<td align="left">1_64</td>
+<td align="left">1_64</td>
 <td align="left">1</td>
-<td align="right">17</td>
-<td align="right">0.0001717</td>
+<td align="right">64</td>
+<td align="right">0.0005397</td>
 </tr>
 <tr class="odd">
-<td align="left">1_23</td>
-<td align="left">1_23</td>
+<td align="left">1_84</td>
+<td align="left">1_84</td>
 <td align="left">1</td>
-<td align="right">23</td>
-<td align="right">0.0002115</td>
+<td align="right">84</td>
+<td align="right">0.0007380</td>
 </tr>
 <tr class="even">
-<td align="left">1_63</td>
-<td align="left">1_63</td>
+<td align="left">1_100</td>
+<td align="left">1_100</td>
 <td align="left">1</td>
-<td align="right">63</td>
-<td align="right">0.0005002</td>
+<td align="right">100</td>
+<td align="right">0.0008811</td>
 </tr>
 <tr class="odd">
-<td align="left">1_149</td>
-<td align="left">1_149</td>
+<td align="left">1_153</td>
+<td align="left">1_153</td>
 <td align="left">1</td>
-<td align="right">149</td>
-<td align="right">0.0009647</td>
+<td align="right">153</td>
+<td align="right">0.0012729</td>
 </tr>
 <tr class="even">
-<td align="left">1_238</td>
-<td align="left">1_238</td>
+<td align="left">1_217</td>
+<td align="left">1_217</td>
 <td align="left">1</td>
-<td align="right">238</td>
-<td align="right">0.0014378</td>
-</tr>
-<tr class="odd">
-<td align="left">1_242</td>
-<td align="left">1_242</td>
-<td align="left">1</td>
-<td align="right">242</td>
-<td align="right">0.0014456</td>
-</tr>
-<tr class="even">
-<td align="left">1_274</td>
-<td align="left">1_274</td>
-<td align="left">1</td>
-<td align="right">274</td>
-<td align="right">0.0016538</td>
+<td align="right">217</td>
+<td align="right">0.0017803</td>
 </tr>
 <tr class="odd">
 <td align="left">1_322</td>
 <td align="left">1_322</td>
 <td align="left">1</td>
 <td align="right">322</td>
-<td align="right">0.0020033</td>
+<td align="right">0.0025914</td>
 </tr>
 <tr class="even">
-<td align="left">1_331</td>
-<td align="left">1_331</td>
+<td align="left">1_353</td>
+<td align="left">1_353</td>
 <td align="left">1</td>
-<td align="right">331</td>
-<td align="right">0.0020842</td>
+<td align="right">353</td>
+<td align="right">0.0028079</td>
+</tr>
+<tr class="odd">
+<td align="left">1_500</td>
+<td align="left">1_500</td>
+<td align="left">1</td>
+<td align="right">500</td>
+<td align="right">0.0041653</td>
+</tr>
+<tr class="even">
+<td align="left">1_503</td>
+<td align="left">1_503</td>
+<td align="left">1</td>
+<td align="right">503</td>
+<td align="right">0.0041910</td>
 </tr>
 </tbody>
 </table>
@@ -908,63 +908,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_6</td>
-<td align="right">0.0098191</td>
-<td align="right">9081</td>
+<td align="left">3_32</td>
+<td align="right">0.0268166</td>
+<td align="right">24800</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_17</td>
-<td align="right">0.0171710</td>
-<td align="right">15880</td>
+<td align="left">3_64</td>
+<td align="right">0.0539717</td>
+<td align="right">49913</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_23</td>
-<td align="right">0.0211451</td>
-<td align="right">19555</td>
+<td align="left">3_84</td>
+<td align="right">0.0737999</td>
+<td align="right">68249</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_63</td>
-<td align="right">0.0500186</td>
-<td align="right">46257</td>
+<td align="left">3_100</td>
+<td align="right">0.0881064</td>
+<td align="right">81480</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_149</td>
-<td align="right">0.0964666</td>
-<td align="right">89211</td>
+<td align="left">3_153</td>
+<td align="right">0.1272875</td>
+<td align="right">117714</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_238</td>
-<td align="right">0.1437766</td>
-<td align="right">132963</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="left">3_242</td>
-<td align="right">0.1445593</td>
-<td align="right">133687</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="left">3_274</td>
-<td align="right">0.1653770</td>
-<td align="right">152939</td>
+<td align="left">3_217</td>
+<td align="right">0.1780252</td>
+<td align="right">164636</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
 <td align="left">3_322</td>
-<td align="right">0.2003321</td>
-<td align="right">185265</td>
+<td align="right">0.2591371</td>
+<td align="right">239648</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_331</td>
-<td align="right">0.2084203</td>
-<td align="right">192745</td>
+<td align="left">3_353</td>
+<td align="right">0.2807865</td>
+<td align="right">259669</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">3_500</td>
+<td align="right">0.4165311</td>
+<td align="right">385204</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="left">3_503</td>
+<td align="right">0.4190983</td>
+<td align="right">387578</td>
 </tr>
 </tbody>
 </table>

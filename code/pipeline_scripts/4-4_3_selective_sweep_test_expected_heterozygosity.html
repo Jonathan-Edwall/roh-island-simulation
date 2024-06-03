@@ -450,7 +450,7 @@ Sys.getenv()  </code></pre>
 ## MAKE                    make
 ## MOTD_SHOWN              pam
 ## n_individuals_breed_formation
-##                         70
+##                         50
 ## n_simulated_generations_breed_formation
 ##                         40
 ## n_simulation_replicates
@@ -489,7 +489,7 @@ Sys.getenv()  </code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpfZ3PqE
+## R_SESSION_TMPDIR        /tmp/RtmpRHl2bR
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -510,8 +510,8 @@ Sys.getenv()  </code></pre>
 ##                         /home/jonathan/results/PLINK/allele_freq/simulated/selection_model
 ## simulation_prune_count_file
 ##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s08_chr3.tsv
-## SSH_CLIENT              172.21.30.58 54500 22
-## SSH_CONNECTION          172.21.30.58 54500 77.235.253.16 22
+## SSH_CLIENT              172.21.30.58 59306 22
+## SSH_CONNECTION          172.21.30.58 59306 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/15
 ## sweep_test_type         Selection_Strength_testing
 ## TAR                     /bin/tar
@@ -522,7 +522,7 @@ Sys.getenv()  </code></pre>
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          9698
+## XDG_SESSION_ID          9710
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir_sweep_test)</code></pre>
@@ -814,8 +814,8 @@ paste(&quot;Snps for each simulation, before the pruning:&quot;,datapoints_befor
 ## [4] &quot;Snps for each simulation, before the pruning: 2970&quot;
 ## [5] &quot;Snps for each simulation, before the pruning: 2970&quot;</code></pre>
 <pre class="r"><code>paste(&quot;Pruned SNPs:&quot;,pruned_counts)</code></pre>
-<pre><code>## [1] &quot;Pruned SNPs: 2340&quot; &quot;Pruned SNPs: 2001&quot; &quot;Pruned SNPs: 2219&quot;
-## [4] &quot;Pruned SNPs: 2064&quot; &quot;Pruned SNPs: 2046&quot;</code></pre>
+<pre><code>## [1] &quot;Pruned SNPs: 2244&quot; &quot;Pruned SNPs: 2475&quot; &quot;Pruned SNPs: 2300&quot;
+## [4] &quot;Pruned SNPs: 2260&quot; &quot;Pruned SNPs: 2263&quot;</code></pre>
 <pre class="r"><code># View(simulated_model_tables)</code></pre>
 <p>#3: Computing window-based average expected heterozygosity Step 1: Create genomic windows Step 2: Compute the average H_e for each genomic window individually</p>
 <pre class="r"><code># Define the window size to be used
@@ -1113,7 +1113,7 @@ simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mea
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>## [1] 0.3643129 0.3474030 0.3425927 0.3632899 0.3385803</code></pre>
+<pre><code>## [1] 0.3462467 0.3896055 0.3730534 0.3730201 0.3689400</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1207,24 +1207,24 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Simulation 5</td>
-<td align="right">0.1326555</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 4</td>
-<td align="right">0.1362969</td>
-</tr>
-<tr class="odd">
 <td align="left">Simulation 2</td>
-<td align="right">0.1410701</td>
+<td align="right">0.1302</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 3</td>
-<td align="right">0.1447476</td>
+<td align="left">Simulation 5</td>
+<td align="right">0.1353</td>
 </tr>
 <tr class="odd">
 <td align="left">Simulation 1</td>
-<td align="right">0.1567276</td>
+<td align="right">0.1472</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 3</td>
+<td align="right">0.1472</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 4</td>
+<td align="right">0.1877</td>
 </tr>
 </tbody>
 </table>
