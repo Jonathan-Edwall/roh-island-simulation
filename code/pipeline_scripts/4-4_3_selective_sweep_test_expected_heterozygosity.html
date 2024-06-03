@@ -433,7 +433,7 @@ Sys.getenv()  </code></pre>
 ##                         unix:path=/run/user/1008/bus
 ## disappearance_threshold_value_to_terminate_script
 ##                         20
-## DISPLAY                 localhost:12.0
+## DISPLAY                 localhost:10.0
 ## EDITOR                  vi
 ## empirical_allele_frequency_dir
 ##                         /home/jonathan/results/PLINK/allele_freq/empirical/german_shepherd
@@ -450,7 +450,7 @@ Sys.getenv()  </code></pre>
 ## MAKE                    make
 ## MOTD_SHOWN              pam
 ## n_individuals_breed_formation
-##                         50
+##                         90
 ## n_simulated_generations_breed_formation
 ##                         40
 ## n_simulation_replicates
@@ -489,7 +489,7 @@ Sys.getenv()  </code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpRHl2bR
+## R_SESSION_TMPDIR        /tmp/Rtmp0QunzH
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -510,9 +510,9 @@ Sys.getenv()  </code></pre>
 ##                         /home/jonathan/results/PLINK/allele_freq/simulated/selection_model
 ## simulation_prune_count_file
 ##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s08_chr3.tsv
-## SSH_CLIENT              172.21.30.58 59306 22
-## SSH_CONNECTION          172.21.30.58 59306 77.235.253.16 22
-## SSH_TTY                 /dev/pts/15
+## SSH_CLIENT              172.21.30.49 62129 22
+## SSH_CONNECTION          172.21.30.49 62129 77.235.253.16 22
+## SSH_TTY                 /dev/pts/0
 ## sweep_test_type         Selection_Strength_testing
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
@@ -522,7 +522,7 @@ Sys.getenv()  </code></pre>
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          9710
+## XDG_SESSION_ID          9749
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir_sweep_test)</code></pre>
@@ -814,8 +814,8 @@ paste(&quot;Snps for each simulation, before the pruning:&quot;,datapoints_befor
 ## [4] &quot;Snps for each simulation, before the pruning: 2970&quot;
 ## [5] &quot;Snps for each simulation, before the pruning: 2970&quot;</code></pre>
 <pre class="r"><code>paste(&quot;Pruned SNPs:&quot;,pruned_counts)</code></pre>
-<pre><code>## [1] &quot;Pruned SNPs: 2244&quot; &quot;Pruned SNPs: 2475&quot; &quot;Pruned SNPs: 2300&quot;
-## [4] &quot;Pruned SNPs: 2260&quot; &quot;Pruned SNPs: 2263&quot;</code></pre>
+<pre><code>## [1] &quot;Pruned SNPs: 2085&quot; &quot;Pruned SNPs: 2240&quot; &quot;Pruned SNPs: 2094&quot;
+## [4] &quot;Pruned SNPs: 2028&quot; &quot;Pruned SNPs: 2105&quot;</code></pre>
 <pre class="r"><code># View(simulated_model_tables)</code></pre>
 <p>#3: Computing window-based average expected heterozygosity Step 1: Create genomic windows Step 2: Compute the average H_e for each genomic window individually</p>
 <pre class="r"><code># Define the window size to be used
@@ -1113,7 +1113,7 @@ simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mea
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>## [1] 0.3462467 0.3896055 0.3730534 0.3730201 0.3689400</code></pre>
+<pre><code>## [1] 0.3231299 0.3517266 0.3418479 0.3240762 0.3481339</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1208,23 +1208,23 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">Simulation 2</td>
-<td align="right">0.1302</td>
+<td align="right">0.1244502</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 5</td>
-<td align="right">0.1353</td>
+<td align="left">Simulation 4</td>
+<td align="right">0.1244502</td>
 </tr>
 <tr class="odd">
 <td align="left">Simulation 1</td>
-<td align="right">0.1472</td>
+<td align="right">0.1340085</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 3</td>
-<td align="right">0.1472</td>
+<td align="right">0.1340085</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 4</td>
-<td align="right">0.1877</td>
+<td align="left">Simulation 5</td>
+<td align="right">0.1410975</td>
 </tr>
 </tbody>
 </table>
