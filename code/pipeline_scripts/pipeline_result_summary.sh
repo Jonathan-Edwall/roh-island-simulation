@@ -74,14 +74,21 @@ Selection_model_H_e_dir=$expected_heterozygosity_dir/simulated/selection_model
 
 ### Causative variant (Selection model) ###
 
-Selection_causative_variant_windows_dir=$results_dir/causative_variant_windows
 raw_selection_dir=$raw_simulated_data_dir/selection_model
 variant_freq_plots_dir=$raw_selection_dir/variant_freq_plots
 variant_position_dir=$raw_selection_dir/variant_position
+pruned_replicates_count_dir=$raw_selection_dir/pruned_counts
+
+Selection_causative_variant_windows_dir=$results_dir/causative_variant_windows
+causative_variant_windows_H_e_dir=$Selection_causative_variant_windows_dir/H_e
+
+
 ######################################  
 ####### Defining the OUTPUT files #######
 ######################################  
+Pipeline_results_output_dir=$results_dir/Pipeline_results
 
+mkdir -p $Pipeline_results_output_dir
 
 
 ##############################################################################################  
@@ -125,9 +132,16 @@ export Neutral_model_H_e_dir="$Neutral_model_H_e_dir"
 export Selection_model_H_e_dir="$Selection_model_H_e_dir"
 
 ### Causative Variant ###
-export Selection_causative_variant_windows_dir="$Selection_causative_variant_windows_dir"
 export variant_freq_plots_dir="$variant_freq_plots_dir"
 export variant_position_dir="$variant_position_dir"
+export pruned_replicates_count_dir="$pruned_replicates_count_dir"
+
+export Selection_causative_variant_windows_dir="$Selection_causative_variant_windows_dir"
+export causative_variant_windows_H_e_dir="$causative_variant_windows_H_e_dir"
+
+
+# Output_dir
+export Pipeline_results_output_dir="$Pipeline_results_output_dir"
 
 # echo "output_dir_sweep_test: $selection_strength_testing_results_dir "
 

@@ -316,16 +316,16 @@ random_mating_generations <- random_mating_breed_formation(last_bottleneck_gener
 # Extracting the final random mating generation:
 last_random_mating_generation <- random_mating_generations[[n_generations_random_mating]]
 
-# SP$addSnpChip(
-#   nSnpPerChr = num_snp_markers_simulated_chromosome,
-#   refPop = last_random_mating_generation
-#   )
-
 SP$addSnpChip(
   nSnpPerChr = num_snp_markers_simulated_chromosome,
-  minSnpFreq = min_MAF,
   refPop = last_random_mating_generation
   )
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_random_mating_generation
+#   )
 
 
 

@@ -25,6 +25,8 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 
 chromosome_end_margin <- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
+
+
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 allele_copies_threshold <- 10 # 10 default (candidate_variants = less than 10)
 min_allowed_gen_before_variant_lost <- 10 # Pruning replicates where the causative variant gets lost within this timespan
@@ -313,10 +315,15 @@ num_snp_markers_simulated_chromosome
 
 ```{r Finding Causative variant}
 
-find_causative_variant <- function(population,SP, allele_copies_threshold,chromosome_end_margin) {
-  upper_boundary_chromosome_margin <- 1 - chromosome_end_margin
+find_causative_variant <- function(population,SP, allele_copies_threshold,chromosome_end_margin,model_chromosome_bp_length) {
+  minimum_position_buffer_from_chromosome_end <- 100001
+  
+  upper_boundary_position_margin <- model_chromosome_bp_length - minimum_position_buffer_from_chromosome_end
+  lower_boundary_position_margin <- minimum_position_buffer_from_chromosome_end
 
-  lower_boundary_chromosome_margin <- chromosome_end_margin
+  # # Boundaries based out of relative position
+  # upper_boundary_chromosome_margin <- 1 - chromosome_end_margin
+  # lower_boundary_chromosome_margin <- chromosome_end_margin
   
   # Extract the genetic map 
   gen_map <- getGenMap(founderGenomes)
@@ -336,13 +343,21 @@ find_causative_variant <- function(population,SP, allele_copies_threshold,chromo
     
     # Determine the position of the variant on the genetic map 
     variant_relative_SNP_POS <- gen_map[gen_map$id == variant_SNP_ID, ]
-  
-  
-    # Check if the causative variant has been fixated  
-    if (variant_relative_SNP_POS$pos >= lower_boundary_chromosome_margin &&  variant_relative_SNP_POS$pos <= upper_boundary_chromosome_margin) {
+    variant_SNP_POS <- round(variant_relative_SNP_POS$pos * (model_chromosome_bp_length))
+    
+    # True Position: Check if the causative variant has been fixated  
+    if (variant_SNP_POS >= lower_boundary_position_margin &&  variant_SNP_POS <= upper_boundary_position_margin) {
       success <- TRUE
       causative_variant <- variant
     }    
+
+  
+  
+    # # Relative position: Check if the causative variant has been fixated  
+    # if (variant_relative_SNP_POS$pos >= lower_boundary_chromosome_margin &&  variant_relative_SNP_POS$pos <= upper_boundary_chromosome_margin) {
+    #   success <- TRUE
+    #   causative_variant <- variant
+    # }    
     
   }
 
@@ -419,7 +434,7 @@ success <- FALSE
 while (!success) {
   
   # Function to randomly pick out a causative variant to be studied
-  causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold,chromosome_end_margin)
+  causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold,chromosome_end_margin,model_chromosome_bp_length)
   # Print the chosen causative variant
   cat("Variant chosen:", causative_variant)
 
@@ -478,27 +493,27 @@ last_mate_selection_generation
 
 
 
-# SP$addSnpChip(
-# 
-#   nSnpPerChr = num_snp_markers_simulated_chromosome,
-# 
-#   refPop = last_mate_selection_generation
-# 
-#   )
-
-
-
-# 
-
 SP$addSnpChip(
 
-nSnpPerChr = num_snp_markers_simulated_chromosome,
+  nSnpPerChr = num_snp_markers_simulated_chromosome,
 
- minSnpFreq = min_MAF,
+  refPop = last_mate_selection_generation
 
-refPop = last_mate_selection_generation
+  )
 
- )
+
+
+# 
+
+# SP$addSnpChip(
+# 
+# nSnpPerChr = num_snp_markers_simulated_chromosome,
+# 
+#  minSnpFreq = min_MAF,
+# 
+# refPop = last_mate_selection_generation
+# 
+#  )
 
 ```
 

@@ -18,36 +18,78 @@ editor_options:
 ```{r}
 # Clean the working environment
 rm(list = ls())
-
 knitr::opts_chunk$set(echo = TRUE)
+
+####################################  
+# Parameters
+#################################### 
+use_MAF_pruning <- TRUE
+# use_MAF_pruning <- FALSE
+# min_MAF <- 0.05
+min_MAF <- 0.01
+
+####################################  
+
 
 # Set the path to your GitHub folder
 YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
 
 # Defining the relative path in the repository
-repository_path <- "Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations"
+repository_path <- file.path(YOUR_GITHUB_ROOT_DIRECTORY,"Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations")
 
+#results_dir <- file.path(repository_path,"results")
+# results_dir <- file.path(repository_path,"results-50")
+results_dir <- file.path(repository_path,"fifty")
+
+sweep_test_type <- "Selection_testing"
 
 ####################################  
 # Defining the input files
 #################################### 
+ROH_hotspots_dir <- file.path(results_dir,"ROH-Hotspots/empirical/german_shepherd")
+# 
+# Empirical_data_ROH_hotspots_dir  <- file.path(ROH_hotspots_dir,"empirical/german_shepherd")
+# Empirical_data_autosome_ROH_freq_dir <- file.path(Empirical_data_ROH_hotspots_dir,"Gosling_plots/autosome_roh_freq")
+
+# Empirical_data_autosome_ROH_freq_dir <- file.path(Empirical_data_ROH_hotspots_dir,"Gosling_plots/autosome_roh_freq")
 
 
+ROH_hotspot_allele_freq_dir <- file.path(ROH_hotspots_dir,"hotspots_allele_freq")
 
-ROH_hotspot_allele_freq_dir <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"results/ROH-Hotspots/empirical/german_shepherd/gosling_plots/hotspots_allele_freq")
-
-empirical_genomewide_allele_freq_dir <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"results/PLINK/empirical/german_shepherd/allele_freq")
-  
-
-neutral_model_allele_freq_dir <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"results/PLINK/simulated/allele_freq")
-
+empirical_genomewide_allele_freq_dir <- file.path(results_dir,"PLINK/allele_freq/empirical/german_shepherd")
+simulated_model_allele_freq_dir <- file.path(results_dir,"PLINK/allele_freq/simulated/neutral_model")
+sim_scenario_id <- "neutral_model_chr3"
 
 
 ####################################  
 # Defining the working directory
 #################################### 
 
-output_dir_sweep_test <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"results/Sweep_test/german_shepherd")
+
+output_dir_sweep_test <- file.path(results_dir,"Sweep_test/german_shepherd")
+# output_dir_sweep_test <- file.path(results_dir,"temp")
+
+
+expected_heterozygosity_results_dir <- file.path(results_dir,"expected_heterozygosity")
+output_empirical_H_e_dir <- file.path(expected_heterozygosity_results_dir,"empirical/german_shepherd")
+# output_empirical_H_e_dir <- file.path(expected_heterozygosity_results_dir,"empirical/german_shepherd/temp")
+
+
+if (!dir.exists(output_empirical_H_e_dir)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_empirical_H_e_dir,recursive = TRUE)
+}
+
+
+# output_simulated_model_H_e_dir <- file.path(expected_heterozygosity_results_dir,"simulated/neutral_model/temp")
+
+output_simulated_model_H_e_dir <- file.path(expected_heterozygosity_results_dir,"simulated/neutral_model")
+
+if (!dir.exists(output_simulated_model_H_e_dir)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_simulated_model_H_e_dir,recursive = TRUE)
+}
+
 
 
 if (!dir.exists(output_dir_sweep_test)) {
@@ -66,10 +108,120 @@ knitr::opts_knit$set(root.dir = output_dir_sweep_test)
 library(knitr)
 ```
 
+# Loading Hotspot windows
+```{r}
+setwd(ROH_hotspots_dir)
+# Pattern for finding files containing "causative_variant_window" and ending with ".bed"
+pattern <- ".*ROH_Hotspot_windows.*\\.bed$"
+hotspot_window_bed_files <- list.files(path = ROH_hotspots_dir, pattern = pattern)
+# Extract the chromosome number and window number from the file names
+chr_numbers <- as.numeric(sub(".*CHR(\\d+)_.*", "\\1", hotspot_window_bed_files))
+# Order the bed_files vector by chromosome number and then by window number
+ordered_hotspot_window_bed_files <- hotspot_window_bed_files[order(chr_numbers)]
+
+
+# Create an empty list to store information for the different ROH-hotspots in
+empirical_hotspot_tables <- list()
+
+# Loop through each .bed file (ROH-hotspot allele frequency window-file)
+for (file in ordered_hotspot_window_bed_files) {
+  # Extract chromosome number and window number from file name
+  chromosome <- sub(".*CHR([0-9]+)_.*", "\\1", file)
+  window <- sub(".*windows_([0-9]+)_.*", "\\1", file)
+  
+  # # Create table name
+  # table_name <- paste("Hotspot_chr", chromosome, "_window_", window, "_allele_freq", sep = "")
+  column_names <- c("CHR","POS1","POS2")
+  # Read the .bed file into a data frame, skipping commented lines
+  bed_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  window_counter <- 0
+  
+  # Loop through each row in bed_data
+  for (i in 1:nrow(bed_data)) {
+    window_counter <- window_counter + 1
+    # Extract row data
+    row_data <- bed_data[i, ]
+    # Create hotspot name
+    hotspot_name <- paste("Hotspot_chr", chromosome, "_window_", window_counter, sep = "")
+    
+    
+    # Check if the hotspot_name already exists in the list
+    if (!(hotspot_name %in% names(empirical_hotspot_tables))) {
+      # If it doesn't exist, create a list for it
+      empirical_hotspot_tables[[hotspot_name]] <- list()
+    }
+    
+    Start_POS <- row_data$POS1
+    End_POS <- row_data$POS2
+    
+    # Extract chromosome, start position, and end position
+    chr <- chromosome
+    start_pos <- Start_POS
+    end_pos <- End_POS
+    
+    # Calculate the number of 100kbp windows
+    num_windows <- ceiling((end_pos - start_pos + 1) / 1e5)
+    
+    # Create an empty data frame to store window information
+    window_df <- data.frame(CHR = numeric(), Start_POS = numeric(), End_POS = numeric())
+    
+    # Generate 100kbp windows
+    for (j in 1:num_windows) {
+      # Calculate start and end positions for each window
+      window_start <- start_pos + (j - 1) * 1e5
+      window_end <- min(start_pos + j * 1e5 - 1, end_pos)
+      
+      # Create a data frame for the current window
+      window_data <- data.frame(CHR = chr, POS1 = window_start, POS2 = window_end)
+      
+      # Append window_data to window_df
+      window_df <- rbind(window_df, window_data)
+    }    
+    
+    # Create a list with table name, filename, and corresponding data frame
+    table_info <- list(CHR = chromosome,Start_POS = Start_POS,End_POS = End_POS, data = window_df)
+    
+    # Append the table info to the list
+    empirical_hotspot_tables[[hotspot_name]] <- c(empirical_hotspot_tables[[hotspot_name]], table_info)
+  }
+  
+      }
+
+
+
+# View(empirical_hotspot_tables)
+
+```
+#: Expected heterozygosity
+
+Takes a list of H_e for a window and computes H_e for each SNP individually
+
+```{r}
+calculate_expected_heterozygosity <- function(p_list) {
+  
+  # Create an empty list to store heterozygosity values
+  heterozygosity_list <- vector("numeric", length(p_list))
+  
+  # Calculate expected heterozygosity for each p in p_list
+  for (i in seq_along(p_list)) {
+    heterozygosity_list[i] <- 2 * p_list[i] * (1 - p_list[i])
+  }
+  
+  # Return the list of heterozygosity values
+  return(heterozygosity_list)
+}
+
+```
+
+
+
+
+
 # 1: Loading the frequency files
 
 ## 1.1 Empirical data
-### 1.1.1: Empirical ROH-Hotspots 
+
+### 1.1.1: Empirical ROH-Hotspots
 
 ```{r}
 # Set the working directory to the directory with allele frequencies for the different ROH-hotspots
@@ -78,17 +230,30 @@ setwd(ROH_hotspot_allele_freq_dir)
 # Get a list of all .bed files in the directory
 bed_files <- list.files(pattern = "\\.bed$")
 
+# Extract the chromosome number and window number from the file names
+chr_numbers <- as.numeric(sub(".*CHR(\\d+)_.*", "\\1", bed_files))
+window_numbers <- as.numeric(sub(".*windows_(\\d+)_.*", "\\1", bed_files))
+
+# Order the bed_files vector by chromosome number and then by window number
+ordered_bed_files <- bed_files[order(chr_numbers, window_numbers)]
+
 # Create an empty list to store information for the different ROH-hotspots in
-empirical_hotspot_tables <- list()
+empirical_hotspot_allele_Freq_tables <- list()
+
+# Initialize a counter for windows without markers
+no_marker_count <- 0
 
 # Loop through each .bed file (ROH-hotspot allele frequency window-file)
-for (file in bed_files) {
+for (file in ordered_bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome <- sub(".*chr([0-9]+)_.*", "\\1", file)
-  window <- sub(".*window_([0-9]+)_.*", "\\1", file)
+  chromosome <- sub(".*CHR([0-9]+)_.*", "\\1", file)
+  window <- sub(".*windows_([0-9]+)_.*", "\\1", file)
   
   # Create table name
   table_name <- paste("Hotspot_chr", chromosome, "_window_", window, "_allele_freq", sep = "")
+  # Create table name
+  hotspot_name <- paste("Hotspot_chr", chromosome, "_window_", window, sep = "")
+
   
   # Read the header line
   con <- file(file, "r")
@@ -98,24 +263,91 @@ for (file in bed_files) {
   # Remove "#" from the header and split it into column names
   column_names <- sub("#", "", header)
   column_names <- strsplit(column_names, "\t")[[1]]
-  
+
   # Read the .bed file into a data frame, skipping commented lines
-  bed_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  hotspot_allele_freq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  
+  # Check if pruning markers by MAF should be done
+  if (use_MAF_pruning == TRUE) {
+    
+    # Remove rows where MAF < min_MAF
+    hotspot_allele_freq_data <- hotspot_allele_freq_data[hotspot_allele_freq_data$MAF >= min_MAF, ]
+  }
+
+  
+  
+  # Reading in the relevant causative window from  causative_variant_window_tables_Selection_Model
+  hotspot_window_data <- empirical_hotspot_tables[[hotspot_name]][["data"]]
+  
+  # Initialize a new column to store MAF lists
+  hotspot_window_data$MAF_list <- vector("list", nrow(hotspot_window_data))
+
+  
+  
+  # Loop through each 100kbp window for the causative window
+  for (j in seq_len(nrow(hotspot_window_data))) {
+
+    genomic_window_start <- hotspot_window_data[j, "POS1"]
+
+    genomic_window_end <- hotspot_window_data[j, "POS2"]
+    
+    H_e_list_current_100kbp_window <- c()
+    
+    # Subset markers within the current genomic window
+    markers_in_window <- hotspot_allele_freq_data[
+      hotspot_allele_freq_data$POS1 >= genomic_window_start & hotspot_allele_freq_data$POS1 <= genomic_window_end,
+      ]
+    
+    if (nrow(markers_in_window) > 0) {
+      # Computed expected heterozygosity for the markers found within the window
+      markers_in_window$H_e <- calculate_expected_heterozygosity(markers_in_window$MAF)
+      hotspot_window_data[j, "H_e"] <- mean(markers_in_window$H_e)
+      # Store the list of MAF values in the new column
+      hotspot_window_data$MAF_list[[j]] <- markers_in_window$MAF
+
+    } else {
+            # Increment the counter for windows without markers
+      no_marker_count <- no_marker_count + 1
+      
+      # Skip this window by setting its H_e to NA
+      hotspot_window_data[j, "H_e"] <- NA
+      hotspot_window_data$MAF_list[[j]] <- list()
+    }
+
+    
+
+    
+  }
+  
+   # Calculate and store the average heterozygosity for the current simulation
+  empirical_hotspot_tables[[hotspot_name]][["data"]] <- hotspot_window_data
+  empirical_hotspot_tables[[hotspot_name]]$Avg_He <- mean(hotspot_window_data$H_e, na.rm = TRUE)
+  
+  
+  # Check if the selection coefficient already exists in the list
+  if (!(hotspot_name %in% names(empirical_hotspot_allele_Freq_tables))) {
+    # If it doesn't exist, create a list for it
+    empirical_hotspot_allele_Freq_tables[[hotspot_name]] <- list()
+  }
+
   
   # Create a list with table name and corresponding data frame
-  table_info <- list(name = table_name, data = bed_data)
+  table_info <- list(name = table_name,filename=file, data = hotspot_allele_freq_data)
   
   # Append the table info to the list
-  empirical_hotspot_tables <- c(empirical_hotspot_tables, list(table_info))
+  empirical_hotspot_allele_Freq_tables[[hotspot_name]] <- c(empirical_hotspot_allele_Freq_tables[[hotspot_name]], table_info)
 }
 
-# Print the list of empirical_hotspot_tables
-#print(empirical_hotspot_tables)
+# #Print the list of empirical_hotspot_allele_Freq_tables
+# print(empirical_hotspot_allele_Freq_tables)
+
+# View(empirical_hotspot_allele_Freq_tables)
 
 
 ```
 
 ### 1.1.2: Empirical - Genomewide
+
 ```{r}
 # Set the working directory to the directory with allele frequencies for the different ROH-genomewides
 setwd(empirical_genomewide_allele_freq_dir)
@@ -147,6 +379,15 @@ for (file in bed_files) {
   # Read the .bed file into a data frame, skipping commented lines
   bed_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   
+  # Check if pruning markers by MAF should be done
+  if (use_MAF_pruning == TRUE) {
+    
+    # Remove rows where MAF < min_MAF
+    bed_data <- bed_data[bed_data$MAF >= min_MAF, ]
+  }
+
+
+  
   # Create a list with table name and corresponding data frame
   table_info <- list(name = table_name, data = bed_data)
   
@@ -154,33 +395,38 @@ for (file in bed_files) {
   empirical_genomewide_tables <- c(empirical_genomewide_tables, list(table_info))
 }
 
-# Print the list of empirical_genomewide_tables
-#print(empirical_genomewide_tables)
-
+# View(empirical_genomewide_tables)
 
 ```
 
-
-## 1.2: Simulated data (Neutral model) 
+## 1.2: Simulated data (Simulated model)
 
 ```{r}
 
 
 
 # Set the working directory to the directory containing the frequency files for the simulated data
-setwd(neutral_model_allele_freq_dir)
+setwd(simulated_model_allele_freq_dir)
 
-# Get a list of all the .tsv frequency files in the current directory 
-# (these .tsv files are identical to the .frq files, but with a POS-column added, to associate the SNP-markers with a genomic position)
-frq_files <- list.files(pattern = "\\.tsv$")
+
+# Create a pattern for finding all the allele frequency files associated with the studied simulation scenario
+pattern <- paste0(".*", sim_scenario_id, "_allele_freq\\.bed$")
+
+# Find all .bed files following the specified pattern
+frq_bed_files <- list.files(pattern = pattern)
+
+# # Display the found files
+# print(frq_bed_files)
+
+
 
 # Extract the simulation number after "sim_"
-simulation_numbers <- as.integer(sub("^sim_(\\d+)_.*", "\\1", frq_files))
+simulation_numbers <- as.integer(sub("^sim_(\\d+)_.*", "\\1", frq_bed_files))
 # Sort the simulation-files based on the simulation number
-sorted_files <- frq_files[order(simulation_numbers)]
+sorted_files <- frq_bed_files[order(simulation_numbers)]
 
-# Initialize an empty list to store neutral model tables
-neutral_model_tables <- list()
+# Initialize an empty list to store Simulated model tables
+simulated_model_allele_freq_tables <- list()
 
 # Loop through each .frq file
 for (file in sorted_files) {
@@ -188,29 +434,39 @@ for (file in sorted_files) {
   # Extract the table name from the file name
   table_name <- gsub(".frq$", "", file)
   
-  # Read the header line
-  con <- file(file, "r")
-  header <- readLines(con, n = 1)
-  close(con)
+  # # Read the header line
+  # con <- file(file, "r")
+  # header <- readLines(con, n = 1)
+  # close(con)
+  # 
+  # # Remove "#" from the header and split it into column names
+  # column_names <- sub("#", "", header)
+  # column_names <- strsplit(column_names, "\t")[[1]]
   
-  # Remove "#" from the header and split it into column names
-  column_names <- sub("#", "", header)
-  column_names <- strsplit(column_names, "\t")[[1]]
+  column_names <- c("CHR","POS1","POS2","SNP","A1","A2","MAF","NCHROBS")
   
   # Read the .tsv frequency file into a data frame
   #frq_data <- read.table(file, header = TRUE)
-  frq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  allele_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  
+  
+  # Check if pruning markers by MAF should be done
+  if (use_MAF_pruning == TRUE) {
+    
+    # Remove rows where MAF < min_MAF
+    allele_freq_data <- allele_freq_data[allele_freq_data$MAF >= min_MAF, ]
+  }
+
   
   # Create a list with table name and corresponding data frame
-  table_info <- list(name = table_name, data = frq_data)
+  table_info <- list(name = table_name, data = allele_freq_data)
   
   # Append the table info to the list
-  neutral_model_tables <- c(neutral_model_tables, list(table_info))
+  simulated_model_allele_freq_tables <- c(simulated_model_allele_freq_tables, list(table_info))
 }
 
 
-# Print the list of neutral_model_tables
-#print(neutral_model_tables)
+# View(simulated_model_allele_freq_tables)
 
 ```
 
@@ -231,38 +487,10 @@ calculate_expected_heterozygosity <- function(p) {
 
 ## 2.1: Empirical data - H_E
 
-### 2.1.1 ROH-Hotspots
 
-```{r}
-for (i in seq_along(empirical_hotspot_tables)) {
-  # Extract table name and data frame
-  table_info <- empirical_hotspot_tables[[i]]
-  table_data <- table_info$data
-  
-  # Calculate expected heterozygosity for each window
-  window_H_e_list <- c()  # Initialize an empty list to store expected heterozygosity values
-  
-  # Loop through each row in the table data
-  for (j in 1:nrow(table_data)) {
-    # Extract the MAF (p value)
-    p <- table_data[j, "MAF"]
-    
-    # Calculate expected heterozygosity using the provided function
-    expected_heterozygosity <- calculate_expected_heterozygosity(p)
-    
-    # Append the calculated expected heterozygosity to the list
-    window_H_e_list <- c(window_H_e_list, expected_heterozygosity)
-  }
-  
-  # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
-  empirical_hotspot_tables[[i]]$H_e_list <- window_H_e_list
-  empirical_hotspot_tables[[i]]$Marker_based_Average_H_e <- mean(empirical_hotspot_tables[[i]]$H_e_list)
-}
 
-#View(empirical_hotspot_tables)
-
-```
 ### 2.1.2 Genomewide
+
 ```{r}
 
 for (i in seq_along(empirical_genomewide_tables)) {
@@ -293,22 +521,21 @@ for (i in seq_along(empirical_genomewide_tables)) {
 # View(empirical_genomewide_tables)
 ```
 
-
-## 2.2: H_e Simulated data (Neutral model) 
+## 2.2: H_e Simulated data (Simulated model)
 
 ```{r}
 # create a vector to store the counts of pruned entries for each simulation
-pruned_counts <- numeric(length(neutral_model_tables))
-datapoints_before_MAF_filtering <- numeric(length(neutral_model_tables))
-#sum(neutral_model_tables[[1]][["data"]][["MAF"]] < 0.05)
-#sum(neutral_model_tables[[20]][["data"]][["MAF"]] < 0.05)
+pruned_counts <- numeric(length(simulated_model_allele_freq_tables))
+datapoints_before_MAF_filtering <- numeric(length(simulated_model_allele_freq_tables))
+sum(simulated_model_allele_freq_tables[[1]][["data"]][["MAF"]] < min_MAF)
+sum(simulated_model_allele_freq_tables[[20]][["data"]][["MAF"]] < min_MAF)
 
 
-for (i in seq_along(neutral_model_tables)) {
+for (i in seq_along(simulated_model_allele_freq_tables)) {
   
   
   # Extract table name and data frame
-  table_info <- neutral_model_tables[[i]]
+  table_info <- simulated_model_allele_freq_tables[[i]]
   table_data <- table_info$data
   datapoints_before_MAF_filtering[[i]] <- length(table_data$MAF)
   
@@ -322,30 +549,49 @@ for (i in seq_along(neutral_model_tables)) {
   for (j in 1:nrow(table_data)) {
     # Extract the MAF (p value)
     p <- table_data[j, "MAF"]
-    # Check if MAF is less than 0.05
-    if (p < 0.05) {
-      # If MAF is less than 0.05, add the row index to the vector of rows to be removed
-      rows_to_remove <- c(rows_to_remove, j)
-    } else {
-      # Calculate expected heterozygosity using the provided function
-      expected_heterozygosity <- calculate_expected_heterozygosity(p)
-      
-      # Append the calculated expected heterozygosity to the list
-      window_H_e_list <- c(window_H_e_list, expected_heterozygosity)
-    }
-  }
+    
+    # Calculate expected heterozygosity using the provided function
+    expected_heterozygosity <- calculate_expected_heterozygosity(p)
+    
+    # Append the calculated expected heterozygosity to the list
+    window_H_e_list <- c(window_H_e_list, expected_heterozygosity)
+    
+    if (use_MAF_pruning == TRUE) { 
+      # Check if MAF is less than 0.05
+      if (p < min_MAF) {
+        # If MAF is less than 0.05, add the row index to the vector of rows to be removed
+        rows_to_remove <- c(rows_to_remove, j)
+      } else {
+        # Calculate expected heterozygosity using the provided function
+        expected_heterozygosity <- calculate_expected_heterozygosity(p)
   
-if (length(rows_to_remove) > 0) {  # Check if rows_to_remove is not empty
-  # Remove rows from neutral_model_tables with MAF less than 0.05
-  table_data_filtered <- table_data[-rows_to_remove, ]
-  neutral_model_tables[[i]]$data <- table_data_filtered
-}
+        # Append the calculated expected heterozygosity to the list
+        window_H_e_list <- c(window_H_e_list, expected_heterozygosity)
+      } }
+    else {
+        # Calculate expected heterozygosity using the provided function
+        expected_heterozygosity <- calculate_expected_heterozygosity(p)
+  
+        # Append the calculated expected heterozygosity to the list
+        window_H_e_list <- c(window_H_e_list, expected_heterozygosity)
+
+      
+    }
+    
+  }
+
+  
+    if (length(rows_to_remove) > 0) {  # Check if rows_to_remove is not empty
+      # Remove rows from simulated_model_allele_freq_tables with MAF less than 0.05
+      table_data_filtered <- table_data[-rows_to_remove, ]
+      simulated_model_allele_freq_tables[[i]]$data <- table_data_filtered
+    }
 
     
   
   # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
-  neutral_model_tables[[i]]$H_e_list <- window_H_e_list
-  neutral_model_tables[[i]]$Marker_based_Average_H_e <- mean(neutral_model_tables[[i]]$H_e_list)
+  simulated_model_allele_freq_tables[[i]]$H_e_list <- window_H_e_list
+  simulated_model_allele_freq_tables[[i]]$Marker_based_Average_H_e <- mean(simulated_model_allele_freq_tables[[i]]$H_e_list)
   
   # Update the count of pruned entries for this simulation
   pruned_counts[i] <- length(rows_to_remove)
@@ -355,13 +601,14 @@ paste("Snps for each simulation, before the pruning:",datapoints_before_MAF_filt
 
 paste("Pruned SNPs:",pruned_counts)
 
-# View(neutral_model_tables)
+# View(simulated_model_allele_freq_tables)
 
 ```
 
-#3: Computing window-based average expected heterozygosity
-Step 1: Create genomic windows
-Step 2: Compute the average H_e for each genomic window individually
+#3: Computing window-based average expected heterozygosity Step 1:
+Create genomic windows Step 2: Compute the average H_e for each genomic
+window individually
+
 ```{r}
 # Define the window size to be used
 window_size <- 100 * 10^3
@@ -370,104 +617,8 @@ window_size <- 100 * 10^3
 
 ## 3.1: Empirical data
 
-
-### 3.1.1 ROH-Hotspots
-```{r}
-########################################################################
-# Step 1: Create genomic windows
-########################################################################
-
-# Initialize an empty list to store windows for each  empirical_hotspot
- empirical_hotspot_windows <- list()
-
-for (index in seq_along( empirical_hotspot_tables)) {
-  # Get the SNP positions, chromosome positions, and H_e values for the current  empirical_hotspot
-  snp_start_positions <-  empirical_hotspot_tables[[index]][["data"]][["POS1"]]
-  snp_end_position <-  empirical_hotspot_tables[[index]][["data"]][["POS2"]]
-  chr_positions <-  empirical_hotspot_tables[[index]][["data"]][["CHR"]]
-  he_values <-  empirical_hotspot_tables[[index]][["H_e_list"]]
-  
-  # Determine the number of windows needed for the current hotspot
-  num_windows <- ceiling( (max(snp_start_positions) - min(snp_start_positions)) / window_size)
-  
-  # Initialize an empty list to store windows for the current chromosome
-  hotspot_windows <- list()
-  
-  # Iterate through each window
-  for (window_index in seq_len(num_windows)) {
-    # Determine the start and end positions of the current window
-    if (window_index == 1) {
-        # For the first window, start from the first SNP of the hotspot (minimum snp_start_positions)
-        window_start <- min(snp_start_positions)
-
-    } else {
-        # For subsequent windows, calculate the start position based on the window index and adjusted start position
-        window_start <- min(snp_start_positions) + (window_index - 1) * window_size
-
-    }
-    
-    
-    
-    window_end <- window_start + window_size
-    
-    # Find the indices of SNPs within the current window
-    snp_indices <- which(snp_start_positions >= window_start & snp_start_positions < window_end)
-    
-    # Extract the SNP positions and H_e values for the current window
-    window_snp_start_positions <- snp_start_positions[snp_indices]
-    window_he_values <- he_values[snp_indices]
-    
-    # Create a sub-table for the current window
-    window_data <- data.frame(CHR = rep(chr_positions[[1]], length(window_snp_start_positions)), POS = window_snp_start_positions, H_e = window_he_values)
-    
-    # Append the sub-table to the list of windows for the current chromosome
-    hotspot_windows[[window_index]] <- window_data
-    }
-    
-  # Append the list of windows for the current chromosome to the main list
-   empirical_hotspot_windows[[index]] <- hotspot_windows
-  }
-
-
-# View the resulting windows
-#View( empirical_hotspot_windows)
-
-
-#######################################################################
-# Step 2: Compute the average H_e for each genomic window individually
-#######################################################################
-
-# Create a list to store the average H_e values for each  empirical_hotspot
-Empirical_hotspot_window_he_3_1 <- list()
-
-# Iterate over each  empirical_hotspot
-for (i in seq_along( empirical_hotspot_windows)) {
-    # Create a vector to store the average H_e values for each window in the current  empirical_hotspot
-    Empirical_hotspot_window_he_3_1[[i]] <- numeric(length( empirical_hotspot_windows[[i]]))
-    
-    # Iterate over each window in the current  empirical_hotspot
-    for (j in seq_along( empirical_hotspot_windows[[i]])) {
-        # Calculate the average H_e value for the current window
-
-        # Using "na.rm = TRUE" To remove windows not having SNP-markers in them
-        window_avg_he <- mean( empirical_hotspot_windows[[i]][[j]][["H_e"]], na.rm = TRUE) 
-        
-        # Store the average H_e value for the current window
-        Empirical_hotspot_window_he_3_1[[i]][j] <- window_avg_he
-    }
-    # Removing NaN values for the current  empirical_hotspot
-    # (Windows without any markers)
-    Empirical_hotspot_window_he_3_1[[i]] <- Empirical_hotspot_window_he_3_1[[i]][!is.na(Empirical_hotspot_window_he_3_1[[i]])]
-
-# Computing the mean window-based H_e for the current ROH-hotspot and storing the reuslt in empirical_hotspot_tables
-empirical_hotspot_tables[[i]]$Window_based_Average_H_e <- mean(Empirical_hotspot_window_he_3_1[[i]])
-
-}
-
-```
-
-
 ### 3.1.2 Genomewide
+
 ```{r}
 ########################################################################
 # Step 1: Create genomic windows
@@ -577,8 +728,8 @@ print(empirical_genomewides_mean_he_window_based)
 
 ```
 
-
 ## 3.2: Simulated data (Neutral)
+
 ```{r}
 ########################################################################
 # Step 1: Create genomic windows
@@ -588,10 +739,10 @@ print(empirical_genomewides_mean_he_window_based)
 simulation_windows <- list()
 
 # Iterating through each simulation
-for (sim_index in seq_along(neutral_model_tables)) {
+for (sim_index in seq_along(simulated_model_allele_freq_tables)) {
   # Get the SNP positions and H_e values for the current simulation
-  snp_positions <- neutral_model_tables[[sim_index]][["data"]][["POS"]]
-  he_values <- neutral_model_tables[[sim_index]][["H_e_list"]]
+  snp_positions <- simulated_model_allele_freq_tables[[sim_index]][["data"]][["POS1"]]
+  he_values <- simulated_model_allele_freq_tables[[sim_index]][["H_e_list"]]
   
   # Determine the number of windows needed
   num_windows <- ceiling(max(snp_positions) / window_size)
@@ -602,21 +753,32 @@ for (sim_index in seq_along(neutral_model_tables)) {
   # Iterate through each window
   for (window_index in seq_len(num_windows)) {
     # Determine the start and end positions of the current window
-    window_start <- (window_index - 1) * window_size
-    window_end <- window_start + window_size
+    window_start <- (window_index - 1) * window_size +1
+    window_end <- window_start + window_size - 1
     
     # Find the indices of SNPs within the current window
-    snp_indices <- which(snp_positions >= window_start & snp_positions < window_end)
+    snp_indices <- which(snp_positions >= window_start & snp_positions <= window_end)
+    
+    # Skip the window if there are no SNPs within it
+    if (length(snp_indices) == 0) {
+      next
+    }
+    
+    else {
     
     # Extract the SNP positions and H_e values for the current window
     window_snp_positions <- snp_positions[snp_indices]
     window_he_values <- he_values[snp_indices]
     
+    
+    
     # Create a sub-table for the current window
     window_data <- data.frame(POS = window_snp_positions, H_e = window_he_values)
     
+    
     # Append the sub-table to the list of windows for the current simulation
-    sim_windows[[window_index]] <- window_data
+    sim_windows[[length(sim_windows) + 1]] <- window_data
+    }
   }
   
   # Append the list of windows for the current simulation to the main list
@@ -662,8 +824,7 @@ simulations_mean_he_window_based
 
 ```
 
-##
-
+## 
 
 # 4: Sweep test (Selection testing)
 
@@ -677,6 +838,10 @@ simulations_mean_he_window_based
 num_bins <- 100  
 
 histogram_title <-  paste("H_e Distribution of the empirical data - Windowsize:",window_size,"bp")
+image_name <- paste("H_e_distribution_german_shepherd.png")
+
+# Save the plot as a PNG file with specified path
+png(file.path(output_empirical_H_e_dir, image_name), width = 1200, height = 900, res = 120)
 
 # Create a histogram with custom breaks
 # Using unlist to 
@@ -690,16 +855,17 @@ abline(v = empirical_dataset_percentile_5, col = "blue", lty = 2)
 
 # Add a legend
 legend("topright", legend = paste("5th percentile =", round(empirical_dataset_percentile_5, 4)), col = "blue", lty = 2)
+
+# Save the plot
+dev.off()
 ```
 
+### 4.1.2: Simulated model - H_e distribution
 
-
-### 4.1.2: Neutral model - H_e distribution
-
-*Using the first simulation from Simulation_windows_avg_he_3_2 *
-
+*Using the first simulation from Simulation_windows_avg_he_3_2*
 
 ```{r}
+setwd(output_simulated_model_H_e_dir)
 # Determine the number of bins you want
 num_bins <- 100  
 
@@ -710,13 +876,18 @@ sim_5th_percentiles_df <- data.frame(Simulation = character(), Fifth_Percentile 
 for (i in seq_along(Simulation_windows_avg_he_3_2)) {
   # Create histogram title
   histogram_title <- paste("H_e Distribution of Simulation", i, "- Windowsize:", window_size, "bp")
-
+  
+  image_name <- paste(sim_scenario_id,"H_e_distribution_sim_",i,".png")
+  
+  # Save the plot as a PNG file with specified path
+  png(file.path(output_simulated_model_H_e_dir, image_name), width = 1200, height = 900, res = 120)
+  
   # Create a histogram with custom breaks
   hist(Simulation_windows_avg_he_3_2[[i]], breaks = num_bins, main = histogram_title, xlab = "H_e")
 
   # Calculate the 5th percentile
   percentile_5 <- quantile(Simulation_windows_avg_he_3_2[[i]], 0.05)
-  neutral_model_tables[[i]]$H_e_5th_percentile <- percentile_5
+  simulated_model_allele_freq_tables[[i]]$H_e_5th_percentile <- percentile_5
 
   # Add the simulation name and the fifth percentile value to the data frame
   sim_5th_percentiles_df[i, "Simulation"] <- paste("Simulation", i)
@@ -727,6 +898,8 @@ for (i in seq_along(Simulation_windows_avg_he_3_2)) {
 
   # Add a legend
   legend("topright", legend = paste("5th percentile =", round(percentile_5, 4)), col = "red", lty = 2)
+  # Save the plot
+  dev.off()
 }
 
 # Sort the data frame by Fifth_Percentile values in ascending order
@@ -736,43 +909,47 @@ sim_5th_percentiles_df <- sim_5th_percentiles_df[order(sim_5th_percentiles_df$Fi
 #print(sim_5th_percentiles_df)
 kable(sim_5th_percentiles_df,row.names = FALSE)
 
+
+# Define the filename with the output directory path
+filename <- file.path(output_simulated_model_H_e_dir, paste(sim_scenario_id,"_5th_percentiles_of_H_e_distribution.tsv", sep = ""))
+
+
+# # Saving the results in a .tsv-file
+write.table(sim_5th_percentiles_df, filename, sep = "\t", row.names = FALSE,quote = FALSE)
+
+
 ```
-
-
-#### Ignore: Neutral model - H_e distribution with marker-based average H_e instead
 
 ```{r}
-# Extract Average_H_e values from all tables in neutral_model_tables
-sim_average_H_e_values <- sapply(neutral_model_tables, function(table) table[["Marker_based_Average_H_e"]])
+# Function to calculate standard error and its confidence interval
+standard_error_confidence_interval_fun <- function(observed_data, confidence_level = 0.95) {
+  
+  # Calculate standard error
+  n <- length(observed_data)
+  standard_deviation <- sd(observed_data)
+  standard_error <- standard_deviation / sqrt(n - 1)
+  
+  # Calculate confidence interval based on standard error
 
-# Determine the number of bins you want
-num_bins <- 20  
-
-# Create a histogram with custom breaks
-hist(sim_average_H_e_values, breaks = num_bins, main = "Average SNP H_e per simulation - Distribution", xlab = "H_e")
-
-# Calculate the 5th percentile
-percentile_5_SNP_based_average <- quantile(sim_average_H_e_values, 0.05)
-
-# Add a vertical line at the 5th percentile
-abline(v = percentile_5_SNP_based_average, col = "red", lty = 2)
-
-# Add a vertical line at the 5th percentile
-abline(v = empirical_dataset_percentile_5, col = "blue", lty = 2)
-
-
-
-# Add a legend
-legend("topright", legend = paste("5th percentile (Simulated data) =", round(percentile_5_SNP_based_average, 4)), col = "red", lty = 2)
-legend("topright", legend = paste("5th percentile (Empirical dataset)=", round(empirical_dataset_percentile_5, 4)), col = "blue", lty = 2)
+  alpha <- (1 - confidence_level) / 2
+  margin_of_error <- qnorm(1 - alpha) * standard_error
+  mean_estimate <- mean(observed_data)
+  # Calculate the percentiles for the confidence interval
+  confidence_interval_lower_bound <- mean_estimate - margin_of_error # 2.5th percentile (2σ)
+  confidence_interval_upper_bound <- mean_estimate + margin_of_error # 97.5th percentile (2σ)
+  
+  # Return confidence interval
+  return(c(confidence_interval_lower_bound, confidence_interval_upper_bound))
+}
 ```
 
-## 4.2: ROH-Hotspots Selection testing
+
+## 4.2: ROH-Hotspots Sweep test
 
 Selection testing for the different ROH-Hotspot windows.
 
 ROH-Hotspots with an average H_e lower than **or** equal to (\<=) the
-5th percentile of the H_e-distribution for the simulated neutral model,
+5th percentile of the H_e-distribution for the simulated Simulated model,
 **are ROH-Hotspots deemed as being under selection**.
 
 ```{r}
@@ -786,21 +963,26 @@ ROH_hotspots_selection_testing <- data.frame(
 )
 
 
-for (i in seq_along(empirical_hotspot_tables)) {
+sim_H_e_5th_percentile_SE_CI <- standard_error_confidence_interval_fun(sim_5th_percentiles_df$Fifth_Percentile)
+sim_H_e_5th_lower_ci <- sim_H_e_5th_percentile_SE_CI[1]
+
+threshold_value <- sim_H_e_5th_lower_ci
+
+for (empirical_hotspot in names(empirical_hotspot_tables)) {
   # Check if Window_based_Average_H_e is <= percentile_5 for the current table (ROH-hotspot)
-  if (empirical_hotspot_tables[[i]][["Window_based_Average_H_e"]] <= min(sim_5th_percentiles_df$Fifth_Percentile)) {
+  if (empirical_hotspot_tables[[empirical_hotspot]][["Avg_He"]] <= threshold_value) {
     # # If under selection, append the name and Window_based_Average_H_e value with "Yes"
     ROH_hotspots_selection_testing <- rbind(ROH_hotspots_selection_testing, data.frame(
-      Name = empirical_hotspot_tables[[i]][["name"]],
+      Name = empirical_hotspot,
       Under_selection = "Yes",  # Marking as "Yes" if under selection
-      Window_based_Average_H_e = empirical_hotspot_tables[[i]][["Window_based_Average_H_e"]]
+      Window_based_Average_H_e = empirical_hotspot_tables[[empirical_hotspot]][["Avg_He"]]
     ))
   } else {
     # If not under selection, append the name and Window_based_Average_H_e value with "No" 
     ROH_hotspots_selection_testing <- rbind(ROH_hotspots_selection_testing, data.frame(
-      Name = empirical_hotspot_tables[[i]][["name"]],
+      Name = empirical_hotspot,
       Under_selection = "No",  # Marking as "No" if not under selection
-      Window_based_Average_H_e = empirical_hotspot_tables[[i]][["Window_based_Average_H_e"]]
+      Window_based_Average_H_e = empirical_hotspot_tables[[empirical_hotspot]][["Avg_He"]]
     ))
   }
 }
@@ -810,8 +992,14 @@ ROH_hotspots_selection_testing <- ROH_hotspots_selection_testing[order(ROH_hotsp
 
 # Create histogram title
 histogram_title <- paste("ROH-Hotspots Distribution of Average H_e Values", i, "- Windowsize:", window_size, "bp")
+
+image_name <- paste("ROH-Hotspots_Avg_H_e_distribution_",sim_scenario_id,"_comparison.png")
+
+# Save the plot as a PNG file with specified path
+png(file.path(output_dir_sweep_test, image_name), width = 1200, height = 900, res = 120)
+
 # Plot histogram of hotspot Window_based_Average_H_e values
-hist(ROH_hotspots_selection_testing$Window_based_Average_H_e, breaks = 20, main = histogram_title, xlab = "H_e")
+histogram <- hist(ROH_hotspots_selection_testing$Window_based_Average_H_e, breaks = 20, main = histogram_title, xlab = "H_e")
 
 # Add a vertical line at the 5th percentile for simulated dataset
 abline(v = min(sim_5th_percentiles_df$Fifth_Percentile), col = "red", lty = 2)
@@ -828,71 +1016,23 @@ legend("topleft", legend = paste("Empirical (5th percentile) =", round(empirical
        col = "blue", lty = 2, cex = 0.8, text.col = "black")
 
 
+# Close the PNG file
+dev.off()
+
 
 cat("ROH-hotspot selection testing results:\n")
 kable(ROH_hotspots_selection_testing, row.names = FALSE)
+
+
+# Formatting the threshold value for the output file, to 5 decimals
+formatted_H_e_threshold_value <- format(threshold_value, nsmall = 5)
+
+# Define the filename with the output directory path
+filename <- file.path(output_dir_sweep_test, paste("ROH_hotspots_", sweep_test_type,"_",sim_scenario_id,"_H_E_threshold_", formatted_H_e_threshold_value, ".tsv", sep = ""))
+
 
 # # Saving the results in a .tsv-file
-write.table(ROH_hotspots_selection_testing, "ROH_hotspots_selection_testing_results.tsv", sep = "\t", row.names = FALSE,quote = FALSE)
+write.table(ROH_hotspots_selection_testing, filename, sep = "\t", row.names = FALSE,quote = FALSE)
 
 
-```
-
-
-### Ignore: Selection testing with marker-based average H_e instead
-
-```{r}
-setwd(output_dir_sweep_test)
-
-# Defining the dataframe that will store the selection testing results
-ROH_hotspots_selection_testing <- data.frame(
-  Name = character(),  
-  Under_selection = character(),
-  Average_H_e = numeric() 
-)
-
-
-for (i in seq_along(empirical_hotspot_tables)) {
-  # Check if Average_H_e is <= percentile_5 for the current table (ROH-hotspot)
-  if (empirical_hotspot_tables[[i]][["Marker_based_Average_H_e"]] <= min(sim_5th_percentiles_df$Fifth_Percentile)) {
-    # # If under selection, append the name and Average_H_e value with "Yes"
-    ROH_hotspots_selection_testing <- rbind(ROH_hotspots_selection_testing, data.frame(
-      Name = empirical_hotspot_tables[[i]][["name"]],
-      Under_selection = "Yes",  # Marking as "Yes" if under selection
-      Average_H_e = empirical_hotspot_tables[[i]][["Marker_based_Average_H_e"]]
-    ))
-  } else {
-    # If not under selection, append the name and Average_H_e value with "No" 
-    ROH_hotspots_selection_testing <- rbind(ROH_hotspots_selection_testing, data.frame(
-      Name = empirical_hotspot_tables[[i]][["name"]],
-      Under_selection = "No",  # Marking as "No" if not under selection
-      Average_H_e = empirical_hotspot_tables[[i]][["Marker_based_Average_H_e"]]
-    ))
-  }
-}
-
-# Sort the data frame by Average_H_e values in ascending order
-ROH_hotspots_selection_testing <- ROH_hotspots_selection_testing[order(ROH_hotspots_selection_testing$Average_H_e), ]
-
-# Plot histogram of hotspot Average_H_e values
-hist(ROH_hotspots_selection_testing$Average_H_e, breaks = 20, main = "ROH-Hotspots Distribution of marker-based Average H_e Values", xlab = "H_e")
-
-# Add a vertical line at the 5th percentile for simulated dataset
-abline(v = min(sim_5th_percentiles_df$Fifth_Percentile), col = "red", lty = 2)
-
-# Adding legend for the 5th percentile of the simulated dataset
-legend("topright", legend = paste("Simulated (5th percentile) =", round(min(sim_5th_percentiles_df$Fifth_Percentile), 4)),
-       col = "red", lty = 2, cex = 0.8, text.col = "black")
-
-# Add a vertical line at the 5th percentile for empirical dataset
-abline(v = empirical_dataset_percentile_5, col = "blue", lty = 2)
-
-# Adding legend for the 5th percentile of the empirical dataset
-legend("topleft", legend = paste("Empirical (5th percentile) =", round(empirical_dataset_percentile_5, 4)),
-       col = "blue", lty = 2, cex = 0.8, text.col = "black")
-
-
-
-cat("ROH-hotspot selection testing results:\n")
-kable(ROH_hotspots_selection_testing, row.names = FALSE)
 ```

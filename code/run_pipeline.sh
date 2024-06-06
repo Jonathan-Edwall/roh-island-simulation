@@ -39,9 +39,9 @@ trap 'handle_interrupt' SIGINT
 ####### Defining parameter values #######
 ######################################
 export chr_simulated="chr3"
-export n_simulation_replicates=5
+export n_simulation_replicates=20
 export n_simulated_generations_breed_formation=40
-export n_individuals_breed_formation=50
+export n_individuals_breed_formation=70
 
 
 ####################################  

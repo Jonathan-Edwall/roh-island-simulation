@@ -34,8 +34,8 @@ mkdir -p $output_dir_selection_simulation/pruned_counts  # Creating a subdirecto
 mkdir -p $output_dir_selection_simulation/variant_position  # Creating a subdirectory for storing the position of the selected causative variant
 
 
-# selection_coefficient_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
-selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+selection_coefficient_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+#selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
 # selection_coefficient_list=(0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
 
 # selection_coefficient_list=(0.6 0.7)

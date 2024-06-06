@@ -107,7 +107,7 @@ variant_position_bp
 ```{r}
 # Read the data without treating "#" as a comment
 Pop_roh_freq_table <- read.table(input_pop_roh_freq_file, header = TRUE, sep = "\t", comment.char = "")
-View(Pop_roh_freq_table)
+#View(Pop_roh_freq_table)
 # Assigning column names
 colnames(Pop_roh_freq_table) <- c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
 
@@ -163,7 +163,7 @@ incorporate_windows_to_causative_window <- function(start_index, direction) {
 incorporate_windows_to_causative_window(variant_row_index, -1)  # Look backwards
 incorporate_windows_to_causative_window(variant_row_index, 1)   # Look forwards
 
-View(causative_variant_window_table)
+#View(causative_variant_window_table)
 
 # Sort the data frame based on F_ROH column
 causative_variant_window_table_sorted <- causative_variant_window_table[order(as.numeric(causative_variant_window_table$POS1)), ]
@@ -172,7 +172,7 @@ causative_variant_window_table_sorted <- causative_variant_window_table[order(as
 # Display the variant window table
 print(causative_variant_window_table_sorted)
 
-View(causative_variant_window_table_sorted)
+#View(causative_variant_window_table_sorted)
 
 length_window <- max(causative_variant_window_table_sorted$POS2) - min(causative_variant_window_table_sorted$POS1) + 1
 length_window_MB <- length_window / (10^6)

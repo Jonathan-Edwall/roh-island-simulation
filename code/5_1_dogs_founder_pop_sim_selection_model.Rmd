@@ -441,7 +441,8 @@ Mate_Selection_scenario <- function(selection_scenario_pop, n_generations_mate_s
 disappearance_counter <- 0
 
 # # Extract the highest IID in the population from the post bottleneck scenario
-# last_bottleneck_IID <- max(last_bottleneck_generation@id)
+last_bottleneck_IID <- integer(max(last_bottleneck_generation@id))
+#last_bottleneck_IID <- as.numeric(max(last_bottleneck_generation@id))
 
 # Define the rerun mechanism
 success <- FALSE
@@ -474,7 +475,8 @@ while (!success) {
   } else { 
     # Increment the pruned replicates counter
     disappearance_counter <- disappearance_counter + 1
-    #SP$resetPed(lastId = last_bottleneck_IID)
+    #SP$resetPed(last_bottleneck_IID)
+    SP$resetPed(lastId = last_bottleneck_IID)
     #SP$resetPed()
 
 

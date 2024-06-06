@@ -1,13 +1,7 @@
 ---
-title: "Pipeline Summary - MAF-pruning - N_e 50"
-output:
-  html_document:
+output: 
+  html_document: 
     toc: true
-    toc_depth: 3  
-date: "2024-06-03"
-editor_options: 
-  markdown: 
-    wrap: 72
 ---
 
 # 0: Preparation
@@ -19,6 +13,35 @@ Defining the input and output files
 rm(list = ls())
 
 knitr::opts_chunk$set(echo = TRUE)
+
+empirical_species <- "German Shepherd"
+document_title <- paste(empirical_species," Pipeline Results")
+
+MAF_pruning_used <- TRUE
+
+N_e <- 50
+# document_sub <- paste("MAF 0.05 used, but only for H_E-computation, N_e=", N_e)
+
+
+
+
+if (MAF_pruning_used == FALSE) {
+  document_sub <- paste("No MAF-based pruning used, N_e =", N_e)
+
+
+} else {
+  document_sub <- paste("MAF-based pruning used, N_e =", N_e)
+}
+
+############################################ 
+# Parameters used for displaying the result
+############################################ 
+ROH_frequency_decimals <- 1
+H_e_values_decimals <- 5
+F_ROH_values_decimals <- 3
+
+
+
 
 
 ####################################  
@@ -48,12 +71,12 @@ Empirical_data_H_e_dir <- Sys.getenv("Empirical_data_H_e_dir")
 ###############
 
 ### Causative variant ###
-
-Selection_causative_variant_windows_dir <- Sys.getenv("Selection_causative_variant_windows_dir")
 variant_freq_plots_dir <- Sys.getenv("variant_freq_plots_dir")
 variant_position_dir <- Sys.getenv("variant_position_dir")
+pruned_replicates_count_dir <- Sys.getenv("pruned_replicates_count_dir")
 
-
+Selection_causative_variant_windows_dir <- Sys.getenv("Selection_causative_variant_windows_dir")
+causative_variant_windows_H_e_dir <- Sys.getenv("causative_variant_windows_H_e_dir")
 
 ### ROH hotspots ###
 Neutral_model_ROH_hotspots_dir <- Sys.getenv("Neutral_model_ROH_hotspots_dir")
@@ -76,6 +99,8 @@ empirical_data_color <- "darkgreen"
 neutral_model_color <- "blue" 
 selection_model_color <- "purple"
 
+output_dir <- Sys.getenv("Pipeline_results_output_dir") 
+
 
 # Sys.getenv()  
 
@@ -83,6 +108,21 @@ selection_model_color <- "purple"
 # knitr::opts_knit$set(root.dir = output_dir_sweep_test)
 
 ```
+
+---
+title: "`r document_title`"
+subtitle: "`r document_sub`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3  
+date: "`r Sys.Date()`"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
 ## Loading libraries
 
 ```{r library()}
@@ -90,9 +130,71 @@ library(knitr)
 library(ggplot2)
 ```
 
+
+
 # Causative variant
 
-## Fixation time
+## Variant fixation
+
+### Fixation probability
+```{r ,echo = FALSE,results= 'hide',warning = FALSE}
+
+setwd(pruned_replicates_count_dir)
+
+# Pattern for finding files containing "pruned_replicates_count" and ending with ".tsv"
+pattern <- ".*pruned_replicates_count.*\\.tsv$"
+pruned_replicates_count_files <- list.files(pattern = pattern)
+
+# Extract simulation numbers from the filename
+sim_number_pattern <- ".*sim_(\\d+)_.*"
+
+sim_name_pattern <- "^(.*)\\.tsv$"
+
+
+sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", pruned_replicates_count_files))
+sim_name <- sub("^(.*?)_causative_variant_window.*", "\\1", pruned_replicates_count_files)
+
+# Combine simulation name, number, and file name
+sim_info <- data.frame(sim_name = sim_name, file_name = pruned_replicates_count_files, stringsAsFactors = FALSE)
+
+# Initialize an empty list to store the selection model tables
+non_fixated_causative_variant_count_tables <- list()
+
+# Loop through each .tsv file
+for (i in 1:length(sim_info$sim_name)) {
+  # Get the file name
+  file <- sim_info$file_name[i]
+  
+  column_names <- c("Sim_name","Non_fixated_variant_count")
+
+  # Read the .tsv frequency file into a data frame
+  causative_variant_not_fixated_count <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
+
+  # Add simulation_number as an attribute to the data frame
+  sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
+  attr(causative_variant_not_fixated_count, "Simulation_number") <- sim_num
+
+  # Extract the selection coefficient from the file name
+  selection_coefficient <- sub("^.*_(s\\d+_chr\\d+).*$", "\\1", file)
+
+  # Check if the selection coefficient already exists in the list
+  if (!(selection_coefficient %in% names(non_fixated_causative_variant_count_tables))) {
+    # If it doesn't exist, create an empty data frame
+    non_fixated_causative_variant_count_tables[[selection_coefficient]] <- data.frame()
+  }
+
+  # Append the data frame to the list under the selection coefficient
+  non_fixated_causative_variant_count_tables[[selection_coefficient]] <- rbind(non_fixated_causative_variant_count_tables[[selection_coefficient]], causative_variant_not_fixated_count)
+}
+
+#View(non_fixated_causative_variant_count_tables)
+```
+
+
+
+
+
+### Fixation time
 ```{r }
 # Function to determine the number of rows until fixation is reached
 time_to_fixation <- function(data, threshold = 0.9) {
@@ -104,6 +206,7 @@ time_to_fixation <- function(data, threshold = 0.9) {
 }
 
 ```
+
 
 ```{r Causative Variant fixation time,echo = FALSE,warning = FALSE}
 setwd(variant_freq_plots_dir)
@@ -165,9 +268,20 @@ for (i in 1:length(sim_info$sim_name)) {
   selection_coefficient <- sub("^.*_(s\\d+_chr\\d+).*$", "\\1", file)
   
   
+  ###### Find the pruned counts for the current simulation  ######
+  
+  matching_simulation_prune_count_row <- non_fixated_causative_variant_count_tables[[selection_coefficient]][non_fixated_causative_variant_count_tables[[selection_coefficient]]$Sim_name == simname_from_file, ]
+  
+  # Extract the FREQUENCY of the matching row
+  if (nrow(matching_simulation_prune_count_row) > 0) {
+    non_fixated_causative_variant_count_simulation <- matching_simulation_prune_count_row$Non_fixated_variant_count
+  } else {
+    print("No matching row found")
+  }
+  
+  
    # Create a list with table name and corresponding data frame
-  table_info <- list(Sim_name = simname_from_file, filename = file,fixation_time = fixation_time, 
-                     allele_freq_data = allele_freq_data) 
+  table_info <- list(Sim_name = simname_from_file, filename = file,fixation_time = fixation_time, non_fixated_causative_variant_count = non_fixated_causative_variant_count_simulation, allele_freq_data = allele_freq_data) 
   
   # Append the table info to the list under selection_scenario
   fixation_data_causative_variant_tables[[selection_scenario]] <- c(fixation_data_causative_variant_tables[[selection_scenario]], list(table_info))
@@ -184,16 +298,25 @@ for (selection_scenario in names(fixation_data_causative_variant_tables)) {
   avg_fixation_time <-  mean(all_fixation_times)
   min_fixation_time <- min(all_fixation_times)
   max_fixation_time <- max(all_fixation_times)
+  
+  all_non_fixation_events <- unlist(lapply(tables, function(table) table$non_fixated_causative_variant_count))
+
+  fixation_probability <- length(tables) / (sum(all_non_fixation_events)+length(tables))
 
   # Store the calculated values back into the main list
   fixation_data_causative_variant_tables[[selection_scenario]]$Avg_fixation_time <- avg_fixation_time
   fixation_data_causative_variant_tables[[selection_scenario]]$Min_fixation_time <- min_fixation_time
   fixation_data_causative_variant_tables[[selection_scenario]]$Max_fixation_time <- max_fixation_time
+  fixation_data_causative_variant_tables[[selection_scenario]]$Fixation_probability <- fixation_probability
   
   
 }
 
+#View(fixation_data_causative_variant_tables)
 
+```
+### Summary - Variant fixation 
+```{r Variant fixation Summary, echo = FALSE,warning = FALSE}
 # Initialize an empty data frame to store the results
 result_df <- data.frame()
 
@@ -201,15 +324,19 @@ result_df <- data.frame()
 for (selection_scenario in names(fixation_data_causative_variant_tables)) {
   # Extract selection coefficent from the selection scenario
   selection_coefficient <- sub("^.*_(s\\d+_chr\\d+)$", "\\1", selection_scenario)
+  # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
+  formatted_selection_coefficient <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_scenario)
+
 
   # Extract the average causative window length for the current selection scenario
   Avg_fixation_time <- fixation_data_causative_variant_tables[[selection_scenario]]$Avg_fixation_time
   Min_fixation_time <- fixation_data_causative_variant_tables[[selection_scenario]]$Min_fixation_time
   Max_fixation_time  <- fixation_data_causative_variant_tables[[selection_scenario]]$Max_fixation_time 
+  Fixation_probability <- round(100*fixation_data_causative_variant_tables[[selection_scenario]]$Fixation_probability,1)
 
   
   # Add the selection scenario and average causative window length to the result data frame
-  result_df <- rbind(result_df, data.frame(Selection_coefficient = selection_coefficient, Avg_Fixation_time = Avg_fixation_time, Min_fixation_time = Min_fixation_time,
+  result_df <- rbind(result_df, data.frame(Selection_coefficient = formatted_selection_coefficient,Fixation_probability=Fixation_probability, Avg_Fixation_time = Avg_fixation_time, Min_fixation_time = Min_fixation_time,
   Max_fixation_time =  Max_fixation_time                                         
                                            ))
 }
@@ -218,20 +345,23 @@ for (selection_scenario in names(fixation_data_causative_variant_tables)) {
 # Sort the data frame based on average fixation time, in descending order
 result_df_sorted <- result_df[order(-result_df$Avg_Fixation_time), ]
 
-#View(fixation_data_causative_variant_tables)
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("Causative_variant_Fixation_summary",".csv", sep = ""))
+
+# Write data to TSV file without quotes and with tab separation
+write.table(result_df_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
 
 # Print the table using kable
 kable(result_df_sorted)
-
-
 ```
 
 
 
+## Causative variant windows
 
 
-## Variant position
+### Variant position
 ```{r ,echo = FALSE,results= 'hide',warning = FALSE}
 
 setwd(variant_position_dir)
@@ -286,7 +416,7 @@ for (i in 1:length(sim_info$sim_name)) {
 ```
 
 
-## Window lengths
+### Window lengths
 ```{r ,echo = FALSE,results= 'hide',warning = FALSE}
 setwd(Selection_causative_variant_windows_dir)
 
@@ -349,7 +479,7 @@ for (i in 1:length(sim_info$sim_name)) {
 #View(window_lengths_causative_variant_tables)
 
 ```
-## Causative variant Summary
+### Causative variant windows
 
 ```{r echo = FALSE,warning = FALSE}
 
@@ -569,72 +699,108 @@ for (selection_scenario in names(causative_variant_window_tables_Selection_Model
   causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_variant_100k_subwindow_frequency <- mean(all_variant_100k_subwindow_frequencies)
 }
 
+```
+
+### Summary - Causative variant windows 
+
+```{r Causative variant windows Summary, echo = FALSE,warning = FALSE}
+#setwd(output_dir)
 
 # Initialize an empty data frame to store the results
-result_df <- data.frame()
+causative_variant_window_results_df <- data.frame()
 
 # Loop through each selection scenario
 for (selection_scenario in names(causative_variant_window_tables_Selection_Model)) {
   # Extract selection coefficent from the selection scenario
   selection_coefficient <- sub("^.*_(s\\d+_chr\\d+)$", "\\1", selection_scenario)
+  # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
+  formatted_selection_coefficient <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_scenario)
 
   # Extract the average causative window length for the current selection scenario
   avg_causative_window_length <- causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_causative_window_length_Mb
   
-  Min_window_freq <- causative_variant_window_tables_Selection_Model[[selection_scenario]]$Min_causative_window_freq 
-  Max_window_freq <- causative_variant_window_tables_Selection_Model[[selection_scenario]]$Max_causative_window_freq 
-  Avg_window_freq <- causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_causative_window_freq
-  Avg_freq_variant_100k_window <- causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_variant_100k_subwindow_frequency
+  Min_window_freq <- round(100*causative_variant_window_tables_Selection_Model[[selection_scenario]]$Min_causative_window_freq,ROH_frequency_decimals) 
+  Max_window_freq <- round(100*causative_variant_window_tables_Selection_Model[[selection_scenario]]$Max_causative_window_freq,ROH_frequency_decimals)
+  Avg_window_freq <- round(100*causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_causative_window_freq,ROH_frequency_decimals)
+  Avg_freq_variant_100k_window <- round(100*causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_variant_100k_subwindow_frequency,ROH_frequency_decimals)
   
   
   # Add the selection scenario and average causative window length to the result data frame
-  result_df <- rbind(result_df, data.frame(Selection_coefficient = selection_coefficient, Avg_Length_Mb = avg_causative_window_length, Min_freq = Min_window_freq,
-  Max_freq =  Max_window_freq,Avg_window_freq = Avg_window_freq,Avg_freq_variant_100k_window = Avg_freq_variant_100k_window                                         
+  causative_variant_window_results_df <- rbind(causative_variant_window_results_df, data.frame(Selection_coefficient = formatted_selection_coefficient, Avg_Length_Mb = avg_causative_window_length,Avg_window_freq = Avg_window_freq, Min_freq = Min_window_freq,
+  Max_freq =  Max_window_freq,Avg_freq_variant_100k_window = Avg_freq_variant_100k_window                                         
                                            ))
 }
 
-#View(causative_variant_window_tables_Selection_Model)
+# Sort the data frame based on the average length of the causative window of each selection coefficient
+causative_variant_window_results_df_sorted <- causative_variant_window_results_df[order(causative_variant_window_results_df$Avg_Length_Mb), ]
 
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("Causative_variant_windows_summary",".csv", sep = ""))
 
-# Sort the data frame based on Inbreeding coefficient column
-result_df_sorted <- result_df[order(result_df$Avg_Length_Mb), ]
+# Write data to TSV file without quotes and with tab separation
+write.table(causative_variant_window_results_df_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
 
 # Print the table using kable
-kable(result_df_sorted)
-
+kable(causative_variant_window_results_df_sorted)
 ```
 
 
 
-# Bootstrap confidence interval function
+# Standard Error Confidence interval function
 Confidence level <=> konfidensgrad
 ```{r}
-# Function to calculate bootstrap confidence intervals
-bootstrap_confidence_interval_fun <- function(observed_data, n_bootstraps = 1000, confidence_level = 0.95) {
+
+# Function to calculate standard error and its confidence interval
+standard_error_confidence_interval_fun <- function(observed_data, confidence_level = 0.95) {
   
-  # Function to calculate the mean for each bootstrap sample
-  compute_bootstrap_mean_fun <- function(observed_data_urn) {
-    bootstrap_dataset <- sample(observed_data_urn, replace = TRUE)
-    bootstrap_estimate <- mean(bootstrap_dataset)
-    return(bootstrap_estimate)
-  }
+  # Calculate standard error
+  n <- length(observed_data)
+  standard_deviation <- sd(observed_data)
+  standard_error <- standard_deviation / sqrt(n - 1)
   
-  # Perform bootstrap resampling
-  bootstrap_point_estimates <- replicate(n_bootstraps, compute_bootstrap_mean_fun(observed_data))
-  
-  # Calculate the percentiles for the confidence interval
+  # Calculate confidence interval based on standard error
+
   alpha <- (1 - confidence_level) / 2
-  confidence_interval_lower_bound <- quantile(bootstrap_point_estimates, alpha) # 2.5th percentile
-  confidence_interval_upper_bound <- quantile(bootstrap_point_estimates, 1 - alpha) # 97.5th percentile
+  margin_of_error <- qnorm(1 - alpha) * standard_error
+  mean_estimate <- mean(observed_data)
+  # Calculate the percentiles for the confidence interval
+  confidence_interval_lower_bound <- mean_estimate - margin_of_error # 2.5th percentile (2σ)
+  confidence_interval_upper_bound <- mean_estimate + margin_of_error # 97.5th percentile (2σ)
   
-  # Return the confidence interval
+  # Return confidence interval
   return(c(confidence_interval_lower_bound, confidence_interval_upper_bound))
 }
+
+
+
+
+
+# # Function to calculate bootstrap confidence intervals
+# standard_error_confidence_interval_fun <- function(observed_data, n_bootstraps = 1000, confidence_level = 0.95) {
+#   
+#   # Function to calculate the mean for each bootstrap sample
+#   compute_bootstrap_mean_fun <- function(observed_data_urn) {
+#     bootstrap_dataset <- sample(observed_data_urn, replace = TRUE)
+#     bootstrap_estimate <- mean(bootstrap_dataset)
+#     return(bootstrap_estimate)
+#   }
+#   
+#   # Perform bootstrap resampling
+#   bootstrap_point_estimates <- replicate(n_bootstraps, compute_bootstrap_mean_fun(observed_data))
+#   
+#   # Calculate the percentiles for the confidence interval
+#   alpha <- (1 - confidence_level) / 2
+#   confidence_interval_lower_bound <- quantile(bootstrap_point_estimates, alpha) # 2.5th percentile
+#   confidence_interval_upper_bound <- quantile(bootstrap_point_estimates, 1 - alpha) # 97.5th percentile
+#   
+#   # Return the confidence interval
+#   return(c(confidence_interval_lower_bound, confidence_interval_upper_bound))
+# }
 ```
 
 
-# 1: ROH-Hotspots
+# 1: ROH-Frequency
 
 ## 1.1 : Autosome ROH-frequencies
 
@@ -671,18 +837,14 @@ for (file in sorted_population_ROH_freq_files) {
 
   file_name <- file
 
-  # # Read the header line
-  # con <- file(file, "r")
-  # header <- readLines(con, n = 1)
-  # close(con)
-  # 
-  # # Remove "#" from the header and split it into column names
-  # column_names <- strsplit(sub("#", "", header), "\t")[[1]]
-  # 
-  # # Read the .tsv frequency file into a data frame
-  # ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
-  
   ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  ROH_freq_data <- ROH_freq_data[1:(nrow(ROH_freq_data)/2), ]
+  # Renaming POS to POS1 and add POS2 = POS1 + 1e5
+  ROH_freq_data <- transform(ROH_freq_data, POS1 = POS, POS2 = POS + 1e5 -1)
+  
+  # Remove the original POS column
+  ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
+  
   
   # Add chromosome_name as an attribute to the data frame
   chr_num <- as.numeric(gsub(".*CHR(\\d+)_.*", "\\1", file))
@@ -697,7 +859,7 @@ for (file in sorted_population_ROH_freq_files) {
 
 ROH_freq_table_Empirical_Data$ROH_hotspot_threshold <- Empirical_data_ROH_hotspot_threshold
 
-##View(ROH_freq_table_Empirical_Data)
+#View(ROH_freq_table_Empirical_Data)
 
 ```
 
@@ -747,6 +909,12 @@ for (file in sorted_neutral_model_ROH_freq_files) {
   # ROH_freq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   
   ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  ROH_freq_data <- ROH_freq_data[1:(nrow(ROH_freq_data)/2), ]
+  # Renaming POS to POS1 and add POS2 = POS1 + 1e5
+  ROH_freq_data <- transform(ROH_freq_data, POS1 = POS, POS2 = POS + 1e5 -1)
+  # Remove the original POS column
+  ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
+
   
   
   
@@ -845,6 +1013,12 @@ for (i in 1:length(sim_info$sim_name)) {
   # ROH_freq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   # 
   ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  ROH_freq_data <- ROH_freq_data[1:(nrow(ROH_freq_data)/2), ]
+  # Renaming POS to POS1 and add POS2 = POS1 + 1e5
+  ROH_freq_data <- transform(ROH_freq_data, POS1 = POS, POS2 = POS + 1e5 -1)
+  # Remove the original POS column
+  ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
+
   
   
   # Add simulation_number as an attribute to the data frame
@@ -883,33 +1057,35 @@ for (selection_coefficient in names(ROH_freq_tables_Selection_Model)) {
 
 ```
 
-## 1.4 ROH-hotspot threshold summary
+### 1.1.4 Summary - ROH-hotspot threshold 
 
 ```{r echo = FALSE,warning = FALSE}
 cat("ROH-hotspot selection testing results://n")
 
 # Initialize an empty vector to store F_ROH values for the different selection coefficients
 selection_model_values_list <- c()
-selection_model_names_list <- c(rownames(summary(ROH_freq_tables_Selection_Model)))
+selection_model_names_list <- c()
 
 # Loop through each selection_coefficient in ROH_freq_tables_Selection_Model
-for (selection_coefficient in ROH_freq_tables_Selection_Model) {
+for (selection_coefficient in names(ROH_freq_tables_Selection_Model)) {
   # Extract the Avg_ROH_hotspot_threshold value from the selection_coefficient
-  Avg_ROH_hotspot_threshold <- selection_coefficient$Avg_ROH_hotspot_threshold
-  # Extract the model name
-  model_name <- selection_coefficient
+  Avg_ROH_hotspot_threshold <- round(100*ROH_freq_tables_Selection_Model[[selection_coefficient]]$Avg_ROH_hotspot_threshold,ROH_frequency_decimals)
+
+  # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
+  formatted_selection_coefficient_labels <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_coefficient)
+
   # Append values to the lists
   selection_model_values_list <- c(selection_model_values_list, Avg_ROH_hotspot_threshold)
-  # selection_model_names_list <- c(selection_model_names_list, model_name)
+  selection_model_names_list <- c(selection_model_names_list, formatted_selection_coefficient_labels)
 }
 
 
 
 # Add overAvg_ROH_hotspot_threshold from ROH_freq_tables_Neutral_Model
-neutral_model_value <- ROH_freq_tables_Neutral_Model[["Avg_ROH_hotspot_threshold"]]
+neutral_model_value <- round(100*ROH_freq_tables_Neutral_Model[["Avg_ROH_hotspot_threshold"]],ROH_frequency_decimals)
 
 # Add Avg_ROH_hotspot_threshold from ROH_freq_table_Empirical_Data
-empirical_model_value <- ROH_freq_table_Empirical_Data[["ROH_hotspot_threshold"]]
+empirical_model_value <- round(100*ROH_freq_table_Empirical_Data[["ROH_hotspot_threshold"]],ROH_frequency_decimals)
 
 # Combine all values into a data frame
 ROH_hotspot_threshold_values <- data.frame(
@@ -920,17 +1096,95 @@ ROH_hotspot_threshold_values <- data.frame(
 # Update the Model column for selection models
 ROH_hotspot_threshold_values$Model[ROH_hotspot_threshold_values$Model == "Selection"] <- selection_model_names_list
 
-# Sort the data frame based on Inbreeding coefficient column
+# Sort the data frame based on the ROH-hotspot threshold
 ROH_hotspot_threshold_values_sorted <- ROH_hotspot_threshold_values[order(ROH_hotspot_threshold_values$Avg_ROH_hotspot_threshold), ]
 
 
-# # Print the table using knitr::kable()
-# knitr::kable(ROH_hotspot_threshold_values, row.names = FALSE)
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("ROH-hotspot threshold comparison",".csv", sep = ""))
+
+# Write data to CSV file without quotes
+write.table(ROH_hotspot_threshold_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
+
 
 # Print the table using knitr::kable()
 knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 
 ```
+## 1.2 ROH-hotspots - ROH Frequency and Length
+```{r ,echo = FALSE,warning = FALSE}
+setwd(Empirical_data_ROH_hotspots_dir)
+# Pattern for finding files containing "F_ROH" and ending with ".tsv"
+pattern <- "^.*ROH_Hotspot_windows*.bed$"
+empirical_roh_hotspot_bed_files <- list.files(pattern = pattern)
+
+chromosome_number_pattern <- "^german_shepherd_CHR(\\d+)_.*"
+# Extract chromosome numbers
+chr_numbers <- sub(chromosome_number_pattern, "\\1", empirical_roh_hotspot_bed_files)
+
+# Sort the files based on chromosome numbers
+empirical_roh_hotspot_bed_files <- empirical_roh_hotspot_bed_files[order(as.numeric(chr_numbers))]
+
+
+# Create an empty list to store information for the different ROH-hotspots in
+empirical_hotspot_tables <- list()
+
+# Loop through each .bed file (ROH-hotspot allele frequency window-file)
+for (file in empirical_roh_hotspot_bed_files) {
+  # Extract chromosome number and window number from file name
+  chromosome <- as.numeric(sub(chromosome_number_pattern, "\\1", file))
+  # window <- sub(".*windows_([0-9]+)_.*", "\\1", file)
+  
+  # # Create table name
+  # table_name <- paste("Hotspot_chr", chromosome, "_window_", window, sep = "")
+  column_names <- c("CHR","POS1","POS2")
+  
+  # Read the .bed file into a data frame, skipping commented lines
+  chromosome_bed_file_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  
+  # Loop through each hotspot for the current chromosome
+  for (i in 1:nrow(chromosome_bed_file_data)) {
+    Hotspot_region_data <- data.frame(
+    CHR = chromosome_bed_file_data[i, ][1],
+    POS1 = chromosome_bed_file_data[i, ][2],
+    POS2 = chromosome_bed_file_data[i, ][3] )
+    
+    Hotspot_length_bp <- Hotspot_region_data$POS2-Hotspot_region_data$POS1 + 1
+    Hotspot_length_Mb <- Hotspot_length_bp / 1e6
+    
+    Hotspot_name <- paste("Hotspot_chr",chromosome, "_window_",i, sep = "")
+    
+      # Find the row where the variant_position_bp is within POS1 and POS2, and CHR equals chr_number
+      roh_freq_windows_in_hotspot <- ROH_freq_table_Empirical_Data[[chromosome]][["data"]][ Hotspot_region_data$POS1 <= ROH_freq_table_Empirical_Data[[chromosome]][["data"]]$POS1 & ROH_freq_table_Empirical_Data[[chromosome]][["data"]]$POS2 <= Hotspot_region_data$POS2, ]
+    
+    avg_frequency <- mean(roh_freq_windows_in_hotspot$FREQUENCY)
+    
+    # Check if the selection coefficient already exists in the list
+    if (!(Hotspot_name %in% names(empirical_hotspot_tables))) {
+      # If it doesn't exist, create an empty data frame
+      empirical_hotspot_tables[[Hotspot_name]] <- data.frame()
+    }
+  
+     # Create a list with table name and corresponding data frame
+    table_info <- list(Filename = file,Hotspot_length_bp=Hotspot_length_bp,Hotspot_length_Mb=Hotspot_length_Mb,Avg_frequency = avg_frequency, Hotspot_region_data = Hotspot_region_data) 
+    
+    # Append the table info to the list under selection_scenario
+    empirical_hotspot_tables[[Hotspot_name]] <- c(empirical_hotspot_tables[[Hotspot_name]], table_info)
+      
+        }
+
+}
+
+# View(empirical_hotspot_tables)
+
+```
+
+
+
+
+
+
 
 
 # 2: Inbreeding coefficient
@@ -1094,7 +1348,7 @@ F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH <- mean(All_Populatio
 
 # Calculate the bootstrap confidence interval of the point estimate F_ROH across all 20 simulations
 # Store the bootstrap confidence interval in the F_ROH_tables_Neutral_Model
-F_ROH_tables_Neutral_Model$Bootstrap_CI_Estimated_Mean_Population_F_ROH <- bootstrap_confidence_interval_fun(All_Population_F_ROH)
+F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH <- standard_error_confidence_interval_fun(All_Population_F_ROH)
 
 
 # Set the plot size
@@ -1136,8 +1390,8 @@ par(mfrow = c(1, 1))
 cat("Point estimate F_ROH across all 20 simulations:", F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH, "//n")
 
 print(paste("Bootstrap 95% Confidence Interval: [", 
-            F_ROH_tables_Neutral_Model$Bootstrap_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
-            F_ROH_tables_Neutral_Model$Bootstrap_CI_Estimated_Mean_Population_F_ROH[2], "]", sep = ""))
+            F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
+            F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[2], "]", sep = ""))
 
 
 ```
@@ -1243,7 +1497,7 @@ for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
 
   # Calculate the bootstrap confidence interval of the point estimate F_ROH across all 20 simulations for the current selection coefficient
   # Store the bootstrap confidence interval in the F_ROH_tables_Selection_Model table
-  F_ROH_tables_Selection_Model[[selection_coefficient]]$Bootstrap_CI_Estimated_Mean_Population_F_ROH <- bootstrap_confidence_interval_fun(All_Population_F_ROH)
+  F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH <- standard_error_confidence_interval_fun(All_Population_F_ROH)
 
   
   
@@ -1287,8 +1541,8 @@ for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
   cat("Point estimate F_ROH across all 20 simulations for ",selection_coefficient,":", F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH, "//n")
 
   print(paste("Bootstrap 95% Confidence Interval: [", 
-  F_ROH_tables_Selection_Model[[selection_coefficient]]$Bootstrap_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
-  F_ROH_tables_Selection_Model[[selection_coefficient]]$Bootstrap_CI_Estimated_Mean_Population_F_ROH[2], "]", sep = ""))
+  F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
+  F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH[2], "]", sep = ""))
 
 
 }
@@ -1305,15 +1559,20 @@ for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
 selection_model_avg_values <- c()
 selection_model_lower_ci <- c()
 selection_model_upper_ci <- c()
-selection_model_names <- c(rownames(summary(F_ROH_tables_Selection_Model)))
+selection_model_names <- c()
 
 # Loop through each selection_coefficient in F_ROH_tables_Selection_Model
-for (selection_coefficient in F_ROH_tables_Selection_Model) {
+for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
+  # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
+  formatted_selection_coefficient_labels <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_coefficient)
+
+  
   # Extract the all_avg_F_ROH value from the selection_coefficient
-  all_avg_F_ROH <- selection_coefficient$Estimated_Mean_Population_F_ROH
-  CI <- selection_coefficient$Bootstrap_CI_Estimated_Mean_Population_F_ROH
+  all_avg_F_ROH <- F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH
+  CI <- F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH
   
   # Append values to the lists
+  selection_model_names <- c(selection_model_names,formatted_selection_coefficient_labels)
   selection_model_avg_values <- c(selection_model_avg_values, all_avg_F_ROH)
   selection_model_lower_ci <- c(selection_model_lower_ci, CI[1])
   selection_model_upper_ci <- c(selection_model_upper_ci, CI[2])
@@ -1321,8 +1580,8 @@ for (selection_coefficient in F_ROH_tables_Selection_Model) {
 
 # Extract neutral model values and CI bounds
 neutral_avg_F_ROH <- F_ROH_tables_Neutral_Model[["Estimated_Mean_Population_F_ROH"]]
-neutral_lower_ci <- F_ROH_tables_Neutral_Model[["Bootstrap_CI_Estimated_Mean_Population_F_ROH"]][1]
-neutral_upper_ci <- F_ROH_tables_Neutral_Model[["Bootstrap_CI_Estimated_Mean_Population_F_ROH"]][2]
+neutral_lower_ci <- F_ROH_tables_Neutral_Model[["SE_CI_Estimated_Mean_Population_F_ROH"]][1]
+neutral_upper_ci <- F_ROH_tables_Neutral_Model[["SE_CI_Estimated_Mean_Population_F_ROH"]][2]
 
 # Extract empirical model value
 empirical_avg_F_ROH <- F_ROH_table_Empirical_Data[["Avg_F_ROH"]]
@@ -1337,10 +1596,10 @@ F_ROH_values <- data.frame(
   Upper_CI = c(selection_model_upper_ci, neutral_upper_ci, empirical_upper_ci)
 )
 
-# Format all numeric values to 5 decimal places
-F_ROH_values$F_ROH <- as.numeric(format(round(F_ROH_values$F_ROH, 5), nsmall = 5))
-F_ROH_values$Lower_CI <- as.numeric(format(round(F_ROH_values$Lower_CI, 5), nsmall = 5))
-F_ROH_values$Upper_CI <- as.numeric(format(round(F_ROH_values$Upper_CI, 5), nsmall = 5))
+# Format all numeric values to have the number of decimals defined by F_ROH_values_decimals
+F_ROH_values$F_ROH <- round(F_ROH_values$F_ROH,F_ROH_values_decimals)
+F_ROH_values$Lower_CI <- as.numeric(round(F_ROH_values$Lower_CI,F_ROH_values_decimals))
+F_ROH_values$Upper_CI <- as.numeric(round(F_ROH_values$Upper_CI,F_ROH_values_decimals))
 
 # # Update the Model column for selection models
 # F_ROH_values$Model[1:length(selection_model_names)] <- selection_model_names
@@ -1352,6 +1611,13 @@ F_ROH_values$Model[1:length(selection_model_names)] <- selection_labels
 
 # Sort the data frame based on F_ROH column
 F_ROH_values_sorted <- F_ROH_values[order(as.numeric(F_ROH_values$F_ROH)), ]
+
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("F_ROH_comparison",".csv", sep = ""))
+
+# Write data to CSV file without quotes
+write.table(F_ROH_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
 
 # Print the table using knitr::kable()
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
@@ -1396,9 +1662,6 @@ cat("\nModels where empirical F_ROH is outside CI:\n")
 print(outside_models)
 
 ```
-
-
-
 # 3: Expected Heterozygosity
 
 ## 3.1 Empirical data
@@ -1457,9 +1720,9 @@ H_e_5th_percentiles_Neutral_model$Estimated_Mean_H_e_5th_percentile <- mean(H_e_
 
 # Calculate the bootstrap confidence interval of the point estimate F_ROH across all 20 simulations
 # Store the bootstrap confidence interval in the F_ROH_tables_Neutral_Model
-H_e_5th_percentiles_Neutral_model$Bootstrap_CI_Estimated_Mean_H_e_5th_percentile <- bootstrap_confidence_interval_fun(H_e_5th_percentiles_Neutral_model[["results"]][["Fifth_Percentile"]])
+H_e_5th_percentiles_Neutral_model$SE_CI_Estimated_Mean_H_e_5th_percentile <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Neutral_model[["results"]][["Fifth_Percentile"]])
 
-##View(H_e_5th_percentiles_Neutral_model)
+#View(H_e_5th_percentiles_Neutral_model)
 
 
 ```
@@ -1508,9 +1771,11 @@ setwd(Neutral_model_H_e_dir)
 ```
 # 
 
+
 ## 3.3 Selection Model
 
 ```{r echo = FALSE,warning = FALSE}
+cat("Uncommented because change of analysis")
 setwd(Selection_model_H_e_dir)
 # Pattern for finding the specific file containing "5th_percentiles_of_H_e_distribution.tsv"
 pattern <- "^.*5th_percentiles_of_H_e_distribution.tsv$"
@@ -1526,22 +1791,22 @@ H_e_5th_percentiles_Selection_models <- list()
 for (i in seq_along(selection_model_5th_percentiles_of_H_e_files)) {
   # Extract the selection coefficient from the file name
   selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", selection_model_5th_percentiles_of_H_e_files[i])
-  
+
   # Read the .tsv file into a data frame
   subtable <- read.table(selection_model_5th_percentiles_of_H_e_files[i], header = TRUE,sep = "\t", stringsAsFactors = FALSE)
   # Read the file
 file <- neutral_model_5th_percentiles_of_H_e_files[1]
 
 
-  
+
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$file_name <- selection_model_5th_percentiles_of_H_e_files[i]
 
-  
+
   # Add the subtable to the list with the selection coefficient as its name
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$results <- subtable
-  
-  
-  
+
+
+
 }
 
 # # View the H_e_5th_percentiles_Selection_models
@@ -1554,19 +1819,102 @@ for (selection_coefficient in names(H_e_5th_percentiles_Selection_models)) {
 
   # Calculate the point estimate F_ROH across all 20 simulations for the current selection coefficient
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$Estimated_Mean_H_e_5th_percentile <- mean(H_e_5th_percentiles_Selection_models[[selection_coefficient]][["results"]][["Fifth_Percentile"]])
-  
+
 
   # Calculate the bootstrap confidence interval of the point estimate F_ROH across all 20 simulations for the current selection coefficient
   # Store the bootstrap confidence interval in the H_e_5th_percentiles_Selection_models table
-  H_e_5th_percentiles_Selection_models[[selection_coefficient]]$Bootstrap_CI_Estimated_Mean_H_e_5th_percentile <- bootstrap_confidence_interval_fun(H_e_5th_percentiles_Selection_models[[selection_coefficient]][["results"]][["Fifth_Percentile"]])
+  H_e_5th_percentiles_Selection_models[[selection_coefficient]]$SE_CI_Estimated_Mean_H_e_5th_percentile <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Selection_models[[selection_coefficient]][["results"]][["Fifth_Percentile"]])
 }
 
 # # View the dataframe
-# #View(H_e_5th_percentiles_Selection_models)
+# View(H_e_5th_percentiles_Selection_models)
 
 
 ```
-## 3.4 Expected Heterozygosity Summary
+
+## 3.4 Causative Variant Window
+```{r H_e Causative Variant Windows, echo = FALSE,warning = FALSE}
+setwd(causative_variant_windows_H_e_dir)
+
+# Pattern for finding files containing "avg_H_e" and ending with ".tsv"
+pattern <- ".*avg_H_e.*\\.tsv$"
+causative_variant_window_H_e_files <- list.files(pattern = pattern)
+
+# Extract simulation numbers from the filename
+sim_number_pattern <- ".*sim_(\\d+)_.*"
+sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", causative_variant_window_H_e_files))
+sim_name <- sub("^(.*?)_causative_variant_window.*", "\\1", causative_variant_window_H_e_files)
+
+# Combine simulation name, number, and file name
+sim_info <- data.frame(sim_name = sim_name, file_name = causative_variant_window_H_e_files, stringsAsFactors = FALSE)
+
+# Initialize an empty list to store the selection model tables
+window_H_e_causative_variant_tables <- list()
+
+# Loop through each .tsv file
+for (i in 1:length(sim_info$sim_name)) {
+  # Get the file name
+  file <- sim_info$file_name[i]
+  
+    # Read the .tsv file into a data frame, using the cleaned column names
+  causative_variant_window_H_e_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+
+  # Extract the selection coefficient from the file name
+  selection_coefficient <- sub("^.*_(s\\d+_chr\\d+).*$", "\\1", file)
+  
+  # Check if the selection coefficient already exists in the list
+  if (!(selection_coefficient %in% names(window_H_e_causative_variant_tables))) {
+    # If it doesn't exist, create an empty data frame
+    window_H_e_causative_variant_tables[[selection_coefficient]] <- data.frame()
+  }
+  
+  # Create a list with table name and corresponding data frame
+  table_info <- list(filename=file, data =causative_variant_window_H_e_data) 
+  
+  # Append the table info to the list under selection_scenario
+  window_H_e_causative_variant_tables[[selection_coefficient]] <- c(window_H_e_causative_variant_tables[[selection_coefficient]], table_info)
+
+  
+  
+  
+}
+
+# Loop through each selection_coefficient and compute Standard Error confidence intervals for the 5th percentile
+for (selection_coefficient in names(window_H_e_causative_variant_tables)) {
+
+  All_Population_Causative_window_Avg_H_e <- window_H_e_causative_variant_tables[[selection_coefficient]][["data"]][["Avg_He"]]
+  # Remove any non-numeric values
+  All_Population_Causative_window_Avg_H_e <- All_Population_Causative_window_Avg_H_e[!is.na(All_Population_Causative_window_Avg_H_e) & is.numeric(All_Population_Causative_window_Avg_H_e)]
+
+  # Calculate the point estimate H_e across all 20 simulations for the current selection coefficient
+  window_H_e_causative_variant_tables[[selection_coefficient]]$Estimated_Mean_Population_H_e <-
+  mean(All_Population_Causative_window_Avg_H_e)
+
+  # Calculate the bootstrap confidence interval of the point estimate H_e across all 20 simulations for the current selection coefficient
+  # Store the bootstrap confidence interval in the window_H_e_causative_variant_tables table
+  window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e <- standard_error_confidence_interval_fun(All_Population_Causative_window_Avg_H_e)  
+  
+
+  # Print the Point estimate of H_e across all 20 simulations
+  cat("Point estimate H_e across all 20 simulations for ",selection_coefficient,":", window_H_e_causative_variant_tables[[selection_coefficient]]$Estimated_Mean_Population_H_e, "//n")
+
+  print(paste("Bootstrap 95% Confidence Interval: [", 
+  window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[1], ", ", 
+  window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[2], "]", sep = ""))
+
+
+}
+
+
+
+
+# View(window_H_e_causative_variant_tables)
+```
+
+
+
+
+## 3.4 Genomewide 5th percentile comparison - Expected Heterozygosity Summary
 
 ```{r Expected Heterozygosity Summary, echo = FALSE,warning = FALSE}
 
@@ -1574,12 +1922,25 @@ for (selection_coefficient in names(H_e_5th_percentiles_Selection_models)) {
 selection_model_avg_values <- c()
 selection_model_lower_ci <- c()
 selection_model_upper_ci <- c()
-selection_model_names <- c(rownames(summary(H_e_5th_percentiles_Selection_models)))
+selection_model_names <- c(rownames(summary(window_H_e_causative_variant_tables)))
+
+# # Loop through each selection_coefficient in H_e_5th_percentiles_Selection_models
+# for (selection_coefficient in window_H_e_causative_variant_tables) {
+#   CI <- selection_coefficient$SE_CI_Estimated_Mean_Population_H_e
+#   
+#   # Append values to the lists
+#   selection_model_avg_values <- c(selection_model_avg_values, selection_coefficient$Estimated_Mean_Population_H_e)
+#   selection_model_lower_ci <- c(selection_model_lower_ci, CI[1])
+#   selection_model_upper_ci <- c(selection_model_upper_ci, CI[2])
+# }
+
+
+
 
 # Loop through each selection_coefficient in H_e_5th_percentiles_Selection_models
 for (selection_coefficient in H_e_5th_percentiles_Selection_models) {
-  CI <- selection_coefficient$Bootstrap_CI_Estimated_Mean_H_e_5th_percentile
-  
+  CI <- selection_coefficient$SE_CI_Estimated_Mean_H_e_5th_percentile
+
   # Append values to the lists
   selection_model_avg_values <- c(selection_model_avg_values, selection_coefficient$Estimated_Mean_H_e_5th_percentile)
   selection_model_lower_ci <- c(selection_model_lower_ci, CI[1])
@@ -1591,8 +1952,8 @@ for (selection_coefficient in H_e_5th_percentiles_Selection_models) {
 
 # Extract neutral model values and CI bounds
 neutral_avg_H_e_5th_percentile <- H_e_5th_percentiles_Neutral_model[["Estimated_Mean_H_e_5th_percentile"]]
-neutral_lower_ci <- H_e_5th_percentiles_Neutral_model[["Bootstrap_CI_Estimated_Mean_H_e_5th_percentile"]][1]
-neutral_upper_ci <- H_e_5th_percentiles_Neutral_model[["Bootstrap_CI_Estimated_Mean_H_e_5th_percentile"]][2]
+neutral_lower_ci <- H_e_5th_percentiles_Neutral_model[["SE_CI_Estimated_Mean_H_e_5th_percentile"]][1]
+neutral_upper_ci <- H_e_5th_percentiles_Neutral_model[["SE_CI_Estimated_Mean_H_e_5th_percentile"]][2]
 
 # Extract empirical model value
 # empirical_avg_H_e_5th_percentile <- F_ROH_table_Empirical_Data[["Avg_H_e_5th_percentile"]]
@@ -1609,20 +1970,28 @@ H_e_5th_percentile_values <- data.frame(
 )
 
 # Format all numeric values to 5 decimal places
-H_e_5th_percentile_values$H_e_5th_percentile <- as.numeric(format(round(H_e_5th_percentile_values$H_e_5th_percentile, 5), nsmall = 5))
-H_e_5th_percentile_values$Lower_CI <- as.numeric(format(round(H_e_5th_percentile_values$Lower_CI, 5), nsmall = 5))
-H_e_5th_percentile_values$Upper_CI <- as.numeric(format(round(H_e_5th_percentile_values$Upper_CI, 5), nsmall = 5))
+H_e_5th_percentile_values$H_e_5th_percentile <- round(H_e_5th_percentile_values$H_e_5th_percentile, H_e_values_decimals)
+H_e_5th_percentile_values$Lower_CI <- round(H_e_5th_percentile_values$Lower_CI,H_e_values_decimals)
+H_e_5th_percentile_values$Upper_CI <- round(H_e_5th_percentile_values$Upper_CI,H_e_values_decimals)
 
 # # Update the Model column for selection models
 # H_e_5th_percentile_values$Model[1:length(selection_model_names)] <- selection_model_names
 
-# Extract labels for the different selection coefficients
-selection_labels <- gsub(".*_(s\\d+)_.*", "\\1", selection_model_names)
-H_e_5th_percentile_values$Model[1:length(selection_model_names)] <- selection_labels
+# Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
+formatted_selection_coefficient_labels <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_model_names)
+
+H_e_5th_percentile_values$Model[1:length(selection_model_names)] <- formatted_selection_coefficient_labels
 
 
 # Sort the data frame based on H_e_5th_percentile column
 H_e_5th_percentile_values_sorted <- H_e_5th_percentile_values[order(as.numeric(H_e_5th_percentile_values$H_e_5th_percentile)), ]
+
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("Expected Heterozygosity Summary",".csv", sep = ""))
+
+# Write data to CSV file without quotes
+write.table(H_e_5th_percentile_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
 
 # Print the table using knitr::kable()
 knitr::kable(H_e_5th_percentile_values_sorted, row.names = FALSE)
@@ -1642,7 +2011,7 @@ cat("\n ROH-hotspot threshold comparison between the different datasets")
 # Print the table using knitr::kable()
 knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 ```
-### 4.0.1 F_ROH comparison
+### 4.0.2 F_ROH comparison
 ```{r echo = FALSE,warning = FALSE}
  # Print the table using knitr::kable()
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
@@ -1681,17 +2050,26 @@ for (file in selection_testing_files) {
   
   # # Read the .tsv frequency file into a data frame
   Selection_testing_results <- read.table(selection_testing_files, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  Selection_testing_results[3] <- round(Selection_testing_results[3],H_e_values_decimals)
   # Remove "_allele_freq" from the names
   Selection_testing_results$Name <- gsub("_allele_freq$", "", Selection_testing_results$Name)
 
 }
 paste0("Selection test results")
-paste0("ROH-hotspot windows with an mean H_e Value lower or equal to the fifth percentile of the neutral models average H_e are classified as being under selection")
+paste0("ROH-hotspot windows with an mean H_e Value lower or equal to the lower confidence interval of the fifth percentile of the neutral model are classified as being under selection")
 paste0("5th percentile of the neutral model is: ",fifth_percentile_H_e_neutral_model)
 # Print the table using knitr::kable()
 knitr::kable(Selection_testing_results, row.names = FALSE) 
 
-  
+formatted_selection_H_e_threshold <- round(fifth_percentile_H_e_neutral_model,H_e_values_decimals)
+
+
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("ROH_hotspots_Selection_testing_neutral_model_H_E_threshold_",formatted_selection_H_e_threshold,".csv", sep = ""))
+# Write data to CSV file without quotes
+write.table(Selection_testing_results, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
+
 
 # Subset the dataframe to extract rows where Under_selection is "Yes"
 under_selection_rows <- subset(Selection_testing_results, Under_selection == "Yes")
@@ -1707,55 +2085,132 @@ knitr::kable(under_selection_rows, row.names = FALSE)
 ### 4.1.2: Selection Strength Test (Sweep test)
 
 ```{r echo = FALSE,warning = FALSE}
-setwd(Selection_strength_test_dir)
-
-# Pattern for finding files containing "F_ROH" and ending with ".tsv"
-pattern <- "^.*selection_model.*.tsv$"
-selection_strength_testing_files <- list.files(pattern = pattern)
-# selection_testing_files
-
-
-# Initialize an empty list to store Selection_Strength_test_results_tables
-Selection_Strength_test_results_tables <- list()
-
-# Loop through each selection coefficient and its associated file
-for (i in seq_along(selection_strength_testing_files)) {
-  # Extract the selection coefficient from the file name
-  selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", selection_strength_testing_files[i])
-  
-  # Read the .tsv file into a data frame
-  subtable <- read.table(selection_strength_testing_files[i], header = TRUE, comment.char = "#", stringsAsFactors = FALSE)
-  
-  Selection_Strength_test_results_tables[[selection_coefficient]]$file_name <- selection_strength_testing_files[i]
-
-  
-  # Add the subtable to the list with the selection coefficient as its name
-  Selection_Strength_test_results_tables[[selection_coefficient]]$results <- subtable
-  
-  
-  
-  # Extracting the ROH-hotspot threshold value from the suffix of the filename
-    parts <- unlist(strsplit(selection_strength_testing_files[i], "threshold_")) # Split the string by "threshold_"
-    # # Extract the decimal number using regular expressions
-    fifth_percentile_H_e_selection_coefficient <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
-    Selection_Strength_test_results_tables[[selection_coefficient]]$fifth_percentile_H_e_threshold <- fifth_percentile_H_e_selection_coefficient
-    
-}
-
-# # View the Selection_Strength_test_results_tables
-# Selection_Strength_test_results_tables
-
-
-# View the dataframe
-# #View(Selection_Strength_test_results_tables)
-#(Selection_Strength_test_df)
+# setwd(Selection_strength_test_dir)
+# 
+# # Pattern for finding files containing "F_ROH" and ending with ".tsv"
+# pattern <- "^.*selection_model.*.tsv$"
+# selection_strength_testing_files <- list.files(pattern = pattern)
+# # selection_testing_files
+# 
+# 
+# # Initialize an empty list to store Selection_Strength_test_results_tables
+# Selection_Strength_test_results_tables <- list()
+# 
+# # Loop through each selection coefficient and its associated file
+# for (i in seq_along(selection_strength_testing_files)) {
+#   # Extract the selection coefficient from the file name
+#   selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", selection_strength_testing_files[i])
+#   
+#   # Read the .tsv file into a data frame
+#   subtable <- read.table(selection_strength_testing_files[i], header = TRUE, comment.char = "#", stringsAsFactors = FALSE)
+#   
+#   Selection_Strength_test_results_tables[[selection_coefficient]]$file_name <- selection_strength_testing_files[i]
+# 
+#   
+#   # Add the subtable to the list with the selection coefficient as its name
+#   Selection_Strength_test_results_tables[[selection_coefficient]]$results <- subtable
+#   
+#   
+#   
+#   # Extracting the ROH-hotspot threshold value from the suffix of the filename
+#     parts <- unlist(strsplit(selection_strength_testing_files[i], "threshold_")) # Split the string by "threshold_"
+#     # # Extract the decimal number using regular expressions
+#     fifth_percentile_H_e_selection_coefficient <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
+#     Selection_Strength_test_results_tables[[selection_coefficient]]$fifth_percentile_H_e_threshold <- fifth_percentile_H_e_selection_coefficient
+#     
+# }
+# 
+# # # View the Selection_Strength_test_results_tables
+# # Selection_Strength_test_results_tables
+# 
+# 
+# # View the dataframe
+# # View(Selection_Strength_test_results_tables)
 
 
 ```
+#### 4.1.1.1 Extracting Causative windows under selection
+```{r ,echo = FALSE,warning = FALSE}
+# Initialize vectors to store H_e values and CI bounds for the different selection coefficients
+selection_model_avg_values <- c()
+selection_model_lower_ci <- c()
+selection_model_upper_ci <- c()
+selection_model_names <- c()
+
+# Loop through each selection_coefficient in H_e_5th_percentiles_Selection_models
+for (selection_coefficient in names(window_H_e_causative_variant_tables)) {
+    # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
+  formatted_selection_coefficient_labels <- sub("s(\\d)(\\d+)_.*", "s=\\1.\\2", selection_coefficient)
+
+  CI <- window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e
+
+  # Append values to the lists
+  selection_model_names <- c(selection_model_names,formatted_selection_coefficient_labels)
+  selection_model_avg_values <- c(selection_model_avg_values, window_H_e_causative_variant_tables[[selection_coefficient]]$Estimated_Mean_Population_H_e)
+  selection_model_lower_ci <- c(selection_model_lower_ci, CI[1])
+  selection_model_upper_ci <- c(selection_model_upper_ci, CI[2])
+}
+
+# Extract neutral model values and CI bounds
+neutral_avg_H_e_5th_percentile <- H_e_5th_percentiles_Neutral_model[["Estimated_Mean_H_e_5th_percentile"]]
+neutral_lower_ci <- H_e_5th_percentiles_Neutral_model[["SE_CI_Estimated_Mean_H_e_5th_percentile"]][1]
+neutral_upper_ci <- H_e_5th_percentiles_Neutral_model[["SE_CI_Estimated_Mean_H_e_5th_percentile"]][2]
+
+# Combine all values into a data frame
+H_e_values <- data.frame(
+  Model = c(selection_model_names, "Neutral"),
+  H_e = c(selection_model_avg_values, neutral_avg_H_e_5th_percentile),
+  Lower_CI = c(selection_model_lower_ci, neutral_lower_ci),
+  Upper_CI = c(selection_model_upper_ci, neutral_upper_ci)
+)
+
+# Format all numeric values to have the number of decimals defined by H_e_values_decimals
+H_e_values$H_e <- round(H_e_values$H_e,H_e_values_decimals)
+H_e_values$Lower_CI <- as.numeric(round(H_e_values$Lower_CI,H_e_values_decimals))
+H_e_values$Upper_CI <- as.numeric(round(H_e_values$Upper_CI,H_e_values_decimals))
+
+# # Update the Model column for selection models
+H_e_values$Model[1:length(selection_model_names)] <- selection_model_names
+
+# Extract labels for the different selection coefficients
+selection_labels <- gsub(".*_(s\\d+)_.*", "\\1", selection_model_names)
+# H_e_values$Model[1:length(selection_model_names)] <- selection_labels
+
+
+# Add a new column 'under_selection' to the data frame
+H_e_values$Under_Selection <- ifelse(H_e_values$H_e < neutral_lower_ci, "Yes", "No")
+
+# Filter the rows where 'under_selection' is 'Yes' and exclude 'Neutral'
+Causative_windows_under_selection <- subset(H_e_values, Under_Selection == "Yes" & Model != "Neutral")
+Causative_windows_under_selection <- Causative_windows_under_selection[, -which(names(Causative_windows_under_selection) == "Under_Selection")]
+
+# Sort the results table based on H_e
+H_e_values_sorted <- H_e_values[order(as.numeric(H_e_values$H_e)), ]
+
+
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("Causative_windows_under_selection",".csv", sep = ""))
+
+# Write data to CSV file without quotes
+write.table(H_e_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
+
+# Print the table using knitr::kable()
+knitr::kable(H_e_values_sorted, row.names = FALSE)
+
+```
+
+
 #### 4.1.1.1 Extracting Hotspots under selection
 ```{r echo = FALSE,warning = FALSE}
 # Initialize an empty list to store the new table
 hotspot_under_selection_H_e_table <- list()
+
+# If no Hotspot is under selection, then display all hotspots instead
+if (nrow(under_selection_rows) == 0) {
+  under_selection_rows <- Selection_testing_results
+}
+
 
 # Loop through each row in under_selection_rows
 for (i in 1:nrow(under_selection_rows)) {
@@ -1769,35 +2224,196 @@ for (i in 1:nrow(under_selection_rows)) {
   # Initialize a subtable for the current ROH-hotspot window
   subtable <- list()
   
-  # Loop through each selection coefficient
-  for (j in seq_along(Selection_Strength_test_results_tables)) {
-    # Get the selection coefficient and its corresponding table
-    selection_coefficient <- names(Selection_Strength_test_results_tables)[j]
-    table <- Selection_Strength_test_results_tables[[j]]
-    
-    # Extract the filename and the fifth percentile H_e threshold
-    filename <- table$file_name
-    fifth_percentile_H_e_threshold <- table$fifth_percentile_H_e_threshold
-    
-    if( fifth_percentile_H_e_threshold < fifth_percentile_H_e_neutral_model) {
-    
-    # Create a subtable for the current selection coefficient
-    subtable[[selection_coefficient]] <- list(
-      fifth_percentile_H_e_threshold = fifth_percentile_H_e_threshold
-    )
-    }
-  }
+  # Remove the 'Under_Selection' column from the table
+  subtable <- Causative_windows_under_selection
+
+
+  # # Loop through each selection coefficient
+  # for (j in seq_along(Selection_Strength_test_results_tables)) {
+  #   # Get the selection coefficient and its corresponding table
+  #   selection_coefficient <- names(Selection_Strength_test_results_tables)[j]
+  #   table <- Selection_Strength_test_results_tables[[j]]
+  #   
+  #   # Extract the filename and the fifth percentile H_e threshold
+  #   filename <- table$file_name
+  #   fifth_percentile_H_e_threshold <- table$fifth_percentile_H_e_threshold
+  #   
+  #   if( fifth_percentile_H_e_threshold < fifth_percentile_H_e_neutral_model) {
+  #   
+  #   # Create a subtable for the current selection coefficient
+  #   subtable[[selection_coefficient]] <- list(
+  #     fifth_percentile_H_e_threshold = fifth_percentile_H_e_threshold
+  #   )
+  #   }
+  # }
+  
+  # Create a list with table name and corresponding data frame
+  table_info <- list(Hotspot_Avg_H_e = Hotspot_Avg_H_e, coefficient_data = subtable)
+  
+
   
   # Add the subtable for the current ROH-hotspot window to the new table
-  hotspot_under_selection_H_e_table[[current_window]] <- subtable
-  hotspot_under_selection_H_e_table[[current_window]]$Hotspot_Avg_H_e <- Hotspot_Avg_H_e
+  hotspot_under_selection_H_e_table[[current_window]] <- c(hotspot_under_selection_H_e_table[[current_window]],table_info)
+  # hotspot_under_selection_H_e_table[[current_window]]$Hotspot_Avg_H_e <- Hotspot_Avg_H_e
 }
 
 
-
 # View the new table
-# #View(hotspot_under_selection_H_e_table)
+# View(hotspot_under_selection_H_e_table)
 ```
+
+
+
+
+
+ *** Behöver bootstrap av 5th percentiles från neutral model
+```{r echo = FALSE,warning = FALSE}
+# # Remove the empirical model from the plotting data
+# plotting_data <- F_ROH_values[F_ROH_values$Model != "Empirical", ]
+# 
+# # Add a column indicating whether the empirical F_ROH is within the CI of each model
+# empirical_F_ROH <- empirical_avg_F_ROH
+# plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_F_ROH) & (plotting_data$Upper_CI >= empirical_F_ROH)
+# 
+# # Create the plot
+# p <- ggplot(plotting_data, aes(x = Model, y = F_ROH, color = Empirical_Within_CI)) +
+#   geom_point(size = 3) +
+#   geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
+#   geom_hline(aes(yintercept = empirical_F_ROH), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
+#   labs(title = "F_ROH Values and Confidence Intervals by Model",
+#        x = "Model",
+#        y = "F_ROH",
+#        color = "Empirical F_ROH\nwithin CI",
+#        linetype = "Empirical F_ROH") +
+#   scale_linetype_manual(name = "Empirical F_ROH", values = c("dashed")) +
+#   scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+#   scale_y_continuous(limits = c(min(plotting_data$Lower_CI), max(plotting_data$Upper_CI)), 
+#                      breaks = round(seq(min(plotting_data$Lower_CI), max(plotting_data$Upper_CI), length.out = 10), 5))
+# 
+# # Print the plot
+# print(p)
+# 
+# # Print which models the empirical F_ROH is inside of
+# inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
+# outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
+# 
+# cat("Models where empirical F_ROH is within CI:\n")
+# print(inside_models)
+# cat("\nModels where empirical F_ROH is outside CI:\n")
+# print(outside_models)
+
+```
+
+
+
+# Hotspot - Causative Window - Comparison 
+```{r ,echo = FALSE,warning = FALSE}
+# Initialize an empty data frame to store the results
+results_df <- data.frame()
+
+hotspot_lengths_mb <- c()
+hotspot_names <- c()
+hotspot_avg_roh_freq <- c()
+
+for (i in seq_along(empirical_hotspot_tables)) {
+hotspot_name <- names(empirical_hotspot_tables)[i]
+
+if (hotspot_name %in% under_selection_rows$Name) {
+  hotspot_length <- empirical_hotspot_tables[[i]][["Hotspot_length_Mb"]]
+  hotspot_avg_freq <- empirical_hotspot_tables[[i]][["Avg_frequency"]]
+  hotspot_lengths_mb <- c(hotspot_lengths_mb,hotspot_length)
+  hotspot_names <- c(hotspot_names,hotspot_name)
+  hotspot_avg_roh_freq <- c(hotspot_avg_roh_freq,hotspot_avg_freq)
+
+  
+} else {
+}
+
+
+}
+
+# Scaling to percentage
+hotspot_avg_roh_freq <- 100*hotspot_avg_roh_freq
+
+selection_coefficient_variant_windows_length_mb <- causative_variant_window_results_df$Avg_Length_Mb
+selection_coefficient_variant_windows_avg_freq <- causative_variant_window_results_df$Avg_window_freq
+selection_coefficient_name <- causative_variant_window_results_df$Selection_coefficient
+
+
+
+# hotspot_lengths_mb
+# hotspot_names
+# hotspot_avg_roh_freq
+
+# Combine all values into a data frame
+Hotspots_and_Causative_windows_comparison <- data.frame(
+  Model = c(hotspot_names,selection_coefficient_name),
+  Lengths_Mb = c(hotspot_lengths_mb, selection_coefficient_variant_windows_length_mb),
+  Avg_ROH_Freq = c(hotspot_avg_roh_freq,selection_coefficient_variant_windows_avg_freq)
+)
+
+Hotspots_and_Causative_windows_comparison$Avg_ROH_Freq <- round(Hotspots_and_Causative_windows_comparison$Avg_ROH_Freq,ROH_frequency_decimals)
+
+# Sort the data frame based on average fixation time, in descending order
+Hotspots_and_Causative_windows_comparison_sorted <- Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$Lengths_Mb), ]
+
+
+
+kable(Hotspots_and_Causative_windows_comparison_sorted, row.names = FALSE)
+# View(causative_variant_window_results_df)
+
+
+```
+# Visualizing and scaling
+```{r, echo = FALSE,warning = FALSE}
+# Function to normalize a vector
+min_max_normalization_fun <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
+
+# Normalize Lengths_Mb and Avg_ROH_Freq
+Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb_Normalized <- min_max_normalization_fun(Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb)
+Hotspots_and_Causative_windows_comparison_sorted$Avg_ROH_Freq_Normalized <- min_max_normalization_fun(Hotspots_and_Causative_windows_comparison_sorted$Avg_ROH_Freq)
+
+
+# Modify the labels by removing "Hotspot_" prefix and "_window" suffix from hotspot models
+Hotspots_and_Causative_windows_comparison_sorted$Label <- ifelse(
+  grepl("Hotspot", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  gsub("Hotspot_|_window", "", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  Hotspots_and_Causative_windows_comparison_sorted$Model
+)
+
+# Create a new column for identifying the type
+Hotspots_and_Causative_windows_comparison_sorted$Type <- ifelse(
+  grepl("Hotspot", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  "Hotspot", 
+  "Selection Coefficient"
+)
+
+plot_title <- paste("Length And Average ROH % Comparison - ROH Hotspots & Causative Windows")
+
+# Create the scatter plot with ggplot2
+p <- ggplot(Hotspots_and_Causative_windows_comparison_sorted, aes(x = Lengths_Mb_Normalized, y = Avg_ROH_Freq_Normalized)) +
+  geom_point(aes(color = Type), size = 3) +                # Use 'Type' for color mapping
+  scale_color_manual(values = c("Hotspot" = "red", "Selection Coefficient" = "blue")) + 
+  labs(title = plot_title,
+       x = "Normalized Lengths",
+       y = "Normalized Mean ROH Frequency",
+       color = "Type") +                                  # Legend title
+  theme_minimal() +
+  theme(legend.position = "top") +                         # Position legend at the top
+  geom_text(aes(label = Label), vjust = -1, size = 3)      # Add text labels with modified labels
+
+print(p)
+# # Save the plot with specified dimensions
+# ggsave("Hotspots_and_Selection_Coefficients_plot.png", plot = p, width = 10, height = 8)
+
+```
+
+
+
 
 # 5 Visualizing Expected Heterozygoisty 
 
@@ -1808,24 +2424,25 @@ for (i in 1:nrow(under_selection_rows)) {
 # Function to generate plot for each hotspot
 generate_plot <- function(hotspot_name, empirical_value) {
   # Remove the empirical model from the plotting data
-  plotting_data <- H_e_5th_percentile_values[H_e_5th_percentile_values$Model != "Empirical", ]
-  
+  # plotting_data <- H_e_5th_percentile_values[H_e_5th_percentile_values$Model != "Empirical", ]
+  plotting_data <- Causative_windows_under_selection
   # Add a column indicating whether the empirical H_e is within the CI of each model
   plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_value) & (plotting_data$Upper_CI >= empirical_value)
+  cat(plotting_data$Empirical_Within_CI)
   
   # Determine the y-axis limits
   min_y <- min(c(plotting_data$Lower_CI, empirical_value))
   max_y <- max(c(plotting_data$Upper_CI, empirical_value))
   
   # Create the plot
-  p <- ggplot(plotting_data, aes(x = Model, y = H_e_5th_percentile, color = Empirical_Within_CI)) +
+  p <- ggplot(plotting_data, aes(x = Model, y = H_e, color = Empirical_Within_CI)) +
     geom_point(size = 3) +
     geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
     geom_hline(aes(yintercept = empirical_value), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
-    labs(title = paste("H_e 5th % and CI for", hotspot_name),
+    labs(title = paste("Avg H_e % and CI for", hotspot_name),
          x = "Model",
-         y = "H_e 5th percentile",
-         color = "Hotspot H_e 5th %\nwithin CI",
+         y = "H_e",
+         color = "Hotspot Avg H_e %\nwithin CI",
          linetype = "Empirical H_e") +
     scale_linetype_manual(name = "Empirical H_e", values = c("dashed")) +
     scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
@@ -1864,81 +2481,87 @@ for (i in 1:nrow(Selection_testing_results)) {
 
 
 ```{r echo = FALSE,warning = FALSE}
-# Initialize empty vectors to store selection coefficients and thresholds
-selection_labels <- c()
-thresholds <- c()
-
-# Extract selection coefficients and thresholds from the first hotspot data
-hotspot_name <- names(hotspot_under_selection_H_e_table)[1]
-hotspot_data <- hotspot_under_selection_H_e_table[[hotspot_name]]
-
-# Extract selection coefficient names and fifth percentile H_e thresholds
-selection_coefficients <- names(hotspot_data)[-length(hotspot_data)]  # Exclude the Hotspot_Avg_H_e entry
-
-for (coef in selection_coefficients) {
-  selection_labels <- c(selection_labels, gsub(".*_(s\\d+)_.*", "\\1", coef))
-  thresholds <- c(thresholds, hotspot_data[[coef]]$fifth_percentile_H_e_threshold)
-}
-
-# Create a dataframe with selection coefficients and thresholds
-selection_table <- data.frame(
-  Selection_Coefficient = selection_labels,
-  H_e_Threshold = as.numeric(thresholds)
-)
-
-# Print the table using knitr::kable()
-knitr::kable(selection_table, row.names = FALSE)
+# # Initialize empty vectors to store selection coefficients and thresholds
+# selection_labels <- c()
+# thresholds <- c()
+# 
+# # Extract selection coefficients and thresholds from the first hotspot data
+# hotspot_name <- names(hotspot_under_selection_H_e_table)[1]
+# hotspot_data <- hotspot_under_selection_H_e_table[[hotspot_name]]
+# 
+# # Extract selection coefficient names and fifth percentile H_e thresholds
+# selection_model_names <- names(hotspot_data)[-length(hotspot_data)]  # Exclude the Hotspot_Avg_H_e entry
+# 
+# for (selection_model_name in selection_model_names) {
+#   # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
+# formatted_selection_coefficient_label <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_model_name)
+#   
+#   selection_labels <- c(selection_labels,formatted_selection_coefficient_label)
+#   
+#   thresholds <- c(thresholds, hotspot_data[[selection_model_name]]$fifth_percentile_H_e_threshold)
+# }
+# 
+# # Create a dataframe with selection coefficients and thresholds
+# selection_table <- data.frame(
+#   Selection_Coefficient = selection_labels,
+#   H_e_Threshold = as.numeric(thresholds)
+# )
+# 
+# # Print the table using knitr::kable()
+# knitr::kable(selection_table, row.names = FALSE)
 ```
 
 
 
 ```{r echo = FALSE,warning = FALSE}
-library(ggplot2)
 
-# H_e_hotspot_visualization creates a visualization of the H_e distribution of the different selection coefficients, in comparison to each ROH-hotspot 
-H_e_hotspot_visualization <- function(hotspot_name, hotspot_data) {
-  
-  # Extract the Hotspot_Avg_H_e value
-  hotspot_avg_H_e <- hotspot_data$Hotspot_Avg_H_e
-  
-  # Extract selection coefficient names and fifth percentile H_e thresholds
-  selection_coefficients <- names(hotspot_data)[-length(hotspot_data)]  # Exclude the Hotspot_Avg_H_e entry
-  
-  thresholds <- sapply(hotspot_data[-length(hotspot_data)], function(x) x$fifth_percentile_H_e_threshold)
-  
-  # Extract labels for the different selection coefficients
-  selection_labels <- gsub(".*_(s\\d+)_.*", "\\1", selection_coefficients)
-  
-  # Create a dataframe with selection coefficients and thresholds
-  df <- data.frame(
-    Selection_Coefficient = selection_labels,
-    H_e = thresholds
-  )
-  
-  # Plot the visualization
-  p <- ggplot(df, aes(x = Selection_Coefficient, y = H_e)) +
-    geom_point(size = 3, color = "blue") +
-    geom_hline(yintercept = hotspot_avg_H_e, linetype = "dashed", color = "red", size = 1) +
-    geom_text(aes(x = 1, y = hotspot_avg_H_e, label = paste("Hotspot Avg H_e =", round(hotspot_avg_H_e, 5))), 
-              color = "red", hjust = -0.1, vjust = -1) +
-    labs(title = paste("5th percentile of the extreme H_e values", hotspot_name),
-         x = "Selection Coefficient",
-         y = "H_e Value") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  
-  return(p)
-}
-
-# Analyze and visualize each ROH hotspot independently
-for (hotspot_name in names(hotspot_under_selection_H_e_table)) {
-  cat("\nHotspot Name:", hotspot_name, "\n")
-  
-  hotspot_data <- hotspot_under_selection_H_e_table[[hotspot_name]]
-  plot <- H_e_hotspot_visualization(hotspot_name, hotspot_data)
-  print(plot)
-}
+# # H_e_hotspot_visualization creates a visualization of the H_e distribution of the different selection coefficients, in comparison to each ROH-hotspot 
+# H_e_hotspot_visualization <- function(hotspot_name, hotspot_data) {
+#   
+#   # Extract the Hotspot_Avg_H_e value
+#   hotspot_avg_H_e <- hotspot_data$Hotspot_Avg_H_e
+#   
+#   # Extract selection coefficient names and fifth percentile H_e thresholds
+#   selection_coefficients <- names(hotspot_data)[-length(hotspot_data)]  # Exclude the Hotspot_Avg_H_e entry
+#   
+#   thresholds <- sapply(hotspot_data[-length(hotspot_data)], function(x) x$fifth_percentile_H_e_threshold)
+#   
+#   # Extract labels for the different selection coefficients
+#   selection_labels <- gsub(".*_(s\\d+)_.*", "\\1", selection_coefficients)
+#   
+#   # Create a dataframe with selection coefficients and thresholds
+#   df <- data.frame(
+#     Selection_Coefficient = selection_labels,
+#     H_e = thresholds
+#   )
+#   
+#   # Plot the visualization
+#   p <- ggplot(df, aes(x = Selection_Coefficient, y = H_e)) +
+#     geom_point(size = 3, color = "blue") +
+#     geom_hline(yintercept = hotspot_avg_H_e, linetype = "dashed", color = "red", size = 1) +
+#     geom_text(aes(x = 1, y = hotspot_avg_H_e, label = paste("Hotspot Avg H_e =", round(hotspot_avg_H_e, 5))), 
+#               color = "red", hjust = -0.1, vjust = -1) +
+#     labs(title = paste("5th percentile of the extreme H_e values", hotspot_name),
+#          x = "Selection Coefficient",
+#          y = "H_e Value") +
+#     theme_minimal() +
+#     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#   
+#   return(p)
+# }
+# 
+# # Analyze and visualize each ROH hotspot independently
+# for (hotspot_name in names(hotspot_under_selection_H_e_table)) {
+#   cat("\nHotspot Name:", hotspot_name, "\n")
+#   
+#   hotspot_data <- hotspot_under_selection_H_e_table[[hotspot_name]]
+#   plot <- H_e_hotspot_visualization(hotspot_name, hotspot_data)
+#   print(plot)
+# }
 
 
 
 ```
+
+
+

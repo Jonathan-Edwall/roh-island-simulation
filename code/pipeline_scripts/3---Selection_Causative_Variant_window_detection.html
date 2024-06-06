@@ -386,7 +386,7 @@ filename &lt;- basename(input_pop_roh_freq_file)
 prefix &lt;- strsplit(filename, &quot;_ROH_freq.bed&quot;)[[1]][1]
 # Output the prefix
 print(prefix)</code></pre>
-<pre><code>## [1] &quot;sim_5_selection_model_s08_chr3&quot;</code></pre>
+<pre><code>## [1] &quot;sim_9_selection_model_s08_chr3&quot;</code></pre>
 <pre class="r"><code>input_selection_coefficient_variant_positions_file &lt;- Sys.getenv(&quot;input_selection_coefficient_variant_positions_file&quot;)
 
 chr_simulated &lt;- Sys.getenv(&quot;chr_simulated&quot;)
@@ -429,7 +429,7 @@ Variant_positions_table &lt;- read.table(input_selection_coefficient_variant_pos
 # Check if the output_sim_files_basename already exists in the file
 existing_row_index &lt;- which(Variant_positions_table$V1 == prefix)
 existing_row_index</code></pre>
-<pre><code>## [1] 5</code></pre>
+<pre><code>## [1] 9</code></pre>
 <pre class="r"><code>if (length(existing_row_index) &gt; 0) {
     variant_position_bp &lt;- Variant_positions_table$V2[existing_row_index]
 } else {
@@ -437,7 +437,7 @@ existing_row_index</code></pre>
 }
 
 variant_position_bp</code></pre>
-<pre><code>## [1] 48699219</code></pre>
+<pre><code>## [1] 36630315</code></pre>
 <pre class="r"><code># Find row where data$V1 = 
 
  # then: variant_pos = $V2 of that row.</code></pre>
@@ -446,7 +446,7 @@ variant_position_bp</code></pre>
 <h1>2: Locate window with causative variant</h1>
 <pre class="r"><code># Read the data without treating &quot;#&quot; as a comment
 Pop_roh_freq_table &lt;- read.table(input_pop_roh_freq_file, header = TRUE, sep = &quot;\t&quot;, comment.char = &quot;&quot;)
-View(Pop_roh_freq_table)
+#View(Pop_roh_freq_table)
 # Assigning column names
 colnames(Pop_roh_freq_table) &lt;- c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;COUNT&quot;, &quot;FREQUENCY&quot;)
 
@@ -463,7 +463,7 @@ if (nrow(row_with_variant_chr) == 0) {
 # Display the row
 print(row_with_variant_chr)</code></pre>
 <pre><code>##      CHR     POS1     POS2 COUNT FREQUENCY
-## 2573   3 48600001 48700000     0         0</code></pre>
+## 2453   3 36600001 36700000    62  0.885714</code></pre>
 </div>
 <div id="find-causative-variant-window" class="section level1">
 <h1>3: Find Causative variant window</h1>
@@ -500,7 +500,7 @@ incorporate_windows_to_causative_window &lt;- function(start_index, direction) {
 incorporate_windows_to_causative_window(variant_row_index, -1)  # Look backwards
 incorporate_windows_to_causative_window(variant_row_index, 1)   # Look forwards
 
-View(causative_variant_window_table)
+#View(causative_variant_window_table)
 
 # Sort the data frame based on F_ROH column
 causative_variant_window_table_sorted &lt;- causative_variant_window_table[order(as.numeric(causative_variant_window_table$POS1)), ]
@@ -509,53 +509,39 @@ causative_variant_window_table_sorted &lt;- causative_variant_window_table[order
 # Display the variant window table
 print(causative_variant_window_table_sorted)</code></pre>
 <pre><code>##      CHR     POS1     POS2 COUNT FREQUENCY
-## 2548   3 46100001 46200000     0         0
-## 2549   3 46200001 46300000     0         0
-## 2550   3 46300001 46400000     0         0
-## 2551   3 46400001 46500000     0         0
-## 2552   3 46500001 46600000     0         0
-## 2553   3 46600001 46700000     0         0
-## 2554   3 46700001 46800000     0         0
-## 2555   3 46800001 46900000     0         0
-## 2556   3 46900001 47000000     0         0
-## 2557   3 47000001 47100000     0         0
-## 2558   3 47100001 47200000     0         0
-## 2559   3 47200001 47300000     0         0
-## 2560   3 47300001 47400000     0         0
-## 2561   3 47400001 47500000     0         0
-## 2562   3 47500001 47600000     0         0
-## 2563   3 47600001 47700000     0         0
-## 2564   3 47700001 47800000     0         0
-## 2565   3 47800001 47900000     0         0
-## 2566   3 47900001 48000000     0         0
-## 2567   3 48000001 48100000     0         0
-## 2568   3 48100001 48200000     0         0
-## 2569   3 48200001 48300000     0         0
-## 2570   3 48300001 48400000     0         0
-## 2571   3 48400001 48500000     0         0
-## 2572   3 48500001 48600000     0         0
-## 2573   3 48600001 48700000     0         0
-## 2574   3 48700001 48800000     0         0
-## 2575   3 48800001 48900000     0         0
-## 2576   3 48900001 49000000     0         0
-## 2577   3 49000001 49100000     0         0
-## 2578   3 49100001 49200000     0         0
-## 2579   3 49200001 49300000     0         0
-## 2580   3 49300001 49400000     0         0
-## 2581   3 49400001 49500000     0         0
-## 2582   3 49500001 49600000     0         0
-## 2583   3 49600001 49700000     0         0
-## 2584   3 49700001 49800000     0         0
-## 2585   3 49800001 49900000     0         0
-## 2586   3 49900001 50000000     0         0
-## 2587   3 50000001 50100000     0         0
-## 2588   3 50100001 50200000     0         0</code></pre>
-<pre class="r"><code>View(causative_variant_window_table_sorted)
+## 2446   3 35900001 36000000    62  0.885714
+## 2447   3 36000001 36100000    62  0.885714
+## 2448   3 36100001 36200000    62  0.885714
+## 2449   3 36200001 36300000    62  0.885714
+## 2450   3 36300001 36400000    62  0.885714
+## 2451   3 36400001 36500000    62  0.885714
+## 2452   3 36500001 36600000    62  0.885714
+## 2453   3 36600001 36700000    62  0.885714
+## 2454   3 36700001 36800000    62  0.885714
+## 2455   3 36800001 36900000    62  0.885714
+## 2456   3 36900001 37000000    62  0.885714
+## 2457   3 37000001 37100000    62  0.885714
+## 2458   3 37100001 37200000    62  0.885714
+## 2459   3 37200001 37300000    62  0.885714
+## 2460   3 37300001 37400000    62  0.885714
+## 2461   3 37400001 37500000    62  0.885714
+## 2462   3 37500001 37600000    62  0.885714
+## 2463   3 37600001 37700000    62  0.885714
+## 2464   3 37700001 37800000    62  0.885714
+## 2465   3 37800001 37900000    62  0.885714
+## 2466   3 37900001 38000000    62  0.885714
+## 2467   3 38000001 38100000    62  0.885714
+## 2468   3 38100001 38200000    62  0.885714
+## 2469   3 38200001 38300000    62  0.885714
+## 2470   3 38300001 38400000    62  0.885714
+## 2471   3 38400001 38500000    62  0.885714
+## 2472   3 38500001 38600000    62  0.885714</code></pre>
+<pre class="r"><code>#View(causative_variant_window_table_sorted)
 
 length_window &lt;- max(causative_variant_window_table_sorted$POS2) - min(causative_variant_window_table_sorted$POS1) + 1
 length_window_MB &lt;- length_window / (10^6)
 length_window_MB</code></pre>
-<pre><code>## [1] 4.1</code></pre>
+<pre><code>## [1] 2.7</code></pre>
 <pre class="r"><code># Define column names for the table
 
 column_names &lt;- c(&quot;#CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;COUNT&quot;, &quot;FREQUENCY&quot;)

@@ -232,21 +232,21 @@ for (CHR in unique(data$CHR)) {
   chr_data <- data[data$CHR == CHR, ]
   chr_merged_data <- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == CHR, ]
   
-  # Create scatter plot
-  p <- ggplot() +
-    geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = "ROH-segments"), alpha = 0.5) +
-    geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = "ROH hotspots"), alpha = 0.5) +
-    geom_hline(aes(yintercept = threshold, color = "ROH hotspot threshold"), linetype = "dashed") +
-    labs(title = paste("Scatter Plot for Chromosome", CHR),
-         x = "Position",
-         y = "FREQUENCY",
-         color = "Legend") +
-    scale_color_manual(values = c("ROH-segments" = "gray", "ROH hotspots" = "blue", "ROH hotspot threshold" = "red"),
-                       labels = c("ROH-segments" = "ROH-segments", "ROH hotspots" = "ROH hotspots", "ROH hotspot threshold" = "ROH hotspot threshold")) +
-    theme_minimal()
-  
-  # Print the plot
-  print(p)
+  # # Create scatter plot
+  # p <- ggplot() +
+  #   geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = "ROH-segments"), alpha = 0.5) +
+  #   geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = "ROH hotspots"), alpha = 0.5) +
+  #   geom_hline(aes(yintercept = threshold, color = "ROH hotspot threshold"), linetype = "dashed") +
+  #   labs(title = paste("Scatter Plot for Chromosome", CHR),
+  #        x = "Position",
+  #        y = "FREQUENCY",
+  #        color = "Legend") +
+  #   scale_color_manual(values = c("ROH-segments" = "gray", "ROH hotspots" = "blue", "ROH hotspot threshold" = "red"),
+  #                      labels = c("ROH-segments" = "ROH-segments", "ROH hotspots" = "ROH hotspots", "ROH hotspot threshold" = "ROH hotspot threshold")) +
+  #   theme_minimal()
+  # 
+  # # Print the plot
+  # print(p)
 }
 
 
