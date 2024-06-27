@@ -386,7 +386,7 @@ filename &lt;- basename(input_pop_roh_freq_file)
 prefix &lt;- strsplit(filename, &quot;_ROH_freq.bed&quot;)[[1]][1]
 # Output the prefix
 print(prefix)</code></pre>
-<pre><code>## [1] &quot;sim_9_selection_model_s08_chr3&quot;</code></pre>
+<pre><code>## [1] &quot;sim_7_selection_model_s08_chr3&quot;</code></pre>
 <pre class="r"><code>input_selection_coefficient_variant_positions_file &lt;- Sys.getenv(&quot;input_selection_coefficient_variant_positions_file&quot;)
 
 chr_simulated &lt;- Sys.getenv(&quot;chr_simulated&quot;)
@@ -429,7 +429,7 @@ Variant_positions_table &lt;- read.table(input_selection_coefficient_variant_pos
 # Check if the output_sim_files_basename already exists in the file
 existing_row_index &lt;- which(Variant_positions_table$V1 == prefix)
 existing_row_index</code></pre>
-<pre><code>## [1] 9</code></pre>
+<pre><code>## [1] 7</code></pre>
 <pre class="r"><code>if (length(existing_row_index) &gt; 0) {
     variant_position_bp &lt;- Variant_positions_table$V2[existing_row_index]
 } else {
@@ -437,7 +437,7 @@ existing_row_index</code></pre>
 }
 
 variant_position_bp</code></pre>
-<pre><code>## [1] 36630315</code></pre>
+<pre><code>## [1] 44053399</code></pre>
 <pre class="r"><code># Find row where data$V1 = 
 
  # then: variant_pos = $V2 of that row.</code></pre>
@@ -462,8 +462,8 @@ if (nrow(row_with_variant_chr) == 0) {
 
 # Display the row
 print(row_with_variant_chr)</code></pre>
-<pre><code>##      CHR     POS1     POS2 COUNT FREQUENCY
-## 2453   3 36600001 36700000    62  0.885714</code></pre>
+<pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY
+## 441   3 44000001 44100000   374  0.997333</code></pre>
 </div>
 <div id="find-causative-variant-window" class="section level1">
 <h1>3: Find Causative variant window</h1>
@@ -508,40 +508,36 @@ causative_variant_window_table_sorted &lt;- causative_variant_window_table[order
 
 # Display the variant window table
 print(causative_variant_window_table_sorted)</code></pre>
-<pre><code>##      CHR     POS1     POS2 COUNT FREQUENCY
-## 2446   3 35900001 36000000    62  0.885714
-## 2447   3 36000001 36100000    62  0.885714
-## 2448   3 36100001 36200000    62  0.885714
-## 2449   3 36200001 36300000    62  0.885714
-## 2450   3 36300001 36400000    62  0.885714
-## 2451   3 36400001 36500000    62  0.885714
-## 2452   3 36500001 36600000    62  0.885714
-## 2453   3 36600001 36700000    62  0.885714
-## 2454   3 36700001 36800000    62  0.885714
-## 2455   3 36800001 36900000    62  0.885714
-## 2456   3 36900001 37000000    62  0.885714
-## 2457   3 37000001 37100000    62  0.885714
-## 2458   3 37100001 37200000    62  0.885714
-## 2459   3 37200001 37300000    62  0.885714
-## 2460   3 37300001 37400000    62  0.885714
-## 2461   3 37400001 37500000    62  0.885714
-## 2462   3 37500001 37600000    62  0.885714
-## 2463   3 37600001 37700000    62  0.885714
-## 2464   3 37700001 37800000    62  0.885714
-## 2465   3 37800001 37900000    62  0.885714
-## 2466   3 37900001 38000000    62  0.885714
-## 2467   3 38000001 38100000    62  0.885714
-## 2468   3 38100001 38200000    62  0.885714
-## 2469   3 38200001 38300000    62  0.885714
-## 2470   3 38300001 38400000    62  0.885714
-## 2471   3 38400001 38500000    62  0.885714
-## 2472   3 38500001 38600000    62  0.885714</code></pre>
+<pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY
+## 433   3 43200001 43300000   342  0.912000
+## 434   3 43300001 43400000   342  0.912000
+## 435   3 43400001 43500000   342  0.912000
+## 436   3 43500001 43600000   342  0.912000
+## 437   3 43600001 43700000   374  0.997333
+## 438   3 43700001 43800000   374  0.997333
+## 439   3 43800001 43900000   374  0.997333
+## 440   3 43900001 44000000   374  0.997333
+## 441   3 44000001 44100000   374  0.997333
+## 442   3 44100001 44200000   374  0.997333
+## 443   3 44200001 44300000   374  0.997333
+## 444   3 44300001 44400000   340  0.906667
+## 445   3 44400001 44500000   345  0.920000
+## 446   3 44500001 44600000   345  0.920000
+## 447   3 44600001 44700000   343  0.914667
+## 448   3 44700001 44800000   343  0.914667
+## 449   3 44800001 44900000   343  0.914667
+## 450   3 44900001 45000000   357  0.952000
+## 451   3 45000001 45100000   357  0.952000
+## 452   3 45100001 45200000   357  0.952000
+## 453   3 45200001 45300000   357  0.952000
+## 454   3 45300001 45400000   357  0.952000
+## 455   3 45400001 45500000   357  0.952000</code></pre>
 <pre class="r"><code>#View(causative_variant_window_table_sorted)
 
 length_window &lt;- max(causative_variant_window_table_sorted$POS2) - min(causative_variant_window_table_sorted$POS1) + 1
 length_window_MB &lt;- length_window / (10^6)
 length_window_MB</code></pre>
-<pre><code>## [1] 2.7</code></pre>
+<pre><code>## [1] 2.3</code></pre>
 <pre class="r"><code># Define column names for the table
 
 column_names &lt;- c(&quot;#CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;COUNT&quot;, &quot;FREQUENCY&quot;)

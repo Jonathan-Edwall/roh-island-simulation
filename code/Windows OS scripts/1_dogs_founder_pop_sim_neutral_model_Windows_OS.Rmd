@@ -1,0 +1,531 @@
+---
+title: "Founder population simulation for Dogs (Neutral Model) in AlphaSimR"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3  
+date: "2024-05-03"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# 0: Preparation
+
+## Defining the output directory & the chromosome to be simulated
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+knitr::opts_chunk$set(echo = TRUE)
+
+
+
+####################################  
+# Defining the working directory
+#################################### 
+
+# Set the path to your GitHub folder
+YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
+
+# Defining the relative path in the repository
+repository_path <- "Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations"
+
+output_dir_simulation <- file.path(YOUR_GITHUB_ROOT_DIRECTORY, repository_path,"data/raw/simulated/neutral_model")
+
+
+if (!dir.exists(output_dir_simulation)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_dir_simulation)
+}
+
+# Set the working directory for notebook chunks
+knitr::opts_knit$set(root.dir = output_dir_simulation)
+
+#################################### 
+# Defining Input parameters
+#################################### 
+# min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
+
+
+chr_simulated <- "chr1"
+# Extract the chromosome number and convert and convert it to numeric
+chr_number <- as.numeric(sub("chr", "", chr_simulated))
+
+# N_e_burn_in <- 50
+N_e_burn_in <- 200
+nInd_founder_population <- 50
+
+Inbred_ancestral_population <- as.logical("FALSE")
+
+N_e_bottleneck <- 50
+
+n_generations_bottleneck <- 19
+
+n_generations_random_mating <- 80
+
+n_indv_breed_formation <- 425
+
+Ref_pop_snp_chip <- "last_breed_formation_generation"
+introduce_mutations <- as.logical("FALSE")
+
+snp_density_Mb <- 91.23
+snp_density_Mb
+
+
+#################################### 
+# Defining the output files
+#################################### 
+
+
+# Define the chromosome to be simulated
+chr_simulated <- "chr3"
+
+# Define the base name for the output .map & .ped PLINK files
+output_sim_files_basename <- paste0("Neutral_simulation_", chr_simulated)
+
+
+# # Verify the current working directory
+#getwd()
+```
+
+## Loading libraries
+
+```{r library()}
+library(AlphaSimR)
+library(knitr)
+
+
+#library(dplyr)
+#library(ggplot2)
+#library(patchwork)
+#library(purrr)
+#library(tibble)
+
+```
+
+# 1: Creating founder Haplotypes
+
+## 1.0: Defining chromosome lengths of model species
+
+```{r}
+# Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
+# which can be found through this link:
+# https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
+
+chromosome_lengths_bp <- c(
+"chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178	, "chr5" = 89562946, 
+"chr6" = 78113029	, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054, 
+"chr11" = 74805798, "chr12" = 72970719, "chr13" = 64299765, "chr14" = 61112200, "chr15" = 64676183, 
+"chr16" = 60362399, "chr17" = 65088165, "chr18" = 56472973, "chr19" = 55516201, "chr20" = 58627490, 
+"chr21" = 51742555, "chr22" = 61573679, "chr23" = 53134997, "chr24" = 48566227, "chr25" = 51730745, 
+"chr26" = 39257614, "chr27" = 46662488, "chr28" = 41733330, "chr29" = 42517134, "chr30" = 40643782, 
+"chr31" = 39901454, "chr32" = 40225481, "chr33" = 32139216, "chr34" = 42397973, "chr35" = 28051305, 
+"chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098	
+)
+
+
+
+```
+
+## 1.1: runMacs2() - Generating founder population
+
+`runMacs2` Parameters:
+
+-   nInd = 100: 100 individuals in the founder population
+
+-   nChr = 1: Haplotypes are created for 1 chromosome per individual
+
+-   Ne = 2500: Effective population size: 2500 (Ne)
+
+-   bp: base pair length of chromosome
+
+-   genLen = 1: Genetic length of chromosome in Morgans, set as 1.
+
+-   HistNe = NULL: No effective population size defined from previous
+    generations (histNe = NULL)
+
+-   histGen = NULL: If HistNe was defined, this parameter would define
+    the number of generations ago we had the Ne defined in HistNe
+
+```{r runMacs2()}
+help(runMacs2)
+
+model_chromosome_bp_length <- chromosome_lengths_bp[chr_simulated]
+
+
+founderGenomes <- runMacs2(nInd = nInd_founder_population ,
+                     nChr = 1,
+                     Ne = N_e_burn_in,
+                     bp = model_chromosome_bp_length,
+                     inbred = Inbred_ancestral_population,
+                     genLen = 1,
+                     histNe = NULL,
+                     histGen = NULL)
+
+# Inspecting the founderGenomes object
+founderGenomes
+
+```
+
+## 1.2: SimParam() - Setting Global Simulation Parameters
+
+```{r SimParam()}
+
+help(SimParam)
+
+# Creating a new Simparam object & Assigning the founder population population to it
+SP <- SimParam$new(founderGenomes) 
+# SP
+
+```
+
+
+
+### 1.2.1: \$setTrackRec() - Setting on recombination tracking for the simulation
+
+Sets recombination tracking for the simulation. By default recombination
+tracking is turned off. **When turned on recombination tracking will
+also turn on pedigree tracking.**
+
+**Recombination tracking keeps records of all individuals created,**
+except those created by hybridCross, because their pedigree is not
+tracked.
+
+```{r SimParam$setTrackRec()}
+SP$setTrackRec(TRUE)
+```
+
+## 1.3: newPop() - Creating two separate populations for bottleneck event
+
+```{r newPop()}
+# Generate the initial founder population
+founderpop <- newPop(founderGenomes, simParam = SP)
+# # Set misc used for setting years of birth for the first individuals
+# current_generation = 0
+# founderpop = setMisc(x = founderpop,
+#                    node = "generation",
+#                    value = current_generation)
+# head(getMisc(x = founderpop, node = "generation"))
+
+
+# Split the founder population into two breeding groups
+# breed1_founders <- founderpop # 1:50
+breed1_founders <- founderpop[1:N_e_bottleneck] # 1:50
+cat("Population 1:\n")
+breed1_founders
+
+# breed2_founders <- founderpop[51:100]
+# breed2_founders
+
+```
+
+# 2: Forward in time simulation
+
+## 2.0: Defining Random Mating function (random_mating) - randCross()
+`randCross()` simulates random mating.
+
+-   **nCrosses**-argument specifies how many times an individual in the
+    population can be a parent. In this case, an individual can only be
+    a parent once (random mating)
+
+-   **nProgeny**-argument specifies how many progeny's each mating pair
+    can have. In this case, this parameter is set at 1 progeny per
+    mating pair.
+
+-   **simParam**-argument specifies the global simulation parameters
+```{r}
+random_mating_bottleneck <- function(pop, SP, n_gen,introduce_mutations) {
+    n_ind <- pop@nInd # Extracting number of individuals in the current population
+    generations <- vector(length = n_gen + 1,
+                          mode = "list") 
+    generations[[1]] <- pop # The initial breeding group population gets stored as the first element
+    
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
+    # Each mating Progenys are generated using randcross
+    for (gen_ix in 2:(n_gen + 1)) {
+        generations[[gen_ix]] <- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_ind, nProgeny = 1,
+                                           simParam = SP)
+        # Introducing mutations
+        if (introduce_mutations == TRUE) {
+          generations[[gen_ix]] <- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
+        }
+
+    }
+     random_mating_generations <- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
+    
+    return(random_mating_generations)
+}
+
+random_mating_breed_formation <- function(pop, SP, n_gen,n_indv_breed_formation,introduce_mutations) {
+    # n_indv_breed_formation <- pop@nInd # Extracting number of individuals in the current population    
+    generations <- vector(length = n_gen + 1,
+                          mode = "list") 
+    generations[[1]] <- pop # The initial breeding group population gets stored as the first element
+    
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
+    # Each mating Progenys are generated using randcross
+    for (gen_ix in 2:(n_gen + 1)) {
+        generations[[gen_ix]] <- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_indv_breed_formation, nProgeny = 1,
+                                           simParam = SP)
+        # Introducing mutations
+        if (introduce_mutations == TRUE) {
+          generations[[gen_ix]] <- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
+        }
+
+    }
+    
+     random_mating_generations <- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
+     # return(random_mating_generations)
+     
+     final_generation <- generations[[n_gen + 1]] # Returning only the final generation
+
+    
+    return(final_generation)
+}
+```
+
+
+## 2.1: Bottleneck Simulation 
+
+### 2.1.1 Simulating 5 generations of bottleneck (Random Mating)
+
+```{r}
+
+# Simulating random mating within each breeding group for 5 generations
+breed1_bottleneck <- random_mating_bottleneck(breed1_founders, SP, n_generations_bottleneck,introduce_mutations)
+# breed2_bottleneck <- random_mating_bottleneck(breed2_founders, SP, n_generations_bottleneck)
+
+```
+
+### 2.1.2 Extracting the final bottleneck generation
+```{r}
+# Viewing the output
+
+# founders
+founderpop
+breed1_bottleneck
+
+
+# Extracting final generation:
+last_bottleneck_generation <- breed1_bottleneck[[n_generations_bottleneck]]
+
+cat("Extracting the final generation from the Bottleneck Scenario")
+last_bottleneck_generation
+```
+## 2.2: Adding SNPs to the last bottleneck generation - SimParam\$addSnpChip() 
+`SP$addSnpChip()` Randomly assigns eligible SNPs to a SNP chip.
+
+**nSnpPerChr**-argument that assigns for each individuals n SNPs for
+each chromsome, where n is the user-specified number.
+
+**minSnpFreq**-argument sets the Minimum Allele Frequency (MAF) allowed
+for each marker. For instance, setting minSnpFreq = 0.05 ensures that
+all markers will have MAF \>= 0.05
+
+**refPop**-argument specifies which population will be genotyped. In
+this case, it will be the last_bottleneck_generation after the simulated population
+bottleneck scenario.
+
+```{r SimParam$addSnpChip()}
+
+model_chromosome_Mb_length <- model_chromosome_bp_length / (10^6)
+
+num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
+# Convert to the closest integer
+num_snp_markers_simulated_chromosome <- round(num_snp_markers_simulated_chromosome)
+num_snp_markers_simulated_chromosome
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_bottleneck_generation
+#   )
+
+# Check if Ref_pop_snp_chip is equal to last_bottleneck_generation
+if (Ref_pop_snp_chip == "last_bottleneck_generation") {
+  SP$addSnpChip(nSnpPerChr = num_snp_markers_simulated_chromosome,
+    refPop = last_bottleneck_generation
+  )
+}
+# nSnpPerChr = num_snp_markers_simulated_chromosome,
+
+
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   refPop = last_bottleneck_generation
+#   )
+
+
+```
+
+
+
+## 2.3 Modern dog breed - Ranom Mating Simulation
+### 2.3.1 Simulating 40 generations of Random Mating (Random Mating)
+```{r}
+# random_mating_generations <- random_mating_breed_formation(last_bottleneck_generation, SP, n_generations_random_mating,n_indv_breed_formation,introduce_mutations)
+# 
+# # Extracting the final random mating generation:
+# last_random_mating_generation <- random_mating_generations[[n_generations_random_mating]]
+
+last_random_mating_generation <- random_mating_breed_formation(last_bottleneck_generation, SP, n_generations_random_mating,n_indv_breed_formation,introduce_mutations)
+
+
+# Check if Ref_pop_snp_chip is equal to "last_breed_formation_generation"
+if (Ref_pop_snp_chip == "last_breed_formation_generation") {
+  SP$addSnpChip(nSnpPerChr = num_snp_markers_simulated_chromosome,
+  refPop = last_random_mating_generation
+  )
+  
+}
+
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   refPop = last_random_mating_generation
+#   )
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_random_mating_generation
+#   )
+
+
+```
+
+
+
+
+
+# 3: Export to PLINK Extracting data to PLINK
+
+## 3.0.1: Optional: pullSnpGeno() - Retrieves a list of the existing marker id:s (SNP id:s)
+
+Function that retrieves SNP genotype data & returns a matrix of SNP
+genotypes
+
+```{r pullSnpGeno(), echo = FALSE}
+#pullSnpGeno(last_random_mating_generation,simParam=SP)
+```
+
+## 3.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map
+
+Function that retrieves the genetic map for a given SNP chip & returns a
+data.frame with:
+
+-   **id:** Unique identifier for the marker (SNP)
+
+-   **chr:** Chromosome containing the SNP
+
+-   **site:** Segregating site on the chromosome
+
+-   **pos:** Genetic map position
+
+```{r getSnPMap()}
+# SP$addSnpChip(5)
+# getSnpMap(snpChip=1,simParam=SP) 
+
+#getSnpMap(simParam=SP)
+
+cat("First 10 markers and their genetic map positions:\n")
+kable(head(getSnpMap(simParam = SP), 10))
+#head(getSnpMap(simParam = SP), 10)
+
+
+```
+
+## 3.1: writePlink()
+
+**Description** Function that inputs a Pop-class & exports it to PLINK
+PED and MAP files.
+
+The arguments for this function were chosen for consistency with
+RRBLUP2. **The base pair coordinate will the locus position as stored in
+AlphaSimR** & not an actual base pair position, because AlphaSimR
+doesn’t track base pair positions, **only relative positions for the
+loci used in the simulation**.
+
+\*\* Usage \*\* writePlink( pop, baseName, traits = 1, use = "pheno",
+snpChip = 1, useQtl = FALSE, simParam = NULL, ... )
+
+**Arguments:**
+
+-   **pop** an object of Pop-class
+
+-   **baseName** basename for PED and MAP files.
+
+-   **traits** an integer indicating the trait to write, a trait name,
+    or a function of the traits returning a single value.
+
+-   **use** what to use for PLINK’s phenotype field. Either phenotypes
+    "pheno", genetic values "gv", estimated breeding values "ebv",
+    breeding values "bv", or random values "rand".
+
+-   **snpChip** an integer indicating which SNP chip genotype to use
+    useQtl should QTL genotypes be used instead of a SNP chip.
+
+    ```         
+       -    If TRUE, snpChip specifies which trait’s QTL to use, and thus these QTL may not match the QTL underlying the phenotype supplied in traits.
+    ```
+
+-   **simParam** an object of SimParam ... additional arguments if using
+    a function for traits
+
+```{r}
+# Setting the directory where the .map and .ped files will be stored in
+setwd(output_dir_simulation)
+
+writePlink(last_random_mating_generation,simParam=SP, baseName=output_sim_files_basename,
+           
+            traits = 1,
+           use = "rand"
+           
+           
+           )
+```
+
+# 4: Convert distances to basepair in the .map file
+
+```{r}
+# Setting the working directory as the output directory
+setwd(output_dir_simulation)
+
+# Read PLINK files into R objects
+ped_file <- paste0(output_sim_files_basename, '.ped')
+map_file <- paste0(output_sim_files_basename, '.map')
+ped_data <- read.table(ped_file)
+map_data <- read.table(map_file)
+
+# ¤¤¤¤¤ .map-file Column 1: Changing to correct chromosome ¤¤¤¤¤
+# Change the first column of the .map file to ensure that the correct chromosome number is used
+map_data$V1 <- chr_number
+
+# ¤¤¤¤¤ .map-file Column 2: Changing the SNP IDs to refer to correct chromosome ¤¤¤¤¤
+# Changing the SNP_Ids (second column) so their prefix indicate the correct chromosome number, otherwise 
+# It  will seem like they all belong to chromosome 1, like "1_21".
+# (will be useful if you would simulate more chromosomes in the future)
+map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
+
+
+# ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
+genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column) 
+base_pair_position_column <- round(genetic_distance_morgan_column * (model_chromosome_bp_length / 100))
+# Redefining the physical position column (4th column) with the new values defined in base_pair_position_column
+map_data$V4 <- base_pair_position_column
+
+
+
+write.table(map_data, file = map_file, sep = "\t", row.names = FALSE, col.names = FALSE,quote = FALSE)
+
+#col.names = FALSE: Removes the header.
+#quote = FALSE: Removes quotation marks from values.
+
+
+cat("Showing the first 10 rows of the new .map file:\n")
+kable(head(map_data, 10))
+
+```

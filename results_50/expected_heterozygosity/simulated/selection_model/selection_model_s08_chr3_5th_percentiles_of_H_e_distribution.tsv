@@ -1,21 +1,21 @@
-Simulation	Fifth_Percentile
-Simulation 1	0
-Simulation 2	0
-Simulation 3	0
-Simulation 4	0
-Simulation 5	0
-Simulation 6	0
-Simulation 7	0
-Simulation 8	0
-Simulation 9	0
-Simulation 10	0
-Simulation 11	0
-Simulation 12	0
-Simulation 13	0
-Simulation 14	0
-Simulation 15	0
-Simulation 16	0
-Simulation 17	0
-Simulation 18	0
-Simulation 19	0
-Simulation 20	0
+Simulation	Fifth_Percentile	Avg_H_e
+Simulation 8	0.0544	0.31874814733771
+Simulation 2	0.0582	0.314651388443018
+Simulation 3	0.0582	0.292292244742291
+Simulation 6	0.0582	0.334778742268041
+Simulation 10	0.0582	0.334276821405545
+Simulation 14	0.0582	0.297466993464052
+Simulation 15	0.05868	0.313542393364929
+Simulation 9	0.07122	0.34582153894081
+Simulation 17	0.07308	0.300265178701678
+Simulation 12	0.0768	0.3369891996337
+Simulation 11	0.07747	0.317105631469979
+Simulation 7	0.07953	0.344384021358543
+Simulation 1	0.095	0.330021437037037
+Simulation 13	0.095	0.33650568627451
+Simulation 20	0.095	0.325410455153949
+Simulation 4	0.1095	0.354586970825574
+Simulation 5	0.111	0.315205873655914
+Simulation 19	0.11191	0.309429087719298
+Simulation 18	0.1128	0.350269352226721
+Simulation 16	0.1302	0.320221086956522

@@ -1,0 +1,2 @@
+Chr	NeBurnIn	nInd	InbredFo	NeBottleneck	nGenBottleneck	nGenBreed	nBreed	SNPchipRefPop	Mutations	Sim_H_e	Sim_H_e_5th_perc	Sim_F_ROH	Sim_ROH_hotspot_thr	Sim_Cost_Result
+chr3	250	50	TRUE	30	5	30	375	last_breed_formation_generation	TRUE	0.18664	0.04471	0.223	0.463	0.68103

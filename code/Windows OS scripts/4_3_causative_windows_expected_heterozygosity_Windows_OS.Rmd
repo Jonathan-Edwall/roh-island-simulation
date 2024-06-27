@@ -1,0 +1,426 @@
+---
+title: "Selective sweep test expected heterozygosity"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3   # Adjust depth as needed
+date: "2024-04-19"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
+# 0: Preparation
+
+## Defining the input and output directories
+
+```{r}
+# Clean the working environment
+rm(list = ls())
+
+knitr::opts_chunk$set(echo = TRUE)
+
+####################################  
+# Parameters
+#################################### 
+# use_MAF_pruning <- TRUE
+use_MAF_pruning <- FALSE
+min_MAF <- 0.05
+
+####################################  
+
+
+
+
+# Set the path to your GitHub folder
+YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
+
+# Defining the relative path in the repository
+repository_path <- file.path(YOUR_GITHUB_ROOT_DIRECTORY,"Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations")
+
+# results_dir <- file.path(repository_path,"results")
+results_dir <- file.path(repository_path,"results_50")
+# results_dir <- file.path(repository_path,"fifty")
+
+
+####################################  
+# Defining the input files
+#################################### 
+
+selection_model_causative_variant_windows_dir <- file.path(results_dir,"causative_variant_windows")
+
+causative_windows_allele_freq_dir <- file.path(selection_model_causative_variant_windows_dir,"allele_freq")
+
+
+selection_model_genomewide_allele_freq_dir <- file.path(results_dir,"PLINK/allele_freq/simulated/selection_model")
+simulated_null_model_allele_freq_dir <- file.path(results_dir,"PLINK/allele_freq/simulated/neutral_model")
+sim_scenario_id <- "neutral_model_chr3"
+
+
+####################################  
+# Defining the working directory
+#################################### 
+
+
+
+causative_variant_windows_selection_strength_testing_results_dir <- file.path(selection_model_causative_variant_windows_dir,"selection_strength_test")
+
+
+
+expected_heterozygosity_results_dir <- file.path(results_dir,"expected_heterozygosity")
+
+output_causative_variant_H_e_dir <- file.path(selection_model_causative_variant_windows_dir,"H_e")
+if (!dir.exists(output_causative_variant_H_e_dir)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_causative_variant_H_e_dir,recursive = TRUE)
+}
+
+
+
+```
+
+## Loading libraries
+
+```{r library()}
+library(knitr)
+```
+
+# Loading in Causative variant windows
+```{r}
+setwd(selection_model_causative_variant_windows_dir)
+# Pattern for finding files containing "causative_variant_window" and ending with ".bed"
+pattern <- ".*causative_variant_window.*\\.bed$"
+selection_model_causative_variant_window_files <- list.files(path = selection_model_causative_variant_windows_dir, pattern = pattern)
+
+# Extract simulation numbers from the filename
+sim_number_pattern <- ".*sim_(\\d+)_.*" 
+sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", selection_model_causative_variant_window_files))
+sim_name <- sub("^(.*?)_causative_variant_window.*", "\\1", selection_model_causative_variant_window_files)
+
+
+# Preallocate sim_info as an empty data frame
+sim_info <- data.frame(sim_name = character(), simulation_number = numeric(), file_name = character(), stringsAsFactors = FALSE)
+
+# Combine simulation name, number, and file name
+sim_info <- data.frame(sim_name = sim_name, simulation_number = sim_numbers, file_name =selection_model_causative_variant_window_files)
+sim_info <- sim_info[order(sim_info$simulation_number), ]
+
+# Initialize an empty list to store the selection model tables
+causative_variant_window_tables_Selection_Model <- list()
+
+# Loop through each sorted .tsv file
+for (i in 1:length(sim_info$sim_name)) {
+  # Get the file name
+  file <- sim_info$file_name[i]
+  # Extract simname from the file name
+  simname_from_file <- sub("^(.*?)_causative_variant_window.*", "\\1", file)
+  
+  # Check if the simname from the file matches with the simname from the dataframe
+  if (simname_from_file != sim_info$sim_name[i]) {
+    print(paste0("simname_from_file:", simname_from_file))
+    print(paste0("sim_info$sim_name[i]:", sim_info$sim_name[i]))
+    stop("Error: Simname from file does not match with simname from dataframe.")
+  }
+  
+  
+  # Read the header line
+  con <- file(file, "r")
+  header <- readLines(con, n = 1)
+  close(con)
+
+  # Remove "#" from the header
+  clean_header <- gsub("^#", "", header)
+  
+  #separator_causative_variant_window_file <- " "
+  separator_causative_variant_window_file <- "\t"
+
+  
+  # Split the cleaned header into column names
+  column_names <- strsplit(clean_header, separator_causative_variant_window_file)[[1]]
+
+  
+  # # Read the .tsv frequency file into a data frame
+  causative_variant_window_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names,sep = separator_causative_variant_window_file)
+  
+  min_freq <- min(causative_variant_window_data[["FREQUENCY"]])
+  max_freq <- max(causative_variant_window_data[["FREQUENCY"]])
+  average_freq <- mean(causative_variant_window_data[["FREQUENCY"]])
+  causative_variant_window_data[["FREQUENCY"]]
+  
+  
+  # Add simulation_number as an attribute to the data frame
+  sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
+  attr(causative_variant_window_data, "Simulation_number") <- sim_num
+  
+  # Extract the selection scenario from the file name
+  selection_scenario <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", file)
+
+  # Check if the selection coefficient already exists in the list
+  if (!(selection_scenario %in% names(causative_variant_window_tables_Selection_Model))) {
+    # If it doesn't exist, create a list for it
+    causative_variant_window_tables_Selection_Model[[selection_scenario]] <- list()
+  }
+  
+  
+  # Extract selection coefficent from the selection scenario
+  selection_coefficient <- sub("^.*_(s\\d+_chr\\d+)$", "\\1", selection_scenario)
+  
+  
+  # Create a list with table name and corresponding data frame
+  table_info <- list(Sim_name = simname_from_file, filename = file,causative_window_data = causative_variant_window_data)  # Added ROH_Hotspot_threshold here
+  
+  # Append the table info to the list under selection_scenario
+  causative_variant_window_tables_Selection_Model[[selection_scenario]] <- c(causative_variant_window_tables_Selection_Model[[selection_scenario]], list(table_info))
+  
+
+  
+  
+  
+  
+  
+}
+
+View(causative_variant_window_tables_Selection_Model)
+
+```
+#: Expected heterozygosity
+
+Takes a list of H_e for a window and computes H_e for each SNP individually
+
+```{r}
+calculate_expected_heterozygosity <- function(p) {
+  # Calculate expected heterozygosity
+  heterozygosity <- 2 * p * (1 - p)
+  
+  # Return the result
+  return(heterozygosity)
+}
+
+```
+
+
+
+# 2: Loading Allele frequenceis and computing Expected Heterozygosity for each position
+
+## 2.1 Selection Data
+
+### 2.1.1: Causative Variant Windows
+
+```{r}
+# Set the working directory to the directory with allele frequencies for the different ROH-hotspots
+setwd(causative_windows_allele_freq_dir)
+
+# Get a list of all .bed files in the directory
+bed_files <- list.files(pattern = "\\.bed$")
+
+# Extract simulation numbers from the filename
+sim_number_pattern <- ".*sim_(\\d+)_.*"
+
+sim_name_pattern <- "^(.*)\\.tsv$"
+
+
+sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", bed_files))
+sim_name <- sub("^(.*?)_causative_variant_window.*", "\\1", bed_files)
+
+# Combine simulation name, number, and file name
+sim_info <- data.frame(sim_name = sim_name, file_name =bed_files, stringsAsFactors = FALSE)
+
+# Initialize a counter for windows without markers
+no_marker_count <- 0
+
+# Loop through each .bed file
+for (i in 1:length(sim_info$sim_name)) {
+  
+  # Get the file name
+  file <- sim_info$file_name[i]
+  full_path <- file.path(causative_windows_allele_freq_dir,file)
+  simname_from_file <- sim_info$sim_name[i]
+  
+  # Read the header line
+  con <- file(full_path, "r")
+  header <- readLines(con, n = 1)
+  close(con)
+  
+  # Remove "#" from the header and split it into column names
+  column_names <- sub("#", "", header)
+  column_names <- strsplit(column_names, "\t")[[1]]
+
+  
+
+  # Read the .bed allele freq file into a data frame
+  causative_variant_allele_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
+  
+    # Check if pruning markers by MAF should be done
+  if (use_MAF_pruning == TRUE) {
+    
+    # Remove rows where MAF < min_MAF
+    causative_variant_allele_freq_data <- causative_variant_allele_freq_data[causative_variant_allele_freq_data$MAF >= min_MAF, ]
+  }
+  
+  causative_variant_allele_freq_data$H_e <- sapply(causative_variant_allele_freq_data$MAF, calculate_expected_heterozygosity)
+
+  
+  
+  
+
+  # Add simulation_number as an attribute to the data frame
+  sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
+  attr(causative_variant_allele_freq_data, "Simulation_number") <- sim_num
+  # attr(causative_variant_not_fixated_count, "Simulation_number") <- sim_num
+  
+  # Extract the selection scenario from the file name
+  selection_scenario <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", file)
+
+   # Extract the selection coefficient from the file name
+  selection_coefficient <- sub("^.*_(s\\d+_chr\\d+).*$", "\\1", file)
+  
+  
+  # Computing expected heterozygosity for each position:
+  window_H_e_list <- c()  # Initialize an empty list to store expected heterozygosity values
+  H_e_data <- c()  # Initialize an empty list to store expected heterozygosity values
+  
+
+  # Reading in the relevant causative window from  causative_variant_window_tables_Selection_Model
+  causative_window_data <- causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]][["causative_window_data"]]
+  
+  # Initialize a new column to store MAF lists
+  causative_window_data$MAF_list <- vector("list", nrow(causative_window_data))
+
+  
+  # Loop through each 100kbp window for the causative window
+  for (j in seq_len(nrow(causative_window_data))) {
+
+    genomic_window_start <- causative_window_data[j, "POS1"]
+
+    genomic_window_end <- causative_window_data[j, "POS2"]
+    
+    H_e_list_current_100kbp_window <- c()
+    
+    # Subset markers within the current genomic window
+    markers_in_window <- causative_variant_allele_freq_data[
+      causative_variant_allele_freq_data$POS1 >= genomic_window_start & causative_variant_allele_freq_data$POS1 <= genomic_window_end,
+
+      ]
+    
+    if (nrow(markers_in_window) > 0) {
+      # Computed the average expected heterozygosity for the current window
+      causative_window_data[j, "H_e"] <- mean(markers_in_window$H_e)
+      # Store the list of MAF values in the new column
+      causative_window_data$MAF_list[[j]] <- markers_in_window$MAF
+
+      
+
+    } else {
+            # Increment the counter for windows without markers
+      no_marker_count <- no_marker_count + 1
+      
+      # Skip this window by setting its H_e to NA
+      causative_window_data[j, "H_e"] <- NA
+      causative_window_data$MAF_list[[j]] <- list()
+    }
+
+    
+
+    
+  }
+  
+ # Calculate and store the average heterozygosity for the current simulation
+  causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]][["allele_freq_data"]] <- causative_variant_allele_freq_data
+  causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]][["causative_window_data"]] <- causative_window_data
+  causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]]$Avg_He <- mean(causative_window_data$H_e, na.rm = TRUE)
+  
+  
+  
+
+}
+
+# sim_scenario_to_follow <- "selection_model_s01_chr3"
+sim_scenario_to_follow <- "selection_model_s08_chr3"
+sim_id_to_follow <- 1
+
+markers_after_MAF_pruning <- nrow(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"])
+cat("Markers in the causative window after pruning, for simulation ",sim_id_to_follow,"of the ",sim_scenario_to_follow,": ",markers_after_MAF_pruning,"\n")
+
+markers_with_he_01_or_less <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"] < 0.1])
+cat("% markers with H_e <= 0.1:\n", round((markers_with_he_01_or_less/markers_after_MAF_pruning)*100 , 1), "\n")
+
+fixated_markers <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"] == 0])
+
+cat("% fixated markers with H_e = 0:\n", round((fixated_markers/markers_after_MAF_pruning)*100 , 1), "\n")
+
+
+```
+```{r}
+# sim_scenario_to_follow <- "selection_model_s01_chr3"
+sim_scenario_to_follow <- "selection_model_s08_chr3"
+sim_id_to_follow <- 1
+
+Windows_after_MAF_pruning <- nrow(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"])
+cat("100kbp Windows in the causative window after pruning, for simulation ",sim_id_to_follow,"of the ",sim_scenario_to_follow,": ",Windows_after_MAF_pruning,"\n")
+
+Windows_with_he_01_or_less <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"] < 0.1])
+cat("% 100kbp Windows with H_e <= 0.1:\n", round((Windows_with_he_01_or_less/Windows_after_MAF_pruning)*100 , 1), "\n")
+
+fixated_Windows <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"] == 0])
+
+cat("% fixated 100kbp Windows with H_e = 0:\n", round((fixated_Windows/Windows_after_MAF_pruning)*100 , 1), "\n")
+```
+
+
+```{r}
+# Calculate overall statistics for each selection coefficient
+for (selection_scenario in names(causative_variant_window_tables_Selection_Model)) {
+  
+  
+  # Extract all tables for the current selection scenario
+  tables <- causative_variant_window_tables_Selection_Model[[selection_scenario]]
+
+  # Calculate average length in bp
+  all_causative_variant_windows_H_e_average <- unlist(lapply(tables, function(table) table$Avg_He))
+
+
+  # Store the calculated values back into the main list
+  causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_H_e_causative_window <- mean(all_causative_variant_windows_H_e_average, na.rm = TRUE)
+  
+  
+  ##### Store the results in a file #####
+  # Initialize an empty data frame to store the results
+  results_df <- data.frame(Sim_name = character(), Avg_He = numeric(), stringsAsFactors = FALSE)
+  
+  # Get the list for the given selection scenario
+  simulation_list <- causative_variant_window_tables_Selection_Model[[selection_scenario]]
+  
+  # Iterate through each sublist, excluding the last one, and extract the information
+  for (i in 1:(length(simulation_list) - 1)) {
+    data <- simulation_list[[i]]
+    sim_name <- data$Sim_name
+    avg_he <- data$Avg_He
+    results_df <- rbind(results_df, data.frame(Sim_name = sim_name, Avg_He = avg_he, stringsAsFactors = FALSE))
+  }  
+  colnames(results_df) <- c("Sim_name", "Avg_He")
+  
+  formatted_average_H_e <- round(causative_variant_window_tables_Selection_Model[[selection_scenario]]$Avg_H_e_causative_window,3)
+  
+
+  # Define the filename with the output directory path
+  # filename <- file.path(output_causative_variant_H_e_dir, paste(selection_scenario,"_avg_H_e_",formatted_average_H_e,".tsv", sep = ""))
+  filename <- file.path(output_causative_variant_H_e_dir, paste(selection_scenario,"_avg_H_e_",".tsv", sep = ""))
+
+
+  
+  # Write the data frame to a .tsv file
+  write.table(results_df, file = filename , sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+  
+  
+  
+  
+  
+}
+
+
+
+
+View(causative_variant_window_tables_Selection_Model)
+
+```

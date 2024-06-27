@@ -207,22 +207,22 @@ for (CHR in unique(data$CHR)) {
   # Subset data for the current chromosome
   chr_data <- data[data$CHR == CHR, ]
   chr_merged_data <- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == CHR, ]
-  
-  # Create scatter plot
-  p <- ggplot() +
-    geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = "ROH-segments"), alpha = 0.5) +
-    geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = "ROH hotspots"), alpha = 0.5) +
-    geom_hline(aes(yintercept = threshold, color = "ROH hotspot threshold"), linetype = "dashed") +
-    labs(title = paste("Scatter Plot for Chromosome", CHR),
-         x = "Position",
-         y = "FREQUENCY",
-         color = "Legend") +
-    scale_color_manual(values = c("ROH-segments" = "gray", "ROH hotspots" = "blue", "ROH hotspot threshold" = "red"),
-                       labels = c("ROH-segments" = "ROH-segments", "ROH hotspots" = "ROH hotspots", "ROH hotspot threshold" = "ROH hotspot threshold")) +
-    theme_minimal()
-  
-  # Print the plot
-  print(p)
+
+  # # Create scatter plot
+  # p <- ggplot() +
+  #   geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = "ROH-segments"), alpha = 0.5) +
+  #   geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = "ROH hotspots"), alpha = 0.5) +
+  #   geom_hline(aes(yintercept = threshold, color = "ROH hotspot threshold"), linetype = "dashed") +
+  #   labs(title = paste("Scatter Plot for Chromosome", CHR),
+  #        x = "Position",
+  #        y = "FREQUENCY",
+  #        color = "Legend") +
+  #   scale_color_manual(values = c("ROH-segments" = "gray", "ROH hotspots" = "blue", "ROH hotspot threshold" = "red"),
+  #                      labels = c("ROH-segments" = "ROH-segments", "ROH hotspots" = "ROH hotspots", "ROH hotspot threshold" = "ROH hotspot threshold")) +
+  #   theme_minimal()
+  # 
+  # # Print the plot
+  # print(p)
 }
 
 
@@ -277,16 +277,14 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   filename <- file.path(output_dir_roh_hotspots_freq, paste(prefix,"_CHR", Chromosome, "_ROH_Hotspot_freq.tsv", sep = ""))
   # Create the directory if it doesn't exist
   dir.create(dirname(filename), recursive = TRUE, showWarnings = FALSE)
-    
-  # Write data to TSV file without quotes and with tab separation
-  write.table(chr_split_data, file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
   
-
+  # Check if the dataframe is not empty before writing to the file
+  if (nrow(chr_split_data) > 0) {
+    # Write data to TSV file without quotes and with tab separation
+    write.table(chr_split_data, file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
+  }
+  
 }
-
-
-
-
 ```
 
 ## 2.2: ROH-frequency into .tsv files (For all chr)
@@ -320,8 +318,13 @@ for (Chromosome in unique(data$CHR)) {
     # Define the filename with the output directory path
     filename <- file.path(output_dir_autosome_roh_freq, paste(prefix, "_CHR", Chromosome, "_ROH_freq", "_threshold_", formatted_threshold, ".tsv", sep = ""))
     
-    # Write data to TSV file without quotes and with tab separation
-    write.table(split_data[[Chromosome]], file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
+    # Check if the dataframe is not empty before writing to the file
+    if (nrow(split_data[[Chromosome]]) > 0) {
+      # Write data to TSV file without quotes and with tab separation
+      write.table(split_data[[Chromosome]], file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
+    }
+    
+    
   } else {
     # Print message indicating no non-zero counts for the chromosome
     print(paste("Skipping chromosome",Chromosome,"due to no ROH-windows found on the chromosome"))
@@ -345,8 +348,12 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   # Define the filename with the output directory path
   filename <- file.path(output_dir_gapless_roh_hotspots, paste(prefix,"_CHR", Chromosome,"_ROH_Hotspot_gapless_windows.bed", sep = "")) 
   
-  # Write data to .bed file
-  write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
+  # Check if the dataframe is not empty before writing to the file
+  if (nrow(chr_data) > 0) {
+      # Write data to .bed file
+      write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
+    }
+
   
   # Print message indicating successful export
   cat("Exported", nrow(chr_data), "hotspot windows to", filename, "\n")
@@ -364,8 +371,13 @@ for (Chromosome in unique(linked_hotspot_windows$CHR)) {
   # Define the filename with the output directory path
   filename <- file.path(output_dir, paste(prefix,"_CHR", Chromosome,"_ROH_Hotspot_windows.bed", sep = "")) 
   
-  # Write data to .bed file
-  write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
+  # Check if the dataframe is not empty before writing to the file
+  if (nrow(chr_data) > 0) {
+    # Write data to .bed file
+    write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
+  }
+
+  
   
   # Print message indicating successful export
   cat("Exported", nrow(chr_data), "hotspot windows to", filename, "\n")

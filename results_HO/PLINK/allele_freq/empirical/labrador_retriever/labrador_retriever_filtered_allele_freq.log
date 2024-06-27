@@ -1,0 +1,26 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --allow-no-sex
+  --bfile /home/jonathan/data/preprocessed/empirical/labrador_retriever/labrador_retriever_filtered
+  --dog
+  --freq
+  --nonfounders
+  --out /home/jonathan/results/PLINK/allele_freq/empirical/labrador_retriever/labrador_retriever_filtered_allele_freq
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Wed Jun 26 14:28:25 2024
+
+Random number seed: 1719412105
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+201850 variants loaded from .bim file.
+222 dogs (135 males, 87 females) loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 222 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.997365.
+--freq: Allele frequencies (all samples) written to
+/home/jonathan/results/PLINK/allele_freq/empirical/labrador_retriever/labrador_retriever_filtered_allele_freq.frq
+.
+
+End time: Wed Jun 26 14:28:25 2024

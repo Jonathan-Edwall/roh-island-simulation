@@ -46,6 +46,7 @@ causative_windows_allele_freq_dir <- Sys.getenv("causative_windows_allele_freq_d
 
 output_causative_variant_H_e_dir <- Sys.getenv("output_causative_variant_H_e_dir")
 
+Sys.getenv()
 
 ```
 
@@ -158,18 +159,12 @@ for (i in 1:length(sim_info$sim_name)) {
 Takes a list of H_e for a window and computes H_e for each SNP individually
 
 ```{r}
-calculate_expected_heterozygosity <- function(p_list) {
+calculate_expected_heterozygosity <- function(p) {
+  # Calculate expected heterozygosity
+  heterozygosity <- 2 * p * (1 - p)
   
-  # Create an empty list to store heterozygosity values
-  heterozygosity_list <- vector("numeric", length(p_list))
-  
-  # Calculate expected heterozygosity for each p in p_list
-  for (i in seq_along(p_list)) {
-    heterozygosity_list[i] <- 2 * p_list[i] * (1 - p_list[i])
-  }
-  
-  # Return the list of heterozygosity values
-  return(heterozygosity_list)
+  # Return the result
+  return(heterozygosity)
 }
 
 ```
@@ -232,6 +227,8 @@ for (i in 1:length(sim_info$sim_name)) {
     # Remove rows where MAF < min_MAF
     causative_variant_allele_freq_data <- causative_variant_allele_freq_data[causative_variant_allele_freq_data$MAF >= min_MAF, ]
   }
+  
+  causative_variant_allele_freq_data$H_e <- sapply(causative_variant_allele_freq_data$MAF, calculate_expected_heterozygosity)
 
   
   
@@ -247,7 +244,6 @@ for (i in 1:length(sim_info$sim_name)) {
 
    # Extract the selection coefficient from the file name
   selection_coefficient <- sub("^.*_(s\\d+_chr\\d+).*$", "\\1", file)
-  
   
   
   # Computing expected heterozygosity for each position:
@@ -278,10 +274,7 @@ for (i in 1:length(sim_info$sim_name)) {
       ]
     
     if (nrow(markers_in_window) > 0) {
-      
-      # Computed expected heterozygosity for the markers found within the window
-      markers_in_window$H_e <- calculate_expected_heterozygosity(markers_in_window$MAF)
-      
+      # Computed the average expected heterozygosity for the current window
       causative_window_data[j, "H_e"] <- mean(markers_in_window$H_e)
       # Store the list of MAF values in the new column
       causative_window_data$MAF_list[[j]] <- markers_in_window$MAF
@@ -303,10 +296,46 @@ for (i in 1:length(sim_info$sim_name)) {
   }
   
  # Calculate and store the average heterozygosity for the current simulation
+  causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]][["allele_freq_data"]] <- causative_variant_allele_freq_data
   causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]][["causative_window_data"]] <- causative_window_data
   causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]]$Avg_He <- mean(causative_window_data$H_e, na.rm = TRUE)
+  
+  
+  
 
 }
+
+# # sim_scenario_to_follow <- "selection_model_s01_chr3"
+# sim_scenario_to_follow <- "selection_model_s08_chr3"
+# sim_id_to_follow <- 1
+# 
+# markers_after_MAF_pruning <- nrow(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"])
+# cat("Markers in the causative window after pruning, for simulation ",sim_id_to_follow,"of the ",sim_scenario_to_follow,": ",markers_after_MAF_pruning,"\n")
+# 
+# markers_with_he_01_or_less <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"] < 0.1])
+# cat("% markers with H_e <= 0.1:\n", round((markers_with_he_01_or_less/markers_after_MAF_pruning)*100 , 1), "\n")
+# 
+# fixated_markers <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["allele_freq_data"]]["H_e"] == 0])
+# 
+# cat("% fixated markers with H_e = 0:\n", round((fixated_markers/markers_after_MAF_pruning)*100 , 1), "\n")
+
+
+```
+
+```{r}
+# # sim_scenario_to_follow <- "selection_model_s01_chr3"
+# sim_scenario_to_follow <- "selection_model_s08_chr3"
+# sim_id_to_follow <- 1
+# 
+# Windows_after_MAF_pruning <- nrow(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"])
+# cat("100kbp Windows in the causative window after pruning, for simulation ",sim_id_to_follow,"of the ",sim_scenario_to_follow,": ",Windows_after_MAF_pruning,"\n")
+# 
+# Windows_with_he_01_or_less <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"] < 0.1])
+# cat("% 100kbp Windows with H_e <= 0.1:\n", round((Windows_with_he_01_or_less/Windows_after_MAF_pruning)*100 , 1), "\n")
+# 
+# fixated_Windows <- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][["causative_window_data"]]["H_e"] == 0])
+# 
+# cat("% fixated 100kbp Windows with H_e = 0:\n", round((fixated_Windows/Windows_after_MAF_pruning)*100 , 1), "\n")
 ```
 
 

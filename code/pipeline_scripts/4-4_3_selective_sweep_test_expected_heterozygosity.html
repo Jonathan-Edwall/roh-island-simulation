@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-05-13" />
+<meta name="date" content="2024-06-25" />
 
 <title>Selective sweep test expected heterozygosity</title>
 
@@ -343,7 +343,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Selective sweep test expected heterozygosity</h1>
-<h4 class="date">2024-05-13</h4>
+<h4 class="date">2024-06-25</h4>
 
 </div>
 
@@ -397,41 +397,60 @@ knitr::opts_chunk$set(echo = TRUE)
 # Parameters
 #################################### 
 
-# use_MAF_pruning &lt;- TRUE
-# # use_MAF_pruning &lt;- FALSE
-# min_MAF &lt;- 0.05
-
-min_MAF &lt;- as.numeric(Sys.getenv(&quot;min_MAF&quot;))
 use_MAF_pruning &lt;- Sys.getenv(&quot;use_MAF_pruning&quot;)
+use_MAF_pruning</code></pre>
+<pre><code>## [1] &quot;TRUE&quot;</code></pre>
+<pre class="r"><code>min_MAF &lt;- as.numeric(Sys.getenv(&quot;min_MAF&quot;))
+min_MAF</code></pre>
+<pre><code>## [1] 0.05</code></pre>
+<pre class="r"><code>empirical_dog_breed &lt;- Sys.getenv(&quot;empirical_dog_breed&quot;)
+empirical_dog_breed</code></pre>
+<pre><code>## [1] &quot;labrador_retriever&quot;</code></pre>
+<pre class="r"><code>H_e_decimals_plots &lt;- 3
 
 ####################################  
 # Defining the input files
 #################################### 
 
 ROH_hotspots_dir &lt;- Sys.getenv(&quot;ROH_hotspots_dir&quot;)
-ROH_hotspot_allele_freq_dir &lt;- Sys.getenv(&quot;empirical_roh_hotspots_allele_frequency_dir&quot;)
-
-empirical_genomewide_allele_freq_dir &lt;-  Sys.getenv(&quot;empirical_allele_frequency_dir&quot;)
-
-simulated_model_allele_freq_dir &lt;- Sys.getenv(&quot;simulated_model_allele_frequency_dir&quot;)
-
-sim_scenario_id &lt;- Sys.getenv(&quot;sim_scenario_id&quot;)
-
-sweep_test_type &lt;- Sys.getenv(&quot;sweep_test_type&quot;)
-
-
-
-output_dir_sweep_test &lt;- Sys.getenv(&quot;output_dir_sweep_test&quot;)
-
-output_empirical_H_e_dir &lt;- Sys.getenv(&quot;output_empirical_H_e_dir&quot;)
-output_simulated_model_H_e_dir &lt;- Sys.getenv(&quot;output_simulated_model_H_e_dir&quot;)
-
-
-Sys.getenv()  </code></pre>
+ROH_hotspots_dir</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results/ROH-Hotspots/empirical/labrador_retriever&quot;</code></pre>
+<pre class="r"><code>ROH_hotspot_allele_freq_dir &lt;- Sys.getenv(&quot;empirical_roh_hotspots_allele_frequency_dir&quot;)
+ROH_hotspot_allele_freq_dir</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results/ROH-Hotspots/empirical/labrador_retriever/hotspots_allele_freq&quot;</code></pre>
+<pre class="r"><code>empirical_genomewide_allele_freq_dir &lt;-  Sys.getenv(&quot;empirical_allele_frequency_dir&quot;)
+empirical_genomewide_allele_freq_dir</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results/PLINK/allele_freq/empirical/labrador_retriever&quot;</code></pre>
+<pre class="r"><code>simulated_model_allele_freq_dir &lt;- Sys.getenv(&quot;simulated_model_allele_frequency_dir&quot;)
+simulated_model_allele_freq_dir</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results/PLINK/allele_freq/simulated/selection_model&quot;</code></pre>
+<pre class="r"><code>sim_scenario_id &lt;- Sys.getenv(&quot;sim_scenario_id&quot;)
+sim_scenario_id</code></pre>
+<pre><code>## [1] &quot;selection_model_s08_chr3&quot;</code></pre>
+<pre class="r"><code>sweep_test_type &lt;- Sys.getenv(&quot;sweep_test_type&quot;)
+sweep_test_type</code></pre>
+<pre><code>## [1] &quot;Selection_Strength_testing&quot;</code></pre>
+<pre class="r"><code>output_dir_sweep_test &lt;- Sys.getenv(&quot;output_dir_sweep_test&quot;)
+output_dir_sweep_test</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results/ROH-Hotspots/selection_strength_test_MAF_0_05&quot;</code></pre>
+<pre class="r"><code>output_empirical_H_e_dir &lt;- Sys.getenv(&quot;output_empirical_H_e_dir&quot;)
+output_empirical_H_e_dir</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results/expected_heterozygosity_MAF_0_05/empirical/labrador_retriever&quot;</code></pre>
+<pre class="r"><code>output_simulated_model_H_e_dir &lt;- Sys.getenv(&quot;output_simulated_model_H_e_dir&quot;)
+output_simulated_model_H_e_dir</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results/expected_heterozygosity_MAF_0_05/simulated/selection_model&quot;</code></pre>
+<pre class="r"><code>Sys.getenv()  </code></pre>
 <pre><code>## _CE_CONDA               
 ## _CE_M                   
 ## _R_CHECK_COMPILATION_FLAGS_KNOWN_
 ##                         -Wformat -Werror=format-security -Wdate-time
+## causative_variant_H_e_dir
+##                         /home/jonathan/results/causative_variant_windows/H_e_MAF_0_05
+## causative_variant_windows_H_e_dir
+##                         /home/jonathan/results/causative_variant_windows/H_e_MAF_0_01
+## causative_windows_allele_freq_dir
+##                         /home/jonathan/results/causative_variant_windows/allele_freq
+## chr_simulated           chr3
 ## CONDA_DEFAULT_ENV       base
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3
@@ -441,12 +460,27 @@ Sys.getenv()  </code></pre>
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
 ## DISPLAY                 localhost:10.0
+## document_sub_title      N_e=375, MAF 0.01 used, but only for
+##                         H_E-computation
 ## EDITOR                  vi
 ## empirical_allele_frequency_dir
-##                         /home/jonathan/results/PLINK/allele_freq/empirical/german_shepherd
+##                         /home/jonathan/results/PLINK/allele_freq/empirical/labrador_retriever
+## Empirical_data_autosome_ROH_freq_dir
+##                         /home/jonathan/results/ROH-Hotspots/empirical/labrador_retriever/Gosling_plots/autosome_roh_freq
+## Empirical_data_F_ROH_dir
+##                         /home/jonathan/results/PLINK/ROH/empirical/labrador_retriever/F_ROH
+## Empirical_data_H_e_dir
+##                         /home/jonathan/results/expected_heterozygosity_MAF_0_01/empirical/labrador_retriever
+## Empirical_data_ROH_hotspots_dir
+##                         /home/jonathan/results/ROH-Hotspots/empirical/labrador_retriever
+## empirical_dog_breed     labrador_retriever
 ## empirical_roh_hotspots_allele_frequency_dir
-##                         /home/jonathan/results/ROH-Hotspots/empirical/german_shepherd/hotspots_allele_freq
+##                         /home/jonathan/results/ROH-Hotspots/empirical/labrador_retriever/hotspots_allele_freq
+## expected_heterozygosity_dir
+##                         /home/jonathan/results/expected_heterozygosity_MAF_0_05
 ## HOME                    /home/jonathan
+## Inbred_ancestral_population
+##                         TRUE
 ## LANG                    en_US.UTF-8
 ## LD_LIBRARY_PATH         /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server
 ## LESSCLOSE               /usr/bin/lesspipe %s %s
@@ -454,18 +488,44 @@ Sys.getenv()  </code></pre>
 ## LN_S                    ln -s
 ## LOGNAME                 jonathan
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
+## MAF_status_suffix       MAF_0_05
 ## MAKE                    make
 ## min_MAF                 0.05
 ## MOTD_SHOWN              pam
+## N_e_bottleneck          30
+## n_generations_bottleneck
+##                         5
+## n_individuals_breed_formation
+##                         375
+## n_simulated_generations_breed_formation
+##                         30
+## n_simulation_replicates
+##                         20
+## Ne_burn_in              250
+## Neutral_model_autosome_ROH_freq_dir
+##                         /home/jonathan/results/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq
+## Neutral_model_F_ROH_dir
+##                         /home/jonathan/results/PLINK/ROH/simulated/neutral_model/F_ROH
+## Neutral_model_H_e_dir   /home/jonathan/results/expected_heterozygosity_MAF_0_01/simulated/neutral_model
+## Neutral_model_ROH_hotspots_dir
+##                         /home/jonathan/results/ROH-Hotspots/simulated/neutral
+## nInd_founder_population
+##                         50
 ## OLDPWD                  /home/jonathan/code
-## output_dir_sweep_test   /home/jonathan/results/ROH-Hotspots/selection_strength_test
+## output_causative_variant_H_e_dir
+##                         /home/jonathan/results/causative_variant_windows/H_e_MAF_0_01
+## output_dir_sweep_test   /home/jonathan/results/ROH-Hotspots/selection_strength_test_MAF_0_05
 ## output_empirical_H_e_dir
-##                         /home/jonathan/results/expected_heterozygosity/empirical/german_shepherd
+##                         /home/jonathan/results/expected_heterozygosity_MAF_0_05/empirical/labrador_retriever
 ## output_simulated_model_H_e_dir
-##                         /home/jonathan/results/expected_heterozygosity/simulated/selection_model
+##                         /home/jonathan/results/expected_heterozygosity_MAF_0_05/simulated/selection_model
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-## PWD                     /home/jonathan/code/pipeline_scripts
+## Pipeline_results_output_dir
+##                         /home/jonathan/results/Pipeline_results_MAF_0_01
+## pruned_replicates_count_dir
+##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts
+## PWD                     /home/jonathan
 ## R_ARCH                  
 ## R_BROWSER               xdg-open
 ## R_BZIPCMD               /bin/bzip2
@@ -481,7 +541,7 @@ Sys.getenv()  </code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpVO4Hij
+## R_SESSION_TMPDIR        /tmp/RtmpORIPhf
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -489,25 +549,52 @@ Sys.getenv()  </code></pre>
 ## R_TEXI2DVICMD           /usr/bin/texi2dvi
 ## R_UNZIPCMD              /usr/bin/unzip
 ## R_ZIPCMD                /usr/bin/zip
-## ROH_hotspots_dir        /home/jonathan/results/ROH-Hotspots/empirical/german_shepherd
+## reference_population_for_snp_chip
+##                         last_breed_formation_generation
+## result_file_sub_title   N_e=375, MAF 0.05 used, but only for
+##                         H_E-computation
+## ROH_hotspots_dir        /home/jonathan/results/ROH-Hotspots/empirical/labrador_retriever
 ## SED                     /bin/sed
+## Selection_causative_variant_windows_dir
+##                         /home/jonathan/results/causative_variant_windows
+## Selection_model_autosome_ROH_freq_dir
+##                         /home/jonathan/results/ROH-Hotspots/simulated/selection/Gosling_plots/autosome_roh_freq
+## selection_model_causative_variant_windows_dir
+##                         /home/jonathan/results/causative_variant_windows
+## Selection_model_F_ROH_dir
+##                         /home/jonathan/results/PLINK/ROH/simulated/selection_model/F_ROH
+## Selection_model_H_e_dir
+##                         /home/jonathan/results/expected_heterozygosity_MAF_0_01/simulated/selection_model
+## Selection_model_ROH_hotspots_dir
+##                         /home/jonathan/results/ROH-Hotspots/simulated/selection
+## selection_simulation    TRUE
+## Selection_strength_test_dir
+##                         /home/jonathan/results/ROH-Hotspots/selection_strength_test_MAF_0_01
+## selection_strength_testing_results_dir
+##                         /home/jonathan/results/ROH-Hotspots/selection_strength_test_MAF_0_05
+## selection_testing_results_dir
+##                         /home/jonathan/results/ROH-Hotspots/sweep_test_MAF_0_05
 ## SHELL                   /bin/bash
 ## SHLVL                   2
 ## sim_scenario_id         selection_model_s08_chr3
 ## simulated_model_allele_frequency_dir
 ##                         /home/jonathan/results/PLINK/allele_freq/simulated/selection_model
-## SSH_CLIENT              172.21.30.31 63437 22
-## SSH_CONNECTION          172.21.30.31 63437 77.235.253.16 22
-## SSH_TTY                 /dev/pts/0
+## SSH_CLIENT              172.21.30.117 63234 22
+## SSH_CONNECTION          172.21.30.117 63234 77.235.253.16 22
+## SSH_TTY                 /dev/pts/7
+## Sweep_test_dir          /home/jonathan/results/ROH-Hotspots/sweep_test_MAF_0_01
 ## sweep_test_type         Selection_Strength_testing
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
-## use_MAF_pruning         FALSE
+## use_MAF_pruning         TRUE
 ## USER                    jonathan
+## variant_freq_plots_dir
+##                         /home/jonathan/data/raw/simulated/selection_model/variant_freq_plots
+## variant_position_dir    /home/jonathan/data/raw/simulated/selection_model/variant_position
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          10069
+## XDG_SESSION_ID          1937
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir_sweep_test)</code></pre>
@@ -602,18 +689,12 @@ for (file in ordered_hotspot_window_bed_files) {
 # View(empirical_hotspot_tables)</code></pre>
 <p>#: Expected heterozygosity</p>
 <p>Takes a list of H_e for a window and computes H_e for each SNP individually</p>
-<pre class="r"><code>calculate_expected_heterozygosity &lt;- function(p_list) {
+<pre class="r"><code>calculate_expected_heterozygosity &lt;- function(p) {
+  # Calculate expected heterozygosity
+  heterozygosity &lt;- 2 * p * (1 - p)
   
-  # Create an empty list to store heterozygosity values
-  heterozygosity_list &lt;- vector(&quot;numeric&quot;, length(p_list))
-  
-  # Calculate expected heterozygosity for each p in p_list
-  for (i in seq_along(p_list)) {
-    heterozygosity_list[i] &lt;- 2 * p_list[i] * (1 - p_list[i])
-  }
-  
-  # Return the list of heterozygosity values
-  return(heterozygosity_list)
+  # Return the result
+  return(heterozygosity)
 }</code></pre>
 </div>
 <div id="loading-the-frequency-files" class="section level1">
@@ -625,10 +706,11 @@ for (file in ordered_hotspot_window_bed_files) {
 <pre class="r"><code># Set the working directory to the directory with allele frequencies for the different ROH-hotspots
 setwd(ROH_hotspot_allele_freq_dir)
 
-# # Get a list of all .bed files in the directory
-# bed_files &lt;- list.files(path = ROH_hotspot_allele_freq_dir ,pattern = &quot;\\.bed$&quot;)
 # Get a list of all .bed files in the directory
-bed_files &lt;- list.files(pattern = &quot;\\.bed$&quot;)
+bed_files &lt;- list.files(path = ROH_hotspot_allele_freq_dir ,pattern = &quot;\\.bed$&quot;)
+
+# Get a list of all .bed files in the directory
+# bed_files &lt;- list.files(pattern = &quot;\\.bed$&quot;)
 
 
 # Extract the chromosome number and window number from the file names
@@ -674,7 +756,8 @@ for (file in ordered_bed_files) {
     # Remove rows where MAF &lt; min_MAF
     hotspot_allele_freq_data &lt;- hotspot_allele_freq_data[hotspot_allele_freq_data$MAF &gt;= min_MAF, ]
   }
-
+  
+  hotspot_allele_freq_data$H_e &lt;- sapply(hotspot_allele_freq_data$MAF, calculate_expected_heterozygosity)
   
   
   # Reading in the relevant causative window from  causative_variant_window_tables_Selection_Model
@@ -700,14 +783,13 @@ for (file in ordered_bed_files) {
       ]
     
     if (nrow(markers_in_window) &gt; 0) {
-      # Computed expected heterozygosity for the markers found within the window
-      markers_in_window$H_e &lt;- calculate_expected_heterozygosity(markers_in_window$MAF)
+      # Computed the average expected heterozygosity for the current window
       hotspot_window_data[j, &quot;H_e&quot;] &lt;- mean(markers_in_window$H_e)
       # Store the list of MAF values in the new column
       hotspot_window_data$MAF_list[[j]] &lt;- markers_in_window$MAF
 
     } else {
-            # Increment the counter for windows without markers
+      # Increment the counter for windows without markers
       no_marker_count &lt;- no_marker_count + 1
       
       # Skip this window by setting its H_e to NA
@@ -720,7 +802,7 @@ for (file in ordered_bed_files) {
     
   }
   
-   # Calculate and store the average heterozygosity for the current simulation
+   # Calculate and store the average heterozygosity from the 100kbp H_e distribution of the current hotspot
   empirical_hotspot_tables[[hotspot_name]][[&quot;data&quot;]] &lt;- hotspot_window_data
   empirical_hotspot_tables[[hotspot_name]]$Avg_He &lt;- mean(hotspot_window_data$H_e, na.rm = TRUE)
   
@@ -739,10 +821,33 @@ for (file in ordered_bed_files) {
   empirical_hotspot_allele_Freq_tables[[hotspot_name]] &lt;- c(empirical_hotspot_allele_Freq_tables[[hotspot_name]], table_info)
 }
 
-# #Print the list of empirical_hotspot_allele_Freq_tables
-# print(empirical_hotspot_allele_Freq_tables)
-
-# View(empirical_hotspot_allele_Freq_tables)</code></pre>
+# View(empirical_hotspot_allele_Freq_tables)
+empirical_hotspot_allele_Freq_tables[[1]]</code></pre>
+<pre><code>## $name
+## [1] &quot;Hotspot_chr1_window_1_allele_freq&quot;
+## 
+## $filename
+## [1] &quot;labrador_retriever_CHR1_ROH_Hotspot_windows_1_allele_freq.bed&quot;
+## 
+## $data
+##    CHR     POS1     POS2            SNP A1 A2     MAF NCHROBS       H_e
+## 10   1 22003486 22003487   BICF2P945211  G  A 0.06532     444 0.1221066
+## 12   1 22018645 22018646 BICF2S22930824  A  G 0.06532     444 0.1221066
+## 14   1 22046657 22046658  BICF2S2394301  G  A 0.06818     440 0.1270630
+## 15   1 22051495 22051496 BICF2S23634186  A  G 0.06757     444 0.1260086
+## 28   1 22003486 22003487   BICF2P945211  G  A 0.06532     444 0.1221066
+## 30   1 22018645 22018646 BICF2S22930824  A  G 0.06532     444 0.1221066
+## 32   1 22046657 22046658  BICF2S2394301  G  A 0.06818     440 0.1270630
+## 33   1 22051495 22051496 BICF2S23634186  A  G 0.06757     444 0.1260086</code></pre>
+<pre class="r"><code># markers_after_MAF_pruning &lt;- nrow(empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][&quot;H_e&quot;])
+# cat(&quot;markers after_pruning:&quot;,markers_after_MAF_pruning,&quot;\n&quot;)
+# 
+# markers_with_he_01_or_less &lt;- length(empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][[&quot;H_e&quot;]][empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][[&quot;H_e&quot;]] &lt; 0.1])
+# cat(&quot;% markers with H_e &lt;= 0.1:\n&quot;, round((markers_with_he_01_or_less/markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)
+# 
+# fixated_markers &lt;- length(empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][[&quot;H_e&quot;]][empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][[&quot;H_e&quot;]] == 0])
+# 
+# cat(&quot;% fixated markers with H_e = 0:\n&quot;, round((fixated_markers/markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)</code></pre>
 </div>
 <div id="empirical---genomewide" class="section level3">
 <h3>1.1.2: Empirical - Genomewide</h3>
@@ -751,7 +856,7 @@ setwd(empirical_genomewide_allele_freq_dir)
 
 # Get a list of all .bed files in the directory
 bed_files &lt;- list.files(pattern = &quot;\\.bed$&quot;)
-
+# bed_files
 # Create an empty list to store information for the different ROH-genomewides in
 empirical_genomewide_tables &lt;- list()
 
@@ -759,6 +864,9 @@ empirical_genomewide_tables &lt;- list()
 for (file in bed_files) {
   # Extract chromosome number and window number from file name
   chromosome &lt;- sub(&quot;.*chr([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
+  print(file)
+  print(chromosome)
+  
   window &lt;- sub(&quot;.*window_([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
   
   # Create table name
@@ -774,25 +882,29 @@ for (file in bed_files) {
   column_names &lt;- strsplit(column_names, &quot;\t&quot;)[[1]]
   
   # Read the .bed file into a data frame, skipping commented lines
-  bed_data &lt;- read.table(file, header = FALSE, comment.char = &quot;#&quot;, stringsAsFactors = FALSE, col.names = column_names)
+  empirical_genomewide_allele_freq_data &lt;- read.table(file, header = FALSE, comment.char = &quot;#&quot;, stringsAsFactors = FALSE, col.names = column_names)
   
   # Check if pruning markers by MAF should be done
   if (use_MAF_pruning == TRUE) {
     
     # Remove rows where MAF &lt; min_MAF
-    bed_data &lt;- bed_data[bed_data$MAF &gt;= min_MAF, ]
+    empirical_genomewide_allele_freq_data &lt;- empirical_genomewide_allele_freq_data[empirical_genomewide_allele_freq_data$MAF &gt;= min_MAF, ]
   }
+  
+  empirical_genomewide_allele_freq_data$H_e &lt;- sapply(empirical_genomewide_allele_freq_data$MAF, calculate_expected_heterozygosity)
 
 
   
   # Create a list with table name and corresponding data frame
-  table_info &lt;- list(name = table_name, data = bed_data)
+  table_info &lt;- list(name = table_name, data = empirical_genomewide_allele_freq_data)
   
   # Append the table info to the list
   empirical_genomewide_tables &lt;- c(empirical_genomewide_tables, list(table_info))
-}
-
-# View(empirical_genomewide_tables)</code></pre>
+}</code></pre>
+<pre><code>## [1] &quot;labrador_retriever_filtered_allele_freq.bed&quot;
+## [1] &quot;labrador_retriever_filtered_allele_freq.bed&quot;</code></pre>
+<pre class="r"><code># View(empirical_genomewide_tables)
+# empirical_genomewide_tables[[1]]</code></pre>
 </div>
 </div>
 <div id="simulated-data-simulated-model" class="section level2">
@@ -826,15 +938,6 @@ for (file in sorted_files) {
   # Extract the table name from the file name
   table_name &lt;- gsub(&quot;.frq$&quot;, &quot;&quot;, file)
   
-  # # Read the header line
-  # con &lt;- file(file, &quot;r&quot;)
-  # header &lt;- readLines(con, n = 1)
-  # close(con)
-  # 
-  # # Remove &quot;#&quot; from the header and split it into column names
-  # column_names &lt;- sub(&quot;#&quot;, &quot;&quot;, header)
-  # column_names &lt;- strsplit(column_names, &quot;\t&quot;)[[1]]
-  
   column_names &lt;- c(&quot;CHR&quot;,&quot;POS1&quot;,&quot;POS2&quot;,&quot;SNP&quot;,&quot;A1&quot;,&quot;A2&quot;,&quot;MAF&quot;,&quot;NCHROBS&quot;)
   
   # Read the .tsv frequency file into a data frame
@@ -848,6 +951,10 @@ for (file in sorted_files) {
     # Remove rows where MAF &lt; min_MAF
     allele_freq_data &lt;- allele_freq_data[allele_freq_data$MAF &gt;= min_MAF, ]
   }
+  
+  # Calculate expected heterozygosity for all the markers 
+  # And store it in a new column called #H_e
+  allele_freq_data$H_e &lt;- sapply(allele_freq_data$MAF, calculate_expected_heterozygosity)
 
   
   # Create a list with table name and corresponding data frame
@@ -857,6 +964,18 @@ for (file in sorted_files) {
   simulated_model_allele_freq_tables &lt;- c(simulated_model_allele_freq_tables, list(table_info))
 }
 
+# sim_id_to_follow &lt;- 1
+# 
+# markers_after_MAF_pruning &lt;- nrow(simulated_model_allele_freq_tables[[sim_id_to_follow]][[&quot;data&quot;]][&quot;H_e&quot;])
+# cat(&quot;markers after pruning for simulation &quot;,sim_id_to_follow, &quot;: &quot;,markers_after_MAF_pruning,&quot;\n&quot;)
+# 
+# markers_with_he_01_or_less &lt;- length(simulated_model_allele_freq_tables[[sim_id_to_follow]][[&quot;data&quot;]][&quot;H_e&quot;][simulated_model_allele_freq_tables[[sim_id_to_follow]][[&quot;data&quot;]][&quot;H_e&quot;] &lt; 0.1])
+# cat(&quot;% markers with H_e &lt;= 0.1:\n&quot;, round((markers_with_he_01_or_less/markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)
+# 
+# fixated_markers &lt;- length(simulated_model_allele_freq_tables[[sim_id_to_follow]][[&quot;data&quot;]][&quot;H_e&quot;][simulated_model_allele_freq_tables[[sim_id_to_follow]][[&quot;data&quot;]][&quot;H_e&quot;] == 0])
+# 
+# cat(&quot;% fixated markers with H_e = 0:\n&quot;, round((fixated_markers/markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)
+
 
 # View(simulated_model_allele_freq_tables)</code></pre>
 </div>
@@ -864,148 +983,118 @@ for (file in sorted_files) {
 <div id="computing-expected-heterozygosity" class="section level1">
 <h1>2: Computing expected heterozygosity</h1>
 <p>Compute H_e for each SNP individually</p>
-<pre class="r"><code>calculate_expected_heterozygosity &lt;- function(p) {
-  # Calculate expected heterozygosity
-  heterozygosity &lt;- 2 * p * (1 - p)
-  
-  # Return the result
-  return(heterozygosity)
-}</code></pre>
 <div id="empirical-data---h_e" class="section level2">
 <h2>2.1: Empirical data - H_E</h2>
 <div id="genomewide" class="section level3">
 <h3>2.1.2 Genomewide</h3>
-<pre class="r"><code>for (i in seq_along(empirical_genomewide_tables)) {
-  # Extract table name and data frame
-  table_info &lt;- empirical_genomewide_tables[[i]]
-  table_data &lt;- table_info$data
-  
-  # Calculate expected heterozygosity for each window
-  window_H_e_list &lt;- c()  # Initialize an empty list to store expected heterozygosity values
-  
-  # Loop through each row in the table data
-  for (j in 1:nrow(table_data)) {
-    # Extract the MAF (p value)
-    p &lt;- table_data[j, &quot;MAF&quot;]
-    
-    # Calculate expected heterozygosity using the provided function
-    expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
-    
-    # Append the calculated expected heterozygosity to the list
-    window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
-  }
-  
-  # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
-  empirical_genomewide_tables[[i]]$H_e_list &lt;- window_H_e_list
-  empirical_genomewide_tables[[i]]$Marker_based_Average_H_e &lt;- mean(empirical_genomewide_tables[[i]]$H_e_list)
-}
+<pre class="r"><code># for (i in seq_along(empirical_genomewide_tables)) {
+#   # Extract table name and data frame
+#   table_info &lt;- empirical_genomewide_tables[[i]]
+#   table_data &lt;- table_info$data
+#   
+#   # Calculate expected heterozygosity for each window
+#   window_H_e_list &lt;- c()  # Initialize an empty list to store expected heterozygosity values
+#   
+#   # Loop through each row in the table data
+#   for (j in 1:nrow(table_data)) {
+#     # Extract the MAF (p value)
+#     p &lt;- table_data[j, &quot;MAF&quot;]
+#     
+#     # Calculate expected heterozygosity using the provided function
+#     expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
+#     
+#     # Append the calculated expected heterozygosity to the list
+#     window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
+#   }
+#   
+#   # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
+#   empirical_genomewide_tables[[i]]$H_e_list &lt;- window_H_e_list
+#   empirical_genomewide_tables[[i]]$Marker_based_Average_H_e &lt;- mean(empirical_genomewide_tables[[i]]$H_e_list)
+# }
 
 # View(empirical_genomewide_tables)</code></pre>
 </div>
 </div>
 <div id="h_e-simulated-data-simulated-model" class="section level2">
 <h2>2.2: H_e Simulated data (Simulated model)</h2>
-<pre class="r"><code># create a vector to store the counts of pruned entries for each simulation
-pruned_counts &lt;- numeric(length(simulated_model_allele_freq_tables))
-datapoints_before_MAF_filtering &lt;- numeric(length(simulated_model_allele_freq_tables))
-sum(simulated_model_allele_freq_tables[[1]][[&quot;data&quot;]][[&quot;MAF&quot;]] &lt; min_MAF)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code>sum(simulated_model_allele_freq_tables[[20]][[&quot;data&quot;]][[&quot;MAF&quot;]] &lt; min_MAF)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code>for (i in seq_along(simulated_model_allele_freq_tables)) {
+<pre class="r"><code># # create a vector to store the counts of pruned entries for each simulation
+# pruned_counts &lt;- numeric(length(simulated_model_allele_freq_tables))
+# datapoints_before_MAF_filtering &lt;- numeric(length(simulated_model_allele_freq_tables))
+# sum(simulated_model_allele_freq_tables[[1]][[&quot;data&quot;]][[&quot;MAF&quot;]] &lt;= min_MAF)
+# # sum(simulated_model_allele_freq_tables[[20]][[&quot;data&quot;]][[&quot;MAF&quot;]] &lt; min_MAF)
+# 
+# 
+# for (i in seq_along(simulated_model_allele_freq_tables)) {
+#   
+#   
+#   # Extract table name and data frame
+#   table_info &lt;- simulated_model_allele_freq_tables[[i]]
+#   table_data &lt;- table_info$data
+#   datapoints_before_MAF_filtering[[i]] &lt;- length(table_data$MAF)
   
-  
-  # Extract table name and data frame
-  table_info &lt;- simulated_model_allele_freq_tables[[i]]
-  table_data &lt;- table_info$data
-  datapoints_before_MAF_filtering[[i]] &lt;- length(table_data$MAF)
-  
-  # Calculate expected heterozygosity for each window
-  window_H_e_list &lt;- c()  # Initialize an empty list to store expected heterozygosity values
-  
-  #create a vector to store the indices of rows to be removed based on having MAF &lt; 0.05 threshold
-  rows_to_remove &lt;- c()
-  
-  # Looping through each row in the table data
-  for (j in 1:nrow(table_data)) {
-    # Extract the MAF (p value)
-    p &lt;- table_data[j, &quot;MAF&quot;]
-    
-    # Calculate expected heterozygosity using the provided function
-    expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
-    
-    # Append the calculated expected heterozygosity to the list
-    window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
-    
-    if (use_MAF_pruning == TRUE) { 
-      # Check if MAF is less than 0.05
-      if (p &lt; min_MAF) {
-        # If MAF is less than 0.05, add the row index to the vector of rows to be removed
-        rows_to_remove &lt;- c(rows_to_remove, j)
-      } else {
-        # Calculate expected heterozygosity using the provided function
-        expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
-  
-        # Append the calculated expected heterozygosity to the list
-        window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
-      } }
-    else {
-        # Calculate expected heterozygosity using the provided function
-        expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
-  
-        # Append the calculated expected heterozygosity to the list
-        window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
-
-      
-    }
-    
-  }
-
-  
-    if (length(rows_to_remove) &gt; 0) {  # Check if rows_to_remove is not empty
-      # Remove rows from simulated_model_allele_freq_tables with MAF less than 0.05
-      table_data_filtered &lt;- table_data[-rows_to_remove, ]
-      simulated_model_allele_freq_tables[[i]]$data &lt;- table_data_filtered
-    }
-
-    
-  
-  # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
-  simulated_model_allele_freq_tables[[i]]$H_e_list &lt;- window_H_e_list
-  simulated_model_allele_freq_tables[[i]]$Marker_based_Average_H_e &lt;- mean(simulated_model_allele_freq_tables[[i]]$H_e_list)
-  
-  # Update the count of pruned entries for this simulation
-  pruned_counts[i] &lt;- length(rows_to_remove)
-}
-
-paste(&quot;Snps for each simulation, before the pruning:&quot;,datapoints_before_MAF_filtering)</code></pre>
-<pre><code>##  [1] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [2] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [3] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [4] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [5] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [6] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [7] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [8] &quot;Snps for each simulation, before the pruning: 2969&quot;
-##  [9] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [10] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [11] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [12] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [13] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [14] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [15] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [16] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [17] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [18] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [19] &quot;Snps for each simulation, before the pruning: 2969&quot;
-## [20] &quot;Snps for each simulation, before the pruning: 2969&quot;</code></pre>
-<pre class="r"><code>paste(&quot;Pruned SNPs:&quot;,pruned_counts)</code></pre>
-<pre><code>##  [1] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-##  [5] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-##  [9] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-## [13] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;
-## [17] &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot; &quot;Pruned SNPs: 0&quot;</code></pre>
-<pre class="r"><code># View(simulated_model_allele_freq_tables)</code></pre>
+#   # Calculate expected heterozygosity for each window
+#   window_H_e_list &lt;- c()  # Initialize an empty list to store expected heterozygosity values
+#   
+#   #create a vector to store the indices of rows to be removed based on having MAF &lt; 0.05 threshold
+#   rows_to_remove &lt;- c()
+#   
+#   # Looping through each row in the table data
+#   for (j in 1:nrow(table_data)) {
+#     # Extract the MAF (p value)
+#     p &lt;- table_data[j, &quot;MAF&quot;]
+#     
+#     # Calculate expected heterozygosity using the provided function
+#     expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
+#     
+#     # Append the calculated expected heterozygosity to the list
+#     window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
+#     
+#     if (use_MAF_pruning == TRUE) { 
+#       # Check if MAF is less than 0.05
+#       if (p &lt; min_MAF) {
+#         # If MAF is less than 0.05, add the row index to the vector of rows to be removed
+#         rows_to_remove &lt;- c(rows_to_remove, j)
+#       } else {
+#         # Calculate expected heterozygosity using the provided function
+#         expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
+#   
+#         # Append the calculated expected heterozygosity to the list
+#         window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
+#       } }
+#     else {
+#         # Calculate expected heterozygosity using the provided function
+#         expected_heterozygosity &lt;- calculate_expected_heterozygosity(p)
+#   
+#         # Append the calculated expected heterozygosity to the list
+#         window_H_e_list &lt;- c(window_H_e_list, expected_heterozygosity)
+# 
+#       
+#     }
+#     
+#   }
+# 
+#   
+#     if (length(rows_to_remove) &gt; 0) {  # Check if rows_to_remove is not empty
+#       # Remove rows from simulated_model_allele_freq_tables with MAF less than 0.05
+#       table_data_filtered &lt;- table_data[-rows_to_remove, ]
+#       simulated_model_allele_freq_tables[[i]]$data &lt;- table_data_filtered
+#     }
+# 
+#     
+#   
+#   # Assign the calculated expected heterozygosity list to the H_e attribute of table_info
+#   simulated_model_allele_freq_tables[[i]]$H_e_list &lt;- window_H_e_list
+#   simulated_model_allele_freq_tables[[i]]$Marker_based_Average_H_e &lt;- mean(simulated_model_allele_freq_tables[[i]]$H_e_list)
+#   
+#   # Update the count of pruned entries for this simulation
+#   pruned_counts[i] &lt;- length(rows_to_remove)
+# }
+# 
+# paste(&quot;Snps for each simulation, before the pruning:&quot;,datapoints_before_MAF_filtering)
+# 
+# paste(&quot;Pruned SNPs:&quot;,pruned_counts)
+# 
+# # View(simulated_model_allele_freq_tables)</code></pre>
 <p>#3: Computing window-based average expected heterozygosity Step 1: Create genomic windows Step 2: Compute the average H_e for each genomic window individually</p>
 <pre class="r"><code># Define the window size to be used
 window_size &lt;- 100 * 10^3
@@ -1027,7 +1116,7 @@ for (index in seq_along(empirical_genomewide_tables)) {
   # Get the SNP positions, chromosome positions, and H_e values for the current empirical_genomewide
   snp_positions &lt;- empirical_genomewide_tables[[index]][[&quot;data&quot;]][[&quot;POS1&quot;]]
   chr_positions &lt;- empirical_genomewide_tables[[index]][[&quot;data&quot;]][[&quot;CHR&quot;]]
-  he_values &lt;- empirical_genomewide_tables[[index]][[&quot;H_e_list&quot;]]
+  he_values &lt;- empirical_genomewide_tables[[index]][[&quot;data&quot;]][[&quot;H_e&quot;]]
   
   # Determine unique chromosomes present in the data
   unique_chromosomes &lt;- unique(chr_positions)
@@ -1047,34 +1136,45 @@ for (index in seq_along(empirical_genomewide_tables)) {
     # Iterate through each window
     for (window_index in seq_len(num_windows)) {
       # Determine the start and end positions of the current window
-      window_start &lt;- (window_index - 1) * window_size
-      window_end &lt;- window_start + window_size
+      window_start &lt;- (window_index - 1) * window_size + 1
+      window_end &lt;- window_start + window_size - 1
       
       # Find the indices of SNPs within the current window
-      snp_indices &lt;- which(chr_snp_positions &gt;= window_start &amp; chr_snp_positions &lt; window_end)
+      snp_indices &lt;- which(chr_snp_positions &gt;= window_start &amp; chr_snp_positions &lt;= window_end)
+      
+      # Skip the window if there are no SNPs within it
+      if (length(snp_indices) == 0) {
+        next
+      }
+
+      else {
+
       
       # Extract the SNP positions and H_e values for the current window
       window_snp_positions &lt;- chr_snp_positions[snp_indices]
       window_he_values &lt;- chr_he_values[snp_indices]
       
       # Create a sub-table for the current window
-      window_data &lt;- data.frame(CHR = rep(chromosome, length(window_snp_positions)), POS = window_snp_positions, H_e = window_he_values)
+      window_data &lt;- data.frame(POS = window_snp_positions, H_e = window_he_values)
       
+      # # Append the sub-table to the list of windows for the current chromosome
+      # chr_windows[[window_index]] &lt;- window_data
       # Append the sub-table to the list of windows for the current chromosome
-      chr_windows[[window_index]] &lt;- window_data
+      chr_windows[[length(chr_windows) + 1]] &lt;- window_data
+
+      
+      
+    }
     }
     
     # Append the list of windows for the current chromosome to the main list
-    #empirical_genomewide_windows[[chromosome]] &lt;- chr_windows
     empirical_genomewide_windows[[chromosome]] &lt;- chr_windows
   }
 }
 
 # View the resulting windows
-# View(empirical_genomewide_windows)
-
-
-#######################################################################
+# View(empirical_genomewide_windows)</code></pre>
+<pre class="r"><code>#######################################################################
 # Step 2: Compute the average H_e for each genomic window individually
 #######################################################################
 
@@ -1111,12 +1211,12 @@ empirical_chromosomes_mean_he_window_based &lt;- sapply(Empirical_genomewide_win
 cat(&quot;Average H_e of each chromosome in the empirical dataset:&quot;) </code></pre>
 <pre><code>## Average H_e of each chromosome in the empirical dataset:</code></pre>
 <pre class="r"><code>print(empirical_chromosomes_mean_he_window_based)</code></pre>
-<pre><code>##  [1] 0.3655476 0.3462126 0.2659307 0.2932938 0.3034113 0.3627844 0.3274011
-##  [8] 0.3408950 0.3453253 0.3373931 0.3518877 0.3471273 0.3635499 0.3493511
-## [15] 0.3064733 0.3423169 0.2535016 0.3462755 0.2552717 0.3637865 0.3196935
-## [22] 0.3656448 0.3331333 0.3372022 0.3444267 0.3542056 0.3209732 0.3458889
-## [29] 0.3621167 0.3496570 0.3337020 0.3262526 0.3190850 0.3270933 0.3317470
-## [36] 0.3541493 0.3450273 0.3708457</code></pre>
+<pre><code>##  [1] 0.3442708 0.3374165 0.3558389 0.3546872 0.3567987 0.3580061 0.3498842
+##  [8] 0.3634016 0.3725542 0.3675638 0.3346605 0.3562718 0.3511173 0.3646747
+## [15] 0.3546484 0.3600428 0.3574503 0.3458644 0.3715817 0.3538734 0.3549177
+## [22] 0.3755275 0.3641939 0.3250149 0.3547033 0.3604699 0.3391096 0.3518508
+## [29] 0.3534918 0.3596581 0.3641034 0.3470326 0.3693873 0.3540888 0.3366211
+## [36] 0.3717211 0.3486786 0.3574493</code></pre>
 <pre class="r"><code>#################################################################################
 # Step 3: Compute the genomwide average H_e for the empirical data (window-based)
 #################################################################################
@@ -1125,7 +1225,7 @@ empirical_genomewides_mean_he_window_based &lt;- mean(empirical_chromosomes_mean
 cat(&quot;Average H_e of the empirical dataset:&quot;)</code></pre>
 <pre><code>## Average H_e of the empirical dataset:</code></pre>
 <pre class="r"><code>print(empirical_genomewides_mean_he_window_based)</code></pre>
-<pre><code>## [1] 0.3344363</code></pre>
+<pre><code>## [1] 0.355227</code></pre>
 </div>
 </div>
 <div id="simulated-data-neutral" class="section level2">
@@ -1141,7 +1241,7 @@ simulation_windows &lt;- list()
 for (sim_index in seq_along(simulated_model_allele_freq_tables)) {
   # Get the SNP positions and H_e values for the current simulation
   snp_positions &lt;- simulated_model_allele_freq_tables[[sim_index]][[&quot;data&quot;]][[&quot;POS1&quot;]]
-  he_values &lt;- simulated_model_allele_freq_tables[[sim_index]][[&quot;H_e_list&quot;]]
+  he_values &lt;- simulated_model_allele_freq_tables[[sim_index]][[&quot;data&quot;]][[&quot;H_e&quot;]]
   
   # Determine the number of windows needed
   num_windows &lt;- ceiling(max(snp_positions) / window_size)
@@ -1214,15 +1314,29 @@ for (i in seq_along(simulation_windows)) {
 
 }
 
+# sim_id_to_follow &lt;- 1
+# 
+# Windows_with_markers_after_MAF_pruning &lt;- length(Simulation_windows_avg_he_3_2[[sim_id_to_follow]])
+# cat(&quot;Number of 100kbp Windows with markers (after MAF-pruning), for simulation &quot;,sim_id_to_follow, &quot;: &quot;,Windows_with_markers_after_MAF_pruning,&quot;\n&quot;)
+# 
+# windows_with_he_01_or_less &lt;- length(Simulation_windows_avg_he_3_2[[sim_id_to_follow]][Simulation_windows_avg_he_3_2[[sim_id_to_follow]] &lt;= 0.1])
+# cat(&quot;% of 100kbp Windows with H_e  &lt;= 0.1:\n&quot;, round((windows_with_he_01_or_less/Windows_with_markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)
+# 
+# fully_fixated_windows &lt;- length(Simulation_windows_avg_he_3_2[[sim_id_to_follow]][Simulation_windows_avg_he_3_2[[sim_id_to_follow]] == 0])
+# 
+# cat(&quot;% Fully fixated windows, with average H_e = 0:\n&quot;, round((fully_fixated_windows/Windows_with_markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)
+
+
+
+
+
 # Calculate the mean H_e value for each simulation
 # sapply applies the mean-function on each chr in Simulation_windows_avg_he_3_2 
 simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mean)
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>##  [1] 0.3693765 0.3171854 0.4172164 0.3724344 0.3598424 0.3096384 0.3711140
-##  [8] 0.3401422 0.3800747 0.3143156 0.3680462 0.3529935 0.3606641 0.3743559
-## [15] 0.3617277 0.3436316 0.3686454 0.3240252 0.3836520 0.3549474</code></pre>
+<pre><code>## [1] 0.3230960 0.3503962 0.3155505 0.3429202 0.2910763 0.2980113 0.3336225</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1234,11 +1348,20 @@ simulations_mean_he_window_based</code></pre>
 <h2>4.1 Computing 5th percentiles of H_e distribution</h2>
 <div id="empirical-dataset---h_e" class="section level3">
 <h3>4.1.1 Empirical dataset - H_e</h3>
-<pre class="r"><code># Determine the number of bins you want
+<pre class="r"><code># Check if pruning markers by MAF should be done
+if (use_MAF_pruning == TRUE) {
+    MAF_setting_text &lt;- paste0(&quot;MAF &gt;= &quot;, min_MAF)
+    # Remove rows where MAF &lt; min_MAF
+    hotspot_allele_freq_data &lt;- hotspot_allele_freq_data[hotspot_allele_freq_data$MAF &gt;= min_MAF, ]
+} else {
+    MAF_setting_text &lt;- &quot;No MAF-pruning&quot;
+}
+
+# Determine the number of bins you want
 num_bins &lt;- 100  
 
-histogram_title &lt;-  paste(&quot;H_e Distribution of the empirical data - Windowsize:&quot;,window_size,&quot;bp&quot;)
-image_name &lt;- paste(&quot;H_e_distribution_german_shepherd.png&quot;)
+histogram_title &lt;-  paste0(empirical_dog_breed,&quot; H_e Distribution (&quot;,MAF_setting_text,&quot;) - Windowsize: &quot;,window_size,&quot;bp &quot;)
+image_name &lt;- paste0(&quot;H_e_distribution_&quot;,empirical_dog_breed,&quot;.png&quot;)
 
 # Save the plot as a PNG file with specified path
 png(file.path(output_empirical_H_e_dir, image_name), width = 1200, height = 900, res = 120)
@@ -1250,16 +1373,34 @@ hist(unlist(Empirical_genomewide_window_he_3_1), breaks = num_bins, main = histo
 # Calculate the 5th percentile
 empirical_dataset_percentile_5 &lt;- quantile(unlist(Empirical_genomewide_window_he_3_1), 0.05)
 
-# Add a vertical line at the 5th percentile
-abline(v = empirical_dataset_percentile_5, col = &quot;blue&quot;, lty = 2)
+# Add a vertical line at the 5th percentile with increased thickness
+abline(v = empirical_dataset_percentile_5, col = &quot;blue&quot;, lty = 2, lwd = 2)
 
-# Add a legend
-legend(&quot;topright&quot;, legend = paste(&quot;5th percentile =&quot;, round(empirical_dataset_percentile_5, 4)), col = &quot;blue&quot;, lty = 2)
+# Add a vertical line for the mean H_e with increased thickness
+abline(v = empirical_genomewides_mean_he_window_based, col = &quot;red&quot;, lty = 2, lwd = 2)
 
-# Save the plot
+# Combine legends into one with matching line thickness
+legend(&quot;topright&quot;, 
+       legend = c(paste(&quot;5th percentile: &quot;, round(empirical_dataset_percentile_5, H_e_decimals_plots)),
+                  paste(&quot;Average H_e: &quot;, round(empirical_genomewides_mean_he_window_based, H_e_decimals_plots))),
+       col = c(&quot;blue&quot;, &quot;red&quot;), 
+       lty = 2, 
+       lwd = 2,
+       inset = c(0, 0.02))
+6</code></pre>
+<pre><code>## [1] 6</code></pre>
+<pre class="r"><code># Save the plot
 dev.off()</code></pre>
 <pre><code>## png 
 ##   2</code></pre>
+<pre class="r"><code># Initialize an empty data frame to store the results
+empirical_5th_percentiles_df &lt;- data.frame(Fifth_Percentile = empirical_dataset_percentile_5,Avg_H_e = empirical_genomewides_mean_he_window_based, stringsAsFactors = FALSE)
+
+# Define the filename with the output directory path
+filename &lt;- file.path(output_empirical_H_e_dir, paste0(&quot;H_e_distribution_&quot;,empirical_dog_breed,&quot;.tsv&quot;))
+
+# # Saving the results in a .tsv-file
+write.table(empirical_5th_percentiles_df, filename, sep = &quot;\t&quot;, row.names = FALSE,quote = FALSE)</code></pre>
 </div>
 <div id="simulated-model---h_e-distribution" class="section level3">
 <h3>4.1.2: Simulated model - H_e distribution</h3>
@@ -1269,14 +1410,14 @@ dev.off()</code></pre>
 num_bins &lt;- 100  
 
 # Initialize an empty data frame to store the results
-sim_5th_percentiles_df &lt;- data.frame(Simulation = character(), Fifth_Percentile = numeric(), stringsAsFactors = FALSE)
+sim_5th_percentiles_df &lt;- data.frame(Simulation = character(), Fifth_Percentile = numeric(),Avg_H_e = numeric(), stringsAsFactors = FALSE)
 
 # Loop through each simulation
 for (i in seq_along(Simulation_windows_avg_he_3_2)) {
   # Create histogram title
-  histogram_title &lt;- paste(&quot;H_e Distribution of Simulation&quot;, i, &quot;- Windowsize:&quot;, window_size, &quot;bp&quot;)
+  histogram_title &lt;- paste0(&quot;Simulation &quot;,i,&quot; H_e Distribution (&quot;,MAF_setting_text,&quot;) - Windowsize: &quot;,window_size,&quot;bp &quot;)
   
-  image_name &lt;- paste(sim_scenario_id,&quot;H_e_distribution_sim_&quot;,i,&quot;.png&quot;)
+  image_name &lt;- paste0(sim_scenario_id,&quot;_H_e_distribution_sim_&quot;,i,&quot;.png&quot;)
   
   # Save the plot as a PNG file with specified path
   png(file.path(output_simulated_model_H_e_dir, image_name), width = 1200, height = 900, res = 120)
@@ -1287,16 +1428,31 @@ for (i in seq_along(Simulation_windows_avg_he_3_2)) {
   # Calculate the 5th percentile
   percentile_5 &lt;- quantile(Simulation_windows_avg_he_3_2[[i]], 0.05)
   simulated_model_allele_freq_tables[[i]]$H_e_5th_percentile &lt;- percentile_5
+  sim_window_based_H_e_avg &lt;- mean(Simulation_windows_avg_he_3_2[[i]])
+
 
   # Add the simulation name and the fifth percentile value to the data frame
   sim_5th_percentiles_df[i, &quot;Simulation&quot;] &lt;- paste(&quot;Simulation&quot;, i)
   sim_5th_percentiles_df[i, &quot;Fifth_Percentile&quot;] &lt;- percentile_5
+  sim_5th_percentiles_df[i, &quot;Avg_H_e&quot;] &lt;- sim_window_based_H_e_avg
+  
 
   # Add a vertical line at the 5th percentile
-  abline(v = percentile_5, col = &quot;red&quot;, lty = 2)
+  abline(v = percentile_5, col = &quot;blue&quot;, lty = 2)
+  
+  # Add a vertical line for the mean H_e with increased thickness
+  abline(v = sim_window_based_H_e_avg, col = &quot;red&quot;, lty = 2, lwd = 2)
+  
+  
+  # Combine legends into one with matching line thickness
+  legend(&quot;topright&quot;, 
+       legend = c(paste(&quot;5th percentile: &quot;, round(percentile_5, H_e_decimals_plots)),
+                  paste(&quot;Average H_e: &quot;, round(sim_window_based_H_e_avg, H_e_decimals_plots))),
+       col = c(&quot;blue&quot;, &quot;red&quot;), 
+       lty = 2, 
+       lwd = 2,
+       inset = c(0, 0.02))
 
-  # Add a legend
-  legend(&quot;topright&quot;, legend = paste(&quot;5th percentile =&quot;, round(percentile_5, 4)), col = &quot;red&quot;, lty = 2)
   # Save the plot
   dev.off()
 }
@@ -1312,93 +1468,49 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 <tr class="header">
 <th align="left">Simulation</th>
 <th align="right">Fifth_Percentile</th>
+<th align="right">Avg_H_e</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Simulation 2</td>
-<td align="right">0.1128000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 6</td>
-<td align="right">0.1128000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 11</td>
-<td align="right">0.1128000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 18</td>
-<td align="right">0.1256427</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 16</td>
-<td align="right">0.1280250</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 17</td>
-<td align="right">0.1302000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 20</td>
-<td align="right">0.1472000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 1</td>
-<td align="right">0.1503600</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 15</td>
-<td align="right">0.1517900</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 4</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="odd">
 <td align="left">Simulation 5</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 8</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 10</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 14</td>
-<td align="right">0.1638000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 9</td>
-<td align="right">0.1830067</td>
+<td align="right">0.1290467</td>
+<td align="right">0.2910763</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 7</td>
-<td align="right">0.1958000</td>
+<td align="right">0.1294747</td>
+<td align="right">0.3336225</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 12</td>
-<td align="right">0.1958000</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 19</td>
-<td align="right">0.1958000</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 13</td>
-<td align="right">0.1981850</td>
-</tr>
-<tr class="even">
 <td align="left">Simulation 3</td>
-<td align="right">0.2262000</td>
+<td align="right">0.1309407</td>
+<td align="right">0.3155505</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 6</td>
+<td align="right">0.1336320</td>
+<td align="right">0.2980113</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 1</td>
+<td align="right">0.1473115</td>
+<td align="right">0.3230960</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 4</td>
+<td align="right">0.1534522</td>
+<td align="right">0.3429202</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 2</td>
+<td align="right">0.1825470</td>
+<td align="right">0.3503962</td>
 </tr>
 </tbody>
 </table>
 <pre class="r"><code># Define the filename with the output directory path
-filename &lt;- file.path(output_simulated_model_H_e_dir, paste(sim_scenario_id,&quot;_5th_percentiles_of_H_e_distribution.tsv&quot;, sep = &quot;&quot;))
+filename &lt;- file.path(output_simulated_model_H_e_dir, paste0(sim_scenario_id,&quot;_5th_percentiles_of_H_e_distribution.tsv&quot;))
 
 
 # # Saving the results in a .tsv-file
@@ -1431,6 +1543,7 @@ standard_error_confidence_interval_fun &lt;- function(observed_data, confidence_
 <p>ROH-Hotspots with an average H_e lower than <strong>or</strong> equal to (&lt;=) the 5th percentile of the H_e-distribution for the simulated Simulated model, <strong>are ROH-Hotspots deemed as being under selection</strong>.</p>
 <pre class="r"><code>setwd(output_dir_sweep_test)
 
+
 # Defining the dataframe that will store the selection testing results
 ROH_hotspots_selection_testing &lt;- data.frame(
   Name = character(),  
@@ -1438,11 +1551,14 @@ ROH_hotspots_selection_testing &lt;- data.frame(
   Window_based_Average_H_e = numeric() 
 )
 
+if ( nrow(sim_5th_percentiles_df) &gt; 1 ){
+  sim_H_e_5th_percentile_SE_CI &lt;- standard_error_confidence_interval_fun(sim_5th_percentiles_df$Fifth_Percentile)
+  sim_H_e_5th_lower_ci &lt;- sim_H_e_5th_percentile_SE_CI[1]
+  threshold_value &lt;- sim_H_e_5th_lower_ci
+} else {
+  threshold_value &lt;- sim_5th_percentiles_df$Fifth_Percentile
+}
 
-sim_H_e_5th_percentile_SE_CI &lt;- standard_error_confidence_interval_fun(sim_5th_percentiles_df$Fifth_Percentile)
-sim_H_e_5th_lower_ci &lt;- sim_H_e_5th_percentile_SE_CI[1]
-
-threshold_value &lt;- sim_H_e_5th_lower_ci
 
 for (empirical_hotspot in names(empirical_hotspot_tables)) {
   # Check if Window_based_Average_H_e is &lt;= percentile_5 for the current table (ROH-hotspot)
@@ -1509,34 +1625,49 @@ dev.off()</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Hotspot_chr3_window_1</td>
+<td align="left">Hotspot_chr1_window_1</td>
 <td align="left">Yes</td>
-<td align="right">0.1070562</td>
+<td align="right">0.1243212</td>
 </tr>
 <tr class="even">
-<td align="left">Hotspot_chr3_window_3</td>
-<td align="left">Yes</td>
-<td align="right">0.1237109</td>
+<td align="left">Hotspot_chr28_window_1</td>
+<td align="left">No</td>
+<td align="right">0.1968694</td>
 </tr>
 <tr class="odd">
-<td align="left">Hotspot_chr3_window_2</td>
-<td align="left">Yes</td>
-<td align="right">0.1445314</td>
+<td align="left">Hotspot_chr24_window_1</td>
+<td align="left">No</td>
+<td align="right">0.2172285</td>
 </tr>
 <tr class="even">
-<td align="left">Hotspot_chr17_window_2</td>
+<td align="left">Hotspot_chr13_window_1</td>
 <td align="left">No</td>
-<td align="right">0.1486567</td>
+<td align="right">0.2247839</td>
 </tr>
 <tr class="odd">
-<td align="left">Hotspot_chr17_window_1</td>
+<td align="left">Hotspot_chr6_window_1</td>
 <td align="left">No</td>
-<td align="right">0.1528480</td>
+<td align="right">0.2629454</td>
 </tr>
 <tr class="even">
-<td align="left">Hotspot_chr19_window_1</td>
+<td align="left">Hotspot_chr15_window_1</td>
 <td align="left">No</td>
-<td align="right">0.1627029</td>
+<td align="right">0.2681639</td>
+</tr>
+<tr class="odd">
+<td align="left">Hotspot_chr11_window_2</td>
+<td align="left">No</td>
+<td align="right">0.2838726</td>
+</tr>
+<tr class="even">
+<td align="left">Hotspot_chr11_window_1</td>
+<td align="left">No</td>
+<td align="right">0.2893144</td>
+</tr>
+<tr class="odd">
+<td align="left">Hotspot_chr8_window_1</td>
+<td align="left">No</td>
+<td align="right">0.3694559</td>
 </tr>
 </tbody>
 </table>

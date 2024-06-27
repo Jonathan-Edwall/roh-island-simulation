@@ -500,18 +500,12 @@ for (i in 1:length(sim_info$sim_name)) {
 # View(causative_variant_window_tables_Selection_Model)</code></pre>
 <p>#: Expected heterozygosity</p>
 <p>Takes a list of H_e for a window and computes H_e for each SNP individually</p>
-<pre class="r"><code>calculate_expected_heterozygosity &lt;- function(p_list) {
+<pre class="r"><code>calculate_expected_heterozygosity &lt;- function(p) {
+  # Calculate expected heterozygosity
+  heterozygosity &lt;- 2 * p * (1 - p)
   
-  # Create an empty list to store heterozygosity values
-  heterozygosity_list &lt;- vector(&quot;numeric&quot;, length(p_list))
-  
-  # Calculate expected heterozygosity for each p in p_list
-  for (i in seq_along(p_list)) {
-    heterozygosity_list[i] &lt;- 2 * p_list[i] * (1 - p_list[i])
-  }
-  
-  # Return the list of heterozygosity values
-  return(heterozygosity_list)
+  # Return the result
+  return(heterozygosity)
 }</code></pre>
 </div>
 <div id="loading-allele-frequenceis-and-computing-expected-heterozygosity-for-each-position" class="section level1">
@@ -569,6 +563,8 @@ for (i in 1:length(sim_info$sim_name)) {
     # Remove rows where MAF &lt; min_MAF
     causative_variant_allele_freq_data &lt;- causative_variant_allele_freq_data[causative_variant_allele_freq_data$MAF &gt;= min_MAF, ]
   }
+  
+  causative_variant_allele_freq_data$H_e &lt;- sapply(causative_variant_allele_freq_data$MAF, calculate_expected_heterozygosity)
 
   
   
@@ -584,7 +580,6 @@ for (i in 1:length(sim_info$sim_name)) {
 
    # Extract the selection coefficient from the file name
   selection_coefficient &lt;- sub(&quot;^.*_(s\\d+_chr\\d+).*$&quot;, &quot;\\1&quot;, file)
-  
   
   
   # Computing expected heterozygosity for each position:
@@ -615,10 +610,7 @@ for (i in 1:length(sim_info$sim_name)) {
       ]
     
     if (nrow(markers_in_window) &gt; 0) {
-      
-      # Computed expected heterozygosity for the markers found within the window
-      markers_in_window$H_e &lt;- calculate_expected_heterozygosity(markers_in_window$MAF)
-      
+      # Computed the average expected heterozygosity for the current window
       causative_window_data[j, &quot;H_e&quot;] &lt;- mean(markers_in_window$H_e)
       # Store the list of MAF values in the new column
       causative_window_data$MAF_list[[j]] &lt;- markers_in_window$MAF
@@ -640,10 +632,41 @@ for (i in 1:length(sim_info$sim_name)) {
   }
   
  # Calculate and store the average heterozygosity for the current simulation
+  causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]][[&quot;allele_freq_data&quot;]] &lt;- causative_variant_allele_freq_data
   causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]][[&quot;causative_window_data&quot;]] &lt;- causative_window_data
   causative_variant_window_tables_Selection_Model[[selection_scenario]][[sim_num]]$Avg_He &lt;- mean(causative_window_data$H_e, na.rm = TRUE)
+  
+  
+  
 
-}</code></pre>
+}
+
+# # sim_scenario_to_follow &lt;- &quot;selection_model_s01_chr3&quot;
+# sim_scenario_to_follow &lt;- &quot;selection_model_s08_chr3&quot;
+# sim_id_to_follow &lt;- 1
+# 
+# markers_after_MAF_pruning &lt;- nrow(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;allele_freq_data&quot;]][&quot;H_e&quot;])
+# cat(&quot;Markers in the causative window after pruning, for simulation &quot;,sim_id_to_follow,&quot;of the &quot;,sim_scenario_to_follow,&quot;: &quot;,markers_after_MAF_pruning,&quot;\n&quot;)
+# 
+# markers_with_he_01_or_less &lt;- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;allele_freq_data&quot;]][&quot;H_e&quot;][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;allele_freq_data&quot;]][&quot;H_e&quot;] &lt; 0.1])
+# cat(&quot;% markers with H_e &lt;= 0.1:\n&quot;, round((markers_with_he_01_or_less/markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)
+# 
+# fixated_markers &lt;- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;allele_freq_data&quot;]][&quot;H_e&quot;][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;allele_freq_data&quot;]][&quot;H_e&quot;] == 0])
+# 
+# cat(&quot;% fixated markers with H_e = 0:\n&quot;, round((fixated_markers/markers_after_MAF_pruning)*100 , 1), &quot;\n&quot;)</code></pre>
+<pre class="r"><code># # sim_scenario_to_follow &lt;- &quot;selection_model_s01_chr3&quot;
+# sim_scenario_to_follow &lt;- &quot;selection_model_s08_chr3&quot;
+# sim_id_to_follow &lt;- 1
+# 
+# Windows_after_MAF_pruning &lt;- nrow(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;causative_window_data&quot;]][&quot;H_e&quot;])
+# cat(&quot;100kbp Windows in the causative window after pruning, for simulation &quot;,sim_id_to_follow,&quot;of the &quot;,sim_scenario_to_follow,&quot;: &quot;,Windows_after_MAF_pruning,&quot;\n&quot;)
+# 
+# Windows_with_he_01_or_less &lt;- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;causative_window_data&quot;]][&quot;H_e&quot;][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;causative_window_data&quot;]][&quot;H_e&quot;] &lt; 0.1])
+# cat(&quot;% 100kbp Windows with H_e &lt;= 0.1:\n&quot;, round((Windows_with_he_01_or_less/Windows_after_MAF_pruning)*100 , 1), &quot;\n&quot;)
+# 
+# fixated_Windows &lt;- length(causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;causative_window_data&quot;]][&quot;H_e&quot;][causative_variant_window_tables_Selection_Model[[sim_scenario_to_follow]][[sim_id_to_follow]][[&quot;causative_window_data&quot;]][&quot;H_e&quot;] == 0])
+# 
+# cat(&quot;% fixated 100kbp Windows with H_e = 0:\n&quot;, round((fixated_Windows/Windows_after_MAF_pruning)*100 , 1), &quot;\n&quot;)</code></pre>
 <pre class="r"><code># Calculate overall statistics for each selection coefficient
 for (selection_scenario in names(causative_variant_window_tables_Selection_Model)) {
   

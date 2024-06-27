@@ -1,0 +1,8 @@
+Pipeline Runtimes:
+Step : Empirical data preprocessing Runtime: 0 seconds
+Step 1: 1_pipeline_neutral_model_simulation.sh Runtime: 512 seconds
+Step 2: 2_1_1_plink_preprocessing_simulated_data.sh Runtime: 29 seconds
+Step 3: 2_2_1_plink_ROH_computation.sh Runtime: 0 seconds
+Step 4: 2_2_2_F_ROH_computation.sh Runtime: 156 seconds
+Step 5: 2_2_3_create_indv_ROH_bed_file.sh Runtime: 364 seconds
+Step 6: 2_3_1_Window_file_creator_for_ROH_frequency_computation.sh Runtime: 1 seconds

@@ -2,7 +2,7 @@
 #!/bin/bash -l
 
 # Start the timer 
-start=$(date +%s)
+script_start=$(date +%s)
 
 
 ######################################  
@@ -12,6 +12,8 @@ start=$(date +%s)
 autosome_lengths_header="#Chromosome\tLength(bp)\tLength(KB)"
 F_ROH_header="#IID\tF_ROH\tROH_length_kB\tKBAVG"
 
+# # Boolean value to determine whether to run the selection simulation code
+# selection_simulation=TRUE # Defined in run_pipeline.sh
 
 ####################################  
 # Defining the working directory
@@ -23,19 +25,21 @@ cd $HOME
 # Defining the input files
 #################################### 
 # Defining input directory
-raw_data_dir=$HOME/data/raw
+# data_dir=$HOME/data # Variable Defined in run_pipeline.sh
+raw_data_dir=$data_dir/raw
 
 
-
-plink_ROH_results_dir=$HOME/results/PLINK/ROH
-preprocessed_data_dir=$HOME/data/preprocessed
+# results_dir=$HOME/results # Variable Defined in run_pipeline.sh
+plink_ROH_results_dir=$results_dir/PLINK/ROH
+preprocessed_data_dir=$data_dir/preprocessed
 
 #�������������
 #� Empirical �
 #�������������
-preprocessed_german_shepherd_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
+# empirical_dog_breed="german_shepherd" # Defined in run_pipeline.sh
+preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
 
-german_shepherd_pop_hom_file_dir=$plink_ROH_results_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
+empirical_breed_pop_hom_file_dir=$plink_ROH_results_dir/empirical/$empirical_dog_breed
 
 #�������������
 #� Simulated � 
@@ -56,8 +60,8 @@ selection_model_pop_hom_file_dir=$simulated_plink_dir/selection_model
 #¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤ Empirical ¤
 #¤¤¤¤¤¤¤¤¤¤¤¤¤
-german_shepherd_F_ROH_results=$german_shepherd_pop_hom_file_dir/F_ROH
-mkdir -p $german_shepherd_F_ROH_results
+empirical_breed_F_ROH_results=$empirical_breed_pop_hom_file_dir/F_ROH
+mkdir -p $empirical_breed_F_ROH_results
 
 #�������������
 #� Simulated � 
@@ -79,52 +83,56 @@ mkdir -p $selection_model_F_ROH_results
 #########################################################
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-#¤¤¤¤ Empirical Data (German Shepherd) ¤¤¤¤ 
+#¤¤¤¤ Empirical Data  ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Loop through each .hom file in the directory
-for hom_file in "$german_shepherd_pop_hom_file_dir"/*.hom.indiv; do
-    prefix=$(basename "$hom_file" _ROH.hom.indiv) # Extract the basename without the _ROH.hom.indiv extension
-    # Define the output file
-    output_file="$german_shepherd_F_ROH_results/${prefix}_F_ROH.tsv"
-    # Find autosome lengths file for the current .hom file
-    autosome_lengths_file="${preprocessed_german_shepherd_dir}/${prefix}_filtered_autosome_lengths_and_marker_density.tsv"
-    # Check if the corresponding autosome lengths file is found
-    if [ ! -f "$autosome_lengths_file" ]; then
-        echo "Error: $autosome_lengths_file: Autosome lengths file not found for $hom_file"
-        continue
-    fi
+if [ "$empirical_processing" = TRUE ]; then
+    # Loop through each .hom file in the directory
+    for hom_file in "$empirical_breed_pop_hom_file_dir"/*.hom.indiv; do
+        prefix=$(basename "$hom_file" _ROH.hom.indiv) # Extract the basename without the _ROH.hom.indiv extension
+        # Define the output file
+        output_file="$empirical_breed_F_ROH_results/${prefix}_F_ROH.tsv"
+        # Find autosome lengths file for the current .hom file
+        autosome_lengths_file="${preprocessed_empirical_breed_dir}/${prefix}_filtered_autosome_lengths_and_marker_density.tsv"
+        # Check if the corresponding autosome lengths file is found
+        if [ ! -f "$autosome_lengths_file" ]; then
+            echo "Error: $autosome_lengths_file: Autosome lengths file not found for $hom_file"
+            continue
+        fi
 
-    # Compute autosome length in KB
-    autosome_length_kb=$(sed 1d "$autosome_lengths_file" | awk '{ sum += $2 } END { print sum / 1000 }')
-    # Find and remove output file (if it exists)
-    find "$german_shepherd_F_ROH_results" -name "${prefix}_F_ROH*" -type f -exec rm -f {} +
-    # Read the input .hom file line by line, skipping the first line
-    sed 1d "$hom_file" | while IFS= read -r line; do
-        # Extract IID from the second column
-        iid=$(echo "$line" | awk '{print $2}')
-        ROH_length_KB=$(echo "$line" | awk '{print $5}')
-        # Convert autosome_length_kb to a regular decimal number for the F_ROH computation
-        autosome_length_kb_decimal=$(printf "%.5f" "$autosome_length_kb")
-        # Calculate F_ROH using awk
-        F_ROH=$(awk -v ROH_length_KB="$ROH_length_KB" -v autosome_length_kb="$autosome_length_kb_decimal" 'BEGIN { printf "%.5f", ROH_length_KB / autosome_length_kb }')
-        # # Debug the output
-        # echo " iid=$iid, ROH_length_KB=$ROH_length_KB, autosome_length_kb=$autosome_length_kb, F_ROH=$F_ROH"
-        KB_AVG=$(echo "$line" | awk '{print $6}')
-        # Append F_ROH information to output file
-        echo -e "$iid\t$F_ROH\t$ROH_length_KB\t$KB_AVG" >> "$output_file"
+        # Compute autosome length in KB
+        autosome_length_kb=$(sed 1d "$autosome_lengths_file" | awk '{ sum += $2 } END { print sum / 1000 }')
+        # Find and remove output file (if it exists)
+        find "$empirical_breed_F_ROH_results" -name "${prefix}_F_ROH*" -type f -exec rm -f {} +
+        # Read the input .hom file line by line, skipping the first line
+        sed 1d "$hom_file" | while IFS= read -r line; do
+            # Extract IID from the second column
+            iid=$(echo "$line" | awk '{print $2}')
+            ROH_length_KB=$(echo "$line" | awk '{print $5}')
+            # Convert autosome_length_kb to a regular decimal number for the F_ROH computation
+            autosome_length_kb_decimal=$(printf "%.5f" "$autosome_length_kb")
+            # Calculate F_ROH using awk
+            F_ROH=$(awk -v ROH_length_KB="$ROH_length_KB" -v autosome_length_kb="$autosome_length_kb_decimal" 'BEGIN { printf "%.5f", ROH_length_KB / autosome_length_kb }')
+            # # Debug the output
+            # echo " iid=$iid, ROH_length_KB=$ROH_length_KB, autosome_length_kb=$autosome_length_kb, F_ROH=$F_ROH"
+            KB_AVG=$(echo "$line" | awk '{print $6}')
+            # Append F_ROH information to output file
+            echo -e "$iid\t$F_ROH\t$ROH_length_KB\t$KB_AVG" >> "$output_file"
+        done
+        # Sort the output file by IID (Individual ID)
+        sort -o "$output_file" -k1,1n "$output_file"
+        # Add the header to the output file
+        sed -i "1i $F_ROH_header" "$output_file"
+
+        # Compute average F_ROH
+        avg_F_ROH=$(awk -F'\t' '{ sum += $2 } END { printf "%.5f", sum / NR }' "$output_file")
+        
+        # Rename output file to include average F_ROH as suffix
+        mv "$output_file" "${output_file%.tsv}_${avg_F_ROH}_avg.tsv"
     done
-    # Sort the output file by IID (Individual ID)
-    sort -o "$output_file" -k1,1n "$output_file"
-    # Add the header to the output file
-    sed -i "1i $F_ROH_header" "$output_file"
-
-    # Compute average F_ROH
-    avg_F_ROH=$(awk -F'\t' '{ sum += $2 } END { printf "%.5f", sum / NR }' "$output_file")
-    
-    # Rename output file to include average F_ROH as suffix
-    mv "$output_file" "${output_file%.tsv}_${avg_F_ROH}_avg.tsv"
-done
-echo "Computed Inbreeding Coefficients (F_ROH) for the Empirical Data. Results saved to: $german_shepherd_F_ROH_results"
+    echo "Computed Inbreeding Coefficients (F_ROH) for the Empirical Data. Results saved to: $empirical_breed_F_ROH_results"
+else
+    echo "Empirical data has been set to not be processed, since files have already been created."
+fi
 
 
 
@@ -179,58 +187,63 @@ echo "Computed Inbreeding Coefficients (F_ROH) for the Neutral Model data. Resul
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Loop through each .hom file in the directory
-for hom_file in "$selection_model_pop_hom_file_dir"/*.hom.indiv; do
-    prefix=$(basename "$hom_file" _ROH.hom.indiv) # Extract the basename without the _ROH.hom.indiv extension
-    # Define the output file
-    output_file="$selection_model_F_ROH_results/${prefix}_F_ROH.tsv"
-    # Find autosome lengths file for the current .hom file
-    autosome_lengths_file="${preprocessed_selection_model_dir}/${prefix}_autosome_lengths_and_marker_density.tsv"
-    # Check if the corresponding autosome lengths file is found
-    if [ ! -f "$autosome_lengths_file" ]; then
-        echo "Error: Autosome lengths file not found for $hom_file"
-        continue
-    fi
 
-    # Compute autosome length in KB
-    autosome_length_kb=$(sed 1d "$autosome_lengths_file" | awk '{ sum += $2 } END { print sum / 1000 }')
-    # Find and remove output file (if it exists)
-    find "$selection_model_F_ROH_results" -name "${prefix}_F_ROH*" -type f -exec rm -f {} +
-    # Read the input .hom file line by line, skipping the first line
-    sed 1d "$hom_file" | while IFS= read -r line; do
-        # Extract IID from the second column
-        iid=$(echo "$line" | awk '{print $2}')
-        ROH_length_KB=$(echo "$line" | awk '{print $5}')
-        # Convert autosome_length_kb to a regular decimal number for the F_ROH computation
-        autosome_length_kb_decimal=$(printf "%.5f" "$autosome_length_kb")
-        # Calculate F_ROH using awk
-        F_ROH=$(awk -v ROH_length_KB="$ROH_length_KB" -v autosome_length_kb="$autosome_length_kb_decimal" 'BEGIN { printf "%.5f", ROH_length_KB / autosome_length_kb }')
-        # # Debug the output
-        # echo " iid=$iid, ROH_length_KB=$ROH_length_KB, autosome_length_kb=$autosome_length_kb, F_ROH=$F_ROH"
-        KB_AVG=$(echo "$line" | awk '{print $6}')
-        # Append F_ROH information to output file
-        echo -e "$iid\t$F_ROH\t$ROH_length_KB\t$KB_AVG" >> "$output_file"
+if [ "$selection_simulation" = TRUE ]; then
+    # Loop through each .hom file in the directory
+    for hom_file in "$selection_model_pop_hom_file_dir"/*.hom.indiv; do
+        prefix=$(basename "$hom_file" _ROH.hom.indiv) # Extract the basename without the _ROH.hom.indiv extension
+        # Define the output file
+        output_file="$selection_model_F_ROH_results/${prefix}_F_ROH.tsv"
+        # Find autosome lengths file for the current .hom file
+        autosome_lengths_file="${preprocessed_selection_model_dir}/${prefix}_autosome_lengths_and_marker_density.tsv"
+        # Check if the corresponding autosome lengths file is found
+        if [ ! -f "$autosome_lengths_file" ]; then
+            echo "Error: Autosome lengths file not found for $hom_file"
+            continue
+        fi
+
+        # Compute autosome length in KB
+        autosome_length_kb=$(sed 1d "$autosome_lengths_file" | awk '{ sum += $2 } END { print sum / 1000 }')
+        # Find and remove output file (if it exists)
+        find "$selection_model_F_ROH_results" -name "${prefix}_F_ROH*" -type f -exec rm -f {} +
+        # Read the input .hom file line by line, skipping the first line
+        sed 1d "$hom_file" | while IFS= read -r line; do
+            # Extract IID from the second column
+            iid=$(echo "$line" | awk '{print $2}')
+            ROH_length_KB=$(echo "$line" | awk '{print $5}')
+            # Convert autosome_length_kb to a regular decimal number for the F_ROH computation
+            autosome_length_kb_decimal=$(printf "%.5f" "$autosome_length_kb")
+            # Calculate F_ROH using awk
+            F_ROH=$(awk -v ROH_length_KB="$ROH_length_KB" -v autosome_length_kb="$autosome_length_kb_decimal" 'BEGIN { printf "%.5f", ROH_length_KB / autosome_length_kb }')
+            # # Debug the output
+            # echo " iid=$iid, ROH_length_KB=$ROH_length_KB, autosome_length_kb=$autosome_length_kb, F_ROH=$F_ROH"
+            KB_AVG=$(echo "$line" | awk '{print $6}')
+            # Append F_ROH information to output file
+            echo -e "$iid\t$F_ROH\t$ROH_length_KB\t$KB_AVG" >> "$output_file"
+        done
+        # Sort the output file by IID (Individual ID)
+        sort -o "$output_file" -k1,1n "$output_file"
+        # Add the header to the output file
+        sed -i "1i $F_ROH_header" "$output_file"
+
+        # Compute average F_ROH
+        avg_F_ROH=$(awk -F'\t' '{ sum += $2 } END { printf "%.5f", sum / NR }' "$output_file")
+        
+        # Rename output file to include average F_ROH as suffix
+        mv "$output_file" "${output_file%.tsv}_${avg_F_ROH}_avg.tsv"
     done
-    # Sort the output file by IID (Individual ID)
-    sort -o "$output_file" -k1,1n "$output_file"
-    # Add the header to the output file
-    sed -i "1i $F_ROH_header" "$output_file"
+    echo "Computed Inbreeding Coefficients (F_ROH) for the Selection Model data. Results saved to: $selection_model_F_ROH_results"
 
-    # Compute average F_ROH
-    avg_F_ROH=$(awk -F'\t' '{ sum += $2 } END { printf "%.5f", sum / NR }' "$output_file")
-    
-    # Rename output file to include average F_ROH as suffix
-    mv "$output_file" "${output_file%.tsv}_${avg_F_ROH}_avg.tsv"
-done
-echo "Computed Inbreeding Coefficients (F_ROH) for the Selection Model data. Results saved to: $selection_model_F_ROH_results"
-
+else
+    echo "Selection simulation is set to FALSE. Skipping the selection model processing."
+fi
 
 
  # Ending the timer 
- end=$(date +%s)
- # Calculating the runtime of the script
- runtime=$((end-start))s
+ script_end=$(date +%s)
+ # Calculating the script_runtime of the script
+ script_runtime=$((script_end-script_start))
 
 echo "F_ROH computed successfully."
 
-echo "Total Runtime: $runtime seconds"
+echo "Total Runtime: $script_runtime seconds"

@@ -23,21 +23,50 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
-
 chromosome_end_margin <- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
+
+chr_simulated <- Sys.getenv("chr_simulated")
+chr_simulated
+# Extract the chromosome number and convert and convert it to numeric
+chr_number <- as.numeric(sub("chr", "", chr_simulated))
+
+# N_e_burn_in <- 2500 # Ancestral population
+N_e_burn_in <- as.numeric(Sys.getenv("Ne_burn_in")) # Ancestral population
+
+nInd_founder_population <- as.numeric(Sys.getenv("nInd_founder_population")) # Founder population
+
+Inbred_ancestral_population <- as.logical(Sys.getenv("Inbred_ancestral_population"))
+
+# N_e_bottleneck <- 50
+N_e_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
+
+n_generations_bottleneck <- as.numeric(Sys.getenv("n_generations_bottleneck")) # 5 default
+
+
+n_generations_mate_selection <-  as.numeric(Sys.getenv("n_simulated_generations_breed_formation"))  # The number of generations to simulate during the mate selection scenario of modern dog breeds
+n_generations_mate_selection
+
+n_ind_per_selection_sim_generation <- as.numeric(Sys.getenv("n_individuals_breed_formation")) # using as.numeric, otherwise class(n_ind_per_selection_sim_generation) = "character"
+n_ind_per_selection_sim_generation
+
+Ref_pop_snp_chip <- Sys.getenv("reference_population_for_snp_chip")
 
 
 min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
-allele_copies_threshold <- 10 # 10 default (candidate_variants = less than 10)
-min_allowed_gen_before_variant_lost <- 10 # Pruning replicates where the causative variant gets lost within this timespan
-causative_variant_prune_threshold <- 0.9
-N_e_burn_in <- 2500 # Ancestral population
-N_e_bottleneck <- 50
-N_e_mate_selection <- 50
+allele_copies_threshold <- 5 # 10 default (candidate_variants = less than 10)
+# min_allowed_gen_before_variant_lost <- 10 # Pruning replicates where the causative variant gets lost within this timespan
+causative_variant_prune_threshold <- 0.99
 
 
-n_generations_bottleneck <- 5
 
+
+s <- as.numeric(Sys.getenv("selection_coefficient")) # using as.numeric, otherwise class(s) = "character"
+# Print the value of selection_coefficient
+cat("Selection Coefficient:", s, "\n")
+
+snp_density_Mb <- as.numeric(Sys.getenv("selected_chr_snp_density_mb")) 
+snp_density_Mb
+disappearance_threshold_value_to_terminate_script <- as.numeric(Sys.getenv("disappearance_threshold_value_to_terminate_script"))
 
 
 #################################### 
@@ -45,40 +74,14 @@ n_generations_bottleneck <- 5
 #################################### 
 print("R script started executing")
 
-
-s <- as.numeric(Sys.getenv("selection_coefficient")) # using as.numeric, otherwise class(s) = "character"
-# Print the value of selection_coefficient
-cat("Selection Coefficient:", s, "\n")
-
-#print(Sys.getenv("selection_coefficient"))
-
-
-n_generations_mate_selection <-  as.numeric(Sys.getenv("n_simulated_generations_breed_formation"))  # The number of generations to simulate during the mate selection scenario of modern dog breeds
-n_generations_mate_selection
-
-
-
-
-n_ind_per_selection_sim_generation <- as.numeric(Sys.getenv("n_individuals_breed_formation")) # using as.numeric, otherwise class(n_ind_per_selection_sim_generation) = "character"
-n_ind_per_selection_sim_generation
-
 # Define the output directory based on the variable passed from the Bash script
 output_dir_simulation <- Sys.getenv("output_dir_selection_simulation")
 output_dir_simulation
 image_output_dir <- paste0(output_dir_simulation, "/variant_freq_plots")
-chr_simulated <- Sys.getenv("chr_simulated")
-chr_simulated
-
-# Extract the chromosome number and convert and convert it to numeric
-chr_number <- as.numeric(sub("chr", "", chr_simulated))
 
 output_sim_files_basename <- Sys.getenv("output_sim_files_basename")
 simulation_prune_count_file <- Sys.getenv("simulation_prune_count_file")
 variant_positions_file <- Sys.getenv("variant_positions_file")
-
-snp_density_Mb <- as.numeric(Sys.getenv("selected_chr_snp_density_mb")) 
-snp_density_Mb
-disappearance_threshold_value_to_terminate_script <- as.numeric(Sys.getenv("disappearance_threshold_value_to_terminate_script"))
 
 # Ensure that output_dir_simulation is defined
 if (is.null(output_dir_simulation)) {
@@ -144,13 +147,16 @@ chromosome_lengths_bp <- c(
 
 model_chromosome_bp_length <- chromosome_lengths_bp[chr_simulated] 
 
-founderGenomes <- runMacs2(nInd = 100,
+
+founderGenomes <- runMacs2(nInd = nInd_founder_population ,
                      nChr = 1,
                      Ne = N_e_burn_in,
                      bp = model_chromosome_bp_length,
+                     inbred = Inbred_ancestral_population,
                      genLen = 1,
                      histNe = NULL,
                      histGen = NULL)
+
 
 # Inspecting the founderGenomes object
 founderGenomes
@@ -200,9 +206,9 @@ breed1_founders <- founderpop[1:N_e_bottleneck] # 1:50
 cat("Population 1:\n")
 breed1_founders
 
-breed2_founders <- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
-cat("Population 2:\n")
-breed2_founders
+# breed2_founders <- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
+# cat("Population 2:\n")
+# breed2_founders
 
 ```
 
@@ -234,6 +240,10 @@ random_mating <- function(pop, SP, n_gen) {
     for (gen_ix in 2:(n_gen + 1)) {
         generations[[gen_ix]] <- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_ind, nProgeny = 1,
                                            simParam = SP)
+        # # Introducing mutations
+        # generations[[gen_ix]] <- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
+
+        
     }
      random_mating_generations <- generations[-1] #all generations except for the founder population gets returned (the simulated generations derived from the bottleneck)
     
@@ -250,7 +260,7 @@ random_mating <- function(pop, SP, n_gen) {
 n_generations <- 5
 # Simulating random mating within each breeding group for 5 generations
 breed1_bottleneck <- random_mating(breed1_founders, SP, n_generations)
-breed2_bottleneck <- random_mating(breed2_founders, SP, n_generations)
+# breed2_bottleneck <- random_mating(breed2_founders, SP, n_generations)
 
 
 ```
@@ -300,10 +310,13 @@ num_snp_markers_simulated_chromosome
 #   refPop = last_bottleneck_generation
 #   )
 
-# SP$addSnpChip(
-#   nSnpPerChr = num_snp_markers_simulated_chromosome,
-#   refPop = last_bottleneck_generation
-#   )
+# Check if Ref_pop_snp_chip is equal to last_bottleneck_generation
+if (Ref_pop_snp_chip == "last_bottleneck_generation") {
+  SP$addSnpChip(
+    nSnpPerChr = num_snp_markers_simulated_chromosome,
+    refPop = last_bottleneck_generation
+  )
+}
 
 ```
 
@@ -377,45 +390,71 @@ Mate_Selection_scenario <- function(selection_scenario_pop, n_generations_mate_s
   
   # Creating a vector to store the allele frequency of the causative variant over the selection simulation generations
   f_causative <- numeric(n_generations_mate_selection)
-    
-  # Loop through generations
-  for (gen in 1:n_generations_mate_selection) {
-    
-    # Retrieves the genotype of the causative variant for each individual in the population  
-    geno <- pullSegSiteGeno(selection_scenario_pop, simParam = SP)[, causative_variant]
-    # cat("\nGeneration", gen, "Geno:",geno)  
-    
-    #     # Print out the genotype of each individual
-    # for (i in 1:length(geno)) {
-    #   if (geno[i] == 2) {
-    #     cat("Generation", gen, "- Individual", i, "is homozygous for the causative variant (AA)\n")
-    #   } else if (geno[i] == 1) {
-    #     cat("Generation", gen, "- Individual", i, "is heterozygous (Aa)\n")
-    #   } else if (geno[i] == 0) {
-    #     cat("Generation", gen, "- Individual", i, "is homozygous for the non-causative variant (aa)\n")
-    #   }
-    # }
-    
-    # Set fitness based on genotype
-    fitness <- rep(1-s, length(geno))
-    fitness[geno == 2] <- 1
-    fitness[geno == 1] <- 1 - (s/2)
-    
-    # Biased sampling of parents based on fitness
-    parent1 <- sample(1:selection_scenario_pop@nInd, n_ind_per_selection_sim_generation, replace = TRUE, prob = fitness)
-    parent2 <- sample(1:selection_scenario_pop@nInd, n_ind_per_selection_sim_generation, replace = TRUE, prob = fitness)
-    
-    # Crossing parents to create next generation
-    selection_scenario_pop <- makeCross(selection_scenario_pop,
-                                        cbind(parent1, parent2),
-                                        nProgeny = 1,
-                                        simParam = SP)
-    
-    # Calculate allele frequency of the causative variant
-    f_causative[gen] <- sum(geno) / length(geno) / 2
-  }
   
-  return(list(f_causative,selection_scenario_pop))
+  generations <- vector(length = n_generations_mate_selection + 1,
+                        mode = "list") 
+
+  
+  generations[[1]] <- selection_scenario_pop # The initial breeding group population gets stored as the first element
+  
+
+    
+    
+    # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
+    # Each mating Progenys are generated using randcross
+    for (gen_ix in 2:(n_generations_mate_selection + 1)) {
+    
+      # Retrieves the genotype of the causative variant for each individual in the population  
+      geno <- pullSegSiteGeno(generations[[gen_ix - 1]], simParam = SP)[, causative_variant]
+      # cat("\nGeneration", gen, "Geno:",geno)  
+      
+      #     # Print out the genotype of each individual
+      # for (i in 1:length(geno)) {
+      #   if (geno[i] == 2) {
+      #     cat("Generation", gen, "- Individual", i, "is homozygous for the causative variant (AA)\n")
+      #   } else if (geno[i] == 1) {
+      #     cat("Generation", gen, "- Individual", i, "is heterozygous (Aa)\n")
+      #   } else if (geno[i] == 0) {
+      #     cat("Generation", gen, "- Individual", i, "is homozygous for the non-causative variant (aa)\n")
+      #   }
+      # }
+      
+      # Set fitness based on genotype
+      fitness <- rep(1-s, length(geno))
+      fitness[geno == 1] <- 1 - (s/2)
+      fitness[geno == 2] <- 1
+      
+      # Initialize vectors for parents
+      parent1 <- integer(n_ind_per_selection_sim_generation)
+      parent2 <- integer(n_ind_per_selection_sim_generation)
+      
+      # Biased sampling of parents based on fitness
+      # Create mating pairs
+      for (i in 1:n_ind_per_selection_sim_generation) {
+          # Sample parent1
+          parent1[i] <- sample(1:generations[[gen_ix - 1]]@nInd, 1, replace = TRUE, prob = fitness)
+          # Ensure parent2 is different from parent1
+          repeat {
+              parent2[i] <- sample(1:generations[[gen_ix - 1]]@nInd,1, replace = TRUE, prob = fitness)
+              if (parent2[i] != parent1[i]) break
+          }
+      }
+      
+      # Crossing parents to create next generation
+      generations[[gen_ix]] <- makeCross(generations[[gen_ix - 1]],
+                                          cbind(parent1, parent2),
+                                          nProgeny = 1,
+                                          simParam = SP)
+      # # Introducing mutations
+      # selection_scenario_pop <- AlphaSimR::mutate(selection_scenario_pop, simParam = SP)
+      
+      # Calculate allele frequency of the causative variant
+      f_causative[gen_ix] <- sum(geno) / length(geno) / 2
+    }
+  
+ selection_scenario_pop_final_generation <- generations[[n_generations_mate_selection+1]] # Final generation extracted
+  
+  return(list(f_causative,selection_scenario_pop_final_generation))
   
 }
 
@@ -493,13 +532,16 @@ last_mate_selection_generation
 
 
 
-SP$addSnpChip(
-
+# Check if Ref_pop_snp_chip is equal to "last_breed_formation_generation"
+if (Ref_pop_snp_chip == "last_breed_formation_generation") {
+  SP$addSnpChip(
   nSnpPerChr = num_snp_markers_simulated_chromosome,
 
   refPop = last_mate_selection_generation
 
   )
+  
+}
 
 
 
