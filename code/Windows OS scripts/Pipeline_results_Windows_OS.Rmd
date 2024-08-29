@@ -83,7 +83,7 @@ simulated_data_dir_basename <- "simulated - HO15_1"
 # results_dir <- file.path(repository_path,"res_HO9_v1")
 # results_dir <- file.path(repository_path,"res_H10_v1")
 # results_dir <- file.path(repository_path,"res_HO14_3")
-results_dir <- file.path(repository_path,"res_HO15_1")
+results_dir <- file.path(repository_path,"resH15_1")
 # results_dir <- file.path(repository_path,"res_Sams")
 
 # results_dir <- file.path(repository_path,"results-50")
@@ -93,22 +93,22 @@ results_dir <- file.path(repository_path,"res_HO15_1")
 
 plink_ROH_dir <- file.path(results_dir,"PLINK//ROH")
 # expected_heterozygosity_dir <- file.path(results_dir,"expected_heterozygosity")
-# expected_heterozygosity_dir <- file.path(results_dir,"expected_heterozygosity_No_MAF")
-expected_heterozygosity_dir <- file.path(results_dir,"expected_heterozygosity_MAF_0_01")
+expected_heterozygosity_dir <- file.path(results_dir,"expected_heterozygosity_No_MAF")
+# expected_heterozygosity_dir <- file.path(results_dir,"expected_heterozygosity_MAF_0_01")
 # expected_heterozygosity_dir <- file.path(results_dir,"expected_heterozygosity_MAF_0_05")
 
 
 ROH_hotspots_dir <- file.path(results_dir,"ROH-Hotspots")
 
 # Selection_strength_test_dir <- file.path(ROH_hotspots_dir,"selection_strength_test")
-# Selection_strength_test_dir <- file.path(ROH_hotspots_dir,"selection_strength_test_No_MAF")
-Selection_strength_test_dir <- file.path(ROH_hotspots_dir,"selection_strength_test_MAF_0_01")
+Selection_strength_test_dir <- file.path(ROH_hotspots_dir,"selection_strength_test_No_MAF")
+# Selection_strength_test_dir <- file.path(ROH_hotspots_dir,"selection_strength_test_MAF_0_01")
 # Selection_strength_test_dir <- file.path(ROH_hotspots_dir,"selection_strength_test_MAF_0_05")
 
 
 # Sweep_test_dir <- file.path(ROH_hotspots_dir,"sweep_test")
-# Sweep_test_dir <- file.path(ROH_hotspots_dir,"sweep_test_No_MAF")
-Sweep_test_dir <- file.path(ROH_hotspots_dir,"sweep_test_MAF_0_01")
+Sweep_test_dir <- file.path(ROH_hotspots_dir,"sweep_test_No_MAF")
+# Sweep_test_dir <- file.path(ROH_hotspots_dir,"sweep_test_MAF_0_01")
 
 #¤¤¤¤¤¤¤¤ Simulated Data ¤¤¤¤¤¤¤¤
 raw_data_dir <- file.path(repository_path,"data/raw")
@@ -152,8 +152,8 @@ Selection_model_H_e_dir <- file.path(expected_heterozygosity_dir,"simulated/sele
 
 # Causative variant
 Selection_causative_variant_windows_dir <- file.path(results_dir,"causative_variant_windows")
-# causative_variant_windows_H_e_dir <- file.path(Selection_causative_variant_windows_dir,"H_e_No_MAF")
-causative_variant_windows_H_e_dir <- file.path(Selection_causative_variant_windows_dir,"H_e_MAF_0_01")
+causative_variant_windows_H_e_dir <- file.path(Selection_causative_variant_windows_dir,"H_e_No_MAF")
+# causative_variant_windows_H_e_dir <- file.path(Selection_causative_variant_windows_dir,"H_e_MAF_0_01")
 # causative_variant_windows_H_e_dir <- file.path(Selection_causative_variant_windows_dir,"H_e_MAF_0_05")
 
 raw_selection_dir <- file.path(raw_simulated_data_dir,"selection_model")
@@ -2691,17 +2691,41 @@ Hotspots_and_Causative_windows_comparison$Lengths_Mb <- round(Hotspots_and_Causa
 Hotspots_and_Causative_windows_comparison_sorted <- Hotspots_and_Causative_windows_comparison[order(Hotspots_and_Causative_windows_comparison$Model, decreasing = TRUE), ]
 
 
+# Now, create a new data frame with confidence intervals as tuples
+Hotspots_and_Causative_windows_CI_tuples <- data.frame(
+  Model = Hotspots_and_Causative_windows_comparison$Model,
+  Lengths_Mb = Hotspots_and_Causative_windows_comparison$Lengths_Mb,
+  Length_CI = ifelse(is.na(Hotspots_and_Causative_windows_comparison$Length_lower_ci), NA, 
+                     paste0("(", Hotspots_and_Causative_windows_comparison$Length_lower_ci, ", ", Hotspots_and_Causative_windows_comparison$Length_upper_ci, ")")),
+  ROH_Freq = Hotspots_and_Causative_windows_comparison$ROH_Freq,
+  ROH_Freq_CI = ifelse(is.na(Hotspots_and_Causative_windows_comparison$ROH_freq_lower_ci), NA, 
+                       paste0("(", Hotspots_and_Causative_windows_comparison$ROH_freq_lower_ci, ", ", Hotspots_and_Causative_windows_comparison$ROH_freq_upper_ci, ")")),
+  H_e = Hotspots_and_Causative_windows_comparison$H_e,
+  H_e_CI = ifelse(is.na(Hotspots_and_Causative_windows_comparison$H_e_lower_ci), NA, 
+                  paste0("(", Hotspots_and_Causative_windows_comparison$H_e_lower_ci, ", ", Hotspots_and_Causative_windows_comparison$H_e_upper_ci, ")"))
+)
 
-Hotspots_and_Causative_windows_comparison_sorted_latex <- Hotspots_and_Causative_windows_comparison_sorted
-# Escape underscores in the Name column
-Hotspots_and_Causative_windows_comparison_sorted_latex$Model <- gsub("_", "\\_", Hotspots_and_Causative_windows_comparison_sorted_latex$Model, fixed = TRUE)
+# Sort the new data frame with tuples based on the 'Model' column in descending order
+Hotspots_and_Causative_windows_CI_tuples_sorted <- Hotspots_and_Causative_windows_CI_tuples[order(Hotspots_and_Causative_windows_CI_tuples$Model, decreasing = TRUE), ]
+
+Hotspots_and_Causative_windows_CI_tuples_sorted$Model <- gsub("_", "\\_", Hotspots_and_Causative_windows_CI_tuples_sorted$Model, fixed = TRUE)
+Hotspots_and_Causative_windows_CI_tuples_sorted$Length_CI <- gsub(",", "\\,", Hotspots_and_Causative_windows_CI_tuples_sorted$Length_CI, fixed = TRUE)
+Hotspots_and_Causative_windows_CI_tuples_sorted$ROH_Freq_CI <- gsub(",", "\\,", Hotspots_and_Causative_windows_CI_tuples_sorted$ROH_Freq_CI, fixed = TRUE)
+Hotspots_and_Causative_windows_CI_tuples_sorted$H_e_CI <- gsub(",", "\\,", Hotspots_and_Causative_windows_CI_tuples_sorted$H_e_CI, fixed = TRUE)
+
+# Define the filename for the new data frame with CI tuples
+filename_tuples <- file.path(output_dir, paste("ROH_Hotspots_and_Causative_Windows_comparison",".csv", sep = ""))
+
+# Write the new sorted data frame to CSV file without quotes
+write.table(Hotspots_and_Causative_windows_CI_tuples_sorted, file = filename_tuples, sep = ",", row.names = FALSE, quote = FALSE)
 
 
-# Define the filename with the output directory path
-filename <- file.path(output_dir, paste("ROH_Hotspots_and_Causative_Windows_comparison",".csv", sep = ""))
 
-# Write data to CSV file without quotes
-write.table(Hotspots_and_Causative_windows_comparison_sorted_latex, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+# # Define the filename with the output directory path
+# filename <- file.path(output_dir, paste("ROH_Hotspots_and_Causative_Windows_comparison",".csv", sep = ""))
+# 
+# # Write data to CSV file without quotes
+# write.table(Hotspots_and_Causative_windows_comparison_sorted_latex, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
 kable(Hotspots_and_Causative_windows_comparison_sorted, row.names = FALSE)
 # View(causative_variant_window_results_df)
