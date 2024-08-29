@@ -1074,8 +1074,8 @@ cat("ROH-hotspot selection testing results:\n")
 kable(ROH_hotspots_selection_testing, row.names = FALSE)
 
 
-# Formatting the threshold value for the output file, to 5 decimals
-formatted_H_e_threshold_value <- format(threshold_value, nsmall = 5)
+# Formatting the threshold value for the output file, to 3 decimals
+formatted_H_e_threshold_value <- format(threshold_value, nsmall = 3)
 
 # Define the filename with the output directory path
 filename <- file.path(output_dir_sweep_test, paste("ROH_hotspots_", sweep_test_type,"_",sim_scenario_id,"_H_E_threshold_", formatted_H_e_threshold_value, ".tsv", sep = ""))

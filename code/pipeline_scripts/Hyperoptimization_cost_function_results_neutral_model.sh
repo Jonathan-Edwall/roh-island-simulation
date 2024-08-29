@@ -90,6 +90,8 @@ mkdir -p $hyperoptimizer_results_dir
 ##############################################################################################  
 ############ RESULTS ###########################################################################
 ############################################################################################## 
+export expected_heterozygosity_dir_NO_MAF="$results_dir/expected_heterozygosity_No_MAF"
+export expected_heterozygosity_dir_MAF_0_05="$results_dir/expected_heterozygosity_MAF_0_05"
 
 ############### 
 ## Empirical ###
@@ -106,7 +108,7 @@ export Empirical_data_F_ROH_dir="$Empirical_breed_F_ROH_dir"
 # expected_heterozygosity_dir="$results_dir/expected_heterozygosity_$MAF_status_suffix"
 # Empirical_breed_H_e_dir=$expected_heterozygosity_dir/empirical/$empirical_dog_breed
 
-export Empirical_data_H_e_dir="$Empirical_breed_H_e_dir"
+# export Empirical_data_H_e_dir="$Empirical_breed_H_e_dir"
 
 ############### 
 ## Simulated ###
@@ -120,7 +122,7 @@ export Neutral_model_autosome_ROH_freq_dir="$Neutral_model_autosome_ROH_freq_dir
 export Neutral_model_F_ROH_dir="$Neutral_model_F_ROH_dir"
 
 ### Expected Heterozygosity distribution ###
-export Neutral_model_H_e_dir="$Neutral_model_H_e_dir"
+# export Neutral_model_H_e_dir="$Neutral_model_H_e_dir"
 
 
 # Output_dir

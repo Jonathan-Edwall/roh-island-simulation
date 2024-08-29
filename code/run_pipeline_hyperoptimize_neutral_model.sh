@@ -40,6 +40,7 @@ echo "Pipeline Runtimes:" > $runtime_log
 ######################################
 export n_simulation_replicates=20
 export empirical_dog_breed="labrador_retriever"
+export empirical_data_basename="LR_fs"
 export selection_simulation=FALSE
 export empirical_processing=FALSE
 export results_dir=$HOME/results_HO
@@ -53,22 +54,39 @@ export data_dir=$HOME/data_HO
 export chr_simulated=$1
 export Ne_burn_in=$2
 export nInd_founder_population=$3
-export Inbred_ancestral_population=$4
-export N_e_bottleneck=$5
-export n_generations_bottleneck=$6
-export n_simulated_generations_breed_formation=$7
-export n_individuals_breed_formation=$8
-export reference_population_for_snp_chip=$9
-export Introduce_mutations=${10}
+export Inbred_ancestral_population=FALSE
+export N_e_bottleneck=$3
+export n_generations_bottleneck=$4
+export n_simulated_generations_breed_formation=$5
+export n_individuals_breed_formation=$6
+export reference_population_for_snp_chip=$7
+# export Introduce_mutations=${10}
+export Introduce_mutations=FALSE
 
-# export chr_simulated="chr3" # "chr28" or "chr1"
-# export Ne_burn_in=225
-# export nInd_founder_population=70 # 50 or 100
+
+
+# # Get parameters from command line arguments for the hyperoptimization
+# export chr_simulated=$1
+# export Ne_burn_in=$2
+# export nInd_founder_population=$3
+# export Inbred_ancestral_population=$4
+# export N_e_bottleneck=$5
+# export n_generations_bottleneck=$6
+# export n_simulated_generations_breed_formation=$7
+# export n_individuals_breed_formation=$8
+# export reference_population_for_snp_chip=$9
+# export Introduce_mutations=${10}
+
+
+
+# export chr_simulated="chr1" # "chr28" or "chr1"
+# export Ne_burn_in=1750
+# export N_e_bottleneck=27 # [30,40,50,60,70]
+# export nInd_founder_population=$N_e_bottleneck # 50 or 100
 # export Inbred_ancestral_population=FALSE # TRUE or FALSE
-# export N_e_bottleneck=30 # [30,40,50,60,70]
-# export n_generations_bottleneck=15
-# export n_simulated_generations_breed_formation=80 # [40,45,50,55,60,65,70]
-# export n_individuals_breed_formation=425 # [40-70]
+# export n_generations_bottleneck=9
+# export n_simulated_generations_breed_formation=62 # [40,45,50,55,60,65,70]
+# export n_individuals_breed_formation=500 # [40-70]
 # # Choose snp chip, either from "last_breed_formation_generation" or last_bottleneck_generation:
 # # export reference_population_for_snp_chip="last_bottleneck_generation" # Creating the SNP chip based out of the final bottleneck scenario gen
 # export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
@@ -110,9 +128,9 @@ export Introduce_mutations=${10}
 # #� Empirical �
 # #�������������
 
-# # Step 1
-# step=1
-# script_name="2_1_1_plink_preprocessing_empirical_data.sh"
+# Step 1
+step=1
+script_name="2_1_1_plink_preprocessing_empirical_data.sh"
 # echo "Step $step: Running $script_name"
 # source "$script_dir/$script_name"
 # end_step1=$(date +%s)
@@ -132,16 +150,28 @@ if [ -f "$output_file" ]; then
     ### Extracting the SNP Density of the selected chromosome that will be simulated ###
     # Step 1: Find the row where column 1 is equal to the chromosome number in $chr_number
     selected_row=$(awk -v chr="$chr_num" '$1 == chr' "$output_file")
-    echo "selected_row: $selected_row"
+    # echo "sann chr: $chr_simulated"
+    # echo "Ne_burn_in: $Ne_burn_in"
+    # echo "nInd_founder_population: $nInd_founder_population"
+    # echo "N_e_bottleneck:$n_generations_bottleneck"
+    # echo "n_generations_bottleneck:$n_generations_bottleneck"
+    # echo "n_simulated_generations_breed_formation:$n_simulated_generations_breed_formation"
+    # echo "n_individuals_breed_formation:$n_individuals_breed_formation"
+    # echo "reference_population_for_snp_chip:$reference_population_for_snp_chip"
+
+    # echo "sann chr: $1"
+    # echo "Ne_burn_in: $2"
+    # echo "nInd_founder_population: $nInd_founder_population"
+    # echo "N_e_bottleneck:$3"
+    # echo "n_generations_bottleneck:$4"
+    # echo "n_simulated_generations_breed_formation:$5"
+    # echo "n_individuals_breed_formation:$6"
+    # echo "reference_population_for_snp_chip:$7"
+    echo "Chosen SNP-density from the empirical dataset: $selected_row"
     # Step 2: Extract the SNP density value from the selected row
     selected_chr_preprocessed_snp_density_mb=$(echo "$selected_row" | awk '{print $5}')
-
 fi
-
-
 num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is used for the SNP chip in alphasimr
-
-
 export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_density_mb * $num_markers_raw_empirical_dataset_scaling_factor" | bc)
 
 echo "selected_chr_snp_density_mb: $selected_chr_snp_density_mb"
@@ -189,14 +219,24 @@ runtime_step5=$((end_step5-end_step4))
 echo "Step $step: $script_name Runtime: $runtime_step5 seconds" >> $runtime_log
 ((step++))
 
+# # Step 6
+# script_name="2_2_3_create_indv_ROH_bed_file.sh"
+# echo "Step $step: Running $script_name"
+# source "$script_dir/$script_name"
+# end_step6=$(date +%s)
+# runtime_step6=$((end_step6-end_step5))
+# echo "Step $step: $script_name Runtime: $runtime_step6 seconds" >> $runtime_log
+# ((step++))
+
 # Step 6
-script_name="2_2_3_create_indv_ROH_bed_file.sh"
+script_name="2_2_3_optimized_create_indv_ROH_bed_file.sh"
 echo "Step $step: Running $script_name"
 source "$script_dir/$script_name"
 end_step6=$(date +%s)
 runtime_step6=$((end_step6-end_step5))
 echo "Step $step: $script_name Runtime: $runtime_step6 seconds" >> $runtime_log
 ((step++))
+
 
 # Step 7
 script_name="2_3_1_Window_file_creator_for_ROH_frequency_computation.sh"
@@ -234,14 +274,26 @@ runtime_step10=$((end_step10-end_step9))
 echo "Step $step: $script_name Runtime: $runtime_step10 seconds" >> $runtime_log
 ((step++))
 
+
 # Step 11
-script_name="Hyperoptimization_H_e_calculation.sh"
+script_name="H_e_calc_for_multiple_MAF_HO.sh"
 echo "Step $step: Running $script_name"
 source "$script_dir/pipeline_scripts/$script_name"
 end_step11=$(date +%s)
 runtime_step11=$((end_step11-end_step10))
 echo "Step $step: $script_name Runtime: $runtime_step11 seconds" >> $runtime_log
 ((step++))
+
+
+
+# # Step 11
+# script_name="Hyperoptimization_H_e_calculation.sh"
+# echo "Step $step: Running $script_name"
+# source "$script_dir/pipeline_scripts/$script_name"
+# end_step11=$(date +%s)
+# runtime_step11=$((end_step11-end_step10))
+# echo "Step $step: $script_name Runtime: $runtime_step11 seconds" >> $runtime_log
+# ((step++))
 
 # Step 12
 script_name="Hyperoptimization_cost_function_results_neutral_model.sh"
@@ -251,6 +303,9 @@ end_step12=$(date +%s)
 runtime_step12=$((end_step12-end_step11))
 echo "Step $step: $script_name Runtime: $runtime_step12 seconds" >> $runtime_log
 ((step++))
+
+# Ensure all background processes are completed before proceeding
+wait
 
 # Calculate total runtime
 total_runtime=$((end_step12-pipeline_start))
@@ -265,15 +320,15 @@ done
 
 echo "Total Pipeline Runtime: $total_runtime seconds"
 
-initial_sleep=20
-final_sleep=60
+# initial_sleep=20
+# # final_sleep=60
 
-echo "Sleep for $initial_sleep sec"
-sleep $initial_sleep
-echo "$initial_sleep seconds passed"
+# echo "Sleep for $initial_sleep sec"
+# sleep $initial_sleep
+# echo "$initial_sleep seconds passed"
 # cd $HOME
 source "$HOME/pipeline_remove_all_simulation_files.sh"
 # bash ./remove_all_pipeline_files.sh
-echo "Sleep for $final_sleep sec"
-sleep $final_sleep
+# echo "Sleep for $final_sleep sec"
+# sleep $final_sleep
 echo "Move on to next trial"

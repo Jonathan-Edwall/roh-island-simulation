@@ -14,6 +14,7 @@ conda activate bedtools
 ####### Defining parameter values #######
 ######################################
 overlap_fraction=1.0 # 100 % of the genomic 100k bp-window ("a-file") needs to be overlapping with the roh-segment ("b-file") 
+# empirical_processing=FALSE # is imported from run_pipeline.sh! (the main script)
 # $n_individuals_breed_formation is imported from run_pipeline.sh! (the main script)
 
 # Hardcoding the number of individual within a simulated population, to calculate the ROH-frequency correctly.
@@ -140,6 +141,32 @@ awk -v chr="$simulated_chr_number" 'NR == 1 || $1 == chr' "$window_files_dir/can
 # Population ROH-frequency file for the 100kbp bp windows, found in ./pop_roh_freq
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
+# Number of parallel jobs to run at a time
+# max_parallel_jobs=10
+# max_parallel_jobs=40
+# max_parallel_jobs=100
+max_parallel_jobs=300
+
+# Function to run bedtools coverage for a single individual file
+process_coverage_file() {
+    local indv_roh_file=$1
+    local basename_part=$(basename "${indv_roh_file%.*}")  # Extracting the basename part 
+
+    local coverage_output_simulation_model_dir=$2
+    local output_file="${coverage_output_simulation_model_dir}/${basename_part}_coverage.bed"
+
+    # Run bedtools coverage-function
+    bedtools coverage \
+        -a $temp_window_file \
+        -b <(tail -n +2 "$indv_roh_file") \
+        -counts \
+        -f $overlap_fraction \
+        > "$output_file"    
+    # echo "Processed $indv_roh_file"
+}
+
+
+
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Empirical Data (German Shepherd) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -159,6 +186,8 @@ if [ "$empirical_processing" = TRUE ]; then
         > "$output_file"    
 
     done
+    echo "Coverage calculations completed for the empirical dataset, results stored in $coverage_output_empirical_breed_dir"
+
 else
     echo "Empirical data has been set to not be processed, since files have already been created."
 fi
@@ -168,33 +197,47 @@ fi
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-
-# Running coverage command for every individual to count to which roh-segments an individual maps.
+# Loop over each .bed file and process it in parallel
 for indv_roh_file in $neutral_model_indv_bed_files_dir/*.bed; do
-    basename_part=$(basename "${indv_roh_file%.*}") # Extracting the basename part 
-    output_file="$coverage_output_neutral_model_dir/${basename_part}_coverage.bed" 
+    process_coverage_file $indv_roh_file $coverage_output_neutral_model_dir &
+
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+        wait -n
+    done
+done
+
+# Wait for all background jobs to finish
+wait
+echo "Coverage calculations completed for the neutral model, results stored in $coverage_output_neutral_model_dir "
 
 
-    # Run bedtools coverage-function 
-    # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
-    bedtools coverage \
-    -a $temp_window_file \
-    -b <(tail -n +2 "$indv_roh_file") \
-    -counts \
-    -f $overlap_fraction \
-    > "$output_file" 
+# # Running coverage command for every individual to count to which roh-segments an individual maps.
+# for indv_roh_file in $neutral_model_indv_bed_files_dir/*.bed; do
+#     basename_part=$(basename "${indv_roh_file%.*}") # Extracting the basename part 
+#     output_file="$coverage_output_neutral_model_dir/${basename_part}_coverage.bed" 
+
+
+#     # Run bedtools coverage-function 
+#     # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
+#     bedtools coverage \
+#     -a $temp_window_file \
+#     -b <(tail -n +2 "$indv_roh_file") \
+#     -counts \
+#     -f $overlap_fraction \
+#     > "$output_file" 
 
 
     
-    # # Run bedtools coverage-function 
-    # # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
-    # bedtools coverage \
-    # -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
-    # -b <(tail -n +2 "$indv_roh_file") \
-    # -counts \
-    # -f $overlap_fraction \
-    # > "$output_file" 
-done
+#     # # Run bedtools coverage-function 
+#     # # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
+#     # bedtools coverage \
+#     # -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
+#     # -b <(tail -n +2 "$indv_roh_file") \
+#     # -counts \
+#     # -f $overlap_fraction \
+#     # > "$output_file" 
+# done
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
@@ -203,40 +246,17 @@ done
 if [ "$selection_simulation" = TRUE ]; then
     # Running coverage command for every individual to count to which roh-segments an individual maps.
     for indv_roh_file in $selection_model_indv_bed_files_dir/*.bed; do
-        basename_part=$(basename "${indv_roh_file%.*}") # Extracting the basename part 
-        output_file="$coverage_output_selection_model_dir/${basename_part}_coverage.bed" 
+        process_coverage_file $indv_roh_file $coverage_output_selection_model_dir &
 
-
-        # Run bedtools coverage-function 
-        # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
-        bedtools coverage \
-        -a $temp_window_file \
-        -b <(tail -n +2 "$indv_roh_file") \
-        -counts \
-        -f $overlap_fraction \
-        > "$output_file" 
-
-
-        
-        # # # Run bedtools coverage-function 
-        # # # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
-        # # bedtools coverage \
-        # # -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
-        # # -b <(tail -n +2 "$indv_roh_file") \
-        # # -counts \
-        # # -f $overlap_fraction \
-        # # > "$output_file" 
-
-        
-        # # Run bedtools coverage-function 
-        # # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
-        # bedtools coverage \
-        # -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
-        # -b <(tail -n +2 "$indv_roh_file") \
-        # -counts \
-        # -f $overlap_fraction \
-        # > "$output_file" 
+        # Control the number of parallel jobs
+        while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+            wait -n
+        done
     done
+    # Wait for all background jobs to finish
+    wait
+    echo "Coverage calculations completed for the selection models, results stored in $coverage_output_selection_model_dir"
+
 
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
@@ -245,6 +265,54 @@ fi
 
 # Clean up the temp window file after use
 rm $temp_window_file
+
+
+
+
+
+# if [ "$selection_simulation" = TRUE ]; then
+#     # Running coverage command for every individual to count to which roh-segments an individual maps.
+#     for indv_roh_file in $selection_model_indv_bed_files_dir/*.bed; do
+#         basename_part=$(basename "${indv_roh_file%.*}") # Extracting the basename part 
+#         output_file="$coverage_output_selection_model_dir/${basename_part}_coverage.bed" 
+
+
+#         # Run bedtools coverage-function 
+#         # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
+#         bedtools coverage \
+#         -a $temp_window_file \
+#         -b <(tail -n +2 "$indv_roh_file") \
+#         -counts \
+#         -f $overlap_fraction \
+#         > "$output_file" 
+
+
+        
+#         # # # Run bedtools coverage-function 
+#         # # # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
+#         # # bedtools coverage \
+#         # # -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
+#         # # -b <(tail -n +2 "$indv_roh_file") \
+#         # # -counts \
+#         # # -f $overlap_fraction \
+#         # # > "$output_file" 
+
+        
+#         # # Run bedtools coverage-function 
+#         # # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
+#         # bedtools coverage \
+#         # -a "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" \
+#         # -b <(tail -n +2 "$indv_roh_file") \
+#         # -counts \
+#         # -f $overlap_fraction \
+#         # > "$output_file" 
+#     done
+
+# else
+#     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
+# fi
+
+
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #
@@ -304,45 +372,88 @@ fi
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+# echo "coverage_output_neutral_model_dir: ${coverage_output_neutral_model_dir}"
 
-echo "coverage_output_neutral_model_dir: ${coverage_output_neutral_model_dir}"
-
-# Extract unique simulation prefixes
-# sort -u extracts unique prefixes, in an alphabetical order
-simulation_prefixes_neutral_model=$(ls $coverage_output_neutral_model_dir/*_ROH_IID_*_coverage.bed | sed 's/.*\/\([^/]*\)_ROH_IID_[0-9]*_.*\.bed/\1/' | sort -u)
-
-# Iterate over each simulation (unique simulation prefix)
-for prefix in $simulation_prefixes_neutral_model; do
-    # Remove existing frequency file if it already exists for the simulation!
-    rm -f "${roh_frequencies_neutral_model_dir}/${prefix}_ROH_freq.bed"
-
+# Function to process each simulation prefix
+process_simulation_prefix() {
+    local prefix=$1
+    local coverage_output_simulation_model_dir=$2
+    local roh_frequencies_simulation_model_dir=$3
+    
+    # Remove existing frequency file if it already exists for the simulation
+    rm -f "${roh_frequencies_simulation_model_dir}/${prefix}_ROH_freq.bed"
 
     # Filter files belonging to the current simulation prefix
-    simulation_files="$coverage_output_neutral_model_dir/${prefix}_ROH*"
-    #
+    local simulation_files="$coverage_output_simulation_model_dir/${prefix}_ROH*"
+
     # Using awk to calculate the sum of counts for each window and add a frequency column. 
     # Then the file is sorted by genomic coordinates
     awk -v num_indiv="$n_individuals_breed_formation" -v header="$header" '{
         window_counts[$1"\t"$2"\t"$3]+=$4
     } 
     END {
-
         for (i in window_counts) {
             frequency = window_counts[i] / num_indiv
             print i "\t" window_counts[i] "\t" frequency
         }
     }' \
     $simulation_files | sed '1i'"$header" | sort -k1,1n -k2,2n \
-    > "${roh_frequencies_neutral_model_dir}/${prefix}_ROH_freq.bed"   
+    > "${roh_frequencies_simulation_model_dir}/${prefix}_ROH_freq.bed"   
       
     echo "Population level ROH-Window-frequencies computed for simulation $prefix"
+}
+# Extract unique simulation prefixes
+# sort -u extracts unique prefixes, in an alphabetical order
+simulation_prefixes_neutral_model=$(ls $coverage_output_neutral_model_dir/*_ROH_IID_*_coverage.bed | sed 's/.*\/\([^/]*\)_ROH_IID_[0-9]*_.*\.bed/\1/' | sort -u)
+max_parallel_jobs_population_roh_freq=20
 
+
+# Loop over each simulation prefix and process it in parallel
+for prefix in $simulation_prefixes_neutral_model; do
+    process_simulation_prefix $prefix $coverage_output_neutral_model_dir $roh_frequencies_neutral_model_dir &
+
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_population_roh_freq ]; do
+        wait -n
+    done
 done
 
-
-
+# Wait for all background jobs to finish
+wait
 echo "Population level ROH-Window-frequencies computed for the neutral model simulations"
 echo "Output files stored in: ${roh_frequencies_neutral_model_dir}"
+
+
+# # Iterate over each simulation (unique simulation prefix)
+# for prefix in $simulation_prefixes_neutral_model; do
+#     # Remove existing frequency file if it already exists for the simulation!
+#     rm -f "${roh_frequencies_neutral_model_dir}/${prefix}_ROH_freq.bed"
+
+
+#     # Filter files belonging to the current simulation prefix
+#     simulation_files="$coverage_output_neutral_model_dir/${prefix}_ROH*"
+#     #
+#     # Using awk to calculate the sum of counts for each window and add a frequency column. 
+#     # Then the file is sorted by genomic coordinates
+#     awk -v num_indiv="$n_individuals_breed_formation" -v header="$header" '{
+#         window_counts[$1"\t"$2"\t"$3]+=$4
+#     } 
+#     END {
+
+#         for (i in window_counts) {
+#             frequency = window_counts[i] / num_indiv
+#             print i "\t" window_counts[i] "\t" frequency
+#         }
+#     }' \
+#     $simulation_files | sed '1i'"$header" | sort -k1,1n -k2,2n \
+#     > "${roh_frequencies_neutral_model_dir}/${prefix}_ROH_freq.bed"   
+      
+#     echo "Population level ROH-Window-frequencies computed for simulation $prefix"
+
+# done
+
+
+
 
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -351,42 +462,65 @@ echo "Output files stored in: ${roh_frequencies_neutral_model_dir}"
 
 if [ "$selection_simulation" = TRUE ]; then
     echo "coverage_output_selection_model_dir: ${coverage_output_selection_model_dir}"
-
     # Extract unique simulation prefixes
     # sort -u extracts unique prefixes, in an alphabetical order
     simulation_prefixes_selection_model=$(find "$coverage_output_selection_model_dir" -name "*_ROH_IID_*_coverage.bed" -exec basename {} \; | sed 's/_ROH_IID_[0-9]*_coverage\.bed//' | sort -Vu)
-
     # Iterate over each simulation (unique simulation prefix)
     for prefix in $simulation_prefixes_selection_model; do
-        # Remove existing frequency file if it already exists for the simulation!
-        rm -f "${roh_frequencies_selection_model_dir}/${prefix}_ROH_freq.bed"
-        
-        # Find files belonging to the current simulation prefix
-        simulation_files=$(find "$coverage_output_selection_model_dir" -name "${prefix}_ROH*")
+        process_simulation_prefix $prefix $coverage_output_selection_model_dir $roh_frequencies_selection_model_dir &
 
-        # Using awk to calculate the sum of counts for each window and add a frequency column. 
-        # Then the file is sorted by genomic coordinates
-        awk -v num_indiv="$n_individuals_breed_formation" -v header="$header" '{
-            window_counts[$1"\t"$2"\t"$3]+=$4
-        } 
-        END{
-        for (i in window_counts) {
-            frequency = window_counts[i] / num_indiv
-            print i "\t" window_counts[i] "\t" frequency
-                                }
-        } ' \
-        $simulation_files | sed '1i'"$header" | sort -k1,1n -k2,2n \
-        > "${roh_frequencies_selection_model_dir}/${prefix}_ROH_freq.bed"   
-        
-        echo "Population level ROH-Window-frequencies computed for simulation $prefix"
-
+        # Control the number of parallel jobs
+        while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_population_roh_freq ]; do
+            wait -n
+        done
+    
     done
-
+    # Wait for all background jobs to finish
+    wait
     echo "Population level ROH-Window-frequencies computed for the selection model simulations"
     echo "Output files stored in: ${roh_frequencies_selection_model_dir}"
 else
     echo ""
 fi
+
+# if [ "$selection_simulation" = TRUE ]; then
+#     echo "coverage_output_selection_model_dir: ${coverage_output_selection_model_dir}"
+
+#     # Extract unique simulation prefixes
+#     # sort -u extracts unique prefixes, in an alphabetical order
+#     simulation_prefixes_selection_model=$(find "$coverage_output_selection_model_dir" -name "*_ROH_IID_*_coverage.bed" -exec basename {} \; | sed 's/_ROH_IID_[0-9]*_coverage\.bed//' | sort -Vu)
+
+#     # Iterate over each simulation (unique simulation prefix)
+#     for prefix in $simulation_prefixes_selection_model; do
+#         # Remove existing frequency file if it already exists for the simulation!
+#         rm -f "${roh_frequencies_selection_model_dir}/${prefix}_ROH_freq.bed"
+        
+#         # Find files belonging to the current simulation prefix
+#         simulation_files=$(find "$coverage_output_selection_model_dir" -name "${prefix}_ROH*")
+
+#         # Using awk to calculate the sum of counts for each window and add a frequency column. 
+#         # Then the file is sorted by genomic coordinates
+#         awk -v num_indiv="$n_individuals_breed_formation" -v header="$header" '{
+#             window_counts[$1"\t"$2"\t"$3]+=$4
+#         } 
+#         END{
+#         for (i in window_counts) {
+#             frequency = window_counts[i] / num_indiv
+#             print i "\t" window_counts[i] "\t" frequency
+#                                 }
+#         } ' \
+#         $simulation_files | sed '1i'"$header" | sort -k1,1n -k2,2n \
+#         > "${roh_frequencies_selection_model_dir}/${prefix}_ROH_freq.bed"   
+        
+#         echo "Population level ROH-Window-frequencies computed for simulation $prefix"
+
+#     done
+
+#     echo "Population level ROH-Window-frequencies computed for the selection model simulations"
+#     echo "Output files stored in: ${roh_frequencies_selection_model_dir}"
+# else
+#     echo ""
+# fi
 
 
 

@@ -25,41 +25,65 @@ def objective(trial):
     output_dir = '/home/jonathan/hyperoptimizer_results'
     failed_trials_file = os.path.join(output_dir, 'failed_trials.tsv')
     # Define the header with tab separation
-    header = "Chr\tNeBurnIn\tnInd\tInbredFo\tNeBottleneck\tnGenBottleneck\tnGenBreed\tnBreed\tSNPchipRefPop\tMutations\tSim_H_e\tSim_H_e_5th_perc\tSim_F_ROH\tSim_ROH_hotspot_thr\tSim_Cost_Result\n"
+    # header = "Chr\tNeBurnIn\tnInd\tInbredFo\tNeBottleneck\tnGenBottleneck\tnGenBreed\tnBreed\tSNPchipRefPop\tMutations\tSim_H_e\tSim_H_e_5th_perc\tSim_F_ROH\tSim_ROH_hotspot_thr\tSim_Cost_Result\n"
+    # header = "Chr\tNeBurnIn\tInbredFo\tNeBottleneck\tnGenBottleneck\tnGenBreed\tnBreed\tSNPchipRefPop\tMutations\tSim_H_e\tSim_H_e_5th_perc\tSim_F_ROH\tSim_ROH_hotspot_thr\tSim_Cost_Result\n"
+    # header = "Chr\tNeBurnIn\tnInd\tInbredFo\tNeBottleneck\tnGenBottleneck\tnGenBreed\tnBreed\tSNPchipRefPop\tMutations\tSim_H_e\tSim_H_e_5th_perc\tSim_F_ROH\tSim_ROH_hotspot_thr\tSim_Cost_Result\n"
+    # header = "Chr\tNeBurnIn\tnInd\tInbredFo\tNeBottleneck\tnGenBottleneck\tnGenBreed\tnBreed\tSNPchipRefPop\tMutations\tSim_H_e\tSim_H_e_5th_perc\tSim_F_ROH\tSim_ROH_hotspot_thr\tSim_Cost_Result\n"
+    header = "Chr\tNeBurnIn\tnInd\tInbredFo\tnBottleneck\tnGenBottleneck\tnGenBreed\tnBreed\tSNPchipRefPop\tMutations\tSim_F_ROH\tSim_ROH_hotspot_thr\tH_e_MAF_0_01\tH_e_5th_perc_MAF_0_01\tH_e_No_MAF\tH_e_5th_perc_No_MAF\tSim_Cost_Result"
+
+
+
     # Function to append the failed parameters to the file
-    def log_failed_parameters(chr_simulated, Ne_burn_in, nInd_founder_population, Inbred_ancestral_population, N_e_bottleneck, n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, reference_population_for_snp_chip, Introduce_mutations):
+    def log_failed_parameters(chr_simulated, Ne_burn_in,n_bottleneck, n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, reference_population_for_snp_chip):
         file_exists = os.path.isfile(failed_trials_file)
         
         with open(failed_trials_file, 'a') as f:
             if not file_exists:
                 f.write(header)
             f.write(
-                f"{chr_simulated}\t{Ne_burn_in}\t{nInd_founder_population}\t{Inbred_ancestral_population}\t{N_e_bottleneck}\t"
+                f"{chr_simulated}\t{Ne_burn_in}\t{n_bottleneck}\t"
                 f"{n_generations_bottleneck}\t{n_simulated_generations_breed_formation}\t{n_individuals_breed_formation}\t"
-                f"{reference_population_for_snp_chip}\t{Introduce_mutations}\n"
+                f"{reference_population_for_snp_chip}\n"
             )
 
 
     try:
-        # Extract parameters
-        chr_simulated = trial.suggest_categorical('chr_simulated', ["chr28", "chr1", "chr13", "chr3"])
-        Ne_burn_in = trial.suggest_int('Ne_burn_in',  225, 7000, step=25)
-        nInd_founder_population = trial.suggest_int('nInd_founder_population', 100,100, step=1)
-        Inbred_ancestral_population = trial.suggest_categorical('Inbred_ancestral_population', ["TRUE", "FALSE"])
-        N_e_bottleneck = trial.suggest_int('N_e_bottleneck', 20, 100, step=5)
-        n_generations_bottleneck = trial.suggest_int('n_generations_bottleneck', 3, 15, step=1)
-        n_simulated_generations_breed_formation = trial.suggest_int('n_simulated_generations_breed_formation', 40, 80, step=5)
-        n_individuals_breed_formation = trial.suggest_int('n_individuals_breed_formation', 225, 700, step=25)
-        reference_population_for_snp_chip = trial.suggest_categorical('reference_population_for_snp_chip', ["last_breed_formation_generation", "last_bottleneck_generation"])
-        Introduce_mutations = trial.suggest_categorical('Introduce_mutations', ["TRUE", "FALSE"])
+        #         # Extract parameters
+        # chr_simulated = trial.suggest_categorical('chr_simulated', ["chr28", "chr1", "chr13", "chr3"])
+        # Ne_burn_in = trial.suggest_int('Ne_burn_in',  50, 5000, step=25)
+        # n_bottleneck = trial.suggest_int('n_bottleneck', 20, 125, step=5)
+        # n_generations_bottleneck = trial.suggest_int('n_generations_bottleneck', 1, 20, step=1)
+        # n_simulated_generations_breed_formation = trial.suggest_int('n_simulated_generations_breed_formation', 40, 80, step=5)
+        # n_individuals_breed_formation = trial.suggest_int('n_individuals_breed_formation', 130, 170, step=25)
+        # reference_population_for_snp_chip = trial.suggest_categorical('reference_population_for_snp_chip', ["last_breed_formation_generation", "last_bottleneck_generation"])
+
+        # # Extract parameters
+        # # chr_simulated = trial.suggest_categorical('chr_simulated', ["chr28", "chr1","chr3"])
+        # chr_simulated = trial.suggest_categorical('chr_simulated', ["chr1","chr3"])
+        # Ne_burn_in = trial.suggest_int('Ne_burn_in',  1500, 7000, step=50)
+        # n_bottleneck = trial.suggest_int('n_bottleneck', 5, 40, step=1)
+        # n_generations_bottleneck = trial.suggest_int('n_generations_bottleneck', 1, 15, step=1)
+        # n_simulated_generations_breed_formation = trial.suggest_int('n_simulated_generations_breed_formation', 40, 90, step=2)
+        # n_individuals_breed_formation = trial.suggest_int('n_individuals_breed_formation', 175, 600, step=5)
+        # reference_population_for_snp_chip = trial.suggest_categorical('reference_population_for_snp_chip', ["last_breed_formation_generation", "last_bottleneck_generation"])
+
+        # Narrowing down to the best fit
+        chr_simulated = trial.suggest_categorical('chr_simulated', ["chr1","chr3"])
+        Ne_burn_in = trial.suggest_int('Ne_burn_in',  2000, 5000, step=5)
+        n_bottleneck = trial.suggest_int('n_bottleneck', 5, 30, step=1)
+        n_generations_bottleneck = trial.suggest_int('n_generations_bottleneck', 1, 3, step=1)
+        n_simulated_generations_breed_formation = trial.suggest_int('n_simulated_generations_breed_formation', 70, 110, step=1)
+        n_individuals_breed_formation = trial.suggest_int('n_individuals_breed_formation', 200, 550, step=5)
+        reference_population_for_snp_chip = trial.suggest_categorical('reference_population_for_snp_chip', ["last_breed_formation_generation"])
+
 
         # Run the pipeline with the given parameters
         result = subprocess.run(['bash', 'run_pipeline_hyperoptimize_neutral_model.sh',
-                                 chr_simulated, str(Ne_burn_in), str(nInd_founder_population),
-                                 Inbred_ancestral_population, str(N_e_bottleneck), str(n_generations_bottleneck),
+                                 chr_simulated, str(Ne_burn_in), 
+                                 str(n_bottleneck), str(n_generations_bottleneck),
                                  str(n_simulated_generations_breed_formation),
                                  str(n_individuals_breed_formation),
-                                 reference_population_for_snp_chip,Introduce_mutations], capture_output=True, text=True)
+                                 reference_population_for_snp_chip], capture_output=True, text=True)
 
         # Check if the pipeline ran successfully
         if result.returncode != 0:
@@ -74,26 +98,20 @@ def objective(trial):
         print(f"Comparing trial parameters to last row of results file:")
         print(f"chr_simulated: {str(chr_simulated).lower()} == {last_row['Chr'].lower()}")
         print(f"Ne_burn_in: {str(Ne_burn_in).lower()} == {last_row['NeBurnIn'].lower()}")
-        print(f"nInd_founder_population: {str(nInd_founder_population).lower()} == {last_row['nInd'].lower()}")
-        print(f"Inbred_ancestral_population: {str(Inbred_ancestral_population).upper()} == {last_row['InbredFo'].upper()}")
-        print(f"N_e_bottleneck: {str(N_e_bottleneck).lower()} == {last_row['NeBottleneck'].lower()}")
+        print(f"n_bottleneck: {str(n_bottleneck).lower()} == {last_row['nBottleneck'].lower()}")
         print(f"n_generations_bottleneck: {str(n_generations_bottleneck).lower()} == {last_row['nGenBottleneck'].lower()}")
         print(f"n_simulated_generations_breed_formation: {str(n_simulated_generations_breed_formation).lower()} == {last_row['nGenBreed'].lower()}")
         print(f"n_individuals_breed_formation: {str(n_individuals_breed_formation).lower()} == {last_row['nBreed'].lower()}")
         print(f"reference_population_for_snp_chip: {str(reference_population_for_snp_chip).lower()} == {last_row['SNPchipRefPop'].lower()}")
-        print(f"Introduce_mutations: {str(Introduce_mutations).upper()} == {last_row['Mutations'].upper()}")
 
         if not (
             last_row["Chr"].lower() == str(chr_simulated).lower() and
             last_row["NeBurnIn"].lower() == str(Ne_burn_in).lower() and
-            last_row["nInd"].lower() == str(nInd_founder_population).lower() and
-            last_row["InbredFo"].upper() == str(Inbred_ancestral_population).upper() and
-            last_row["NeBottleneck"].lower() == str(N_e_bottleneck).lower() and
+            last_row["nBottleneck"].lower() == str(n_bottleneck).lower() and
             last_row["nGenBottleneck"].lower() == str(n_generations_bottleneck).lower() and
             last_row["nGenBreed"].lower() == str(n_simulated_generations_breed_formation).lower() and
             last_row["nBreed"].lower() == str(n_individuals_breed_formation).lower() and
-            last_row["SNPchipRefPop"].lower() == str(reference_population_for_snp_chip).lower() and
-            last_row["Mutations"].upper() == str(Introduce_mutations).upper()
+            last_row["SNPchipRefPop"].lower() == str(reference_population_for_snp_chip).lower()
         ):
             raise RuntimeError("Trial parameters do not match the last row of the results file.")           
         # Extract the cost function value
@@ -102,15 +120,15 @@ def objective(trial):
     except Exception as e:
         print(f"\n {10 * '!'}\n Error during optimization: {e}\n{10 * '!'}\n")
         # Log the failed parameters
-        log_failed_parameters(chr_simulated, Ne_burn_in, nInd_founder_population, Inbred_ancestral_population, N_e_bottleneck,
-                        n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, reference_population_for_snp_chip, Introduce_mutations)
+        log_failed_parameters(chr_simulated, Ne_burn_in, n_bottleneck,
+                        n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, reference_population_for_snp_chip)
         return float('inf')
 
 # Create a study object
 study = optuna.create_study(direction='minimize')
 
 # Run the optimization
-study.optimize(objective, n_trials=100)
+study.optimize(objective, n_trials=300)
 # study.optimize(objective, n_trials=2)
 
 # Save the best hyperparameters

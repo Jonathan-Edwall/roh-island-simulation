@@ -7,9 +7,9 @@ Options in effect:
 
 Hostname: axelina
 Working directory: /home/jonathan
-Start time: Fri Mar  1 15:52:09 2024
+Start time: Mon May 13 21:18:54 2024
 
-Random number seed: 1709308329
+Random number seed: 1715635134
 385423 MB RAM detected; reserving 192711 MB for main workspace.
 Scanning .ped file... done.
 Performing single-pass .bed write (78088 variants, 324 dogs).
@@ -35,4 +35,4 @@ and
 /home/jonathan/data/raw/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/PCA/Wang_HDGenetDogs_Genotypes_100621_UK_PCA.eigenvec
 .
 
-End time: Fri Mar  1 15:52:10 2024
+End time: Mon May 13 21:18:55 2024

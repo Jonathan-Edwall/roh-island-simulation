@@ -1,0 +1,46 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --allow-no-sex
+  --bfile /home/jonathan/data/raw/simulated/selection_model/sim_7_selection_model_s08_chr3
+  --dog
+  --geno 0.05
+  --make-bed
+  --mind 0.1
+  --nonfounders
+  --out /home/jonathan/data/preprocessed/simulated/selection_model/sim_7_selection_model_s08_chr3
+  --pca 2
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Thu Aug 15 12:07:08 2024
+
+Random number seed: 1723723628
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+8172 variants loaded from .bim file.
+200 dogs (0 males, 0 females, 200 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/jonathan/data/preprocessed/simulated/selection_model/sim_7_selection_model_s08_chr3.nosex
+.
+200 phenotype values loaded from .fam.
+0 dogs removed due to missing genotype data (--mind).
+Using up to 31 threads (change this with --threads).
+Before main variant filters, 200 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+0 variants removed due to missing genotype data (--geno).
+8172 variants and 200 dogs pass filters and QC.
+Phenotype data is quantitative.
+Relationship matrix calculation complete.
+--pca: Results saved to
+/home/jonathan/data/preprocessed/simulated/selection_model/sim_7_selection_model_s08_chr3.eigenval
+and
+/home/jonathan/data/preprocessed/simulated/selection_model/sim_7_selection_model_s08_chr3.eigenvec
+.
+--make-bed to
+/home/jonathan/data/preprocessed/simulated/selection_model/sim_7_selection_model_s08_chr3.bed
++
+/home/jonathan/data/preprocessed/simulated/selection_model/sim_7_selection_model_s08_chr3.bim
++
+/home/jonathan/data/preprocessed/simulated/selection_model/sim_7_selection_model_s08_chr3.fam
+... done.
+
+End time: Thu Aug 15 12:07:08 2024

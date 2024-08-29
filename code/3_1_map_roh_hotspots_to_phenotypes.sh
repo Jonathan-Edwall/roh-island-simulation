@@ -66,7 +66,7 @@ phenotype_file=$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_any_br
 for roh_hotspot_file in $empirical_breed_roh_hotspots_dir/*.bed; do
     echo "Processing file: $roh_hotspot_file"
     prefix=$(basename "$roh_hotspot_file" .bed) # Extracting basename without the .bed extension
-    output_file="$phenotype_mapping_output_dir/${prefix}_phenotypes.bed"   
+    output_file="${phenotype_mapping_output_dir}/${prefix}_phenotypes.bed"   
 
     # Run bedtools intersect-function        
     bedtools intersect \

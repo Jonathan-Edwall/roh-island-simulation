@@ -1,0 +1,4 @@
+Model,F_ROH,Lower_CI,Upper_CI,Error_percentage
+Neutral - Sams,0.155,0.15,0.16,34
+Empirical,0.233,NA,NA,NA
+Neutral - HO,0.24,0.229,0.252,3

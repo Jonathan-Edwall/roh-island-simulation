@@ -71,6 +71,59 @@ mkdir -p $raw_simulated_neutral_model_dir/PCA
 #--mind 0.1: maximum threshold for allowed non-genotyped markers per individual (10%). Individuals with more non-genotyped markers than this threshold, will be pruned away.
 # --pca 2: Performing PCA analysis to identify outliers in the dataset by calculating 2 principal components (PCA1,PCA2) that captures the major sources of variation in the dataset while reducing the dimensionality of the data.
 
+# Function to run the plink commands
+run_plink_preprocessing() {
+    local simulation_name=$1
+    local raw_simulated_model_dir=$2
+    local preprocessed_simulated_model_dir=$3
+    do_pca_analysis=FALSE
+
+    # # Performing PCA on the non-preprocessed dataset for comparison. 
+    # plink \
+    #     --file "${raw_simulated_model_dir}/${simulation_name}" \
+    #     --out "${raw_simulated_model_dir}/PCA/${simulation_name}_PCA" \
+    #     --nonfounders --allow-no-sex \
+    #     --dog \
+    #     --pca 2
+    
+    # Converting the files to binary format
+    plink \
+    --file "${raw_simulated_model_dir}/${simulation_name}" \
+    --out "${raw_simulated_model_dir}/${simulation_name}" \
+    --make-bed \
+    --dog 
+
+    # Remove the .ped and .map files
+    rm -f "${raw_simulated_model_dir}/${simulation_name}.ped"
+    rm "${raw_simulated_model_dir}/${simulation_name}.map"
+    # wait
+
+    if [ "$do_pca_analysis" = TRUE ]; then
+        plink \
+        --bfile "${raw_simulated_model_dir}/${simulation_name}" \
+        --out "${preprocessed_simulated_model_dir}/${simulation_name}" \
+        --make-bed \
+        --dog \
+        --geno 0.05 --mind 0.1 \
+        --nonfounders --allow-no-sex \
+        --pca 2 
+
+    else
+        plink \
+        --bfile "${raw_simulated_model_dir}/${simulation_name}" \
+        --out "${preprocessed_simulated_model_dir}/${simulation_name}" \
+        --make-bed \
+        --dog \
+        --geno 0.05 --mind 0.1 \
+        --nonfounders --allow-no-sex
+    fi
+
+
+}
+
+max_parallel_jobs=20
+
+
 ##�������������������������
 ##���� Neutral Model (Simulated) ���� 
 ##�������������������������
@@ -80,59 +133,47 @@ for map_file in $raw_simulated_neutral_model_dir/*.map; do
     # Extract simulation name from the filename (minus the .map extension)
     # simulation_name=$(basename "${simulation_file%.*}")  
     simulation_name=$(basename "$map_file" .map) # Extract the basename without the .map extension
-  
-    echo "$simulation_name"     
-          
-    # Performing PCA on the non-preprocessed dataset for comparison. 
-    plink \
-     --file $raw_simulated_neutral_model_dir/$simulation_name \
-     --out $raw_simulated_neutral_model_dir/PCA/${simulation_name}_PCA \
-     --nonfounders --allow-no-sex \
-     --dog \
-     --pca 2
-    
-    # Converting the files to binary format
-    plink \
-    --file $raw_simulated_neutral_model_dir/$simulation_name \
-    --out $raw_simulated_neutral_model_dir/$simulation_name \
-    --make-bed \
-    --dog 
+    # Run the function in the background
+    run_plink_preprocessing $simulation_name $raw_simulated_neutral_model_dir $preprocessed_neutral_model_dir &
 
-    # Remove the .ped and .map files
-    rm $raw_simulated_neutral_model_dir/$simulation_name.ped
-    rm $raw_simulated_neutral_model_dir/$simulation_name.map
-    
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+        wait -n
+    done      
 done
 
+# Wait for all background jobs to finish
+wait
+echo "Pre-processing of the Neutral Model completed"
+echo "Outputfiles stored in: $preprocessed_neutral_model_dir"
 
 
+# # Find any .bed file in raw_simulated_neutral_model_dir and use its basename as the simulation name
+# for bim_file in $raw_simulated_neutral_model_dir/*.bim; do
+#     simulation_name=$(basename "$bim_file" .bim) # Extract the basename without the .bim extension
+#     echo "$simulation_name"     
 
+#     plink \
+#     --bfile "${raw_simulated_neutral_model_dir}/${simulation_name}" \
+#     --out "${preprocessed_neutral_model_dir}/${simulation_name}" \
+#     --make-bed \
+#     --dog \
+#     --geno 0.05 --mind 0.1 \
+#     --nonfounders --allow-no-sex \
+#     --pca 2   
+    
+#     # Uncomment code below if you wish to prune by MAF
+#     # plink \
+#     # --file $raw_simulated_neutral_model_dir/$simulation_name \
+#     # --out $preprocessed_neutral_model_dir/$simulation_name \
+#     # --make-bed \
+#     # --nonfounders --allow-no-sex \
+#     # --dog \
+#     # --geno 0.05 --mind 0.1 \
+#     # --maf 0.05 \
+#     # --pca 2
 
-# Find any .bed file in raw_simulated_neutral_model_dir and use its basename as the simulation name
-for bim_file in $raw_simulated_neutral_model_dir/*.bim; do
-    simulation_name=$(basename "$bim_file" .bim) # Extract the basename without the .bim extension
-    echo "$simulation_name"     
-    # # Running --homozyg command for ROH computation
-    # plink \
-    # --file $raw_simulated_neutral_model_dir/$simulation_name \
-    # --out $preprocessed_neutral_model_dir/$simulation_name \
-    # --make-bed \
-    # --nonfounders --allow-no-sex \
-    # --dog \
-    # --geno 0.05 --mind 0.1 \
-    # --maf 0.05 \
-    # --pca 2
-
-    # Running --homozyg command for ROH computation
-    plink \
-    --bfile $raw_simulated_neutral_model_dir/$simulation_name \
-    --out $preprocessed_neutral_model_dir/$simulation_name \
-    --make-bed \
-    --dog \
-    --geno 0.05 --mind 0.1 \
-    --nonfounders --allow-no-sex \
-    --pca 2   
-done
+# done
 
 echo "Pre-processing of the Neutral Model completed"
 echo "Outputfiles stored in: $preprocessed_neutral_model_dir"
@@ -145,64 +186,17 @@ if [ "$selection_simulation" = TRUE ]; then
     # Find any .map file in raw_simulated_selection_model_dir and use its basename as the simulation name
     for map_file in $raw_simulated_selection_model_dir/*.map; do
         # Extract simulation name from the filename (minus the .map extension)
-        # simulation_name=$(basename "${simulation_file%.*}")    
-        # echo "$simulation_name"     
         simulation_name=$(basename "$map_file" .map) # Extract the basename without the .map extension
+        # Run the function in the background
+        run_plink_preprocessing $simulation_name $raw_simulated_selection_model_dir $preprocessed_selection_model_dir &
 
-            
-        # Performing PCA on the non-preprocessed dataset for comparison. 
-        plink \
-        --file $raw_simulated_selection_model_dir/$simulation_name \
-        --out $raw_simulated_selection_model_dir/PCA/${simulation_name}_PCA \
-        --nonfounders --allow-no-sex \
-        --dog \
-        --pca 2
-
-        # Converting the files to binary format
-        plink \
-        --file $raw_simulated_selection_model_dir/$simulation_name \
-        --out $raw_simulated_selection_model_dir/$simulation_name \
-        --make-bed \
-        --dog 
-
-        # Remove the .ped and .map files
-        rm $raw_simulated_selection_model_dir/$simulation_name.ped
-        rm $raw_simulated_selection_model_dir/$simulation_name.map
-        
+        # Control the number of parallel jobs
+        while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+            wait -n
+        done      
     done
-
-
-
-
-    for bim_file in $raw_simulated_selection_model_dir/*.bim; do
-        # Extract simulation name from the filename (minus the .bim extension)
-        # simulation_name=$(basename "${simulation_file%.*}")    
-        # echo "$simulation_name"     
-        simulation_name=$(basename "$bim_file" .bim) # Extract the basename without the .bim extension
-
-        # # Running --homozyg command for ROH computation
-        # plink \
-        #  --file $raw_simulated_selection_model_dir/$simulation_name \
-        #  --out $preprocessed_selection_model_dir/$simulation_name \
-        #  --make-bed \
-        #  --nonfounders --allow-no-sex \
-        #  --dog \
-        #  --geno 0.05 --mind 0.1 \
-        #  --maf 0.05 \
-        #  --pca 2    
-
-            # Running --homozyg command for ROH computation
-        plink \
-        --bfile $raw_simulated_selection_model_dir/$simulation_name \
-        --out $preprocessed_selection_model_dir/$simulation_name \
-        --make-bed \
-        --dog \
-        --geno 0.05 --mind 0.1 \
-        --nonfounders --allow-no-sex \
-        --pca 2  
-
-    done
-
+    # Wait for all background jobs to finish
+    wait
     echo "Pre-processing of the Selection Model completed"
     echo "Outputfiles stored in: $preprocessed_selection_model_dir"
 
@@ -210,6 +204,74 @@ if [ "$selection_simulation" = TRUE ]; then
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
 fi
+
+
+
+
+# if [ "$selection_simulation" = TRUE ]; then
+#     # Find any .map file in raw_simulated_selection_model_dir and use its basename as the simulation name
+#     for map_file in $raw_simulated_selection_model_dir/*.map; do
+#         # Extract simulation name from the filename (minus the .map extension)
+#         simulation_name=$(basename "$map_file" .map) # Extract the basename without the .map extension
+
+#         # Performing PCA on the non-preprocessed dataset for comparison. 
+#         plink \
+#         --file "${raw_simulated_selection_model_dir}/${simulation_name}" \
+#         --out "${raw_simulated_selection_model_dir}/PCA/${simulation_name}_PCA" \
+#         --nonfounders --allow-no-sex \
+#         --dog \
+#         --pca 2
+        
+#         # Converting the files to binary format
+#         plink \
+#         --file "${raw_simulated_selection_model_dir}/${simulation_name}" \
+#         --out "${raw_simulated_selection_model_dir}/${simulation_name}" \
+#         --make-bed \
+#         --dog 
+
+#         # Remove the .ped and .map files
+#         rm "${raw_simulated_selection_model_dir}/${simulation_name}.ped"
+#         rm "${raw_simulated_selection_model_dir}/${simulation_name}.map"            
+        
+#     done
+
+
+
+
+#     for bim_file in $raw_simulated_selection_model_dir/*.bim; do
+#         # Extract simulation name from the filename (minus the .bim extension)
+#         # simulation_name=$(basename "${simulation_file%.*}")    
+#         # echo "$simulation_name"     
+#         simulation_name=$(basename "$bim_file" .bim) # Extract the basename without the .bim extension
+#         plink \
+#         --bfile "${raw_simulated_selection_model_dir}/${simulation_name}" \
+#         --out "${preprocessed_selection_model_dir}/${simulation_name}" \
+#         --make-bed \
+#         --dog \
+#         --geno 0.05 --mind 0.1 \
+#         --nonfounders --allow-no-sex \
+#         --pca 2   
+
+#         # Uncomment code below if you wish to prune by MAF
+#         # plink \
+#         #  --file $raw_simulated_selection_model_dir/$simulation_name \
+#         #  --out $preprocessed_selection_model_dir/$simulation_name \
+#         #  --make-bed \
+#         #  --nonfounders --allow-no-sex \
+#         #  --dog \
+#         #  --geno 0.05 --mind 0.1 \
+#         #  --maf 0.05 \
+#         #  --pca 2    
+
+#     done
+
+#     echo "Pre-processing of the Selection Model completed"
+#     echo "Outputfiles stored in: $preprocessed_selection_model_dir"
+
+
+# else
+#     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
+# fi
 
 #########################################################
 ##### Calculating Autosome Lengths #####

@@ -1,0 +1,28 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --bfile /home/jonathan/data/raw/empirical/labrador_retriever/LR_fs
+  --chr 1-38
+  --dog
+  --out /home/jonathan/data/raw/empirical/labrador_retriever/PCA/LR_fs
+  --pca 2
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Mon Aug 12 06:55:48 2024
+
+Random number seed: 1723445748
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+211256 out of 220853 variants loaded from .bim file.
+229 dogs (138 males, 91 females) loaded from .fam.
+Using up to 31 threads (change this with --threads).
+Before main variant filters, 229 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.970021.
+211256 variants and 229 dogs pass filters and QC.
+Note: No phenotypes present.
+Relationship matrix calculation complete.
+--pca: Results saved to
+/home/jonathan/data/raw/empirical/labrador_retriever/PCA/LR_fs.eigenval and
+/home/jonathan/data/raw/empirical/labrador_retriever/PCA/LR_fs.eigenvec .
+
+End time: Mon Aug 12 06:55:49 2024

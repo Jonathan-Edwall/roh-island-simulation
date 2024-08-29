@@ -61,8 +61,9 @@ document_sub <- Sys.getenv("document_sub_title")
 # Parameters used for displaying the result
 ############################################ 
 ROH_frequency_decimals <- 1
-H_e_values_decimals <- 5
+H_e_values_decimals <- 3
 F_ROH_values_decimals <- 3
+Window_lengths_decimals <- 2
 
 ####################################  
 # Defining the input files
@@ -141,18 +142,58 @@ editor_options:
   markdown: 
     wrap: 72
 ---
-
-
 ## Loading libraries
+```{r Loading Libraries }
 
-```{r library()}
+if (!require(knitr)) install.packages("knitr", dependencies = TRUE)
 library(knitr)
+
+if (!require(ggplot2)) install.packages("ggplot2", dependencies = TRUE)
 library(ggplot2)
-# # Install and load the scatterplot3d package
-# install.packages("scatterplot3d")
-library(scatterplot3d)
+
+if (!require(scatterplot3d)) install.packages("scatterplot3d", dependencies = TRUE)
+library(scatterplot3d) # For generating the 3d plots 
+
+if (!require(RColorBrewer)) install.packages("RColorBrewer", dependencies = TRUE)
+library(RColorBrewer) # For generating a color palette
+
 
 ```
+# Latex formatting function
+```{r ,echo = FALSE}
+# Function to format and write a data frame to a LaTeX-compatible text file
+write_latex_table <- function(data_frame, sort_column, output_dir, output_filename) {
+  
+  # Sort the data frame based on the specified column
+  sorted_df <- data_frame[order(data_frame[[sort_column]]), ]
+  
+  # Define the complete file path
+  file_path <- file.path(output_dir, paste(output_filename, ".txt", sep = ""))
+  
+  # Open a connection to the file for writing
+  file_conn <- file(file_path, open = "wt")
+  
+  # Loop through each row in the sorted DataFrame
+  for (i in 1:nrow(sorted_df)) {
+    # Format the row with & separator and \\ at the end
+    formatted_row <- paste(sorted_df[i, ], collapse = " & ")
+    formatted_row <- paste(formatted_row, "\\\\", sep = "")
+    
+    # Write the formatted row to the file
+    cat(formatted_row, file = file_conn, sep = "\n")
+  }
+  
+  # Close the file connection
+  close(file_conn)
+  
+  # Return the file path for reference
+  return(file_path)
+}
+
+```
+
+
+
 
 # Causative variant
 
@@ -363,16 +404,28 @@ for (selection_scenario in names(fixation_data_causative_variant_tables)) {
                                            ))
 }
 
+# Showing the average fixation time as an integer
+result_df$Avg_Fixation_time <- round(result_df$Avg_Fixation_time,0)
 
 # Sort the data frame based on average fixation time, in descending order
 result_df_sorted <- result_df[order(-result_df$Avg_Fixation_time), ]
 
 # Define the filename with the output directory path
 filename <- file.path(output_dir, paste("Causative_variant_Fixation_summary",".csv", sep = ""))
-
+# 
 # Write data to TSV file without quotes and with tab separation
 write.table(result_df_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
+
+
+
+# Example usage with your first data frame
+write_latex_table(
+  data_frame = result_df,
+  sort_column = "Avg_Fixation_time",
+  output_dir = output_dir,
+  output_filename = "Causative_variant_Fixation_summary"
+)
 
 # Print the table using kable
 kable(result_df_sorted)
@@ -755,6 +808,10 @@ for (selection_scenario in names(causative_variant_window_tables_Selection_Model
                                            ))
 }
 
+# Formatting the length  column to 2 decimals
+causative_variant_window_results_df$Avg_Length_Mb <- round(causative_variant_window_results_df$Avg_Length_Mb,Window_lengths_decimals)
+
+
 # Sort the data frame based on the average length of the causative window of each selection coefficient
 causative_variant_window_results_df_sorted <- causative_variant_window_results_df[order(causative_variant_window_results_df$Avg_Length_Mb), ]
 
@@ -764,6 +821,13 @@ filename <- file.path(output_dir, paste("Causative_variant_windows_summary",".cs
 # Write data to TSV file without quotes and with tab separation
 write.table(causative_variant_window_results_df_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
+# Example usage with your second data frame
+write_latex_table(
+  data_frame = causative_variant_window_results_df,
+  sort_column = "Avg_Length_Mb",
+  output_dir = output_dir,
+  output_filename = "Causative_variant_windows_summary"
+)
 
 # Print the table using kable
 kable(causative_variant_window_results_df_sorted)
@@ -974,6 +1038,9 @@ Avg_ROH_hotspot_threshold <- mean(all_ROH_hotspot_thresholds)
 ROH_freq_tables_Neutral_Model$Avg_ROH_hotspot_threshold <- Avg_ROH_hotspot_threshold
 
 
+# Calculate the confidence interval of the point estimate ROH-hotspot threshold across all 20 simulations
+ROH_freq_tables_Neutral_Model$SE_CI_ROH_hotspot_threshold <- standard_error_confidence_interval_fun(all_ROH_hotspot_thresholds)
+
 
 #View(ROH_freq_tables_Neutral_Model)
 ```
@@ -1084,6 +1151,12 @@ for (selection_coefficient in names(ROH_freq_tables_Selection_Model)) {
   all_thresholds <- unlist(lapply(ROH_freq_tables_Selection_Model[[selection_coefficient]], function(table) table$ROH_Hotspot_threshold))
   overall_avg_threshold <- mean(all_thresholds)
   ROH_freq_tables_Selection_Model[[selection_coefficient]]$Avg_ROH_hotspot_threshold <- overall_avg_threshold
+  
+  # Calculate the confidence interval of the point estimate ROH-hotspot threshold across all 20 simulations
+  ROH_freq_tables_Selection_Model[[selection_coefficient]]$SE_CI_ROH_hotspot_threshold <- standard_error_confidence_interval_fun(all_thresholds)
+
+  
+  
 }
 
 # View the resulting nested structure
@@ -1099,33 +1172,51 @@ cat("ROH-hotspot selection testing results://n")
 # Initialize an empty vector to store F_ROH values for the different selection coefficients
 selection_model_values_list <- c()
 selection_model_names_list <- c()
+selection_model_lower_ci <- c()
+selection_model_upper_ci <- c()
+
 
 # Loop through each selection_coefficient in ROH_freq_tables_Selection_Model
 for (selection_coefficient in names(ROH_freq_tables_Selection_Model)) {
   # Extract the Avg_ROH_hotspot_threshold value from the selection_coefficient
   Avg_ROH_hotspot_threshold <- round(100*ROH_freq_tables_Selection_Model[[selection_coefficient]]$Avg_ROH_hotspot_threshold,ROH_frequency_decimals)
-
+  CI <- ROH_freq_tables_Selection_Model[[selection_coefficient]]$SE_CI_ROH_hotspot_threshold
   # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
   formatted_selection_coefficient_labels <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_coefficient)
 
   # Append values to the lists
   selection_model_values_list <- c(selection_model_values_list, Avg_ROH_hotspot_threshold)
+  selection_model_lower_ci <- c(selection_model_lower_ci, 100*CI[1])
+  selection_model_upper_ci <- c(selection_model_upper_ci, 100*CI[2])
   selection_model_names_list <- c(selection_model_names_list, formatted_selection_coefficient_labels)
 }
 
 
 
+
 # Add overAvg_ROH_hotspot_threshold from ROH_freq_tables_Neutral_Model
 neutral_model_value <- round(100*ROH_freq_tables_Neutral_Model[["Avg_ROH_hotspot_threshold"]],ROH_frequency_decimals)
+# neutral_lower_ci <- round(100*ROH_freq_tables_Neutral_Model$SE_CI_ROH_hotspot_threshold[1],ROH_frequency_decimals)
+neutral_lower_ci <- round(100*ROH_freq_tables_Neutral_Model[["SE_CI_ROH_hotspot_threshold"]][1],ROH_frequency_decimals)
+neutral_upper_ci <- round(100*ROH_freq_tables_Neutral_Model[["SE_CI_ROH_hotspot_threshold"]][2],ROH_frequency_decimals)
+
 
 # Add Avg_ROH_hotspot_threshold from ROH_freq_table_Empirical_Data
 empirical_model_value <- round(100*ROH_freq_table_Empirical_Data[["ROH_hotspot_threshold"]],ROH_frequency_decimals)
+empirical_lower_ci <- NA # Placeholder for confidence interval lower bound
+empirical_upper_ci <- NA # Placeholder for confidence interval upper bound
 
 # Combine all values into a data frame
 ROH_hotspot_threshold_values <- data.frame(
   Model = c(rep("Selection", length(selection_model_values_list)), "Neutral", "Empirical"),
-  Avg_ROH_hotspot_threshold = c(selection_model_values_list, neutral_model_value, empirical_model_value)
+  Avg_ROH_hotspot_threshold = c(selection_model_values_list, neutral_model_value, empirical_model_value),
+  Lower_CI = c(selection_model_lower_ci, neutral_lower_ci, empirical_lower_ci),
+  Upper_CI = c(selection_model_upper_ci, neutral_upper_ci, empirical_upper_ci)
 )
+
+# FOrmatting the confidence interval values
+ROH_hotspot_threshold_values$Lower_CI <- round(ROH_hotspot_threshold_values$Lower_CI,ROH_frequency_decimals)
+ROH_hotspot_threshold_values$Upper_CI <- round(ROH_hotspot_threshold_values$Upper_CI,ROH_frequency_decimals)
 
 # Update the Model column for selection models
 ROH_hotspot_threshold_values$Model[ROH_hotspot_threshold_values$Model == "Selection"] <- selection_model_names_list
@@ -1134,11 +1225,20 @@ ROH_hotspot_threshold_values$Model[ROH_hotspot_threshold_values$Model == "Select
 ROH_hotspot_threshold_values_sorted <- ROH_hotspot_threshold_values[order(ROH_hotspot_threshold_values$Avg_ROH_hotspot_threshold), ]
 
 
+
 # Define the filename with the output directory path
-filename <- file.path(output_dir, paste("ROH-hotspot threshold comparison",".csv", sep = ""))
+filename <- file.path(output_dir, paste("ROH-hotspot_threshold_comparison",".csv", sep = ""))
 
 # Write data to CSV file without quotes
 write.table(ROH_hotspot_threshold_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
+# Use the write_latex_table() function to write the data to a LaTeX-compatible text file
+write_latex_table(
+  data_frame = ROH_hotspot_threshold_values,
+  sort_column = "Avg_ROH_hotspot_threshold",  
+  output_dir = output_dir,
+  output_filename = "ROH-hotspot_threshold_comparison"  # File name without extension
+)
 
 
 
@@ -1556,7 +1656,7 @@ for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
   abline(v = F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH, col = selection_model_color, lwd = histogram_line_sizes)
   
   # Add legend for the red line
-  legend(simulated_line_location, legend = paste("Selection Coefficient F_ROH Point estimate:", round(F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH, 4)),
+  legend(simulated_line_location, legend = paste("Selection Coefficient F_ROH Point estimate:", round(F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH, F_ROH_values_decimals)),
        col = selection_model_color, lty = 1, cex = 0.8, text.col = "black")
   
   # Add a vertical line for the average F_ROH of the empirical population
@@ -1650,58 +1750,19 @@ filename <- file.path(output_dir, paste("F_ROH_comparison",".csv", sep = ""))
 # Write data to CSV file without quotes
 write.table(F_ROH_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
+# Use the write_latex_table() function to write the data to a LaTeX-compatible text file
+write_latex_table(
+  data_frame = F_ROH_values,
+  sort_column = "F_ROH",  # Sorting was done using this column
+  output_dir = output_dir,
+  output_filename = "F_ROH_comparison"  # File name without extension
+)
 
 # Print the table using knitr::kable()
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
 
 ```
-### 2.4.1 Visualizing F_ROH
-```{r echo = FALSE,warning = FALSE}
-# Remove the empirical model from the plotting data
-plotting_data <- F_ROH_values[F_ROH_values$Model != "Empirical", ]
 
-# Add a column indicating whether the empirical F_ROH is within the CI of each model
-empirical_F_ROH <- empirical_avg_F_ROH
-plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_F_ROH) & (plotting_data$Upper_CI >= empirical_F_ROH)
-
-if(is.na(plotting_data$Empirical_Within_CI[[1]])){
-  # print("")
-} else {
-  # Create the plot
-p <- ggplot(plotting_data, aes(x = Model, y = F_ROH, color = Empirical_Within_CI)) +
-  geom_point(size = 3) +
-  geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
-  geom_hline(aes(yintercept = empirical_F_ROH), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
-  labs(title = "F_ROH Values and Confidence Intervals by Model",
-       x = "Model",
-       y = "F_ROH",
-       color = "Empirical F_ROH\nwithin CI",
-       linetype = "Empirical F_ROH") +
-  scale_linetype_manual(name = "Empirical F_ROH", values = c("dashed")) +
-  scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_y_continuous(limits = c(min(plotting_data$Lower_CI), max(plotting_data$Upper_CI)), 
-                     breaks = round(seq(min(plotting_data$Lower_CI), max(plotting_data$Upper_CI), length.out = 10), 5))
-
-# Print the plot
-print(p)
-
-# Print which models the empirical F_ROH is inside of
-inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
-outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
-
-cat("Models where empirical F_ROH is within CI:\n")
-print(inside_models)
-cat("\nModels where empirical F_ROH is outside CI:\n")
-print(outside_models)
-
-  
-  
-}
-
-
-```
 
 
 
@@ -1837,7 +1898,6 @@ H_e_5th_percentiles_Neutral_model$SE_CI_Estimated_Mean_H_e_5th_percentile <- sta
 ## 3.3 Selection Model
 
 ```{r echo = FALSE,warning = FALSE}
-cat("Uncommented because change of analysis")
 setwd(Selection_model_H_e_dir)
 # Pattern for finding the specific file containing "5th_percentiles_of_H_e_distribution.tsv"
 pattern <- "^.*5th_percentiles_of_H_e_distribution.tsv$"
@@ -1853,44 +1913,22 @@ H_e_5th_percentiles_Selection_models <- list()
 for (i in seq_along(selection_model_5th_percentiles_of_H_e_files)) {
   # Extract the selection coefficient from the file name
   selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", selection_model_5th_percentiles_of_H_e_files[i])
-
   # Read the .tsv file into a data frame
   subtable <- read.table(selection_model_5th_percentiles_of_H_e_files[i], header = TRUE,sep = "\t", stringsAsFactors = FALSE)
-  # Read the file
-file <- neutral_model_5th_percentiles_of_H_e_files[1]
-
-
-
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$file_name <- selection_model_5th_percentiles_of_H_e_files[i]
-
-
   # Add the subtable to the list with the selection coefficient as its name
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$results <- subtable
-
-
-
 }
-
-# # View the H_e_5th_percentiles_Selection_models
-# H_e_5th_percentiles_Selection_models
-
-# Calculating Average F_ROH for each table
-
 # Loop through each selection_coefficient
 for (selection_coefficient in names(H_e_5th_percentiles_Selection_models)) {
-
   # Calculate the point estimate F_ROH across all 20 simulations for the current selection coefficient
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$Estimated_Mean_H_e_5th_percentile <- mean(H_e_5th_percentiles_Selection_models[[selection_coefficient]][["results"]][["Fifth_Percentile"]])
-
-
   # Calculate the bootstrap confidence interval of the point estimate F_ROH across all 20 simulations for the current selection coefficient
   # Store the bootstrap confidence interval in the H_e_5th_percentiles_Selection_models table
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$SE_CI_Estimated_Mean_H_e_5th_percentile <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Selection_models[[selection_coefficient]][["results"]][["Fifth_Percentile"]])
 }
-
-# # View the dataframe
+ # View the dataframe
 # View(H_e_5th_percentiles_Selection_models)
-
 
 ```
 
@@ -1936,14 +1974,10 @@ for (i in 1:length(sim_info$sim_name)) {
   # Append the table info to the list under selection_scenario
   window_H_e_causative_variant_tables[[selection_coefficient]] <- c(window_H_e_causative_variant_tables[[selection_coefficient]], table_info)
 
-  
-  
-  
 }
 
 # Loop through each selection_coefficient and compute Standard Error confidence intervals for the 5th percentile
 for (selection_coefficient in names(window_H_e_causative_variant_tables)) {
-
   All_Population_Causative_window_Avg_H_e <- window_H_e_causative_variant_tables[[selection_coefficient]][["data"]][["Avg_He"]]
   # Remove any non-numeric values
   All_Population_Causative_window_Avg_H_e <- All_Population_Causative_window_Avg_H_e[!is.na(All_Population_Causative_window_Avg_H_e) & is.numeric(All_Population_Causative_window_Avg_H_e)]
@@ -1963,22 +1997,99 @@ for (selection_coefficient in names(window_H_e_causative_variant_tables)) {
   print(paste("Bootstrap 95% Confidence Interval: [", 
   window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[1], ", ", 
   window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[2], "]", sep = ""))
-
-
 }
-
-
-
-
 # View(window_H_e_causative_variant_tables)
+```
+## 3.4 Genomewide Average H_e
+```{r Expected Heterozygosity Avg H_e Summary, echo = FALSE,warning = FALSE}
+# Initialize vectors to store F_ROH values and CI bounds for the different selection coefficients
+selection_model_avg_values <- c()
+selection_model_lower_ci <- c()
+selection_model_upper_ci <- c()
+selection_model_names <- c(rownames(summary(H_e_5th_percentiles_Selection_models)))
+
+# window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e <- standard_error_confidence_interval_fun(All_Population_Causative_window_Avg_H_e)  
+
+# Loop through each selection_coefficient in H_es_Selection_models
+for (selection_coefficient in H_e_5th_percentiles_Selection_models) {
+  selection_coefficient$Estimated_Mean_Population_H_e <- mean(selection_coefficient$results$Avg_H_e)
+  CI <- standard_error_confidence_interval_fun(selection_coefficient$results$Avg_H_e)
+
+  # Append values to the lists
+  selection_model_avg_values <- c(selection_model_avg_values, selection_coefficient$Estimated_Mean_Population_H_e)
+  selection_model_lower_ci <- c(selection_model_lower_ci, CI[1])
+  selection_model_upper_ci <- c(selection_model_upper_ci, CI[2])
+}
+# Extract neutral model values and CI bounds
+H_e_5th_percentiles_Neutral_model$Estimated_Mean_Population_H_e <- mean(H_e_5th_percentiles_Neutral_model[["results"]][["Avg_H_e"]])
+H_e_5th_percentiles_Neutral_model$SE_CI_Estimated_Mean_H_e <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Neutral_model[["results"]][["Avg_H_e"]])
+
+neutral_avg_H_e <- H_e_5th_percentiles_Neutral_model$Estimated_Mean_Population_H_e 
+neutral_lower_ci <- H_e_5th_percentiles_Neutral_model$SE_CI_Estimated_Mean_H_e[1]
+neutral_upper_ci <- H_e_5th_percentiles_Neutral_model$SE_CI_Estimated_Mean_H_e[2]
+# Extract empirical model value
+empirical_avg_H_e <- empirical_H_e_distribution_table$Avg_H_e
+empirical_lower_ci <- NA # Placeholder for confidence interval lower bound
+empirical_upper_ci <- NA # Placeholder for confidence interval upper bound
+
+# Combine all values into a data frame
+H_e_values <- data.frame(
+  Model = c(rep("Selection", length(selection_model_avg_values)), "Neutral", "Empirical"),
+  H_e = c(selection_model_avg_values, neutral_avg_H_e, empirical_avg_H_e),
+  Lower_CI = c(selection_model_lower_ci, neutral_lower_ci, empirical_lower_ci),
+  Upper_CI = c(selection_model_upper_ci, neutral_upper_ci, empirical_upper_ci)
+)
+
+# Format all numeric values to 5 decimal places
+H_e_values$H_e <- round(H_e_values$H_e, H_e_values_decimals)
+H_e_values$Lower_CI <- round(H_e_values$Lower_CI,H_e_values_decimals)
+H_e_values$Upper_CI <- round(H_e_values$Upper_CI,H_e_values_decimals)
+
+# # Update the Model column for selection models
+# H_e_values$Model[1:length(selection_model_names)] <- selection_model_names
+
+# Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient
+
+# formatted_selection_coefficient_labels <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_model_names)
+formatted_selection_coefficient_labels <-sub("s(\\d)(\\d+)_.*", "s=\\1.\\2", selection_model_names)
+formatted_selection_coefficient_labels <- sub("selection_model_", "", formatted_selection_coefficient_labels)
+
+H_e_values$Model[1:length(selection_model_names)] <- formatted_selection_coefficient_labels
+
+H_e_values$H_e <- as.numeric(round(H_e_values$H_e,H_e_values_decimals))
+
+
+
+# Sort the data frame based on H_e column
+H_e_values_sorted <- H_e_values[order(as.numeric(H_e_values$H_e)), ]
+
+
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("Genomic_Average_Expected_Heterozygosity_Summary",".csv", sep = ""))
+
+# Write data to CSV file without quotes
+write.table(H_e_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
+# # Use the write_latex_table() function to write the data to a LaTeX-compatible text file
+# write_latex_table(
+#   data_frame = H_e_values,
+#   sort_column = "H_e",  # Column used for sorting
+#   output_dir = output_dir,
+#   output_filename = "Expected_Heterozygosity_Summary"  # File name without extension
+# )
+
+
+
+# Print the table using knitr::kable()
+knitr::kable(H_e_values_sorted, row.names = FALSE)
+
 ```
 
 
 
+## 3.5 Genomewide 5th percentile comparison - Expected Heterozygosity Summary
 
-## 3.4 Genomewide 5th percentile comparison - Expected Heterozygosity Summary
-
-```{r Expected Heterozygosity Summary, echo = FALSE,warning = FALSE}
+```{r Expected Heterozygosity 5th percentile Summary, echo = FALSE,warning = FALSE}
 
 # Initialize vectors to store F_ROH values and CI bounds for the different selection coefficients
 selection_model_avg_values <- c()
@@ -2036,19 +2147,34 @@ H_e_5th_percentile_values$Upper_CI <- round(H_e_5th_percentile_values$Upper_CI,H
 # H_e_5th_percentile_values$Model[1:length(selection_model_names)] <- selection_model_names
 
 # Formatting the selection coefficient for when displaying it. Removing "chr[0-9]" and adding a decimal point to the selection coefficient 
-formatted_selection_coefficient_labels <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_model_names)
+
+# formatted_selection_coefficient_labels <- sub("^.*_s(0?)(\\d+)_chr\\d+$", "s=\\1.\\2", selection_model_names)
+formatted_selection_coefficient_labels <-sub("s(\\d)(\\d+)_.*", "s=\\1.\\2", selection_model_names)
 
 H_e_5th_percentile_values$Model[1:length(selection_model_names)] <- formatted_selection_coefficient_labels
+
+H_e_5th_percentile_values$H_e_5th_percentile <- as.numeric(round(H_e_5th_percentile_values$H_e_5th_percentile,H_e_values_decimals))
+
 
 
 # Sort the data frame based on H_e_5th_percentile column
 H_e_5th_percentile_values_sorted <- H_e_5th_percentile_values[order(as.numeric(H_e_5th_percentile_values$H_e_5th_percentile)), ]
 
+
 # Define the filename with the output directory path
-filename <- file.path(output_dir, paste("Expected Heterozygosity Summary",".csv", sep = ""))
+filename <- file.path(output_dir, paste("Expected_Heterozygosity_Summary",".csv", sep = ""))
 
 # Write data to CSV file without quotes
 write.table(H_e_5th_percentile_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+
+# Use the write_latex_table() function to write the data to a LaTeX-compatible text file
+write_latex_table(
+  data_frame = H_e_5th_percentile_values,
+  sort_column = "H_e_5th_percentile",  # Column used for sorting
+  output_dir = output_dir,
+  output_filename = "Expected_Heterozygosity_Summary"  # File name without extension
+)
+
 
 
 # Print the table using knitr::kable()
@@ -2071,7 +2197,52 @@ knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 ```
 ### 4.0.2 F_ROH comparison
 ```{r echo = FALSE,warning = FALSE}
- # Print the table using knitr::kable()
+setwd(output_dir)
+
+# Creating an image of the F_ROH plot
+# png(filename = "Population_F_ROH_comparison_with_CI.png", width = 800, height = 600, res = 300)
+png(filename = "Population_F_ROH_comparison_with_CI.png",width = 1920, height = 1080, res = 300)
+
+
+# Remove the empirical model from the plotting data
+plotting_data <- F_ROH_values[F_ROH_values$Model != "Empirical", ]
+
+# Add a column indicating whether the empirical F_ROH is within the CI of each model
+empirical_F_ROH <- empirical_avg_F_ROH
+plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_F_ROH) & (plotting_data$Upper_CI >= empirical_F_ROH)
+
+# Create the plot
+p <- ggplot(plotting_data, aes(x = Model, y = F_ROH, color = Empirical_Within_CI)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
+  # Force the empirical F_ROH line to always be shown
+  geom_hline(aes(yintercept = empirical_F_ROH), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
+  labs(title = "F_ROH Values and Confidence Intervals by Model",
+       x = "Model",
+       y = "F_ROH",
+       color = "Empirical F_ROH\nwithin CI",
+       linetype = "Empirical F_ROH") +
+  scale_linetype_manual(name = "Empirical F_ROH", values = c("dashed")) +
+  scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Print the plot
+print(p)
+
+# Print which models the empirical F_ROH is inside of
+inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
+outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
+
+cat("Models where empirical F_ROH is within CI:\n")
+print(inside_models)
+cat("\nModels where empirical F_ROH is outside CI:\n")
+print(outside_models)
+
+# Close the graphics device
+dev.off()
+
+# Print the table using knitr::kable()
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
 ```
 
@@ -2122,11 +2293,27 @@ knitr::kable(Selection_testing_results, row.names = FALSE)
 formatted_selection_H_e_threshold <- round(fifth_percentile_H_e_neutral_model,H_e_values_decimals)
 
 
-# Define the filename with the output directory path
-filename <- file.path(output_dir, paste("ROH_hotspots_Selection_testing_neutral_model_H_E_threshold_",formatted_selection_H_e_threshold,".csv", sep = ""))
-# Write data to CSV file without quotes
-write.table(Selection_testing_results, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
+#Define the filename with the output directory path
+filename_csv <- file.path(output_dir, paste("ROH_hotspots_Sweep_test_H_E_threshold_",formatted_selection_H_e_threshold,".csv", sep = ""))
 
+Selection_testing_results_latex <- Selection_testing_results
+# Escape underscores in the Name column
+Selection_testing_results_latex$Name <- gsub("_", "\\_", Selection_testing_results_latex$Name, fixed = TRUE)
+
+# Write data to CSV file without quotes
+write.table(Selection_testing_results_latex, file = filename_csv, sep = ",", row.names = FALSE, quote = FALSE)
+
+# Define the filename with the output directory path
+filename <- file.path(paste("ROH_hotspots_Selection_testing_neutral_model_H_E_threshold_",formatted_selection_H_e_threshold,".csv", sep = ""))
+
+
+# Use the write_latex_table() function to write the data to a LaTeX-compatible text file
+write_latex_table(
+  data_frame = Selection_testing_results,
+  sort_column = "Window_based_Average_H_e",  #
+  output_dir = output_dir,
+  output_filename = filename  
+)
 
 
 # Subset the dataframe to extract rows where Under_selection is "Yes"
@@ -2252,6 +2439,13 @@ filename <- file.path(output_dir, paste("Causative_windows_under_selection",".cs
 # Write data to CSV file without quotes
 write.table(H_e_values_sorted, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
+# Use the write_latex_table() function to write the data to a LaTeX-compatible text file
+write_latex_table(
+  data_frame = H_e_values,
+  sort_column = "H_e",  # Column used for sorting
+  output_dir = output_dir,
+  output_filename = "Causative_windows_under_selection"  
+)
 
 # Print the table using knitr::kable()
 knitr::kable(H_e_values_sorted, row.names = FALSE)
@@ -2428,17 +2622,480 @@ Hotspots_and_Causative_windows_comparison$ROH_Freq <- round(Hotspots_and_Causati
 
 Hotspots_and_Causative_windows_comparison$H_e <- round(Hotspots_and_Causative_windows_comparison$H_e,H_e_values_decimals)
 
-
-# Sort the data frame based on average fixation time, in descending order
-Hotspots_and_Causative_windows_comparison_sorted <- Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$Lengths_Mb), ]
+Hotspots_and_Causative_windows_comparison$Lengths_Mb <- round(Hotspots_and_Causative_windows_comparison$Lengths_Mb,Window_lengths_decimals)
 
 
+# # Sort the data frame based on length
+# Hotspots_and_Causative_windows_comparison_sorted <- Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$Lengths_Mb), ]
+
+# Sort the data frame based on the 'Model' column in descending order
+Hotspots_and_Causative_windows_comparison_sorted <- Hotspots_and_Causative_windows_comparison[order(Hotspots_and_Causative_windows_comparison$Model, decreasing = TRUE), ]
+
+
+
+Hotspots_and_Causative_windows_comparison_sorted_latex <- Hotspots_and_Causative_windows_comparison_sorted
+# Escape underscores in the Name column
+Hotspots_and_Causative_windows_comparison_sorted_latex$Model <- gsub("_", "\\_", Hotspots_and_Causative_windows_comparison_sorted_latex$Model, fixed = TRUE)
+
+
+# Define the filename with the output directory path
+filename <- file.path(output_dir, paste("ROH_Hotspots_and_Causative_Windows_comparison",".csv", sep = ""))
+
+# Write data to CSV file without quotes
+write.table(Hotspots_and_Causative_windows_comparison_sorted_latex, file = filename, sep = ",", row.names = FALSE, quote = FALSE)
 
 kable(Hotspots_and_Causative_windows_comparison_sorted, row.names = FALSE)
 # View(causative_variant_window_results_df)
 
 
 ```
+
+```{r}
+
+# plot_title <- paste("Length And Average ROH % Comparison - ROH Hotspots & Causative Windows")
+plot_title <- paste("ROH Hotspot(s) & Causative Windows comparison")
+
+
+# Modify the labels by removing "Hotspot_" prefix and "_window" suffix from hotspot models
+Hotspots_and_Causative_windows_comparison_sorted$Label <- ifelse(
+  grepl("Hotspot", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  gsub("Hotspot_|_window", "", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  Hotspots_and_Causative_windows_comparison_sorted$Model
+)
+
+# Removing the "s=" part from the selection coefficients for the plot displayal
+Hotspots_and_Causative_windows_comparison_sorted$Label <- gsub("^s=", "", Hotspots_and_Causative_windows_comparison_sorted$Label)
+
+
+
+# Create a new column for identifying the type
+Hotspots_and_Causative_windows_comparison_sorted$Type <- ifelse(
+  grepl("Hotspot", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  "Hotspot", 
+  "Selection Coefficient"
+)
+
+
+# # Create the 3D scatter plot
+# s3d <- scatterplot3d(
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   color = ifelse(Hotspots_and_Causative_windows_comparison_sorted$Type == "Hotspot", "red", "blue"),
+#   pch = 19, # Solid circle
+#   xlab = "Lengths",
+#   ylab = "ROH Frequency",
+#   zlab = "H_e",
+#   main = plot_title
+# )
+# 
+# # Add labels to the points
+# s3d.coords <- s3d$xyz.convert(
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e
+# )
+# text(s3d.coords$x, s3d.coords$y, 
+#      labels = Hotspots_and_Causative_windows_comparison_sorted$Label, 
+#      pos = 3, cex = 0.5) # pos=3 means above
+
+
+# Create the 3D scatter plot
+s3d <- scatterplot3d(
+  Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+  Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+  Hotspots_and_Causative_windows_comparison_sorted$H_e,
+  color = ifelse(Hotspots_and_Causative_windows_comparison_sorted$Type == "Hotspot", "red", "blue"),
+  pch = 19, # Solid circle
+  xlab = "Avg ROH-frequency (%)",
+  ylab = "Length (Mb)",
+  zlab = "Avg H_e",
+  main = plot_title
+)
+
+# )
+
+# Add labels to the points
+s3d.coords <- s3d$xyz.convert(
+  Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+  Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+  Hotspots_and_Causative_windows_comparison_sorted$H_e
+)
+text(s3d.coords$x, s3d.coords$y, 
+     labels = Hotspots_and_Causative_windows_comparison_sorted$Label, 
+     pos = 3, cex = 0.5) # pos=3 means above
+
+
+
+```
+# Test med skuggor
+```{r}
+setwd(output_dir)
+
+# plot_title <- paste("Length And Average ROH % Comparison - ROH Hotspots & Causative Windows")
+plot_title <- paste("ROH Hotspot(s) & Causative Windows comparison")
+
+# Modify the labels by removing "Hotspot_" prefix and "_window" suffix from hotspot models
+Hotspots_and_Causative_windows_comparison_sorted$Label <- ifelse(
+  grepl("Hotspot", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  gsub("Hotspot_|_window", "", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  Hotspots_and_Causative_windows_comparison_sorted$Model
+)
+
+# Removing the "s=" part from the selection coefficients for the plot display
+Hotspots_and_Causative_windows_comparison_sorted$Label <- gsub("^s=", "", Hotspots_and_Causative_windows_comparison_sorted$Label)
+
+# Create a new column for identifying the type
+Hotspots_and_Causative_windows_comparison_sorted$Type <- ifelse(
+  grepl("Hotspot", Hotspots_and_Causative_windows_comparison_sorted$Model), 
+  "Hotspot", 
+  "Selection Coefficient"
+)
+
+# Generate a color palette for the hotspots
+hotspot_models <- unique(Hotspots_and_Causative_windows_comparison_sorted$Model[Hotspots_and_Causative_windows_comparison_sorted$Type == "Hotspot"])
+num_hotspots <- length(hotspot_models)
+
+# Choose the color palette based on the number of hotspots
+if (num_hotspots == 2) {
+  color_palette_name <- "Set2"
+} else {
+  color_palette_name <- "Set3"
+}
+
+# Get the colors for the hotspots
+hotspot_colors <- setNames(brewer.pal(n = num_hotspots, name = color_palette_name), hotspot_models)
+
+# Assign colors to each point
+Hotspots_and_Causative_windows_comparison_sorted$Color <- ifelse(
+  Hotspots_and_Causative_windows_comparison_sorted$Type == "Hotspot", 
+  hotspot_colors[Hotspots_and_Causative_windows_comparison_sorted$Model], 
+  "blue"
+)
+
+x_value <- Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq
+x_axis_label <- "Avg ROH-frequency (%)"
+y_value <- Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
+y_axis_label <- "Length (Mb)"
+z_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
+z_axis_label <- "Avg H_e"
+
+
+# x_value <- Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
+# x_axis_label <- "Length (Mb)"
+# y_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
+# y_axis_label <- "Avg H_e"
+# z_value <- Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq
+# z_axis_label <- "Avg ROH-frequency (%)"
+
+
+x_value <- Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq
+x_axis_label <- "Avg ROH-frequency (%)"
+y_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
+y_axis_label <- "Avg H_e"
+z_value <- Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
+z_axis_label <- "Length (Mb)"
+
+# x_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
+# x_axis_label <- "Avg H_e"
+# y_value <- Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq
+# y_axis_label <- "Avg ROH-frequency (%)"
+# z_value <- Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
+# z_axis_label <- "Length (Mb)"
+
+# # Create and save the 3D scatter plot as a PNG file
+# png(filename = "3dplot_Hotspot_Causative_Window_Comparison.png", width = 1920, height = 1080, res = 300)
+# png(filename = "3dplot_Hotspot_Causative_Window_Comparison.png",width = 800, height = 600, res = 300)
+
+
+# Create the 3D scatter plot
+s3d <- scatterplot3d(
+  x_value  ,
+  y_value,
+  z_value,
+  color = Hotspots_and_Causative_windows_comparison_sorted$Color,
+  pch = 19, # Solid circle
+  xlab = x_axis_label,
+  ylab = y_axis_label,
+  zlab = z_axis_label,
+  main = plot_title
+)
+
+# Add shadows on the x-y plane (z = 0)
+s3d$points3d(
+  x_value,
+  y_value,
+  rep(0, nrow(Hotspots_and_Causative_windows_comparison_sorted)),  # Set z to 0 for shadow
+  col = adjustcolor(Hotspots_and_Causative_windows_comparison_sorted$Color, alpha.f = 0.3), # Semi-transparent shadows
+  pch = 19
+)
+
+# Convert coordinates for adding labels
+s3d.coords <- s3d$xyz.convert(
+  x_value,
+  y_value,
+  z_value
+)
+
+# Add labels to the original points
+text(s3d.coords$x, s3d.coords$y, 
+     labels = Hotspots_and_Causative_windows_comparison_sorted$Label, 
+     pos = 3, cex = 0.5) # pos=3 means above
+
+# # Close the graphics device
+# dev.off()
+
+```
+
+
+
+
+# Fixar överlappande labels
+```{r}
+# # Increase plot size
+# par(mar = c(5, 5, 5, 5)) # Adjust margins if needed
+# 
+# s3d <- scatterplot3d(
+#   # x = Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   # y = Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   # z = Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   
+#   # x = Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   # y = Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   # z = Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq ,
+#   
+#   # x = Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb ,
+#   # y = Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   # z = Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq ,
+#   
+#   x = Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   y = Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   z = Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb  ,
+# 
+#   
+#   color = ifelse(Hotspots_and_Causative_windows_comparison_sorted$Type == "Hotspot", "red", "blue"),
+#   pch = 19, 
+#   # xlab = "Avg ROH-frequency (%)",
+#   # ylab = "Length (Mb)",
+#   # zlab = "H_e",
+#   
+#   # xlab = "Length (Mb) ",
+#   # ylab = "H_e",
+#   # zlab = "Avg ROH-frequency (%)",
+#   
+#   # xlab = "Length (Mb) ",
+#   # ylab = "H_e",
+#   # zlab = "Avg ROH-frequency (%)",
+#   
+#   xlab = "Avg ROH-frequency (%)",
+#   ylab = "H_e",
+#   zlab = "Length (Mb)",
+# 
+# 
+#   
+#   main = plot_title
+# )
+# # # Add labels to the points
+# # s3d.coords <- s3d$xyz.convert(
+# #   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+# #   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+# #   Hotspots_and_Causative_windows_comparison_sorted$H_e
+# # )
+# 
+# 
+# # Add labels to the points
+# s3d.coords <- s3d$xyz.convert(
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
+# )
+# 
+# # 
+# # # Add jitter to the label positions
+# # text(s3d.coords$x + runif(nrow(Hotspots_and_Causative_windows_comparison_sorted), -0.04, 0.04),
+# #      s3d.coords$y + runif(nrow(Hotspots_and_Causative_windows_comparison_sorted), -0.04, 0.04),
+# #      labels = Hotspots_and_Causative_windows_comparison_sorted$Label,
+# #      pos = 3, cex = 0.5)
+# # 
+# # 
+# text(s3d.coords$x, s3d.coords$y,
+#      labels = Hotspots_and_Causative_windows_comparison_sorted$Label,
+#      pos = 3, cex = 0.5) # pos=3 means above
+
+```
+# jittering on all axis
+```{r}
+# setwd(output_dir)
+# 
+# # Identify indices for selection and non-selection points based on labels starting with '0'
+# selection_indices <- grepl("^0", Hotspots_and_Causative_windows_comparison_sorted$Label)
+# non_selection_indices <- !selection_indices
+# 
+# # windows(width = 1920 / 96, height = 1080 / 96)  # 96 DPI is default
+# # # # Create and save the 3D scatter plot as a PNG file
+# # png(filename = "3dplot_Hotspot_Causative_Window_Comparison.png", width = 1920, height = 1080)
+# 
+# # Create the 3D scatter plot with both selection and non-selection points
+# s3d <- scatterplot3d(
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   color = ifelse(selection_indices, "blue", "red"), # Blue for selection, Red for hotspots
+#   pch = 19, # Solid circle
+#   xlab = "Avg ROH-frequency (%)",
+#   ylab = "Length (Mb)",
+#   zlab = "H_e",
+#   main = plot_title
+# )
+# # Convert 3D coordinates for labeling
+# s3d.coords <- s3d$xyz.convert(
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e
+# )
+# # Subset data for non-selection points
+# non_selection_data <- Hotspots_and_Causative_windows_comparison_sorted[non_selection_indices, ]
+# # s3d.coords$x[non_selection_indices]
+# # 7.888889 6.278889 6.715556 7.655556 6.674444 5.723333 6.143333 5.773333 6.212222
+# # custom_jitter_x_axis_hotspots <- c(0,0,-0.05,0,0.1,-0.4,0,0,0)  # Adjust as needed
+# custom_jitter_x_axis_hotspots <- c(0,0,0,0,0,0,0,0,0)  # Adjust as needed
+# 
+# # s3d.coords$y[non_selection_indices]
+# #3.7711111 2.4511111 1.9444444 1.5644444 2.5355556 3.1066667 2.6066667 3.1466667 0.8977778
+# # custom_jitter_y_axis_hotspots <- c(0,-0.7,-0.65,0,0,-0.3,0,0.1,0)   # Adjust as needed
+# custom_jitter_y_axis_hotspots <- c(0,0,0,0,0,0,0,0,0)   # Adjust as needed
+# 
+# # Add labels for non-selection points without jitter
+# text(s3d.coords$x[non_selection_indices]+ custom_jitter_x_axis_hotspots, 
+#      s3d.coords$y[non_selection_indices]+ custom_jitter_y_axis_hotspots, 
+#      labels = Hotspots_and_Causative_windows_comparison_sorted$Label[non_selection_indices], 
+#      pos = 3, cex = 0.7)
+# 
+# 
+# 
+# selection_data <- Hotspots_and_Causative_windows_comparison_sorted[selection_indices, ]
+# custom_jitter_x_axis_sel_coeff <- c(0.2,0.05,0.025,0,-0.05,0,0)
+# # custom_jitter_x_axis_sel_coeff <- c(0,0,0,0,0,0,0) 
+# custom_jitter_y_axis_sel_coeff <- c(-0.25,0,-0.57,-0.1,-0.6,0,0)
+# # custom_jitter_y_axis_sel_coeff <- c(0,0,0,0,0,0,0) 
+# # Apply jitter to selection point labels
+# label_jitter <- runif(sum(selection_indices), 0, 0.2) # Small random jitter
+# # Add labels for selection points with jitter
+# text(s3d.coords$x[selection_indices] + custom_jitter_x_axis_sel_coeff, 
+#      s3d.coords$y[selection_indices] + custom_jitter_y_axis_sel_coeff, 
+#      labels = Hotspots_and_Causative_windows_comparison_sorted$Label[selection_indices], 
+#      pos = 3, cex = 0.7)
+
+# # Close the graphics device
+# dev.off()
+
+# kable(selection_data,row.names = FALSE)
+# kable(non_selection_data,row.names = FALSE)
+```
+#Jitter z-axis
+```{r}
+# # Create the 3D scatter plot with both selection and non-selection points
+# s3d <- scatterplot3d(
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   color = ifelse(selection_indices, "blue", "red"), # Blue for selection, Red for hotspots
+#   pch = 19, # Solid circle
+#   xlab = "Avg ROH-frequency (%)",
+#   ylab = "Length (Mb)",
+#   zlab = "H_e",
+#   main = plot_title
+# )
+# 
+# # Convert 3D coordinates for labeling
+# s3d.coords <- s3d$xyz.convert(
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e
+# )
+# 
+# # Generate small random jitter for the y-axis (simulating z-axis movement)
+# y_jitter <- runif(sum(selection_indices), -0.02, 0.02)
+# 
+# # Adjust y-coordinates for selection labels only
+# jittered_y <- s3d.coords$y[selection_indices] + y_jitter
+# 
+# # Add labels for selection points with y-axis adjustment
+# text(s3d.coords$x[selection_indices],
+#      jittered_y,
+#      labels = Hotspots_and_Causative_windows_comparison_sorted$Label[selection_indices],
+#      pos = 3, cex = 0.7)
+# # 
+# # Add labels for non-selection points without jitter
+# text(s3d.coords$x[non_selection_indices],
+#      s3d.coords$y[non_selection_indices],
+#      labels = Hotspots_and_Causative_windows_comparison_sorted$Label[non_selection_indices],
+#      pos = 3, cex = 0.7)
+
+
+```
+```{r}
+# Sort the data frame based on average fixation time, in descending order
+ kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$ROH_Freq), ])
+ kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$H_e), ])
+```
+
+```{r}
+# # Load the required packages
+# library(rgl)
+# 
+# # Identify indices for selection and non-selection points based on labels starting with '0'
+# selection_indices <- grepl("^0", Hotspots_and_Causative_windows_comparison_sorted$Label)
+# non_selection_indices <- !selection_indices
+# 
+# # Open a new 3D plotting device
+# open3d()
+# 
+# # Plot with rgl
+# plot3d(
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e,
+#   col = ifelse(selection_indices, "blue", "red"), # Blue for selection, Red for hotspots
+#   type = 's', # Use points
+#   xlab = "Avg ROH-frequency (%)",
+#   ylab = "Length (Mb)",
+#   zlab = "H_e",
+#   main = plot_title
+# )
+# 
+# # Convert 3D coordinates for labeling
+# s3d_coords <- cbind(
+#   Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq,
+#   Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb,
+#   Hotspots_and_Causative_windows_comparison_sorted$H_e
+# )
+# 
+# # Add labels for non-selection points with custom jitter
+# text3d(
+#   s3d_coords[non_selection_indices, ] + cbind(custom_jitter_x_axis_hotspots, custom_jitter_y_axis_hotspots, 0),
+#   texts = Hotspots_and_Causative_windows_comparison_sorted$Label[non_selection_indices],
+#   col = "red", # Color of the text
+#   cex = 0.7
+# )
+# 
+# # Add labels for selection points with custom jitter
+# text3d(
+#   s3d_coords[selection_indices, ] + cbind(custom_jitter_x_axis_sel_coeff, custom_jitter_y_axis_sel_coeff, label_jitter),
+#   texts = Hotspots_and_Causative_windows_comparison_sorted$Label[selection_indices],
+#   col = "blue", # Color of the text
+#   cex = 0.7
+# )
+
+# # Save the 3D plot as a PNG file
+# rgl.postscript("3dplot_Hotspot_Causative_Window_Comparison.png", fmt = "png")
+
+# # Close the 3D device
+# rgl.close()
+
+```
+
+
 # Visualizing and scaling
 ```{r}
 # Min-max-scaling normalization function, that normalizes a vector of values
@@ -2450,10 +3107,6 @@ min_max_normalization_fun <- function(x) {
 
 
 ```{r}
-# Install and load the scatterplot3d package
-# install.packages("scatterplot3d")
-library(scatterplot3d)
-
 
 ### Min max scaling ###
 # Normalize Lengths_Mb
@@ -2477,7 +3130,8 @@ Hotspots_and_Causative_windows_comparison_sorted$Type <- ifelse(
   "Selection Coefficient"
 )
 
-plot_title <- paste("Length And Average ROH % Comparison - ROH Hotspots & Causative Windows")
+plot_title <- paste("Normalized ROH Hotspot(s) & Causative Windows comparison")
+
 
 # Create the 3D scatter plot
 s3d <- scatterplot3d(
@@ -2503,12 +3157,8 @@ text(s3d.coords$x, s3d.coords$y,
      pos = 3, cex = 0.5) # pos=3 means above
 ```
 
-
-
-
 ```{r, echo = FALSE,warning = FALSE}
-
-### Min max scaling ###
+# Min max scaling
 # Normalize Lengths_Mb
 Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb_Normalized <- min_max_normalization_fun(Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb)
 # Normalize ROH Frequency
@@ -2547,10 +3197,7 @@ p <- ggplot(Hotspots_and_Causative_windows_comparison_sorted, aes(x = Lengths_Mb
 print(p)
 # # Save the plot with specified dimensions
 # ggsave("Hotspots_and_Selection_Coefficients_plot.png", plot = p, width = 10, height = 8)
-
 ```
-
-
 
 
 # 5 Visualizing Expected Heterozygoisty 

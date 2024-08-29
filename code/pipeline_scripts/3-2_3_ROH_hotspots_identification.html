@@ -384,7 +384,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 input_file &lt;- Sys.getenv(&quot;input_bed_file&quot;)
 input_file</code></pre>
-<pre><code>## [1] &quot;/home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_2_neutral_model_chr28_ROH_freq.bed&quot;</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed&quot;</code></pre>
 <pre class="r"><code>Sys.getenv()  #wtf</code></pre>
 <pre><code>## _CE_CONDA               
 ## _CE_M                   
@@ -392,7 +392,7 @@ input_file</code></pre>
 ##                         -Wformat -Werror=format-security -Wdate-time
 ## autosome_roh_freq_directory
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq
-## chr_simulated           chr28
+## chr_simulated           chr1
 ## CONDA_DEFAULT_ENV       bedtools
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/bedtools
@@ -404,16 +404,18 @@ input_file</code></pre>
 ## data_dir                /home/jonathan/data_HO
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:14.0
+## DISPLAY                 localhost:11.0
 ## EDITOR                  vi
+## empirical_data_basename
+##                         LR_fs
 ## empirical_dog_breed     labrador_retriever
 ## empirical_processing    FALSE
 ## gapless_roh_hotspots_directory
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/gapless_roh_hotspots
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
-##                         TRUE
-## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_2_neutral_model_chr28_ROH_freq.bed
+##                         FALSE
+## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
 ## Introduce_mutations     FALSE
 ## LANG                    en_US.UTF-8
 ## LD_LIBRARY_PATH         /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server
@@ -424,27 +426,23 @@ input_file</code></pre>
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAKE                    make
 ## MOTD_SHOWN              pam
-## N_e_bottleneck          40
+## N_e_bottleneck          6
 ## n_generations_bottleneck
 ##                         2
 ## n_individuals_breed_formation
-##                         225
+##                         405
 ## n_simulated_generations_breed_formation
-##                         65
+##                         96
 ## n_simulation_replicates
-##                         2
-## Ne_burn_in              2000
+##                         20
+## Ne_burn_in              3545
 ## nInd_founder_population
-##                         50
+##                         6
 ## OLDPWD                  /home/jonathan
-## output_dir_neutral_simulation
-##                         /home/jonathan/data_HO/raw/simulated/neutral_model
 ## output_directory        /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral
-## output_sim_files_basename
-##                         sim_2_neutral_model_chr28
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/bedtools/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_2_neutral_model_chr28_ROH_freq.bed
+## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
 ## PWD                     /home/jonathan
 ## R_ARCH                  
 ## R_BROWSER               xdg-open
@@ -461,7 +459,7 @@ input_file</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmp4NPnyT
+## R_SESSION_TMPDIR        /tmp/RtmpIs4q3p
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -476,20 +474,20 @@ input_file</code></pre>
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/roh_hotspots_freq
 ## SED                     /bin/sed
 ## selected_chr_snp_density_mb
-##                         96.64
+##                         91.23
 ## selection_simulation    FALSE
 ## SHELL                   /bin/bash
 ## SHLVL                   2
-## SSH_CLIENT              172.21.31.25 53878 22
-## SSH_CONNECTION          172.21.31.25 53878 77.235.253.16 22
-## SSH_TTY                 /dev/pts/9
+## SSH_CLIENT              172.21.30.174 56047 22
+## SSH_CONNECTION          172.21.30.174 56047 77.235.253.16 22
+## SSH_TTY                 /dev/pts/2
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          2358
+## XDG_SESSION_ID          6777
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code>## Extracting the prefix of the file used  
 # Extracting the basename (filename without extension) from the file path
@@ -498,7 +496,7 @@ filename &lt;- basename(input_file)
 prefix &lt;- strsplit(filename, &quot;_ROH_freq.bed&quot;)[[1]][1]
 # Output the prefix
 print(prefix)</code></pre>
-<pre><code>## [1] &quot;sim_2_neutral_model_chr28&quot;</code></pre>
+<pre><code>## [1] &quot;sim_20_neutral_model_chr1&quot;</code></pre>
 <pre class="r"><code>#################################### 
 # Defining the output dirs
 #################################### 
@@ -525,7 +523,7 @@ Sys.getenv()</code></pre>
 ##                         -Wformat -Werror=format-security -Wdate-time
 ## autosome_roh_freq_directory
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq
-## chr_simulated           chr28
+## chr_simulated           chr1
 ## CONDA_DEFAULT_ENV       bedtools
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/bedtools
@@ -537,16 +535,18 @@ Sys.getenv()</code></pre>
 ## data_dir                /home/jonathan/data_HO
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:14.0
+## DISPLAY                 localhost:11.0
 ## EDITOR                  vi
+## empirical_data_basename
+##                         LR_fs
 ## empirical_dog_breed     labrador_retriever
 ## empirical_processing    FALSE
 ## gapless_roh_hotspots_directory
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/gapless_roh_hotspots
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
-##                         TRUE
-## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_2_neutral_model_chr28_ROH_freq.bed
+##                         FALSE
+## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
 ## Introduce_mutations     FALSE
 ## LANG                    en_US.UTF-8
 ## LD_LIBRARY_PATH         /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server
@@ -557,27 +557,23 @@ Sys.getenv()</code></pre>
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAKE                    make
 ## MOTD_SHOWN              pam
-## N_e_bottleneck          40
+## N_e_bottleneck          6
 ## n_generations_bottleneck
 ##                         2
 ## n_individuals_breed_formation
-##                         225
+##                         405
 ## n_simulated_generations_breed_formation
-##                         65
+##                         96
 ## n_simulation_replicates
-##                         2
-## Ne_burn_in              2000
+##                         20
+## Ne_burn_in              3545
 ## nInd_founder_population
-##                         50
+##                         6
 ## OLDPWD                  /home/jonathan
-## output_dir_neutral_simulation
-##                         /home/jonathan/data_HO/raw/simulated/neutral_model
 ## output_directory        /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral
-## output_sim_files_basename
-##                         sim_2_neutral_model_chr28
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/bedtools/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_2_neutral_model_chr28_ROH_freq.bed
+## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
 ## PWD                     /home/jonathan
 ## R_ARCH                  
 ## R_BROWSER               xdg-open
@@ -594,7 +590,7 @@ Sys.getenv()</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmp4NPnyT
+## R_SESSION_TMPDIR        /tmp/RtmpIs4q3p
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -609,20 +605,20 @@ Sys.getenv()</code></pre>
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/roh_hotspots_freq
 ## SED                     /bin/sed
 ## selected_chr_snp_density_mb
-##                         96.64
+##                         91.23
 ## selection_simulation    FALSE
 ## SHELL                   /bin/bash
 ## SHLVL                   2
-## SSH_CLIENT              172.21.31.25 53878 22
-## SSH_CONNECTION          172.21.31.25 53878 77.235.253.16 22
-## SSH_TTY                 /dev/pts/9
+## SSH_CLIENT              172.21.30.174 56047 22
+## SSH_CONNECTION          172.21.30.174 56047 77.235.253.16 22
+## SSH_TTY                 /dev/pts/2
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          2358
+## XDG_SESSION_ID          6777
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code>################################### 
 #Defining Input parameters
@@ -666,11 +662,19 @@ top_1_percent_ROH &lt;- data[data$FREQUENCY &gt;= threshold, ]
 # Print the top 1% of ROH regions
 print(top_1_percent_ROH)</code></pre>
 <pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY
-## 113  28 11200001 11300000    41  0.182222
-## 238  28 23700001 23800000    45  0.200000
-## 239  28 23800001 23900000    45  0.200000
-## 240  28 23900001 24000000    43  0.191111
-## 247  28 24600001 24700000    41  0.182222</code></pre>
+## 249   1 24800001 24900000   223  0.550617
+## 250   1 24900001 25000000   226  0.558025
+## 251   1 25000001 25100000   224  0.553086
+## 253   1 25200001 25300000   222  0.548148
+## 254   1 25300001 25400000   219  0.540741
+## 256   1 25500001 25600000   233  0.575309
+## 257   1 25600001 25700000   231  0.570370
+## 260   1 25900001 26000000   220  0.543210
+## 261   1 26000001 26100000   221  0.545679
+## 262   1 26100001 26200000   221  0.545679
+## 263   1 26200001 26300000   222  0.548148
+## 264   1 26300001 26400000   221  0.545679
+## 265   1 26400001 26500000   218  0.538272</code></pre>
 <div id="gapless-roh-hotspot-windows" class="section level2">
 <h2>1.2: Gapless ROH-hotspot windows</h2>
 <p>Here, directly adjacent ROH-hotspot windows are merged together. For these ROH-hotspot windows, no gaps are allowed within the ROH-hotspot window.</p>
@@ -713,15 +717,31 @@ merged_top_1_percent_ROH$Distance_to_next_kb &lt;- c(diff(merged_top_1_percent_R
 # Print the merged top 1% ROH data
 print(merged_top_1_percent_ROH)</code></pre>
 <pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY Length_kb Distance_to_prev_kb
-## 113  28 11200001 11300000    41  0.182222       100                  NA
-## 238  28 23700001 23900000    45  0.200000       200               12500
-## 240  28 23900001 24000000    43  0.191111       100                 200
-## 247  28 24600001 24700000    41  0.182222       100                 700
+## 249   1 24800001 24900000   223  0.550617       100                  NA
+## 250   1 24900001 25000000   226  0.558025       100                 100
+## 251   1 25000001 25100000   224  0.553086       100                 100
+## 253   1 25200001 25300000   222  0.548148       100                 200
+## 254   1 25300001 25400000   219  0.540741       100                 100
+## 256   1 25500001 25600000   233  0.575309       100                 200
+## 257   1 25600001 25700000   231  0.570370       100                 100
+## 260   1 25900001 26000000   220  0.543210       100                 300
+## 261   1 26000001 26200000   221  0.545679       200                 100
+## 263   1 26200001 26300000   222  0.548148       100                 200
+## 264   1 26300001 26400000   221  0.545679       100                 100
+## 265   1 26400001 26500000   218  0.538272       100                 100
 ##     Distance_to_next_kb
-## 113               12500
-## 238                 200
-## 240                 700
-## 247                  NA</code></pre>
+## 249                 100
+## 250                 100
+## 251                 200
+## 253                 100
+## 254                 200
+## 256                 100
+## 257                 300
+## 260                 100
+## 261                 200
+## 263                 100
+## 264                 100
+## 265                  NA</code></pre>
 </div>
 <div id="merging-together-roh-hotspot-windows-within-2mb" class="section level2">
 <h2>1.3: Merging together ROH-hotspot windows within 2Mb</h2>
@@ -761,8 +781,7 @@ if (!is.null(current_window)) {
 # Print the linked windows
 print(linked_hotspot_windows)</code></pre>
 <pre><code>##     CHR     POS1     POS2 Length_kb
-## 113  28 11200001 11300000       100
-## 238  28 23700001 24700000      1000</code></pre>
+## 249   1 24800001 26500000      1700</code></pre>
 </div>
 <div id="visualization-of-roh-hotspots" class="section level2">
 <h2>1.4: Visualization of ROH Hotspots</h2>
@@ -912,7 +931,7 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   # Print message indicating successful export
   cat(&quot;Exported&quot;, nrow(chr_data), &quot;hotspot windows to&quot;, filename, &quot;\n&quot;)
 }</code></pre>
-<pre><code>## Exported 4 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/gapless_roh_hotspots/sim_2_neutral_model_chr28_CHR28_ROH_Hotspot_gapless_windows.bed</code></pre>
+<pre><code>## Exported 12 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/gapless_roh_hotspots/sim_20_neutral_model_chr1_CHR1_ROH_Hotspot_gapless_windows.bed</code></pre>
 </div>
 <div id="mb-roh-hotspot-windows" class="section level2">
 <h2>3.2: 2Mb ROH-hotspot windows</h2>
@@ -935,7 +954,7 @@ for (Chromosome in unique(linked_hotspot_windows$CHR)) {
   # Print message indicating successful export
   cat(&quot;Exported&quot;, nrow(chr_data), &quot;hotspot windows to&quot;, filename, &quot;\n&quot;)
 }</code></pre>
-<pre><code>## Exported 2 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/sim_2_neutral_model_chr28_CHR28_ROH_Hotspot_windows.bed</code></pre>
+<pre><code>## Exported 1 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/sim_20_neutral_model_chr1_CHR1_ROH_Hotspot_windows.bed</code></pre>
 </div>
 </div>
 

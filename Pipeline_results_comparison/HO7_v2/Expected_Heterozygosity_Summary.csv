@@ -1,0 +1,4 @@
+Model,H_e_5th_percentile,Lower_CI,Upper_CI,Error_perc
+Neutral - Sams,0.044,0.042,0.047,40
+Neutral - HO,0.069,0.059,0.079,8
+Empirical,0.074,NA,NA,NA

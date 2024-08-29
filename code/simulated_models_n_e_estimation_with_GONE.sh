@@ -12,7 +12,8 @@ conda activate plink
 ######################################
 # chr_simulated="chr1" # Imported from run_pipeline.sh
 # selection_models_list=("s02" "s04" "s06" "s08")
-selection_models_list=("s04" "s06" "s08")
+selection_models_list=("s01" "s02" "s03" "s04" "s05" "s06" "s07" "s08")
+# selection_models_list=("s04" "s06" "s08")
 
 
 # # Boolean value to determine whether to run the selection simulation code

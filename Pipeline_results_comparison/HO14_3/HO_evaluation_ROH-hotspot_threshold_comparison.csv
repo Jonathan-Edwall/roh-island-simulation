@@ -1,0 +1,4 @@
+Model,ROH_hotspot_thr,Lower_CI,Upper_CI,Standard_Deviation,Coefficient_of_variation,Error_percentage
+Neutral Sams,30,27.9,32.1,4.7,15.7,45.9
+Neutral HO,52,44.9,59.1,15.8,30.4,6.1
+Empirical,55.4,NA,NA,NA,NA,NA

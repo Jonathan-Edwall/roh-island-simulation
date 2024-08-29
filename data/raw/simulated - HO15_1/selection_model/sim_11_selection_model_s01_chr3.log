@@ -1,0 +1,44 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --dog
+  --file /home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3
+  --make-bed
+  --out /home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Sun Aug 25 17:58:44 2024
+
+Random number seed: 1724608724
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (8172 variants, 370 dogs).
+--file:
+/home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3-temporary.bed
++
+/home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3-temporary.bim
++
+/home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3-temporary.fam
+written.
+8172 variants loaded from .bim file.
+370 dogs (0 males, 0 females, 370 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3.nosex
+.
+370 phenotype values loaded from .fam.
+Warning: Ignoring phenotypes of missing-sex samples.  If you don't want those
+phenotypes to be ignored, use the --allow-no-sex flag.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 370 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+8172 variants and 370 dogs pass filters and QC.
+Phenotype data is quantitative.
+--make-bed to
+/home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3.bed
++
+/home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3.bim
++
+/home/jonathan/data/raw/simulated/selection_model/sim_11_selection_model_s01_chr3.fam
+... done.
+
+End time: Sun Aug 25 17:58:44 2024

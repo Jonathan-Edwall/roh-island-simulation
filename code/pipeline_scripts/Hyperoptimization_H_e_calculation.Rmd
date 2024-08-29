@@ -566,62 +566,62 @@ simulations_mean_he_window_based
 ### 4.1.1 Empirical dataset - H_e
 
 ```{r}
-
-# Check if pruning markers by MAF should be done
-if (use_MAF_pruning == TRUE) {
-    MAF_setting_text <- paste0("MAF >= ", min_MAF)
-    # Remove rows where MAF < min_MAF
-    hotspot_allele_freq_data <- hotspot_allele_freq_data[hotspot_allele_freq_data$MAF >= min_MAF, ]
-} else {
-    MAF_setting_text <- "No MAF-pruning"
-}
-
-# Calculate the 5th percentile
-empirical_dataset_percentile_5 <- quantile(unlist(Empirical_genomewide_window_he_3_1), 0.05)
-
-
-
-# # Determine the number of bins you want
-# num_bins <- 100  
-# 
-# histogram_title <-  paste0(empirical_dog_breed," H_e Distribution (",MAF_setting_text,") - Windowsize: ",window_size,"bp ")
-# image_name <- paste0("H_e_distribution_",empirical_dog_breed,".png")
-# 
-# # Save the plot as a PNG file with specified path
-# png(file.path(output_empirical_H_e_dir, image_name), width = 1200, height = 900, res = 120)
-# 
-# # Create a histogram with custom breaks
-# # Using unlist to 
-# hist(unlist(Empirical_genomewide_window_he_3_1), breaks = num_bins, main = histogram_title, xlab = "H_e")
+# # 
+# # # Check if pruning markers by MAF should be done
+# # if (use_MAF_pruning == TRUE) {
+# #     MAF_setting_text <- paste0("MAF >= ", min_MAF)
+# #     # Remove rows where MAF < min_MAF
+# #     hotspot_allele_freq_data <- hotspot_allele_freq_data[hotspot_allele_freq_data$MAF >= min_MAF, ]
+# # } else {
+# #     MAF_setting_text <- "No MAF-pruning"
+# # }
+# # 
+# # # Calculate the 5th percentile
+# # empirical_dataset_percentile_5 <- quantile(unlist(Empirical_genomewide_window_he_3_1), 0.05)
 # 
 # 
-# # Add a vertical line at the 5th percentile with increased thickness
-# abline(v = empirical_dataset_percentile_5, col = "blue", lty = 2, lwd = 2)
 # 
-# # Add a vertical line for the mean H_e with increased thickness
-# abline(v = empirical_genomewides_mean_he_window_based, col = "red", lty = 2, lwd = 2)
+# # # Determine the number of bins you want
+# # num_bins <- 100  
+# # 
+# # histogram_title <-  paste0(empirical_dog_breed," H_e Distribution (",MAF_setting_text,") - Windowsize: ",window_size,"bp ")
+# # image_name <- paste0("H_e_distribution_",empirical_dog_breed,".png")
+# # 
+# # # Save the plot as a PNG file with specified path
+# # png(file.path(output_empirical_H_e_dir, image_name), width = 1200, height = 900, res = 120)
+# # 
+# # # Create a histogram with custom breaks
+# # # Using unlist to 
+# # hist(unlist(Empirical_genomewide_window_he_3_1), breaks = num_bins, main = histogram_title, xlab = "H_e")
+# # 
+# # 
+# # # Add a vertical line at the 5th percentile with increased thickness
+# # abline(v = empirical_dataset_percentile_5, col = "blue", lty = 2, lwd = 2)
+# # 
+# # # Add a vertical line for the mean H_e with increased thickness
+# # abline(v = empirical_genomewides_mean_he_window_based, col = "red", lty = 2, lwd = 2)
+# # 
+# # # Combine legends into one with matching line thickness
+# # legend("topright", 
+# #        legend = c(paste("5th percentile: ", round(empirical_dataset_percentile_5, H_e_decimals_plots)),
+# #                   paste("Average H_e: ", round(empirical_genomewides_mean_he_window_based, H_e_decimals_plots))),
+# #        col = c("blue", "red"), 
+# #        lty = 2, 
+# #        lwd = 2,
+# #        inset = c(0, 0.02))
+# # 6
+# # # Save the plot
+# # dev.off()
 # 
-# # Combine legends into one with matching line thickness
-# legend("topright", 
-#        legend = c(paste("5th percentile: ", round(empirical_dataset_percentile_5, H_e_decimals_plots)),
-#                   paste("Average H_e: ", round(empirical_genomewides_mean_he_window_based, H_e_decimals_plots))),
-#        col = c("blue", "red"), 
-#        lty = 2, 
-#        lwd = 2,
-#        inset = c(0, 0.02))
-# 6
-# # Save the plot
-# dev.off()
-
-
-# Initialize an empty data frame to store the results
-empirical_5th_percentiles_df <- data.frame(Fifth_Percentile = empirical_dataset_percentile_5,Avg_H_e = empirical_genomewides_mean_he_window_based, stringsAsFactors = FALSE)
-
-# Define the filename with the output directory path
-filename <- file.path(output_empirical_H_e_dir, paste0("H_e_distribution_",empirical_dog_breed,".tsv"))
-
-# # Saving the results in a .tsv-file
-write.table(empirical_5th_percentiles_df, filename, sep = "\t", row.names = FALSE,quote = FALSE)
+# 
+# # Initialize an empty data frame to store the results
+# empirical_5th_percentiles_df <- data.frame(Fifth_Percentile = empirical_dataset_percentile_5,Avg_H_e = empirical_genomewides_mean_he_window_based, stringsAsFactors = FALSE)
+# 
+# # Define the filename with the output directory path
+# filename <- file.path(output_empirical_H_e_dir, paste0("H_e_distribution_",empirical_dog_breed,".tsv"))
+# 
+# # # Saving the results in a .tsv-file
+# write.table(empirical_5th_percentiles_df, filename, sep = "\t", row.names = FALSE,quote = FALSE)
 ```
 
 ### 4.1.2: Simulated model - H_e distribution

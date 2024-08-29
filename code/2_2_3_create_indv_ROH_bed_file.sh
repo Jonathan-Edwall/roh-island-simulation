@@ -59,17 +59,17 @@ mkdir -p $empirical_breed_indv_bed_files_dir
 #� Simulated � 
 #�������������
 ### Neutral Model ###
-neutral_model_indv_files=$neutral_model_pop_hom_file_dir/individual_ROH
-mkdir -p $neutral_model_indv_files
+neutral_model_indv_files_dir=$neutral_model_pop_hom_file_dir/individual_ROH
+mkdir -p $neutral_model_indv_files_dir
 # Creating a directory to store the .BED-files in, if it does not already exist.
-neutral_model_indv_bed_files_dir=$neutral_model_indv_files/bed_format
+neutral_model_indv_bed_files_dir=$neutral_model_indv_files_dir/bed_format
 mkdir -p $neutral_model_indv_bed_files_dir
 
 ### Selection Model ###
-selection_model_indv_files=$selection_model_pop_hom_file_dir/individual_ROH
-mkdir -p $selection_model_indv_files
+selection_model_indv_files_dir=$selection_model_pop_hom_file_dir/individual_ROH
+mkdir -p $selection_model_indv_files_dir
 # Creating a directory to store the .BED-files in, if it does not already exist.
-selection_model_indv_bed_files_dir=$selection_model_indv_files/bed_format
+selection_model_indv_bed_files_dir=$selection_model_indv_files_dir/bed_format
 mkdir -p $selection_model_indv_bed_files_dir
 
 ###############################################################################################  
@@ -81,6 +81,52 @@ mkdir -p $selection_model_indv_bed_files_dir
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 # Creating individual .hom files
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+# Number of parallel jobs to run at a time
+max_parallel_jobs_create_indv_hom_files=20
+max_parallel_jobs_make_indv_bed=200
+
+# Function to process a single .hom file
+create_indv_hom_files() {
+    local hom_file=$1
+    local simulation_model_indv_files_dir=$2
+    
+    # Extract simulation name from the file name    
+    simulation_name=$(basename "$hom_file" | awk -F '.hom' '{print $1}')
+    
+    # # Extract unique IIDs
+    # unique_iids=$(awk '{print $2}' "$hom_file" | sort -u)
+    
+    # # Remove existing output files with the same IID (if they exist)
+    # for identifier in $unique_iids; do
+    #     rm -f "${simulation_model_indv_files_dir}/${simulation_name}_IID_${identifier}.hom"
+    # done
+
+    # Read the input .hom file line by line, skipping the first line
+    sed 1d "$hom_file" | while IFS= read -r line; do
+        # Extract IID from the second column
+        iid=$(echo "$line" | awk '{print $2}')
+        
+        # Append the line to the corresponding IID file with simulation name prefix
+        echo "$line" >> "${simulation_model_indv_files_dir}/${simulation_name}_IID_${iid}.hom"
+    done
+
+    # echo "Processed $hom_file"
+}
+
+# Function to convert a single .hom file to .bed format
+convert_indv_hom_to_bed() {
+    local hom_file=$1
+    local individual_id=$(basename "$hom_file" .hom)
+    local simulation_model_indv_bed_files_dir=$2    
+    # Remove existing .bed file (if it exists)
+    rm -f "${simulation_model_indv_bed_files_dir}/${individual_id}.bed"    
+    # Convert .hom to .bed format
+    awk 'BEGIN {OFS="\t"} {print $4,$7,$8}' "$hom_file" | sed '1i'"$header" > "${simulation_model_indv_bed_files_dir}/${individual_id}.bed"
+    # echo "Processed $hom_file"
+}
+
+
+
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Empirical Data (German Shepherd) ¤¤¤¤ 
@@ -123,68 +169,129 @@ fi
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Read each .hom file in the directory
+rm -f $neutral_model_indv_files_dir/* #Removing pre-existing files in the directory
+
+# Parallel processing of .hom files in the directory
 for hom_file in $neutral_model_pop_hom_file_dir/*.hom; do
-    # Extract simulation name from the file name    
-    simulation_name=$(basename "$hom_file" | awk -F '.hom' '{print $1}')
-    
-    # Extract unique IIDs
-    unique_iids=$(awk '{print $2}' "$hom_file" | sort -u)
-    
-    # Remove existing output files with the same IID (if they exist)
-    for identifier in $unique_iids; do
-        rm -f "$neutral_model_indv_files/${simulation_name}_IID_${identifier}.hom"
+    create_indv_hom_files $hom_file $neutral_model_indv_files_dir &
+
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_create_indv_hom_files ]; do
+        wait -n
     done
 
-    
-    # Read the input .hom file line by line, skipping the first line
-    sed 1d "$hom_file" | while IFS= read -r line; do
-        # Extract IID from the second column
-        iid=$(echo "$line" | awk '{print $2}')
-        
-        # Append the line to the corresponding IID file with simulation name prefix
-        echo "$line" >> "$neutral_model_indv_files/${simulation_name}_IID_${iid}.hom"
-    done
 done
 
+# Wait for all background jobs to finish
+wait
 echo "Creation of individual ROH files completed for the neutral model"
-echo "The output files are stored in: $neutral_model_indv_files"
+echo "The output files are stored in: $neutral_model_indv_files_dir"
+
+# # Read each .hom file in the directory
+# for hom_file in $neutral_model_pop_hom_file_dir/*.hom; do
+#     # Extract simulation name from the file name    
+#     simulation_name=$(basename "$hom_file" | awk -F '.hom' '{print $1}')
+    
+#     # Extract unique IIDs
+#     unique_iids=$(awk '{print $2}' "$hom_file" | sort -u)
+    
+#     # Remove existing output files with the same IID (if they exist)
+#     for identifier in $unique_iids; do
+#         rm -f "$neutral_model_indv_files_dir/${simulation_name}_IID_${identifier}.hom"
+#     done
+
+    
+#     # Read the input .hom file line by line, skipping the first line
+#     sed 1d "$hom_file" | while IFS= read -r line; do
+#         # Extract IID from the second column
+#         iid=$(echo "$line" | awk '{print $2}')
+        
+#         # Append the line to the corresponding IID file with simulation name prefix
+#         echo "$line" >> "$neutral_model_indv_files_dir/${simulation_name}_IID_${iid}.hom"
+#     done
+# done
+
 
 # #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 # #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 # #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+rm -f $selection_model_indv_files_dir/* #Removing pre-existing files in the directory
 
 if [ "$selection_simulation" = TRUE ]; then
     # Read each .hom file in the directory
     for hom_file in $selection_model_pop_hom_file_dir/*.hom; do
-        # Extract simulation name from the file name    
-        simulation_name=$(basename "$hom_file" | awk -F '.hom' '{print $1}')
-        
-        # Extract unique IIDs
-        unique_iids=$(awk '{print $2}' "$hom_file" | sort -u)
-        
-        # Remove existing output files with the same IID (if they exist)
-        for identifier in $unique_iids; do
-            rm -f "$selection_model_indv_files/${simulation_name}_IID_${identifier}.hom"
-        done
+        create_indv_hom_files $hom_file $selection_model_indv_files_dir &
 
-        
-        # Read the input .hom file line by line, skipping the first line
-        sed 1d "$hom_file" | while IFS= read -r line; do
-            # Extract IID from the second column
-            iid=$(echo "$line" | awk '{print $2}')
-            
-            # Append the line to the corresponding IID file with simulation name prefix
-            echo "$line" >> "$selection_model_indv_files/${simulation_name}_IID_${iid}.hom"
+        # Control the number of parallel jobs
+        while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_create_indv_hom_files ]; do
+            wait -n
         done
     done
 
+    # Wait for all background jobs to finish
+    wait
     echo "Creation of individual ROH files completed for the selection model"
-    echo "The output files are stored in: $selection_model_indv_files"
+    echo "The output files are stored in: $selection_model_indv_files_dir"
+
 
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
 fi
+
+
+
+# if [ "$selection_simulation" = TRUE ]; then
+#     # Read each .hom file in the directory
+#     for hom_file in $selection_model_pop_hom_file_dir/*.hom; do
+#         create_indv_hom_files $hom_file $selection_model_indv_files_dir &
+
+#         # Control the number of parallel jobs
+#         while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+#             wait -n
+#         done
+#     done
+
+#     echo "Creation of individual ROH files completed for the selection model"
+#     echo "The output files are stored in: $selection_model_indv_files_dir"
+
+# else
+#     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
+# fi
+
+
+
+
+# if [ "$selection_simulation" = TRUE ]; then
+#     # Read each .hom file in the directory
+#     for hom_file in $selection_model_pop_hom_file_dir/*.hom; do
+#         # Extract simulation name from the file name    
+#         simulation_name=$(basename "$hom_file" | awk -F '.hom' '{print $1}')
+        
+#         # Extract unique IIDs
+#         unique_iids=$(awk '{print $2}' "$hom_file" | sort -u)
+        
+#         # Remove existing output files with the same IID (if they exist)
+#         for identifier in $unique_iids; do
+#             rm -f "$selection_model_indv_files_dir/${simulation_name}_IID_${identifier}.hom"
+#         done
+
+        
+#         # Read the input .hom file line by line, skipping the first line
+#         sed 1d "$hom_file" | while IFS= read -r line; do
+#             # Extract IID from the second column
+#             iid=$(echo "$line" | awk '{print $2}')
+            
+#             # Append the line to the corresponding IID file with simulation name prefix
+#             echo "$line" >> "$selection_model_indv_files_dir/${simulation_name}_IID_${iid}.hom"
+#         done
+#     done
+
+#     echo "Creation of individual ROH files completed for the selection model"
+#     echo "The output files are stored in: $selection_model_indv_files_dir"
+
+# else
+#     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
+# fi
 
 
 
@@ -217,43 +324,73 @@ fi
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Convert each individual .hom file into .bed-format
-for hom_file in $neutral_model_indv_files/*.hom; do
-    # Extract individual ID from the file name (everything before the .hom extension)
-    individual_id=$(basename "$hom_file" .hom)    
-    
-    # Remove existing .bed file (if it exists)
-    rm -f "$neutral_model_indv_bed_files_dir/${individual_id}.bed"
-    
-    # Convert .hom to .bed format
-    awk 'BEGIN {OFS="\t"} {print $4,$7,$8}' "$hom_file" | sed '1i'"$header" > "$neutral_model_indv_bed_files_dir/${individual_id}.bed"
+# Loop over each .hom file and process it in parallel
+for hom_file in $neutral_model_indv_files_dir/*.hom; do
+    convert_indv_hom_to_bed $hom_file $neutral_model_indv_bed_files_dir &
+
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_make_indv_bed ]; do
+        wait -n
+    done
 done
+
+# Wait for all background jobs to finish
+wait
 echo "Creation of individual ROH files in BED-format completed for the neutral model"
 echo "The output files are stored in: $neutral_model_indv_bed_files_dir"
 
-
+# # Convert each individual .hom file into .bed-format
+# for hom_file in $neutral_model_indv_files_dir/*.hom; do
+#     # Extract individual ID from the file name (everything before the .hom extension)
+#     individual_id=$(basename "$hom_file" .hom)    
+    
+#     # Remove existing .bed file (if it exists)
+#     rm -f "$neutral_model_indv_bed_files_dir/${individual_id}.bed"
+    
+#     # Convert .hom to .bed format
+#     awk 'BEGIN {OFS="\t"} {print $4,$7,$8}' "$hom_file" | sed '1i'"$header" > "$neutral_model_indv_bed_files_dir/${individual_id}.bed"
+# done
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+
 if [ "$selection_simulation" = TRUE ]; then
-    # Convert each individual .hom file into .bed-format
-    for hom_file in $selection_model_indv_files/*.hom; do
-        # Extract individual ID from the file name (everything before the .hom extension)
-        individual_id=$(basename "$hom_file" .hom)
-        
-        # Remove existing .bed file (if it exists)
-        rm -f "$selection_model_indv_bed_files_dir/${individual_id}.bed"
-        
-        # Convert .hom to .bed format
-        awk 'BEGIN {OFS="\t"} {print $4,$7,$8}' "$hom_file" | sed '1i'"$header" > "$selection_model_indv_bed_files_dir/${individual_id}.bed"
+    # Loop over each .hom file and process it in parallel
+    for hom_file in $selection_model_indv_files_dir/*.hom; do
+        convert_indv_hom_to_bed $hom_file $selection_model_indv_bed_files_dir &
+        # Control the number of parallel jobs
+        while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_make_indv_bed ]; do
+            wait -n
+        done
     done
+    # Wait for all background jobs to finish
+    wait
     echo "Creation of individual ROH files in BED-format completed for the selection model"
     echo "The output files are stored in: $selection_model_indv_bed_files_dir"
-
 else
     echo ""
 fi
+
+
+# if [ "$selection_simulation" = TRUE ]; then
+#     # Convert each individual .hom file into .bed-format
+#     for hom_file in $selection_model_indv_files_dir/*.hom; do
+#         # Extract individual ID from the file name (everything before the .hom extension)
+#         individual_id=$(basename "$hom_file" .hom)
+        
+#         # Remove existing .bed file (if it exists)
+#         rm -f "$selection_model_indv_bed_files_dir/${individual_id}.bed"
+        
+#         # Convert .hom to .bed format
+#         awk 'BEGIN {OFS="\t"} {print $4,$7,$8}' "$hom_file" | sed '1i'"$header" > "$selection_model_indv_bed_files_dir/${individual_id}.bed"
+#     done
+#     echo "Creation of individual ROH files in BED-format completed for the selection model"
+#     echo "The output files are stored in: $selection_model_indv_bed_files_dir"
+
+# else
+#     echo ""
+# fi
 
 
  # Ending the timer 

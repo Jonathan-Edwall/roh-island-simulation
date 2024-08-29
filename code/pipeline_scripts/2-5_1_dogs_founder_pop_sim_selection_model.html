@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-06-02" />
+<meta name="date" content="2024-06-30" />
 
 <title>Selection Scenario simulation for Dogs in AlphaSimR</title>
 
@@ -343,7 +343,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Selection Scenario simulation for Dogs in AlphaSimR</h1>
-<h4 class="date">2024-06-02</h4>
+<h4 class="date">2024-06-30</h4>
 
 </div>
 
@@ -402,8 +402,21 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
-chromosome_end_margin &lt;- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
 
+chromosome_end_margin &lt;- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
+s &lt;- as.numeric(Sys.getenv(&quot;selection_coefficient&quot;)) # using as.numeric, otherwise class(s) = &quot;character&quot;
+# Print the value of selection_coefficient
+cat(&quot;Selection Coefficient:&quot;, s, &quot;\n&quot;)</code></pre>
+<pre><code>## Selection Coefficient: 0.1</code></pre>
+<pre class="r"><code>allele_copies_threshold &lt;- 5 # 10 default (candidate_variants = less than 10)
+# min_allowed_gen_before_variant_lost &lt;- 10 # Pruning replicates where the causative variant gets lost within this timespan
+fixation_threshold_causative_variant &lt;- as.numeric(Sys.getenv(&quot;fixation_threshold_causative_variant&quot;))
+# fixation_threshold_causative_variant &lt;- 0.99
+disappearance_threshold_value_to_terminate_script &lt;- as.numeric(Sys.getenv(&quot;disappearance_threshold_value_to_terminate_script&quot;))
+
+
+
+# min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 chr_simulated &lt;- Sys.getenv(&quot;chr_simulated&quot;)
 chr_simulated</code></pre>
 <pre><code>## [1] &quot;chr3&quot;</code></pre>
@@ -425,50 +438,37 @@ n_generations_bottleneck &lt;- as.numeric(Sys.getenv(&quot;n_generations_bottlen
 
 n_generations_mate_selection &lt;-  as.numeric(Sys.getenv(&quot;n_simulated_generations_breed_formation&quot;))  # The number of generations to simulate during the mate selection scenario of modern dog breeds
 n_generations_mate_selection</code></pre>
-<pre><code>## [1] 30</code></pre>
-<pre class="r"><code>n_ind_per_selection_sim_generation &lt;- as.numeric(Sys.getenv(&quot;n_individuals_breed_formation&quot;)) # using as.numeric, otherwise class(n_ind_per_selection_sim_generation) = &quot;character&quot;
-n_ind_per_selection_sim_generation</code></pre>
-<pre><code>## [1] 375</code></pre>
+<pre><code>## [1] 94</code></pre>
+<pre class="r"><code>n_indv_breed_formation &lt;- as.numeric(Sys.getenv(&quot;n_individuals_breed_formation&quot;)) # using as.numeric, otherwise class(n_indv_breed_formation) = &quot;character&quot;
+n_indv_breed_formation</code></pre>
+<pre><code>## [1] 370</code></pre>
 <pre class="r"><code>Ref_pop_snp_chip &lt;- Sys.getenv(&quot;reference_population_for_snp_chip&quot;)
 
+# introduce_mutations &lt;- as.logical(&quot;FALSE&quot;)
+introduce_mutations &lt;- as.logical(&quot;TRUE&quot;)
 
-min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
-allele_copies_threshold &lt;- 5 # 10 default (candidate_variants = less than 10)
-# min_allowed_gen_before_variant_lost &lt;- 10 # Pruning replicates where the causative variant gets lost within this timespan
-causative_variant_prune_threshold &lt;- 0.99
-
-
-
-
-s &lt;- as.numeric(Sys.getenv(&quot;selection_coefficient&quot;)) # using as.numeric, otherwise class(s) = &quot;character&quot;
-# Print the value of selection_coefficient
-cat(&quot;Selection Coefficient:&quot;, s, &quot;\n&quot;)</code></pre>
-<pre><code>## Selection Coefficient: 0.8</code></pre>
-<pre class="r"><code>snp_density_Mb &lt;- as.numeric(Sys.getenv(&quot;selected_chr_snp_density_mb&quot;)) 
+snp_density_Mb &lt;- as.numeric(Sys.getenv(&quot;selected_chr_snp_density_mb&quot;)) 
 snp_density_Mb</code></pre>
 <pre><code>## [1] 88.37</code></pre>
-<pre class="r"><code>disappearance_threshold_value_to_terminate_script &lt;- as.numeric(Sys.getenv(&quot;disappearance_threshold_value_to_terminate_script&quot;))
-
-
-#################################### 
+<pre class="r"><code>#################################### 
 # Defining the output files
 #################################### 
-print(&quot;R script started executing&quot;)</code></pre>
-<pre><code>## [1] &quot;R script started executing&quot;</code></pre>
-<pre class="r"><code># Define the output directory based on the variable passed from the Bash script
+output_sim_files_basename &lt;- Sys.getenv(&quot;output_sim_files_basename&quot;)
+
+# Define the output directory based on the variable passed from the Bash script
 output_dir_simulation &lt;- Sys.getenv(&quot;output_dir_selection_simulation&quot;)
 output_dir_simulation</code></pre>
 <pre><code>## [1] &quot;/home/jonathan/data/raw/simulated/selection_model&quot;</code></pre>
-<pre class="r"><code>image_output_dir &lt;- paste0(output_dir_simulation, &quot;/variant_freq_plots&quot;)
-
-output_sim_files_basename &lt;- Sys.getenv(&quot;output_sim_files_basename&quot;)
-simulation_prune_count_file &lt;- Sys.getenv(&quot;simulation_prune_count_file&quot;)
-variant_positions_file &lt;- Sys.getenv(&quot;variant_positions_file&quot;)
-
-# Ensure that output_dir_simulation is defined
+<pre class="r"><code># Ensure that output_dir_simulation is defined
 if (is.null(output_dir_simulation)) {
   stop(&quot;output_dir_simulation is not provided.&quot;)
 }
+
+simulation_prune_count_file &lt;- Sys.getenv(&quot;simulation_prune_count_file&quot;)
+variant_positions_file &lt;- Sys.getenv(&quot;variant_positions_file&quot;)
+
+image_output_dir &lt;- paste0(output_dir_simulation, &quot;/variant_freq_plots&quot;)
+
 
 Sys.getenv()</code></pre>
 <pre><code>## _CE_CONDA               
@@ -483,6 +483,7 @@ Sys.getenv()</code></pre>
 ## CONDA_PROMPT_MODIFIER   (plink)
 ## CONDA_PYTHON_EXE        /home/martin/anaconda3/bin/python
 ## CONDA_SHLVL             2
+## data_dir                /home/jonathan/data
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
 ## disappearance_threshold_value_to_terminate_script
@@ -492,9 +493,13 @@ Sys.getenv()</code></pre>
 ## empirical_dog_breed     labrador_retriever
 ## empirical_preprocessed_data_basename
 ##                         labrador_retriever_filtered
+## empirical_processing    TRUE
+## fixation_threshold_causative_variant
+##                         0.99
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
-##                         TRUE
+##                         FALSE
+## Introduce_mutations     FALSE
 ## LANG                    en_US.UTF-8
 ## LD_LIBRARY_PATH         /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server
 ## LESSCLOSE               /usr/bin/lesspipe %s %s
@@ -503,30 +508,30 @@ Sys.getenv()</code></pre>
 ## LOGNAME                 jonathan
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAKE                    make
+## max_parallel_jobs_selection_sim
+##                         2
 ## MOTD_SHOWN              pam
-## N_e_bottleneck          30
+## N_e_bottleneck          5
 ## n_generations_bottleneck
-##                         5
+##                         2
 ## n_individuals_breed_formation
-##                         375
+##                         370
 ## n_simulated_generations_breed_formation
-##                         30
+##                         94
 ## n_simulation_replicates
 ##                         20
-## Ne_burn_in              250
+## Ne_burn_in              3700
 ## nInd_founder_population
-##                         50
+##                         5
 ## num_markers_preprocessed_empirical_dataset
 ##                         201850
 ## num_markers_raw_empirical_dataset
 ##                         220853
-## OLDPWD                  /home/jonathan
-## output_dir_neutral_simulation
-##                         /home/jonathan/data/raw/simulated/neutral_model
+## OLDPWD                  /home/jonathan/data/raw/simulated/selection_model
 ## output_dir_selection_simulation
 ##                         /home/jonathan/data/raw/simulated/selection_model
 ## output_sim_files_basename
-##                         sim_7_selection_model_s08_chr3
+##                         sim_1_selection_model_s01_chr3
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/plink/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ## PWD                     /home/jonathan/data/raw/simulated/selection_model
@@ -545,7 +550,7 @@ Sys.getenv()</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmpz31iet
+## R_SESSION_TMPDIR        /tmp/Rtmp70a4kb
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -555,29 +560,30 @@ Sys.getenv()</code></pre>
 ## R_ZIPCMD                /usr/bin/zip
 ## reference_population_for_snp_chip
 ##                         last_breed_formation_generation
+## results_dir             /home/jonathan/results
 ## SED                     /bin/sed
 ## selected_chr_preprocessed_snp_density_mb
 ##                         88.37
 ## selected_chr_snp_density_mb
 ##                         88.37
-## selection_coefficient   0.8
+## selection_coefficient   0.1
 ## selection_simulation    TRUE
 ## SHELL                   /bin/bash
 ## SHLVL                   2
 ## simulation_prune_count_file
-##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s08_chr3.tsv
-## SSH_CLIENT              172.21.30.231 50147 22
-## SSH_CONNECTION          172.21.30.231 50147 77.235.253.16 22
+##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s01_chr3.tsv
+## SSH_CLIENT              172.21.30.174 51346 22
+## SSH_CONNECTION          172.21.30.174 51346 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/3
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
 ## variant_positions_file
-##                         /home/jonathan/data/raw/simulated/selection_model/variant_position/variant_position_s08_chr3.tsv
+##                         /home/jonathan/data/raw/simulated/selection_model/variant_position/variant_position_s01_chr3.tsv
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          1915
+## XDG_SESSION_ID          6910
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># # Verify the current working directory
 #getwd()</code></pre>
@@ -640,9 +646,9 @@ founderGenomes &lt;- runMacs2(nInd = nInd_founder_population ,
 founderGenomes</code></pre>
 <pre><code>## An object of class &quot;MapPop&quot; 
 ## Ploidy: 2 
-## Individuals: 50 
+## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 10479</code></pre>
+## Loci: 98347</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
 <h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
@@ -662,39 +668,23 @@ SP &lt;- SimParam$new(founderGenomes)
 <h2>1.3: newPop() - Creating two separate populations for bottleneck event</h2>
 <pre class="r"><code># Generate the initial founder population
 founderpop &lt;- newPop(founderGenomes, simParam = SP)
-# Set misc used for setting years of birth for the first individuals
-current_generation &lt;- 0
-founderpop &lt;- setMisc(x = founderpop,
-                   node = &quot;generation&quot;,
-                   value = current_generation)
-head(getMisc(x = founderpop, node = &quot;generation&quot;))</code></pre>
-<pre><code>## [[1]]
-## [1] 0
-## 
-## [[2]]
-## [1] 0
-## 
-## [[3]]
-## [1] 0
-## 
-## [[4]]
-## [1] 0
-## 
-## [[5]]
-## [1] 0
-## 
-## [[6]]
-## [1] 0</code></pre>
-<pre class="r"><code># Split the founder population into two breeding groups
+# # Set misc used for setting years of birth for the first individuals
+# current_generation &lt;- 0
+# founderpop &lt;- setMisc(x = founderpop,
+#                    node = &quot;generation&quot;,
+#                    value = current_generation)
+# head(getMisc(x = founderpop, node = &quot;generation&quot;))
+# 
+# Split the founder population into two breeding groups
 breed1_founders &lt;- founderpop[1:N_e_bottleneck] # 1:50
 cat(&quot;Population 1:\n&quot;)</code></pre>
 <pre><code>## Population 1:</code></pre>
 <pre class="r"><code>breed1_founders</code></pre>
 <pre><code>## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 30 
+## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 10479 
+## Loci: 98347 
 ## Traits: 0</code></pre>
 <pre class="r"><code># breed2_founders &lt;- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
 # cat(&quot;Population 2:\n&quot;)
@@ -711,7 +701,7 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
 <li><p><strong>nProgeny</strong>-argument specifies how many progeny’s each mating pair can have. In this case, this parameter is set at 1 progeny per mating pair.</p></li>
 <li><p><strong>simParam</strong>-argument specifies the global simulation parameters</p></li>
 </ul>
-<pre class="r"><code>random_mating &lt;- function(pop, SP, n_gen) {
+<pre class="r"><code>random_mating &lt;- function(pop, SP, n_gen, introduce_mutations) {
     n_ind &lt;- pop@nInd # Extracting number of individuals in the current population
     generations &lt;- vector(length = n_gen + 1,
                           mode = &quot;list&quot;) 
@@ -722,8 +712,10 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
     for (gen_ix in 2:(n_gen + 1)) {
         generations[[gen_ix]] &lt;- randCross(pop=generations[[gen_ix - 1]], nCrosses = n_ind, nProgeny = 1,
                                            simParam = SP)
-        # # Introducing mutations
-        # generations[[gen_ix]] &lt;- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
+        # Introducing mutations
+        if (introduce_mutations == TRUE) {
+          generations[[gen_ix]] &lt;- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
+        }
 
         
     }
@@ -736,10 +728,8 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
 <h2>2.1: Bottleneck Simulation</h2>
 <div id="simulating-5-generations-of-bottleneck-random-mating" class="section level3">
 <h3>2.1.1 Simulating 5 generations of bottleneck (Random Mating)</h3>
-<pre class="r"><code>n_generations &lt;- 5
-# Simulating random mating within each breeding group for 5 generations
-breed1_bottleneck &lt;- random_mating(breed1_founders, SP, n_generations)
-# breed2_bottleneck &lt;- random_mating(breed2_founders, SP, n_generations)</code></pre>
+<pre class="r"><code># Simulating random mating within each breeding group for 5 generations
+breed1_bottleneck &lt;- random_mating(breed1_founders, SP, n_generations_bottleneck,introduce_mutations)</code></pre>
 </div>
 <div id="extracting-the-final-bottleneck-generation" class="section level3">
 <h3>2.1.2 Extracting the final bottleneck generation</h3>
@@ -749,49 +739,25 @@ breed1_bottleneck &lt;- random_mating(breed1_founders, SP, n_generations)
 founderpop</code></pre>
 <pre><code>## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 50 
+## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 10479 
+## Loci: 98347 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed1_bottleneck</code></pre>
 <pre><code>## [[1]]
 ## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 30 
+## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 10479 
+## Loci: 98347 
 ## Traits: 0 
 ## 
 ## [[2]]
 ## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 30 
+## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 10479 
-## Traits: 0 
-## 
-## [[3]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 30 
-## Chromosomes: 1 
-## Loci: 10479 
-## Traits: 0 
-## 
-## [[4]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 30 
-## Chromosomes: 1 
-## Loci: 10479 
-## Traits: 0 
-## 
-## [[5]]
-## An object of class &quot;Pop&quot; 
-## Ploidy: 2 
-## Individuals: 30 
-## Chromosomes: 1 
-## Loci: 10479 
+## Loci: 98347 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Extracting final generation:
 last_bottleneck_generation &lt;- breed1_bottleneck[[n_generations_bottleneck]]
@@ -801,9 +767,9 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 <pre class="r"><code>last_bottleneck_generation</code></pre>
 <pre><code>## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 30 
+## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 10479 
+## Loci: 98347 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -816,9 +782,30 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 <pre class="r"><code>model_chromosome_Mb_length &lt;- model_chromosome_bp_length / (10^6)
 
 num_snp_markers_simulated_chromosome &lt;- snp_density_Mb * model_chromosome_Mb_length
-num_snp_markers_simulated_chromosome</code></pre>
-<pre><code>##     chr3 
-## 8172.374</code></pre>
+
+
+if (num_snp_markers_simulated_chromosome &gt; founderGenomes@nLoci) {
+  cat(&quot;Reference amount of SNP markers for &quot;,chr_simulated, &quot;: &quot;,num_snp_markers_simulated_chromosome)
+  cat(&quot;\n&quot;,num_snp_markers_simulated_chromosome,&quot; &gt; &quot;,founderGenomes@nLoci)
+  cat(&quot;\n Burn in N_e: &quot;, N_e_burn_in,&quot;\n&quot;)
+
+  
+  num_snp_markers_simulated_chromosome &lt;- founderGenomes@nLoci
+  
+  new_SNP_density &lt;- num_snp_markers_simulated_chromosome / model_chromosome_Mb_length
+  cat(&quot;\n Old SNP density: &quot;,snp_density_Mb,&quot; markers/Mb&quot;)
+  cat(&quot;\n New SNP density: &quot;,new_SNP_density,&quot; markers/Mb&quot;)
+
+
+} else {
+  cat(&quot;Reference amount of SNP markers for &quot;,chr_simulated, &quot;: &quot;,num_snp_markers_simulated_chromosome)
+  cat(&quot;\n&quot;,num_snp_markers_simulated_chromosome,&quot; &lt; &quot;,founderGenomes@nLoci)
+  cat(&quot;\n Burn in N_e: &quot;, N_e_burn_in,&quot;\n&quot;)
+
+}</code></pre>
+<pre><code>## Reference amount of SNP markers for  chr3 :  8172.374
+##  8172.374  &lt;  98347
+##  Burn in N_e:  3700</code></pre>
 <pre class="r"><code># SP$addSnpChip(
 #   nSnpPerChr = num_snp_markers_simulated_chromosome,
 #   minSnpFreq = min_MAF,
@@ -892,73 +879,73 @@ if (Ref_pop_snp_chip == &quot;last_bottleneck_generation&quot;) {
 </div>
 <div id="defining-the-mate-selection-function---mate_selection_scenario" class="section level3">
 <h3>2.3.2 Defining the Mate selection function - Mate_Selection_scenario()</h3>
-<pre class="r"><code>Mate_Selection_scenario &lt;- function(selection_scenario_pop, n_generations_mate_selection, causative_variant, s, n_ind_per_selection_sim_generation,SP) {
+<pre class="r"><code>Mate_Selection_scenario &lt;- function(selection_scenario_pop,SP, n_generations_mate_selection,n_indv_breed_formation,introduce_mutations, causative_variant,s) {
   
-  # Creating a vector to store the allele frequency of the causative variant over the selection simulation generations
-  f_causative &lt;- numeric(n_generations_mate_selection)
-  
-  generations &lt;- vector(length = n_generations_mate_selection + 1,
-                        mode = &quot;list&quot;) 
-
-  
-  generations[[1]] &lt;- selection_scenario_pop # The initial breeding group population gets stored as the first element
-  
-
+    # Creating a vector to store the allele frequency of the causative variant over the selection simulation generations
+    f_causative &lt;- numeric(n_generations_mate_selection)
     
+    generations &lt;- vector(length = n_generations_mate_selection + 1,
+                          mode = &quot;list&quot;) 
+  
     
+    generations[[1]] &lt;- selection_scenario_pop # The initial breeding group population gets stored as the first element
+      
     # Simulating random mating to perform simulation of the 2nd until the n+1:th generation
     # Each mating Progenys are generated using randcross
     for (gen_ix in 2:(n_generations_mate_selection + 1)) {
-    
-      # Retrieves the genotype of the causative variant for each individual in the population  
-      geno &lt;- pullSegSiteGeno(generations[[gen_ix - 1]], simParam = SP)[, causative_variant]
-      # cat(&quot;\nGeneration&quot;, gen, &quot;Geno:&quot;,geno)  
       
-      #     # Print out the genotype of each individual
-      # for (i in 1:length(geno)) {
-      #   if (geno[i] == 2) {
-      #     cat(&quot;Generation&quot;, gen, &quot;- Individual&quot;, i, &quot;is homozygous for the causative variant (AA)\n&quot;)
-      #   } else if (geno[i] == 1) {
-      #     cat(&quot;Generation&quot;, gen, &quot;- Individual&quot;, i, &quot;is heterozygous (Aa)\n&quot;)
-      #   } else if (geno[i] == 0) {
-      #     cat(&quot;Generation&quot;, gen, &quot;- Individual&quot;, i, &quot;is homozygous for the non-causative variant (aa)\n&quot;)
-      #   }
-      # }
-      
-      # Set fitness based on genotype
-      fitness &lt;- rep(1-s, length(geno))
-      fitness[geno == 1] &lt;- 1 - (s/2)
-      fitness[geno == 2] &lt;- 1
-      
-      # Initialize vectors for parents
-      parent1 &lt;- integer(n_ind_per_selection_sim_generation)
-      parent2 &lt;- integer(n_ind_per_selection_sim_generation)
-      
-      # Biased sampling of parents based on fitness
-      # Create mating pairs
-      for (i in 1:n_ind_per_selection_sim_generation) {
-          # Sample parent1
-          parent1[i] &lt;- sample(1:generations[[gen_ix - 1]]@nInd, 1, replace = TRUE, prob = fitness)
-          # Ensure parent2 is different from parent1
-          repeat {
-              parent2[i] &lt;- sample(1:generations[[gen_ix - 1]]@nInd,1, replace = TRUE, prob = fitness)
-              if (parent2[i] != parent1[i]) break
-          }
-      }
-      
-      # Crossing parents to create next generation
-      generations[[gen_ix]] &lt;- makeCross(generations[[gen_ix - 1]],
-                                          cbind(parent1, parent2),
-                                          nProgeny = 1,
-                                          simParam = SP)
-      # # Introducing mutations
-      # selection_scenario_pop &lt;- AlphaSimR::mutate(selection_scenario_pop, simParam = SP)
-      
-      # Calculate allele frequency of the causative variant
-      f_causative[gen_ix] &lt;- sum(geno) / length(geno) / 2
-    }
+        # Retrieves the genotype of the causative variant for each individual in the population  
+        geno &lt;- pullSegSiteGeno(generations[[gen_ix - 1]], simParam = SP)[, causative_variant]
+        # cat(&quot;\nGeneration&quot;, gen, &quot;Geno:&quot;,geno)  
+        
+        #     # Print out the genotype of each individual
+        # for (i in 1:length(geno)) {
+        #   if (geno[i] == 2) {
+        #     cat(&quot;Generation&quot;, gen, &quot;- Individual&quot;, i, &quot;is homozygous for the causative variant (AA)\n&quot;)
+        #   } else if (geno[i] == 1) {
+        #     cat(&quot;Generation&quot;, gen, &quot;- Individual&quot;, i, &quot;is heterozygous (Aa)\n&quot;)
+        #   } else if (geno[i] == 0) {
+        #     cat(&quot;Generation&quot;, gen, &quot;- Individual&quot;, i, &quot;is homozygous for the non-causative variant (aa)\n&quot;)
+        #   }
+        # }
+        
+        # Set fitness based on genotype
+        fitness &lt;- rep(1-s, length(geno))
+        fitness[geno == 1] &lt;- 1 - (s/2)
+        fitness[geno == 2] &lt;- 1
+        
+        # Initialize vectors for parents
+        parent1 &lt;- integer(n_indv_breed_formation)
+        parent2 &lt;- integer(n_indv_breed_formation)
+        
+        # Biased sampling of parents based on fitness
+        # Create mating pairs
+        for (i in 1:n_indv_breed_formation) {
+            # Sample parent1
+            parent1[i] &lt;- sample(1:generations[[gen_ix - 1]]@nInd, 1, replace = TRUE, prob = fitness)
+            # Ensure parent2 is different from parent1
+            repeat {
+                parent2[i] &lt;- sample(1:generations[[gen_ix - 1]]@nInd,1, replace = TRUE, prob = fitness)
+                if (parent2[i] != parent1[i]) break
+            }
+        }
+        
+        # Crossing parents to create next generation
+        generations[[gen_ix]] &lt;- makeCross(generations[[gen_ix - 1]],
+                                            cbind(parent1, parent2),
+                                            nProgeny = 1,
+                                            simParam = SP)
+        
+        # Introducing mutations
+        if (introduce_mutations == TRUE) {
+          generations[[gen_ix]] &lt;- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
+        }
   
- selection_scenario_pop_final_generation &lt;- generations[[n_generations_mate_selection+1]] # Final generation extracted
+        # Calculate allele frequency of the causative variant
+        f_causative[gen_ix] &lt;- sum(geno) / length(geno) / 2
+  }
+    
+  selection_scenario_pop_final_generation &lt;- generations[[n_generations_mate_selection+1]] # Final generation extracted
   
   return(list(f_causative,selection_scenario_pop_final_generation))
   
@@ -987,14 +974,14 @@ while (!success) {
   
   # Run the simulation, starting with the last generation of the bottleneck simulation as 
   # The initial population for the selection scenario
-  result &lt;- Mate_Selection_scenario(selection_scenario_pop, n_generations_mate_selection, causative_variant, s, n_ind_per_selection_sim_generation, SP)
-  
+  result &lt;- Mate_Selection_scenario(selection_scenario_pop,SP, n_generations_mate_selection,n_indv_breed_formation,introduce_mutations,causative_variant,s)
+
   f_causative &lt;- result[[1]]
   
-  causative_variant_prune_threshold 
+  fixation_threshold_causative_variant 
     
   # Check if the causative variant has been fixated  
-  if (max(f_causative) &gt;= causative_variant_prune_threshold) {
+  if (max(f_causative) &gt;= fixation_threshold_causative_variant) {
     success &lt;- TRUE
     last_mate_selection_generation &lt;- result[[2]]
     causative_variant_SNP_ID &lt;- names(causative_variant)
@@ -1022,9 +1009,7 @@ while (!success) {
   }
   
 }</code></pre>
-<pre><code>## Variant chosen: 4475Causative variant disappeared, rerunning simulation...
-## f_causative: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-## Variant chosen: 4794</code></pre>
+<pre><code>## Variant chosen: 61049</code></pre>
 <pre class="r"><code>#last_mate_selection_generation &lt;- selection_scenario_pop[[n_generations_mate_selection]]
 
 cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></pre>
@@ -1032,19 +1017,19 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 <pre class="r"><code>last_bottleneck_generation</code></pre>
 <pre><code>## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 30 
+## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 10479 
+## Loci: 98347 
 ## Traits: 0</code></pre>
 <pre class="r"><code>cat(&quot;\nPopulation after&quot;,n_generations_mate_selection,&quot;generations of selection scenario simulation:\n&quot;)</code></pre>
 <pre><code>## 
-## Population after 30 generations of selection scenario simulation:</code></pre>
+## Population after 94 generations of selection scenario simulation:</code></pre>
 <pre class="r"><code>last_mate_selection_generation</code></pre>
 <pre><code>## An object of class &quot;Pop&quot; 
 ## Ploidy: 2 
-## Individuals: 375 
+## Individuals: 370 
 ## Chromosomes: 1 
-## Loci: 10479 
+## Loci: 98347 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Check if Ref_pop_snp_chip is equal to &quot;last_breed_formation_generation&quot;
 if (Ref_pop_snp_chip == &quot;last_breed_formation_generation&quot;) {
@@ -1108,74 +1093,74 @@ cat(&quot;First 10 markers of the SNP chip and their genetic map positions:\n&qu
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1_1</td>
-<td align="left">1_1</td>
-<td align="left">1</td>
-<td align="right">1</td>
-<td align="right">0.0000000</td>
-</tr>
-<tr class="even">
-<td align="left">1_2</td>
-<td align="left">1_2</td>
-<td align="left">1</td>
-<td align="right">2</td>
-<td align="right">0.0001589</td>
-</tr>
-<tr class="odd">
-<td align="left">1_5</td>
-<td align="left">1_5</td>
-<td align="left">1</td>
-<td align="right">5</td>
-<td align="right">0.0004692</td>
-</tr>
-<tr class="even">
-<td align="left">1_6</td>
-<td align="left">1_6</td>
-<td align="left">1</td>
-<td align="right">6</td>
-<td align="right">0.0006336</td>
-</tr>
-<tr class="odd">
 <td align="left">1_7</td>
 <td align="left">1_7</td>
 <td align="left">1</td>
 <td align="right">7</td>
-<td align="right">0.0006436</td>
+<td align="right">0.0000360</td>
 </tr>
 <tr class="even">
-<td align="left">1_9</td>
-<td align="left">1_9</td>
+<td align="left">1_8</td>
+<td align="left">1_8</td>
 <td align="left">1</td>
-<td align="right">9</td>
-<td align="right">0.0007435</td>
+<td align="right">8</td>
+<td align="right">0.0000372</td>
 </tr>
 <tr class="odd">
-<td align="left">1_12</td>
-<td align="left">1_12</td>
+<td align="left">1_15</td>
+<td align="left">1_15</td>
 <td align="left">1</td>
-<td align="right">12</td>
-<td align="right">0.0012543</td>
+<td align="right">15</td>
+<td align="right">0.0000801</td>
 </tr>
 <tr class="even">
-<td align="left">1_13</td>
-<td align="left">1_13</td>
+<td align="left">1_30</td>
+<td align="left">1_30</td>
 <td align="left">1</td>
-<td align="right">13</td>
-<td align="right">0.0013132</td>
+<td align="right">30</td>
+<td align="right">0.0001601</td>
 </tr>
 <tr class="odd">
-<td align="left">1_16</td>
-<td align="left">1_16</td>
+<td align="left">1_32</td>
+<td align="left">1_32</td>
 <td align="left">1</td>
-<td align="right">16</td>
-<td align="right">0.0015093</td>
+<td align="right">32</td>
+<td align="right">0.0001697</td>
 </tr>
 <tr class="even">
-<td align="left">1_17</td>
-<td align="left">1_17</td>
+<td align="left">1_34</td>
+<td align="left">1_34</td>
 <td align="left">1</td>
-<td align="right">17</td>
-<td align="right">0.0018317</td>
+<td align="right">34</td>
+<td align="right">0.0001867</td>
+</tr>
+<tr class="odd">
+<td align="left">1_49</td>
+<td align="left">1_49</td>
+<td align="left">1</td>
+<td align="right">49</td>
+<td align="right">0.0004765</td>
+</tr>
+<tr class="even">
+<td align="left">1_58</td>
+<td align="left">1_58</td>
+<td align="left">1</td>
+<td align="right">58</td>
+<td align="right">0.0005715</td>
+</tr>
+<tr class="odd">
+<td align="left">1_95</td>
+<td align="left">1_95</td>
+<td align="left">1</td>
+<td align="right">95</td>
+<td align="right">0.0007703</td>
+</tr>
+<tr class="even">
+<td align="left">1_103</td>
+<td align="left">1_103</td>
+<td align="left">1</td>
+<td align="right">103</td>
+<td align="right">0.0008269</td>
 </tr>
 </tbody>
 </table>
@@ -1274,63 +1259,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_1</td>
-<td align="right">0.0000000</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="left">3_2</td>
-<td align="right">0.0158905</td>
-<td align="right">14695</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="left">3_5</td>
-<td align="right">0.0469196</td>
-<td align="right">43391</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="left">3_6</td>
-<td align="right">0.0633599</td>
-<td align="right">58595</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
 <td align="left">3_7</td>
-<td align="right">0.0643561</td>
-<td align="right">59516</td>
+<td align="right">0.0035981</td>
+<td align="right">3327</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_9</td>
-<td align="right">0.0743513</td>
-<td align="right">68759</td>
+<td align="left">3_8</td>
+<td align="right">0.0037156</td>
+<td align="right">3436</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_12</td>
-<td align="right">0.1254251</td>
-<td align="right">115992</td>
+<td align="left">3_15</td>
+<td align="right">0.0080108</td>
+<td align="right">7408</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_13</td>
-<td align="right">0.1313201</td>
-<td align="right">121444</td>
+<td align="left">3_30</td>
+<td align="right">0.0160080</td>
+<td align="right">14804</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_16</td>
-<td align="right">0.1509270</td>
-<td align="right">139576</td>
+<td align="left">3_32</td>
+<td align="right">0.0169682</td>
+<td align="right">15692</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_17</td>
-<td align="right">0.1831683</td>
-<td align="right">169392</td>
+<td align="left">3_34</td>
+<td align="right">0.0186740</td>
+<td align="right">17270</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">3_49</td>
+<td align="right">0.0476486</td>
+<td align="right">44065</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="left">3_58</td>
+<td align="right">0.0571520</td>
+<td align="right">52854</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">3_95</td>
+<td align="right">0.0770294</td>
+<td align="right">71236</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="left">3_103</td>
+<td align="right">0.0826869</td>
+<td align="right">76468</td>
 </tr>
 </tbody>
 </table>
@@ -1341,25 +1326,26 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <h1>3.2 Causative variant</h1>
 <div id="export-information-about-the-location-of-the-causative-variant" class="section level2">
 <h2>3.2.1 Export information about the location of the causative variant</h2>
-<pre class="r"><code>#selection_scenario_pop
+<pre class="r"><code># setwd(variant_position_dir)
+#selection_scenario_pop
 gen_map &lt;- getGenMap(founderGenomes)
 #View(gen_map)
 causative_variant_relative_SNP_POS &lt;- gen_map[gen_map$id == causative_variant_SNP_ID, ]
 cat(&quot;Causative variant:\n&quot;,causative_variant_SNP_ID)</code></pre>
 <pre><code>## Causative variant:
-##  1_4794</code></pre>
+##  1_61049</code></pre>
 <pre class="r"><code>causative_variant_relative_SNP_POS</code></pre>
-<pre><code>##          id chr       pos
-## 4794 1_4794   1 0.4763608</code></pre>
+<pre><code>##            id chr       pos
+## 61049 1_61049   1 0.6237305</code></pre>
 <pre class="r"><code>cat(&quot;\n Relative postions of the causative variant:\n&quot;,causative_variant_relative_SNP_POS$pos)</code></pre>
 <pre><code>## 
 ##  Relative postions of the causative variant:
-##  0.4763608</code></pre>
+##  0.6237305</code></pre>
 <pre class="r"><code>causative_variant_SNP_pos_in_bp &lt;- round(causative_variant_relative_SNP_POS$pos * (model_chromosome_bp_length))
 cat(&quot;\n BP position of the causative variant:\n&quot;,causative_variant_SNP_pos_in_bp)</code></pre>
 <pre><code>## 
 ##  BP position of the causative variant:
-##  44053399</code></pre>
+##  57682013</code></pre>
 <pre class="r"><code># Check if the file exists
 if (file.exists(variant_positions_file)) {
     # Read the existing data from the file
@@ -1424,11 +1410,13 @@ write.table(f_causative, file = paste0(output_sim_files_basename, &#39;.txt&#39;
 </div>
 <div id="export-pruned-replicates-information" class="section level2">
 <h2>3.2: Export pruned replicates information</h2>
-<pre class="r"><code># Print the number of times the causative variant disappeared
+<pre class="r"><code># setwd(pruned_counts_dir)
+
+# Print the number of times the causative variant disappeared
 cat(&quot;Number of times the causative variant disappeared:\n&quot;)</code></pre>
 <pre><code>## Number of times the causative variant disappeared:</code></pre>
 <pre class="r"><code>cat(&quot;Disappearance Counter:&quot;, disappearance_counter, &quot;\n&quot;)  # Print disappearance_counter value to standard output</code></pre>
-<pre><code>## Disappearance Counter: 1</code></pre>
+<pre><code>## Disappearance Counter: 0</code></pre>
 <pre class="r"><code># Check if the file exists
 if (file.exists(simulation_prune_count_file)) {
     # Read the existing data from the file

@@ -1,0 +1,11 @@
+Model,Lengths_Mb,ROH_Freq,H_e,Under_selection
+Hotspot\_chr28\_window\_1,1.4,75,0.118,Yes
+Hotspot\_chr28\_window\_1,1.4,75,0.159,Yes
+Hotspot\_chr28\_window\_1,1.4,75,0.218,No
+Hotspot\_chr28\_window\_1,1.4,75,0.153,Yes
+Hotspot\_chr28\_window\_1,1.4,75,0.226,No
+Hotspot\_chr1\_window\_1,0.2,61.9,0.096,Yes
+Hotspot\_chr1\_window\_1,0.2,61.9,0.206,No
+Hotspot\_chr1\_window\_1,0.2,61.9,0.16,Yes
+Hotspot\_chr1\_window\_1,0.2,61.9,0.137,Yes
+Hotspot\_chr1\_window\_1,0.2,61.9,0.2,No

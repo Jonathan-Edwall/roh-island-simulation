@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-05-03"
+date: "2024-06-29"
 editor_options: 
   markdown: 
     wrap: 72
@@ -40,8 +40,8 @@ if (!dir.exists(output_dir_simulation)) {
   dir.create(output_dir_simulation)
 }
 
-# Set the working directory for notebook chunks
-knitr::opts_knit$set(root.dir = output_dir_simulation)
+# # Set the working directory for notebook chunks
+# knitr::opts_knit$set(root.dir = output_dir_simulation)
 
 #################################### 
 # Defining Input parameters
@@ -54,21 +54,29 @@ chr_simulated <- "chr1"
 chr_number <- as.numeric(sub("chr", "", chr_simulated))
 
 # N_e_burn_in <- 50
-N_e_burn_in <- 200
-nInd_founder_population <- 50
+# N_e_burn_in <- 250
+N_e_burn_in <- 125
 
-Inbred_ancestral_population <- as.logical("FALSE")
+nInd_founder_population <- 100
 
-N_e_bottleneck <- 50
+# Inbred_ancestral_population <- as.logical("FALSE")
+Inbred_ancestral_population <- as.logical("TRUE")
 
-n_generations_bottleneck <- 19
 
-n_generations_random_mating <- 80
+N_e_bottleneck <- 85
 
-n_indv_breed_formation <- 425
+n_generations_bottleneck <- 14
 
-Ref_pop_snp_chip <- "last_breed_formation_generation"
-introduce_mutations <- as.logical("FALSE")
+n_generations_random_mating <- 60
+
+n_indv_breed_formation <- 650
+
+# Ref_pop_snp_chip <- "last_breed_formation_generation"
+Ref_pop_snp_chip <- "last_bottleneck_generation"
+
+# introduce_mutations <- as.logical("FALSE")
+introduce_mutations <- as.logical("TRUE")
+
 
 snp_density_Mb <- 91.23
 snp_density_Mb
@@ -77,10 +85,6 @@ snp_density_Mb
 #################################### 
 # Defining the output files
 #################################### 
-
-
-# Define the chromosome to be simulated
-chr_simulated <- "chr3"
 
 # Define the base name for the output .map & .ped PLINK files
 output_sim_files_basename <- paste0("Neutral_simulation_", chr_simulated)
@@ -335,7 +339,31 @@ model_chromosome_Mb_length <- model_chromosome_bp_length / (10^6)
 num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
 # Convert to the closest integer
 num_snp_markers_simulated_chromosome <- round(num_snp_markers_simulated_chromosome)
-num_snp_markers_simulated_chromosome
+
+
+if (num_snp_markers_simulated_chromosome > founderGenomes@nLoci) {
+  cat("Reference amount of SNP markers for ",chr_simulated, ": ",num_snp_markers_simulated_chromosome)
+  cat("\n",num_snp_markers_simulated_chromosome," > ",founderGenomes@nLoci)
+  cat("\n Burn in N_e: ", N_e_burn_in,"\n")
+
+  
+  num_snp_markers_simulated_chromosome <- founderGenomes@nLoci
+  
+  new_SNP_density <- num_snp_markers_simulated_chromosome / model_chromosome_Mb_length
+  cat("\n Old SNP density: ",snp_density_Mb," markers/Mb")
+  cat("\n New SNP density: ",new_SNP_density," markers/Mb")
+
+
+} else {
+  cat("Reference amount of SNP markers for ",chr_simulated, ": ",num_snp_markers_simulated_chromosome)
+  cat("\n",num_snp_markers_simulated_chromosome," < ",founderGenomes@nLoci)
+  cat("\n Burn in N_e: ", N_e_burn_in,"\n")
+
+  
+}
+
+
+
 
 # SP$addSnpChip(
 #   nSnpPerChr = num_snp_markers_simulated_chromosome,
@@ -344,6 +372,7 @@ num_snp_markers_simulated_chromosome
 #   )
 
 # Check if Ref_pop_snp_chip is equal to last_bottleneck_generation
+
 if (Ref_pop_snp_chip == "last_bottleneck_generation") {
   SP$addSnpChip(nSnpPerChr = num_snp_markers_simulated_chromosome,
     refPop = last_bottleneck_generation

@@ -325,13 +325,29 @@ bottleneck scenario.
 model_chromosome_Mb_length <- model_chromosome_bp_length / (10^6)
 
 num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
-num_snp_markers_simulated_chromosome
 
 # SP$addSnpChip(
 #   nSnpPerChr = num_snp_markers_simulated_chromosome,
 #   minSnpFreq = min_MAF,
 #   refPop = last_bottleneck_generation
 #   )
+
+if (num_snp_markers_simulated_chromosome > founderGenomes@nLoci) {
+  cat("Reference amount of SNP markers for ",chr_simulated, ": ",num_snp_markers_simulated_chromosome)
+  cat("\n",num_snp_markers_simulated_chromosome," > ",founderGenomes@nLoci)
+  cat("\n Burn in N_e: ", N_e_burn_in,"\n")
+
+  
+  num_snp_markers_simulated_chromosome <- founderGenomes@nLoci
+  
+  new_SNP_density <- num_snp_markers_simulated_chromosome / model_chromosome_Mb_length
+  cat("\n Old SNP density: ",snp_density_Mb," markers/Mb")
+  cat("\n New SNP density: ",new_SNP_density," markers/Mb")
+
+
+}
+
+
 
 # Check if Ref_pop_snp_chip is equal to last_bottleneck_generation
 if (Ref_pop_snp_chip == "last_bottleneck_generation") {
@@ -363,6 +379,8 @@ if (Ref_pop_snp_chip == "last_bottleneck_generation") {
 # last_random_mating_generation <- random_mating_generations[[n_generations_random_mating]]
 
 last_random_mating_generation <- random_mating_breed_formation(last_bottleneck_generation, SP, n_generations_random_mating,n_indv_breed_formation,introduce_mutations)
+
+
 
 
 # Check if Ref_pop_snp_chip is equal to "last_breed_formation_generation"
