@@ -1,0 +1,29 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --allow-no-sex
+  --bfile /home/jonathan/data/preprocessed/simulated/selection_model/sim_11_selection_model_s08_chr3
+  --dog
+  --freq
+  --nonfounders
+  --out /home/jonathan/results/PLINK/allele_freq/simulated/selection_model/sim_11_selection_model_s08_chr3_allele_freq
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Tue Sep  3 20:08:13 2024
+
+Random number seed: 1725394093
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+8172 variants loaded from .bim file.
+370 dogs (0 males, 0 females, 370 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/jonathan/results/PLINK/allele_freq/simulated/selection_model/sim_11_selection_model_s08_chr3_allele_freq.nosex
+.
+370 phenotype values loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 370 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+--freq: Allele frequencies (all samples) written to
+/home/jonathan/results/PLINK/allele_freq/simulated/selection_model/sim_11_selection_model_s08_chr3_allele_freq.frq
+.
+
+End time: Tue Sep  3 20:08:13 2024

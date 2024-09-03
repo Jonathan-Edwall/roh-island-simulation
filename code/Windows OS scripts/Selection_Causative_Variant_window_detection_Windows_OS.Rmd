@@ -68,7 +68,7 @@ input_selection_coefficient_variant_positions_file <- file.path(variant_position
 
 chr_simulated="chr3"
 # Extract the chromosome number and convert and convert it to numeric
-chr_number <- as.numeric(sub("chr", "", chr_simulated))
+chr_number <- as.numeric(sub(tolower("chr"), "", tolower(chr_simulated)))
 
 
 

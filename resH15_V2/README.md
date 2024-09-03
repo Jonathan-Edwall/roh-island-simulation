@@ -1,0 +1,1 @@
+This folder contains results from a redefinition of ROH-hotspots. In this result, ROH-hotspots with adjacent 100kbp windows with ROH-frequencies with higher or equal to 10% lower ROH-frequency than the maximum ROH-frequency of a window, gets incorporated, until no such window exist (in both directions upstreams/downstream).

@@ -1,0 +1,9 @@
+hotspot_chr28_window_1 & Yes & 0.197\\
+hotspot_chr1_window_1 & Yes & 0.198\\
+hotspot_chr24_window_1 & No & 0.217\\
+hotspot_chr13_window_1 & No & 0.225\\
+hotspot_chr6_window_1 & No & 0.263\\
+hotspot_chr15_window_1 & No & 0.268\\
+hotspot_chr11_window_2 & No & 0.284\\
+hotspot_chr11_window_1 & No & 0.29\\
+hotspot_chr8_window_1 & No & 0.331\\

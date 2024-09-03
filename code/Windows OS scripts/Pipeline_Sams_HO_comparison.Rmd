@@ -93,8 +93,8 @@ simulated_data_dir_SAMS_basename <- "simulated - Sams"
 # results_dir_HO <- file.path(repository_path,"res_HO11_6")
 # results_dir_HO <- file.path(repository_path,"res_HO14_1")
 # results_dir_HO <- file.path(repository_path,"res_HO14_3")
-results_dir_HO <- file.path(repository_path,"res_HO15_1")
-results_dir_SAMS <- file.path(repository_path,"res_Sams")
+results_dir_HO <- file.path(repository_path,"resH15_1")
+results_dir_SAMS <- file.path(repository_path,"rSams")
 
 # results_dir <- file.path(repository_path,"results-50")
 # results_dir <- file.path(repository_path,"results_50")
@@ -341,7 +341,6 @@ standard_deviation_fun <- function(observed_data, confidence_level = 0.95) {
 ## 1.1 : Autosome ROH-frequencies
 ### 1.1.1 : Empirical - ROH frequency
 ```{r Empirical - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
-
 setwd(Empirical_data_autosome_ROH_freq_dir)
 
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
@@ -354,7 +353,7 @@ parts <- unlist(strsplit(population_ROH_freq_files[1], "threshold_")) # Split th
 Empirical_data_ROH_hotspot_threshold <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
 
 # Extract chromosome numbers from filenames
-chr_numbers <- as.numeric(gsub(".*CHR(\\d+)_.*", "\\1", population_ROH_freq_files))
+chr_numbers <- as.numeric(gsub(tolower(".*CHR(\\d+)_.*"), "\\1", tolower(population_ROH_freq_files)))
 # cat("CHR Values:", chr_numbers, "\n")
 # Sort filenames based on chromosome numbers
 sorted_population_ROH_freq_files <- population_ROH_freq_files[order(chr_numbers)]
@@ -370,7 +369,7 @@ for (file in sorted_population_ROH_freq_files) {
   # Remove the original POS column
   ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
   # Add chromosome_name as an attribute to the data frame
-  chr_num <- as.numeric(gsub(".*CHR(\\d+)_.*", "\\1", file))
+  chr_num <- as.numeric(gsub(tolower(".*CHR(\\d+)_.*"), "\\1", tolower(file)))
   attr(ROH_freq_data, "chromosome_name") <- chr_num
   # Create a list with table name and corresponding data frame
   table_info <- list(chromosome_name = chr_num, filename = file_name, data = ROH_freq_data)  # Added chromosome_name here
@@ -388,7 +387,7 @@ pattern <- ".*ROH_freq.*\\.tsv$"
 neutral_model_ROH_freq_files_HO <- list.files(path = Neutral_model_autosome_ROH_freq_dir_HO, pattern = pattern)
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
-sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", neutral_model_ROH_freq_files_HO))
+sim_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(neutral_model_ROH_freq_files_HO)))
 # cat("CHR Values:", chr_numbers, "\n")
 # Sort filenames based on chromosome numbers
 sorted_neutral_model_ROH_freq_files_HO <- neutral_model_ROH_freq_files_HO[order(sim_numbers)]
@@ -407,7 +406,7 @@ for (file in sorted_neutral_model_ROH_freq_files_HO) {
   # Remove the original POS column
   ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
   # Add chromosome_name as an attribute to the data frame
-  sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
+  sim_num <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(file)))
   attr(ROH_freq_data, "Simulation_number") <- sim_num
   # Create a list with table name and corresponding data frame
   table_info <- list(Simulation_number = sim_num, filename = file, data = ROH_freq_data,ROH_Hotspot_threshold = simulation_ROH_hotspot_threshold)  # Added chromosome_name here
@@ -435,7 +434,7 @@ pattern <- ".*ROH_freq.*\\.tsv$"
 neutral_model_ROH_freq_files_SAMS <- list.files(path = Neutral_model_autosome_ROH_freq_dir_SAMS, pattern = pattern)
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
-sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", neutral_model_ROH_freq_files_SAMS))
+sim_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(neutral_model_ROH_freq_files_SAMS)))
 # cat("CHR Values:", chr_numbers, "\n")
 # Sort filenames based on chromosome numbers
 sorted_neutral_model_ROH_freq_files_SAMS <- neutral_model_ROH_freq_files_SAMS[order(sim_numbers)]
@@ -454,7 +453,7 @@ for (file in sorted_neutral_model_ROH_freq_files_SAMS) {
   # Remove the original POS column
   ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
   # Add chromosome_name as an attribute to the data frame
-  sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
+  sim_num <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(file)))
   attr(ROH_freq_data, "Simulation_number") <- sim_num
   # Create a list with table name and corresponding data frame
   table_info <- list(Simulation_number = sim_num, filename = file, data = ROH_freq_data,ROH_Hotspot_threshold = simulation_ROH_hotspot_threshold)  # Added chromosome_name here
@@ -482,8 +481,8 @@ pattern <- ".*ROH_freq.*\\.tsv$"
 selection_model_ROH_freq_files_HO <- list.files(path = Selection_model_autosome_ROH_freq_dir_HO, pattern = pattern)
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
-sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", selection_model_ROH_freq_files_HO))
-sim_name <- sub("^(.*?)_ROH_freq.*", "\\1", selection_model_ROH_freq_files_HO)
+sim_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(selection_model_ROH_freq_files_HO)))
+sim_name <- sub(tolower("^(.*?)_ROH_freq.*"), "\\1", tolower(selection_model_ROH_freq_files_HO))
 # Preallocate sim_info as an empty data frame
 sim_info <- data.frame(sim_name = character(), simulation_number = numeric(), file_name = character(), stringsAsFactors = FALSE)
 # Combine simulation name, number, and file name
@@ -496,7 +495,7 @@ for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
   # Extract simname from the file name
-  simname_from_file <- sub("^(.*?)_ROH_freq.*", "\\1", file)
+  simname_from_file <- sub(tolower("^(.*?)_ROH_freq.*"), "\\1", tolower(file))
   
   # Check if the simname from the file matches with the simname from the dataframe
   if (simname_from_file != sim_info$sim_name[i]) {
@@ -515,10 +514,10 @@ for (i in 1:length(sim_info$sim_name)) {
   # Remove the original POS column
   ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
   # Add simulation_number as an attribute to the data frame
-  sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
+  sim_num <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(file)))
   attr(ROH_freq_data, "Simulation_number") <- sim_num
   # Extract the selection coefficient from the file name
-  selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", file)
+  selection_coefficient <- sub(tolower(".*(selection_model_s\\d+_chr\\d+).*"), "\\1", tolower(file))
   # Check if the selection coefficient already exists in the list
   if (!(selection_coefficient %in% names(ROH_freq_tables_Selection_Model_HO))) {
     # If it doesn't exist, create a list for it
@@ -548,8 +547,8 @@ pattern <- ".*ROH_freq.*\\.tsv$"
 selection_model_ROH_freq_files_SAMS <- list.files(path = Selection_model_autosome_ROH_freq_dir_SAMS, pattern = pattern)
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
-sim_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", selection_model_ROH_freq_files_SAMS))
-sim_name <- sub("^(.*?)_ROH_freq.*", "\\1", selection_model_ROH_freq_files_SAMS)
+sim_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(selection_model_ROH_freq_files_SAMS)))
+sim_name <- sub(tolower("^(.*?)_ROH_freq.*"), "\\1", tolower(selection_model_ROH_freq_files_SAMS))
 # Preallocate sim_info as an empty data frame
 sim_info <- data.frame(sim_name = character(), simulation_number = numeric(), file_name = character(), stringsAsFactors = FALSE)
 # Combine simulation name, number, and file name
@@ -562,7 +561,7 @@ for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
   # Extract simname from the file name
-  simname_from_file <- sub("^(.*?)_ROH_freq.*", "\\1", file)
+  simname_from_file <- sub(tolower("^(.*?)_ROH_freq.*"), "\\1", tolower(file))
   
   # Check if the simname from the file matches with the simname from the dataframe
   if (simname_from_file != sim_info$sim_name[i]) {
@@ -581,10 +580,10 @@ for (i in 1:length(sim_info$sim_name)) {
   # Remove the original POS column
   ROH_freq_data <- ROH_freq_data[, c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")]
   # Add simulation_number as an attribute to the data frame
-  sim_num <- as.numeric(gsub(sim_number_pattern, "\\1", file))
+  sim_num <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(file)))
   attr(ROH_freq_data, "Simulation_number") <- sim_num
   # Extract the selection coefficient from the file name
-  selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", file)
+  selection_coefficient <- sub(tolower(".*(selection_model_s\\d+_chr\\d+).*"), "\\1", tolower(file))
   # Check if the selection coefficient already exists in the list
   if (!(selection_coefficient %in% names(ROH_freq_tables_Selection_Model_SAMS))) {
     # If it doesn't exist, create a list for it
@@ -766,7 +765,7 @@ empirical_roh_hotspot_bed_files <- list.files(path = Empirical_data_ROH_hotspots
 # chromosome_number_pattern <- "^german_shepherd_CHR(\\d+)_.*"
 chromosome_number_pattern <- paste0("^",empirical_dog_breed,"_CHR(\\d+)_.*")
 # Extract chromosome numbers
-chr_numbers <- sub(chromosome_number_pattern, "\\1", empirical_roh_hotspot_bed_files)
+chr_numbers <- sub(tolower(chromosome_number_pattern), "\\1", tolower(empirical_roh_hotspot_bed_files))
 
 # Sort the files based on chromosome numbers
 empirical_roh_hotspot_bed_files <- empirical_roh_hotspot_bed_files[order(as.numeric(chr_numbers))]
@@ -778,7 +777,7 @@ empirical_hotspot_tables <- list()
 # Loop through each .bed file (ROH-hotspot allele frequency window-file)
 for (file in empirical_roh_hotspot_bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome <- as.numeric(sub(chromosome_number_pattern, "\\1", file))
+  chromosome <- as.numeric(sub(tolower(chromosome_number_pattern), "\\1", tolower(file)))
   column_names <- c("CHR","POS1","POS2")
   # Read the .bed file into a data frame, skipping commented lines
   chromosome_bed_file_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
@@ -1140,7 +1139,7 @@ pattern <- "^.*F_ROH.*.tsv$"
 population_F_ROH_file <- list.files(path = Empirical_data_F_ROH_dir, pattern = pattern)
 
 # Extract the population name from the file names
-empirical_population_name <- sub("^(.*?)_F_ROH.*", "\\1", population_F_ROH_file)
+empirical_population_name <- sub(tolower("^(.*?)_F_ROH.*"), "\\1", tolower(population_F_ROH_file))
 
 # Combine population name, number, and file name
 population_info <- data.frame(empirical_population_name = empirical_population_name, file_name = population_F_ROH_file)
@@ -1216,9 +1215,9 @@ setwd(Neutral_model_F_ROH_dir_HO)
 pattern <- "^.*F_ROH.*.tsv$"
 simulation_F_ROH_files_HO <- list.files(path = Neutral_model_F_ROH_dir_HO, pattern = pattern)
 # Extract the simulation name from the file names
-sim_name <- sub("^(.*?)_F_ROH.*", "////1", simulation_F_ROH_files_HO)
+sim_name <- sub(tolower("^(.*?)_F_ROH.*"), "////1", tolower(simulation_F_ROH_files_HO))
 # Extract the simulation number after "sim_"
-simulation_numbers <- as.integer(sub("^sim_(////d+)_.*", "////1", simulation_F_ROH_files_HO))
+simulation_numbers <- as.integer(sub(tolower("^sim_(////d+)_.*"), "////1", tolower(simulation_F_ROH_files_HO)))
 # Combine simulation name, number, and file name
 sim_info <- data.frame(sim_name = sim_name, simulation_number = simulation_numbers, file_name = simulation_F_ROH_files_HO)
 sim_info <- sim_info[order(sim_info$simulation_number), ]
@@ -1302,9 +1301,9 @@ setwd(Neutral_model_F_ROH_dir_SAMS)
 pattern <- "^.*F_ROH.*.tsv$"
 simulation_F_ROH_files_SAMS <- list.files(path = Neutral_model_F_ROH_dir_SAMS, pattern = pattern)
 # Extract the simulation name from the file names
-sim_name <- sub("^(.*?)_F_ROH.*", "////1", simulation_F_ROH_files_SAMS)
+sim_name <- sub(tolower("^(.*?)_F_ROH.*"), "////1", tolower(simulation_F_ROH_files_SAMS))
 # Extract the simulation number after "sim_"
-simulation_numbers <- as.integer(sub("^sim_(////d+)_.*", "////1", simulation_F_ROH_files_SAMS))
+simulation_numbers <- as.integer(sub(tolower("^sim_(////d+)_.*"), "////1", tolower(simulation_F_ROH_files_SAMS)))
 # Combine simulation name, number, and file name
 sim_info <- data.frame(sim_name = sim_name, simulation_number = simulation_numbers, file_name = simulation_F_ROH_files_SAMS)
 sim_info <- sim_info[order(sim_info$simulation_number), ]
@@ -1392,8 +1391,8 @@ pattern <- "^.*F_ROH.*.tsv$"
 simulation_F_ROH_files_HO <- list.files(path = Selection_model_F_ROH_dir_HO, pattern = pattern)
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
-simulation_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", simulation_F_ROH_files_HO))
-sim_name <- sub("^(.*?)_F_ROH.*", "\\1", simulation_F_ROH_files_HO)
+simulation_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(simulation_F_ROH_files_HO)))
+sim_name <- sub(tolower("^(.*?)_F_ROH.*"), "\\1", tolower(simulation_F_ROH_files_HO))
 # Combine simulation name, number, and file name
 sim_info <- data.frame(sim_name = sim_name, simulation_number = simulation_numbers, file_name = simulation_F_ROH_files_HO)
 sim_info <- sim_info[order(sim_info$simulation_number), ]
@@ -1404,14 +1403,14 @@ for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
   # Extract the selection_model_type from the file name
-  selection_model_type <- sub("^sim_[0-9]+_(.*?)_F_ROH.*", "\\1", file)
+  selection_model_type <- sub(tolower("^sim_[0-9]+_(.*?)_F_ROH.*"), "\\1", tolower(file))
   # Check if the selection_model_type already exists in the list
   if (!(selection_model_type %in% names(F_ROH_tables_Selection_Model_HO))) {
     # If it doesn't exist, create a list for it
     F_ROH_tables_Selection_Model_HO[[selection_model_type]] <- list()
   }
   # Extract simname from the file name
-  simname_from_file <- sub("^(.*?)_F_ROH.*", "\\1", file)
+  simname_from_file <- sub(tolower("^(.*?)_F_ROH.*"), "\\1", tolower(file))
   # Check if the simname from the file matches with the simname from the dataframe
   if (simname_from_file != sim_info$sim_name[i]) {
     stop("Error: Simname from file does not match with simname from dataframe.")
@@ -1496,8 +1495,8 @@ pattern <- "^.*F_ROH.*.tsv$"
 simulation_F_ROH_files_SAMS <- list.files(path = Selection_model_F_ROH_dir_SAMS, pattern = pattern)
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
-simulation_numbers <- as.numeric(gsub(sim_number_pattern, "\\1", simulation_F_ROH_files_SAMS))
-sim_name <- sub("^(.*?)_F_ROH.*", "\\1", simulation_F_ROH_files_SAMS)
+simulation_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(simulation_F_ROH_files_SAMS)))
+sim_name <- sub(tolower("^(.*?)_F_ROH.*"), "\\1", tolower(simulation_F_ROH_files_SAMS))
 # Combine simulation name, number, and file name
 sim_info <- data.frame(sim_name = sim_name, simulation_number = simulation_numbers, file_name = simulation_F_ROH_files_SAMS)
 sim_info <- sim_info[order(sim_info$simulation_number), ]
@@ -1508,14 +1507,14 @@ for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
   # Extract the selection_model_type from the file name
-  selection_model_type <- sub("^sim_[0-9]+_(.*?)_F_ROH.*", "\\1", file)
+  selection_model_type <- sub(tolower("^sim_[0-9]+_(.*?)_F_ROH.*"), "\\1", tolower(file))
   # Check if the selection_model_type already exists in the list
   if (!(selection_model_type %in% names(F_ROH_tables_Selection_Model_SAMS))) {
     # If it doesn't exist, create a list for it
     F_ROH_tables_Selection_Model_SAMS[[selection_model_type]] <- list()
   }
   # Extract simname from the file name
-  simname_from_file <- sub("^(.*?)_F_ROH.*", "\\1", file)
+  simname_from_file <- sub(tolower("^(.*?)_F_ROH.*"), "\\1", tolower(file))
   # Check if the simname from the file matches with the simname from the dataframe
   if (simname_from_file != sim_info$sim_name[i]) {
     stop("Error: Simname from file does not match with simname from dataframe.")
@@ -1815,7 +1814,7 @@ H_e_5th_percentiles_Selection_models_HO <- list()
 # Loop through each selection coefficient and its associated file
 for (i in seq_along(selection_model_5th_percentiles_of_H_e_files_HO)) {
   # Extract the selection coefficient from the file name
-  selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", selection_model_5th_percentiles_of_H_e_files_HO[i])
+  selection_coefficient <- sub(tolower(".*(selection_model_s\\d+_chr\\d+).*"), "\\1", tolower(selection_model_5th_percentiles_of_H_e_files_HO[i]))
   # Read the .tsv file into a data frame
   subtable <- read.table(selection_model_5th_percentiles_of_H_e_files_HO[i], header = TRUE,sep = "\t", stringsAsFactors = FALSE)
   H_e_5th_percentiles_Selection_models_HO[[selection_coefficient]]$file_name <- selection_model_5th_percentiles_of_H_e_files_HO[i]
@@ -1850,7 +1849,7 @@ H_e_5th_percentiles_Selection_models_SAMS <- list()
 # Loop through each selection coefficient and its associated file
 for (i in seq_along(selection_model_5th_percentiles_of_H_e_files_SAMS)) {
   # Extract the selection coefficient from the file name
-  selection_coefficient <- sub(".*(selection_model_s\\d+_chr\\d+).*", "\\1", selection_model_5th_percentiles_of_H_e_files_SAMS[i])
+  selection_coefficient <- sub(tolower(".*(selection_model_s\\d+_chr\\d+).*"), "\\1", tolower(selection_model_5th_percentiles_of_H_e_files_SAMS[i]))
   # Read the .tsv file into a data frame
   subtable <- read.table(selection_model_5th_percentiles_of_H_e_files_SAMS[i], header = TRUE,sep = "\t", stringsAsFactors = FALSE)
   H_e_5th_percentiles_Selection_models_SAMS[[selection_coefficient]]$file_name <- selection_model_5th_percentiles_of_H_e_files_SAMS[i]
