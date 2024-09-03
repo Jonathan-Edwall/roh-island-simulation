@@ -5,7 +5,7 @@ output:
     toc: true
     toc_depth: 3  
     output_dir: output_dir
-date: "2024-09-03"
+date: "2024-05-07"
 editor_options: 
   markdown: 
     wrap: 72
@@ -114,7 +114,7 @@ data <- read.table(input_file, header = TRUE, sep = "\t", comment.char = "")
 colnames(data) <- c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
 
 
-# Extracting the frequency data for the genomic windows
+# Frequency Data is chosen
 values <- data$FREQUENCY
 
 # Sort the values in descending order to find the top 1%
@@ -165,8 +165,8 @@ if (!is.null(prev_row)) {
   merged_top_1_percent_ROH <- rbind(merged_top_1_percent_ROH, prev_row)
 }
 
-# Calculate the length in Megabases (Mb)
-merged_top_1_percent_ROH$Length_mb <- (merged_top_1_percent_ROH$POS2 - merged_top_1_percent_ROH$POS1 + 1) / 10^6
+# Calculate the length in kilobases (kb)
+merged_top_1_percent_ROH$Length_kb <- (merged_top_1_percent_ROH$POS2 - merged_top_1_percent_ROH$POS1 + 1) / 1000
 
 # Compute distance to previous and next window
 merged_top_1_percent_ROH$Distance_to_prev_kb <- c(NA, diff(merged_top_1_percent_ROH$POS1)/1000)
@@ -179,162 +179,16 @@ print(merged_top_1_percent_ROH)
 
 ## 1.3 Expanding hotspots thats 10 % lower!
 ```{r}
-# # Assuming merged_top_1_percent_ROH and data are data frames
-# 
-# incorporate_adjacent_windows <- function(merged_df, data_df, threshold) {
-#   merged_df$Incorporated <- FALSE  # Track incorporated windows
-#   
-#   for (i in 1:nrow(merged_df)) {
-#     current_row <- merged_df[i, ]
-#     chrom <- current_row$CHR
-#     pos1 <- current_row$POS1
-#     pos2 <- current_row$POS2
-# 
-#     # Find corresponding 100kbp window in data
-#     data_pos1_index <- which(data_df$CHR == chrom & data_df$POS1 == pos1)
-# 
-#     if (length(data_pos1_index) > 0) {
-#       index <- data_pos1_index[1]
-#       
-#       # Check lower index condition
-#       while (index - 1 >= 1) {
-#         lower_row <- data_df[index - 1, ]
-#         if (lower_row$FREQUENCY >= threshold - 10) {
-#           # Incorporate this window
-#           merged_df[i, "POS1"] <- lower_row$POS1
-#           merged_df[i, "Incorporated"] <- TRUE
-#           index <- index - 1
-#         } else {
-#           break
-#         }
-#       }
-#     }
-#     
-#     # Check if the next ROH-hotspot is close enough to skip POS2 check
-#     if (i < nrow(merged_df)) {
-#       next_row <- merged_df[i + 1, ]
-#       if (next_row$POS1 - pos2 > 100) {
-#         # Find corresponding 100kbp window for POS2
-#         data_pos2_index <- which(data_df$CHR == chrom & data_df$POS1 == pos2)
-#         
-#         if (length(data_pos2_index) > 0) {
-#           index <- data_pos2_index[1]
-#           
-#           # Check higher index condition
-#           while (index + 1 <= nrow(data_df)) {
-#             higher_row <- data_df[index + 1, ]
-#             if (higher_row$FREQUENCY >= threshold - 10) {
-#               # Incorporate this window
-#               merged_df[i, "POS2"] <- higher_row$POS2
-#               merged_df[i, "Incorporated"] <- TRUE
-#               index <- index + 1
-#             } else {
-#               break
-#             }
-#           }
-#         }
-#       }
-#     }
-#   }
-#   
-#   return(merged_df)
-# }
-# 
-# 
-# ROH_hotspots_df <- incorporate_adjacent_windows(merged_top_1_percent_ROH, data, threshold)
-# print(ROH_hotspots_df)
-
-```
-
-
-
-
-## 1.4: Merging together ROH-hotspot windows within 2Mb
-For these ROH-hotspot windows, gaps of up to 2 Megabases are allowed, when linking together "up to 2Mb adjacent" ROH-hotspot windows.
-
-```{r ROH-hotspot windows within 2Mb merge}
-
-# Initialize an empty dataframe to store linked windows
-linked_hotspot_windows <- data.frame(CHR = character(), POS1 = integer(), POS2 = integer(), Length_Mb = numeric())
-
-# Initialize variables to keep track of linked window
-current_window <- NULL
-
-# Iterate over each row in the merged dataframe
-for (i in 1:nrow(merged_top_1_percent_ROH)) {
-  # Get the current row
-  current_row <- merged_top_1_percent_ROH[i, ]
-  
-  # If it's the first row or if it's not within the specified distance from the previous window, start a new window
-  if (is.null(current_window) || current_row$POS1 - current_window$POS2 > max_hotspot_windows_gap || current_row$CHR != current_window$CHR) {
-    if (!is.null(current_window)) {
-      # Calculate Length_kb for the completed window and add it to the linked dataframe
-      current_window$Length_Mb <- (current_window$POS2 - current_window$POS1 + 1) / 10^6
-      linked_hotspot_windows <- rbind(linked_hotspot_windows, current_window[, c("CHR", "POS1", "POS2", "Length_Mb")])
-    }
-    # Start a new window
-    current_window <- current_row
-  } else {
-    # Extend the current window
-    current_window$POS2 <- current_row$POS2
-  }
-}
-
-
-# # Iterate over each row in the merged dataframe
-# for (i in 1:nrow(ROH_hotspots_df)) {
-#   # Get the current row
-#   current_row <- ROH_hotspots_df[i, ]
-#   
-#   # If it's the first row or if it's not within the specified distance from the previous window, start a new window
-#   if (is.null(current_window) || current_row$POS1 - current_window$POS2 > max_hotspot_windows_gap || current_row$CHR != current_window$CHR) {
-#     if (!is.null(current_window)) {
-#       # Calculate Length_kb for the completed window and add it to the linked dataframe
-#       current_window$Length_kb <- (current_window$POS2 - current_window$POS1 + 1) / 1000
-#       linked_hotspot_windows <- rbind(linked_hotspot_windows, current_window[, c("CHR", "POS1", "POS2", "Length_kb")])
-#     }
-#     # Start a new window
-#     current_window <- current_row
-#   } else {
-#     # Extend the current window
-#     current_window$POS2 <- current_row$POS2
-#   }
-# }
-
-
-
-# Add the last window to the linked dataframe
-if (!is.null(current_window)) {
-  current_window$Length_Mb <- (current_window$POS2 - current_window$POS1 + 1) / 10^6
-  linked_hotspot_windows <- rbind(linked_hotspot_windows, current_window[, c("CHR", "POS1", "POS2", "Length_Mb")])
-}
-
-# Print the linked windows
-print(linked_hotspot_windows)
-
-
-
-```
-
-## 1.5 Creating the final ROH-hotspots by adding adjacent windows under the hotspot-threshold
-Adjacent 100kbp subwindows with ROH-frequencies >= maximum threshold of a window - 0.1, are incorporated to the hotspots in each direction, until noamore subwindows not reaching this criteria are not found. 
-```{r}
 # Assuming merged_top_1_percent_ROH and data are data frames
 
 incorporate_adjacent_windows <- function(merged_df, data_df, threshold) {
-  # new_threshold <- threshold - 0.1
   merged_df$Incorporated <- FALSE  # Track incorporated windows
   
   for (i in 1:nrow(merged_df)) {
-    
     current_row <- merged_df[i, ]
     chrom <- current_row$CHR
     pos1 <- current_row$POS1
     pos2 <- current_row$POS2
-    # max(data$FREQUENCY[data$CHR == 1 & data$POS1 >= 21900001 & data$POS2 <= 24000000])
-    threshold_frequency <- max(data_df$FREQUENCY[data_df$CHR == chrom & data_df$POS1 >= pos1 & data_df$POS2 <= pos2])
-    new_threshold <- threshold_frequency - 0.1
-
 
     # Find corresponding 100kbp window in data
     data_pos1_index <- which(data_df$CHR == chrom & data_df$POS1 == pos1)
@@ -345,9 +199,7 @@ incorporate_adjacent_windows <- function(merged_df, data_df, threshold) {
       # Check lower index condition
       while (index - 1 >= 1) {
         lower_row <- data_df[index - 1, ]
-        # if (lower_row$CHR == chrom && lower_row$POS2 == merged_df[i, "POS1"] - 1 && lower_row$FREQUENCY >= new_threshold) {
-
-        if (lower_row$CHR == chrom && lower_row$FREQUENCY >= new_threshold) {
+        if (lower_row$FREQUENCY >= threshold - 10) {
           # Incorporate this window
           merged_df[i, "POS1"] <- lower_row$POS1
           merged_df[i, "Incorporated"] <- TRUE
@@ -360,10 +212,10 @@ incorporate_adjacent_windows <- function(merged_df, data_df, threshold) {
     
     # Check if the next ROH-hotspot is close enough to skip POS2 check
     if (i < nrow(merged_df)) {
-      next_row <- merged_df[i+1, ]
-      if (next_row$POS1 - pos2 > 10^5) {
+      next_row <- merged_df[i + 1, ]
+      if (next_row$POS1 - pos2 > 100) {
         # Find corresponding 100kbp window for POS2
-        data_pos2_index <- which(data_df$CHR == chrom & data_df$POS2 == pos2)
+        data_pos2_index <- which(data_df$CHR == chrom & data_df$POS1 == pos2)
         
         if (length(data_pos2_index) > 0) {
           index <- data_pos2_index[1]
@@ -371,7 +223,7 @@ incorporate_adjacent_windows <- function(merged_df, data_df, threshold) {
           # Check higher index condition
           while (index + 1 <= nrow(data_df)) {
             higher_row <- data_df[index + 1, ]
-            if (higher_row$CHR == chrom && higher_row$FREQUENCY >= new_threshold) {
+            if (higher_row$FREQUENCY >= threshold - 10) {
               # Incorporate this window
               merged_df[i, "POS2"] <- higher_row$POS2
               merged_df[i, "Incorporated"] <- TRUE
@@ -389,32 +241,57 @@ incorporate_adjacent_windows <- function(merged_df, data_df, threshold) {
 }
 
 
-ROH_hotspots_df <- incorporate_adjacent_windows(linked_hotspot_windows, data, threshold)
-ROH_hotspots_df$Length_Mb <- (ROH_hotspots_df$POS2-ROH_hotspots_df$POS1+1)/10^6
-print(ROH_hotspots_df)
-```
-### 1.5.1 Extracting the ROH-frequencies for the final ROH-hotspot windows
-```{r}
-# Initialize an empty dataframe to store linked windows
-ROH_hotspot_windows_frequencies <- data.frame(CHR = character(), POS1 = integer(), POS2 = integer(),COUNT = integer(),FREQUENCY = numeric())
+result <- incorporate_adjacent_windows(merged_top_1_percent_ROH, data, threshold)
+print(result)
 
-for (i in 1:nrow(ROH_hotspots_df)) {
+```
+
+
+
+
+## 1.4: Merging together ROH-hotspot windows within 2Mb
+For these ROH-hotspot windows, gaps of up to 2 Megabases are allowed, when linking together "up to 2Mb adjacent" ROH-hotspot windows.
+
+```{r ROH-hotspot windows within 2Mb merge}
+
+# Initialize an empty dataframe to store linked windows
+linked_hotspot_windows <- data.frame(CHR = character(), POS1 = integer(), POS2 = integer(), Length_kb = numeric())
+
+# Initialize variables to keep track of linked window
+current_window <- NULL
+
+# Iterate over each row in the merged dataframe
+for (i in 1:nrow(merged_top_1_percent_ROH)) {
+  # Get the current row
+  current_row <- merged_top_1_percent_ROH[i, ]
   
-  
- ROH_hotspot_100kbp_windows <- data[data$CHR == ROH_hotspots_df$CHR[i] & data$POS1 >= ROH_hotspots_df$POS1[i] & data$POS2 <= ROH_hotspots_df$POS2[i], ]
- ROH_hotspot_100kbp_windows$Hotspot_interval <- c(rep(paste0("[", ROH_hotspots_df$POS1[i], ",", ROH_hotspots_df$POS2[i], "]"),nrow(ROH_hotspot_100kbp_windows)))
- ROH_hotspot_100kbp_windows$Length_Mb <- (ROH_hotspots_df$POS2[i] - ROH_hotspots_df$POS1[i] + 1) / 10^6
-  
-  ROH_hotspot_windows_frequencies <- rbind(ROH_hotspot_windows_frequencies,ROH_hotspot_100kbp_windows)
-  
-  
+  # If it's the first row or if it's not within the specified distance from the previous window, start a new window
+  if (is.null(current_window) || current_row$POS1 - current_window$POS2 > max_hotspot_windows_gap || current_row$CHR != current_window$CHR) {
+    if (!is.null(current_window)) {
+      # Calculate Length_kb for the completed window and add it to the linked dataframe
+      current_window$Length_kb <- (current_window$POS2 - current_window$POS1 + 1) / 1000
+      linked_hotspot_windows <- rbind(linked_hotspot_windows, current_window[, c("CHR", "POS1", "POS2", "Length_kb")])
+    }
+    # Start a new window
+    current_window <- current_row
+  } else {
+    # Extend the current window
+    current_window$POS2 <- current_row$POS2
+  }
 }
 
-ROH_hotspot_windows_frequencies
+# Add the last window to the linked dataframe
+if (!is.null(current_window)) {
+  current_window$Length_kb <- (current_window$POS2 - current_window$POS1 + 1) / 1000
+  linked_hotspot_windows <- rbind(linked_hotspot_windows, current_window[, c("CHR", "POS1", "POS2", "Length_kb")])
+}
+
+# Print the linked windows
+print(linked_hotspot_windows)
+
+
 
 ```
-
-
 
 ## 1.5: Visualization of ROH Hotspots
 
@@ -423,7 +300,7 @@ ROH_hotspot_windows_frequencies
 for (CHR in unique(data$CHR)) {
   # Subset data for the current chromosome
   chr_data <- data[data$CHR == CHR, ]
-  chr_merged_data <- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == CHR, ]
+  chr_merged_data <- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == CHR, ]
   
   # Create scatter plot
   p <- ggplot() +
@@ -460,12 +337,12 @@ formatted_threshold <- format(threshold, nsmall = 3)
 split_window <- function(data) {
   # Create a new dataframe to store the split rows
   new_data <- data.frame(
-    CHR = rep(data$CHR,2),
+    CHR = data$CHR,
     POS = c(data$POS1, data$POS2),
     COUNT = rep(data$COUNT, 2),
     FREQUENCY = rep(data$FREQUENCY, 2),
-    Length_Mb = rep(data$Length_Mb, 2),
-    Hotspot_interval = rep(data$Hotspot_interval,2)
+    Length_kb = rep(data$Length_kb, 2),
+    Hotspot_interval = c(paste0("[", data$POS1, ",", data$POS2, "]"), paste0("[", data$POS1, ",", data$POS2, "]"))
   )
   return(new_data)
 }
@@ -474,9 +351,9 @@ split_window <- function(data) {
 split_data <- list()
 
 # Iterate over each chromosome
-for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
+for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   # Subset data for the current chromosome
-  chr_data <- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == Chromosome, ]
+  chr_data <- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == Chromosome, ]
   
   # Split each window into two rows
   split_data[[Chromosome]] <- split_window(chr_data)
@@ -486,7 +363,7 @@ for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
 split_data_combined <- do.call(rbind, split_data)
 
 # Export the combined split dataframe to TSV files for each chromosome
-for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
+for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   # Subset the split data for the current chromosome
   chr_split_data <- split_data_combined[split_data_combined$CHR == Chromosome, ]
   
@@ -555,12 +432,12 @@ for (Chromosome in unique(data$CHR)) {
 
 ## 3.2: Gapless ROH-hotspot windows 
 
-```{r Export Gapless ROH-hotpots to .bed-files}
+```{r Export ROH-hotpots to .bed-files}
 # Iterate over unique chromosomes
 
-for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
+for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
   # Subset data for the current chromosome
-  chr_data <- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == Chromosome, c("CHR", "POS1", "POS2")]
+  chr_data <- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == Chromosome, c("CHR", "POS1", "POS2")]
   
   # Define the filename with the output directory path
   filename <- file.path(output_dir_gapless_roh_hotspots, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_gapless_windows.bed", sep = "")) 
@@ -577,9 +454,9 @@ for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
 ## 3.2: 2Mb ROH-hotspot windows
 ```{r Export ROH-hotpots to .bed-files}
 # Iterate over unique chromosomes
-for (Chromosome in unique(ROH_hotspots_df$CHR)) {
+for (Chromosome in unique(linked_hotspot_windows$CHR)) {
   # Subset data for the current chromosome
-  chr_data <- ROH_hotspots_df[ROH_hotspots_df$CHR == Chromosome, c("CHR", "POS1", "POS2")]
+  chr_data <- linked_hotspot_windows[linked_hotspot_windows$CHR == Chromosome, c("CHR", "POS1", "POS2")]
   
   # Define the filename with the output directory path
   filename <- file.path(output_dir, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_windows.bed", sep = "")) 
