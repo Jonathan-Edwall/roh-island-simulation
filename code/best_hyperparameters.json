@@ -1,1 +1,1 @@
-{"chr_simulated": "chr3", "Ne_burn_in": 3700, "n_bottleneck": 5, "n_generations_bottleneck": 2, "n_simulated_generations_breed_formation": 94, "n_individuals_breed_formation": 370, "reference_population_for_snp_chip": "last_breed_formation_generation"}
+{"chr_simulated": "chr1", "Ne_burn_in": 400, "n_bottleneck": 7, "n_generations_bottleneck": 1, "n_simulated_generations_breed_formation": 78, "n_individuals_breed_formation": 260, "reference_population_for_snp_chip": "last_bottleneck_generation"}

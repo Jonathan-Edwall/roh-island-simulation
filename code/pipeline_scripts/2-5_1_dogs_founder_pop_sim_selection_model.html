@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-06-30" />
+<meta name="date" content="2024-09-06" />
 
 <title>Selection Scenario simulation for Dogs in AlphaSimR</title>
 
@@ -343,7 +343,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Selection Scenario simulation for Dogs in AlphaSimR</h1>
-<h4 class="date">2024-06-30</h4>
+<h4 class="date">2024-09-06</h4>
 
 </div>
 
@@ -354,12 +354,16 @@ pre code {
 <li><a href="#loading-libraries">Loading libraries</a></li>
 </ul></li>
 <li><a href="#creating-founder-haplotypes">1: Creating founder Haplotypes</a><ul>
-<li><a href="#defining-chromosome-lengths-of-model-species">1.0: Defining chromosome lengths of model species</a></li>
-<li><a href="#runmacs2---generating-founder-population">1.1: runMacs2() - Generating founder population</a></li>
-<li><a href="#simparam---setting-global-simulation-parameters">1.2: SimParam() - Setting Global Simulation Parameters</a><ul>
-<li><a href="#settrackrec---setting-on-recombination-tracking-for-the-simulation">1.2.1: $setTrackRec() - Setting on recombination tracking for the simulation</a></li>
+<li><a href="#defining-physical-chromosome-lengths-of-model-species">1.0: Defining physical chromosome lengths of model species</a></li>
+<li><a href="#genetic-chromosome-lengths">1.1 Genetic chromosome lengths</a><ul>
+<li><a href="#defining-recombination-rates-for-the-model-species">1.1.1 Defining recombination rates for the model species</a></li>
+<li><a href="#defining-physical-chromosome-lengths-of-model-species-1">1.1.2 Defining physical chromosome lengths of model species</a></li>
 </ul></li>
-<li><a href="#newpop---creating-two-separate-populations-for-bottleneck-event">1.3: newPop() - Creating two separate populations for bottleneck event</a></li>
+<li><a href="#runmacs2---generating-founder-population">1.2: runMacs2() - Generating founder population</a></li>
+<li><a href="#simparam---setting-global-simulation-parameters">1.3: SimParam() - Setting Global Simulation Parameters</a><ul>
+<li><a href="#settrackrec---setting-on-recombination-tracking-for-the-simulation">1.3.1: $setTrackRec() - Setting on recombination tracking for the simulation</a></li>
+</ul></li>
+<li><a href="#newpop---creating-two-separate-populations-for-bottleneck-event">1.4: newPop() - Creating two separate populations for bottleneck event</a></li>
 </ul></li>
 <li><a href="#forward-in-time-simulation">2: Forward in time simulation</a><ul>
 <li><a href="#defining-random-mating-function-random_mating---randcross">2.0: Defining Random Mating function (random_mating) - randCross()</a></li>
@@ -402,20 +406,22 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
-
-chromosome_end_margin &lt;- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
+allele_copies_threshold &lt;- as.numeric(Sys.getenv(&quot;allele_copies_threshold&quot;))
+# allele_copies_threshold &lt;- 5 
+cat(&quot;The selected causative Variant must have &lt;=&quot;,allele_copies_threshold,&quot; allele copies\n&quot;)</code></pre>
+<pre><code>## The selected causative Variant must have &lt;= 1  allele copies</code></pre>
+<pre class="r"><code>chromosome_end_margin &lt;- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
 s &lt;- as.numeric(Sys.getenv(&quot;selection_coefficient&quot;)) # using as.numeric, otherwise class(s) = &quot;character&quot;
 # Print the value of selection_coefficient
 cat(&quot;Selection Coefficient:&quot;, s, &quot;\n&quot;)</code></pre>
-<pre><code>## Selection Coefficient: 0.1</code></pre>
-<pre class="r"><code>allele_copies_threshold &lt;- 5 # 10 default (candidate_variants = less than 10)
-# min_allowed_gen_before_variant_lost &lt;- 10 # Pruning replicates where the causative variant gets lost within this timespan
+<pre><code>## Selection Coefficient: 0.15</code></pre>
+<pre class="r"><code># min_allowed_gen_before_variant_lost &lt;- 10 # Pruning replicates where the causative variant gets lost within this timespan
 fixation_threshold_causative_variant &lt;- as.numeric(Sys.getenv(&quot;fixation_threshold_causative_variant&quot;))
 # fixation_threshold_causative_variant &lt;- 0.99
 disappearance_threshold_value_to_terminate_script &lt;- as.numeric(Sys.getenv(&quot;disappearance_threshold_value_to_terminate_script&quot;))
 
 
-
+use_chromosome_specific_recombination_rate &lt;- as.logical(Sys.getenv(&quot;chr_specific_recombination_rate&quot;))
 # min_MAF &lt;- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 chr_simulated &lt;- Sys.getenv(&quot;chr_simulated&quot;)
 chr_simulated</code></pre>
@@ -430,8 +436,7 @@ nInd_founder_population &lt;- as.numeric(Sys.getenv(&quot;nInd_founder_populatio
 
 Inbred_ancestral_population &lt;- as.logical(Sys.getenv(&quot;Inbred_ancestral_population&quot;))
 
-# N_e_bottleneck &lt;- 50
-N_e_bottleneck &lt;- as.numeric(Sys.getenv(&quot;N_e_bottleneck&quot;))
+n_bottleneck &lt;- as.numeric(Sys.getenv(&quot;N_e_bottleneck&quot;))
 
 n_generations_bottleneck &lt;- as.numeric(Sys.getenv(&quot;n_generations_bottleneck&quot;)) # 5 default
 
@@ -475,7 +480,11 @@ Sys.getenv()</code></pre>
 ## _CE_M                   
 ## _R_CHECK_COMPILATION_FLAGS_KNOWN_
 ##                         -Wformat -Werror=format-security -Wdate-time
+## allele_copies_threshold
+##                         1
 ## chr_simulated           chr3
+## chr_specific_recombination_rate
+##                         FALSE
 ## CONDA_DEFAULT_ENV       plink
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/plink
@@ -487,8 +496,8 @@ Sys.getenv()</code></pre>
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
 ## disappearance_threshold_value_to_terminate_script
-##                         20
-## DISPLAY                 localhost:12.0
+##                         100
+## DISPLAY                 localhost:13.0
 ## EDITOR                  vi
 ## empirical_dog_breed     labrador_retriever
 ## empirical_preprocessed_data_basename
@@ -508,8 +517,10 @@ Sys.getenv()</code></pre>
 ## LOGNAME                 jonathan
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAKE                    make
-## max_parallel_jobs_selection_sim
+## max_parallel_jobs_neutral_model_simulations
 ##                         2
+## max_parallel_jobs_selection_sim
+##                         3
 ## MOTD_SHOWN              pam
 ## N_e_bottleneck          5
 ## n_generations_bottleneck
@@ -519,7 +530,7 @@ Sys.getenv()</code></pre>
 ## n_simulated_generations_breed_formation
 ##                         94
 ## n_simulation_replicates
-##                         20
+##                         50
 ## Ne_burn_in              3700
 ## nInd_founder_population
 ##                         5
@@ -527,11 +538,11 @@ Sys.getenv()</code></pre>
 ##                         201850
 ## num_markers_raw_empirical_dataset
 ##                         220853
-## OLDPWD                  /home/jonathan/data/raw/simulated/selection_model
+## OLDPWD                  /home/jonathan
 ## output_dir_selection_simulation
 ##                         /home/jonathan/data/raw/simulated/selection_model
 ## output_sim_files_basename
-##                         sim_1_selection_model_s01_chr3
+##                         sim_1_selection_model_s015_chr3
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/plink/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ## PWD                     /home/jonathan/data/raw/simulated/selection_model
@@ -550,7 +561,7 @@ Sys.getenv()</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmp70a4kb
+## R_SESSION_TMPDIR        /tmp/Rtmp2TeuKN
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -566,24 +577,24 @@ Sys.getenv()</code></pre>
 ##                         88.37
 ## selected_chr_snp_density_mb
 ##                         88.37
-## selection_coefficient   0.1
+## selection_coefficient   0.15
 ## selection_simulation    TRUE
 ## SHELL                   /bin/bash
 ## SHLVL                   2
 ## simulation_prune_count_file
-##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/pruned_replicates_count_s01_chr3.tsv
-## SSH_CLIENT              172.21.30.174 51346 22
-## SSH_CONNECTION          172.21.30.174 51346 77.235.253.16 22
+##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts/technical_replicates/pruned_replicates_count_s015_chr3_rep1.tsv
+## SSH_CLIENT              172.21.30.27 60872 22
+## SSH_CONNECTION          172.21.30.27 60872 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/3
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
 ## variant_positions_file
-##                         /home/jonathan/data/raw/simulated/selection_model/variant_position/variant_position_s01_chr3.tsv
+##                         /home/jonathan/data/raw/simulated/selection_model/variant_position/technical_replicates/variant_position_s015_chr3_rep1.tsv
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          6910
+## XDG_SESSION_ID          1454
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># # Verify the current working directory
 #getwd()</code></pre>
@@ -598,13 +609,10 @@ Sys.getenv()</code></pre>
 </div>
 <div id="creating-founder-haplotypes" class="section level1">
 <h1>1: Creating founder Haplotypes</h1>
-<div id="defining-chromosome-lengths-of-model-species" class="section level2">
-<h2>1.0: Defining chromosome lengths of model species</h2>
-<pre class="r"><code># Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
-# which can be found through this link:
-# https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
-
-chromosome_lengths_bp &lt;- c(
+<div id="defining-physical-chromosome-lengths-of-model-species" class="section level2">
+<h2>1.0: Defining physical chromosome lengths of model species</h2>
+<p>Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0, which can be found through this link: <a href="https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/" class="uri">https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/</a></p>
+<pre class="r"><code>chromosome_lengths_bp &lt;- c(
 &quot;chr1&quot; = 123556469, &quot;chr2&quot; = 84979418, &quot;chr3&quot; = 92479059, &quot;chr4&quot; = 89535178 , &quot;chr5&quot; = 89562946, 
 &quot;chr6&quot; = 78113029   , &quot;chr7&quot; = 81081596, &quot;chr8&quot; = 76405709, &quot;chr9&quot; = 61171909, &quot;chr10&quot; = 70643054, 
 &quot;chr11&quot; = 74805798, &quot;chr12&quot; = 72970719, &quot;chr13&quot; = 64299765, &quot;chr14&quot; = 61112200, &quot;chr15&quot; = 64676183, 
@@ -615,8 +623,47 @@ chromosome_lengths_bp &lt;- c(
 &quot;chr36&quot; = 31223415, &quot;chr37&quot; = 30785915, &quot;chr38&quot; = 24803098  
 )</code></pre>
 </div>
+<div id="genetic-chromosome-lengths" class="section level2">
+<h2>1.1 Genetic chromosome lengths</h2>
+<div id="defining-recombination-rates-for-the-model-species" class="section level3">
+<h3>1.1.1 Defining recombination rates for the model species</h3>
+<p>The used chromosomal recombination rates of the dog autosome comes from the canine linkage map produced by the paper Wong et al. 2010. The table from which the values comes from, can be found through this link: <a href="https://www.researchgate.net/figure/Physical-and-genetic-lengths-of-dog-chromosomes_tbl3_40453037" class="uri">https://www.researchgate.net/figure/Physical-and-genetic-lengths-of-dog-chromosomes_tbl3_40453037</a></p>
+<pre class="r"><code>chromosome_recombination_rates_cM_Mb &lt;- c(
+&quot;chr1&quot; = 0.68, &quot;chr2&quot; = 0.88, &quot;chr3&quot; =0.69, &quot;chr4&quot; = 0.75, &quot;chr5&quot; = 0.85, 
+&quot;chr6&quot; = 0.71, &quot;chr7&quot; = 0.75 , &quot;chr8&quot; = 0.83, &quot;chr9&quot; = 1.11, &quot;chr10&quot; = 0.78, 
+&quot;chr11&quot; = 0.84, &quot;chr12&quot; = 0.87, &quot;chr13&quot; = 0.90, &quot;chr14&quot; = 0.89, &quot;chr15&quot; = 0.80, 
+&quot;chr16&quot; = 0.90, &quot;chr17&quot; = 0.89, &quot;chr18&quot; = 0.88, &quot;chr19&quot; = 0.93, &quot;chr20&quot; = 0.93, 
+&quot;chr21&quot; = 1.02, &quot;chr22&quot; = 0.84, &quot;chr23&quot; = 1.02, &quot;chr24&quot; = 1.13, &quot;chr25&quot; = 1.05, 
+&quot;chr26&quot; = 1.22, &quot;chr27&quot; = 1.18, &quot;chr28&quot; =1.31, &quot;chr29&quot; = 1.15, &quot;chr30&quot; = 1.36, 
+&quot;chr31&quot; = 1.29, &quot;chr32&quot; = 1.37, &quot;chr33&quot; = 1.53, &quot;chr34&quot; = 1.17, &quot;chr35&quot; = 2.15, 
+&quot;chr36&quot; = 1.54, &quot;chr37&quot; = 1.38, &quot;chr38&quot; = 2.22  
+)</code></pre>
+</div>
+<div id="defining-physical-chromosome-lengths-of-model-species-1" class="section level3">
+<h3>1.1.2 Defining physical chromosome lengths of model species</h3>
+<pre class="r"><code># Extracting the physical length of the simulated chromosome 
+model_chromosome_physical_length_bp &lt;- chromosome_lengths_bp[chr_simulated]
+
+if (use_chromosome_specific_recombination_rate) {
+  # Extracting the recombination rate of the simulated chromosome 
+  model_chromosome_recombination_rate &lt;- chromosome_recombination_rates_cM_Mb[chr_simulated]
+  cat(&quot;Recombination rate:&quot;,model_chromosome_recombination_rate)
+  # Computing the genetic length of the simulated chromosome 
+  model_chromosome_genetic_length_morgan &lt;- (model_chromosome_physical_length_bp*10^-6)*(model_chromosome_recombination_rate*10^-2)
+  cat(&quot;Genetic Length in Morgan:&quot;,model_chromosome_genetic_length_morgan)
+} else {
+  # Setting the average recombination rate for dogs.
+  average_recombination_rate &lt;- 0.97
+  # Computing the genetic length of the simulated chromosome 
+  model_chromosome_genetic_length_morgan &lt;- (model_chromosome_physical_length_bp*10^-6)*(average_recombination_rate*10^-2)
+  model_chromosome_genetic_length_morgan
+}</code></pre>
+<pre><code>##      chr3 
+## 0.8970469</code></pre>
+</div>
+</div>
 <div id="runmacs2---generating-founder-population" class="section level2">
-<h2>1.1: runMacs2() - Generating founder population</h2>
+<h2>1.2: runMacs2() - Generating founder population</h2>
 <p><code>runMacs2</code> Parameters:</p>
 <ul>
 <li><p>nInd = 100: 100 individuals in the founder population</p></li>
@@ -631,13 +678,23 @@ chromosome_lengths_bp &lt;- c(
 
 model_chromosome_bp_length &lt;- chromosome_lengths_bp[chr_simulated] 
 
-
-founderGenomes &lt;- runMacs2(nInd = nInd_founder_population ,
+n_bottleneck</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>N_e_burn_in</code></pre>
+<pre><code>## [1] 3700</code></pre>
+<pre class="r"><code>model_chromosome_physical_length_bp</code></pre>
+<pre><code>##     chr3 
+## 92479059</code></pre>
+<pre class="r"><code>model_chromosome_genetic_length_morgan</code></pre>
+<pre><code>##      chr3 
+## 0.8970469</code></pre>
+<pre class="r"><code>founderGenomes &lt;- runMacs2(nInd = n_bottleneck ,
                      nChr = 1,
                      Ne = N_e_burn_in,
-                     bp = model_chromosome_bp_length,
+                     bp = model_chromosome_physical_length_bp,
                      inbred = Inbred_ancestral_population,
-                     genLen = 1,
+                     genLen = model_chromosome_genetic_length_morgan,
+                     mutRate = 1*10^-8,
                      histNe = NULL,
                      histGen = NULL)
 
@@ -648,24 +705,24 @@ founderGenomes</code></pre>
 ## Ploidy: 2 
 ## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 98347</code></pre>
+## Loci: 38369</code></pre>
 </div>
 <div id="simparam---setting-global-simulation-parameters" class="section level2">
-<h2>1.2: SimParam() - Setting Global Simulation Parameters</h2>
+<h2>1.3: SimParam() - Setting Global Simulation Parameters</h2>
 <pre class="r"><code>#help(SimParam)
 
 # Creating a new Simparam object &amp; Assigning the founder population population to it
 SP &lt;- SimParam$new(founderGenomes)
 # SP</code></pre>
 <div id="settrackrec---setting-on-recombination-tracking-for-the-simulation" class="section level3">
-<h3>1.2.1: $setTrackRec() - Setting on recombination tracking for the simulation</h3>
+<h3>1.3.1: $setTrackRec() - Setting on recombination tracking for the simulation</h3>
 <p>Sets recombination tracking for the simulation. By default recombination tracking is turned off. <strong>When turned on recombination tracking will also turn on pedigree tracking.</strong></p>
 <p><strong>Recombination tracking keeps records of all individuals created,</strong> except those created by hybridCross, because their pedigree is not tracked.</p>
 <pre class="r"><code>SP$setTrackRec(TRUE)</code></pre>
 </div>
 </div>
 <div id="newpop---creating-two-separate-populations-for-bottleneck-event" class="section level2">
-<h2>1.3: newPop() - Creating two separate populations for bottleneck event</h2>
+<h2>1.4: newPop() - Creating two separate populations for bottleneck event</h2>
 <pre class="r"><code># Generate the initial founder population
 founderpop &lt;- newPop(founderGenomes, simParam = SP)
 # # Set misc used for setting years of birth for the first individuals
@@ -676,7 +733,7 @@ founderpop &lt;- newPop(founderGenomes, simParam = SP)
 # head(getMisc(x = founderpop, node = &quot;generation&quot;))
 # 
 # Split the founder population into two breeding groups
-breed1_founders &lt;- founderpop[1:N_e_bottleneck] # 1:50
+breed1_founders &lt;- founderpop[1:n_bottleneck] # 1:50
 cat(&quot;Population 1:\n&quot;)</code></pre>
 <pre><code>## Population 1:</code></pre>
 <pre class="r"><code>breed1_founders</code></pre>
@@ -684,9 +741,9 @@ cat(&quot;Population 1:\n&quot;)</code></pre>
 ## Ploidy: 2 
 ## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 98347 
+## Loci: 38369 
 ## Traits: 0</code></pre>
-<pre class="r"><code># breed2_founders &lt;- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
+<pre class="r"><code># breed2_founders &lt;- founderpop[(n_bottleneck + 1):(2 * n_bottleneck)] # 51:100
 # cat(&quot;Population 2:\n&quot;)
 # breed2_founders</code></pre>
 </div>
@@ -741,7 +798,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 98347 
+## Loci: 38369 
 ## Traits: 0</code></pre>
 <pre class="r"><code>breed1_bottleneck</code></pre>
 <pre><code>## [[1]]
@@ -749,7 +806,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 98347 
+## Loci: 38369 
 ## Traits: 0 
 ## 
 ## [[2]]
@@ -757,7 +814,7 @@ founderpop</code></pre>
 ## Ploidy: 2 
 ## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 98347 
+## Loci: 38369 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Extracting final generation:
 last_bottleneck_generation &lt;- breed1_bottleneck[[n_generations_bottleneck]]
@@ -769,7 +826,7 @@ cat(&quot;Extracting the final generation from the Bottleneck Scenario&quot;)</c
 ## Ploidy: 2 
 ## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 98347 
+## Loci: 38369 
 ## Traits: 0</code></pre>
 </div>
 </div>
@@ -804,7 +861,7 @@ if (num_snp_markers_simulated_chromosome &gt; founderGenomes@nLoci) {
 
 }</code></pre>
 <pre><code>## Reference amount of SNP markers for  chr3 :  8172.374
-##  8172.374  &lt;  98347
+##  8172.374  &lt;  38369
 ##  Burn in N_e:  3700</code></pre>
 <pre class="r"><code># SP$addSnpChip(
 #   nSnpPerChr = num_snp_markers_simulated_chromosome,
@@ -842,7 +899,7 @@ if (Ref_pop_snp_chip == &quot;last_bottleneck_generation&quot;) {
   count &lt;- colSums(pullSegSiteGeno(last_bottleneck_generation, simParam = SP))
   
   # Find candidate variants (less than or equal to the threshold)
-  candidate_variants &lt;- which(count &lt;= allele_copies_threshold)
+  candidate_variants &lt;- which(0 &lt; count &amp; count &lt;= allele_copies_threshold)
   
   # Find a candidate variant within 
   success &lt;- FALSE
@@ -860,9 +917,6 @@ if (Ref_pop_snp_chip == &quot;last_bottleneck_generation&quot;) {
       success &lt;- TRUE
       causative_variant &lt;- variant
     }    
-
-  
-  
     # # Relative position: Check if the causative variant has been fixated  
     # if (variant_relative_SNP_POS$pos &gt;= lower_boundary_chromosome_margin &amp;&amp;  variant_relative_SNP_POS$pos &lt;= upper_boundary_chromosome_margin) {
     #   success &lt;- TRUE
@@ -871,11 +925,88 @@ if (Ref_pop_snp_chip == &quot;last_bottleneck_generation&quot;) {
     
   }
 
-  
-  
-
   return(causative_variant)
+}
+
+# Extract the genetic map 
+gen_map &lt;- getGenMap(founderGenomes)
+
+# Count occurrences of each variant
+count &lt;- colSums(pullSegSiteGeno(last_bottleneck_generation, simParam = SP))
+
+
+allele_copies_list &lt;- c(0,1,2,3,4,5,6,7,8,9,10)
+
+for (allele_copy_num in allele_copies_list) {
+  
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants &lt;- which(count == allele_copy_num)
+  
+  cat(&quot;\n&quot;,length(candidate_variants),&quot;variants found,with&quot;, allele_copy_num, &quot;allele copies&quot;)
 }</code></pre>
+<pre><code>## 
+##  5765 variants found,with 0 allele copies
+##  7331 variants found,with 1 allele copies
+##  6609 variants found,with 2 allele copies
+##  4514 variants found,with 3 allele copies
+##  3401 variants found,with 4 allele copies
+##  2837 variants found,with 5 allele copies
+##  2116 variants found,with 6 allele copies
+##  2181 variants found,with 7 allele copies
+##  1606 variants found,with 8 allele copies
+##  1258 variants found,with 9 allele copies
+##  751 variants found,with 10 allele copies</code></pre>
+<pre class="r"><code># for (allele_copy_num in allele_copies_list) {
+#   
+#   # Find candidate variants (less than or equal to the threshold)
+#   candidate_variants &lt;- which(count &lt;=  allele_copy_num)
+#   
+#   cat(&quot;\n&quot;,length(candidate_variants),&quot;variants found,with&quot;, allele_copy_num, &quot;allele copies&quot;)
+# }
+
+
+
+for (allele_copy_num in allele_copies_list) {
+  
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants &lt;- which(0 &lt; count &amp; count &lt;= allele_copy_num)
+  
+  cat(&quot;\n&quot;,length(candidate_variants),&quot;variants found,with 0 &lt;  &quot;, allele_copy_num, &quot;&lt;= allele copies&quot;)
+}</code></pre>
+<pre><code>## 
+##  0 variants found,with 0 &lt;   0 &lt;= allele copies
+##  7331 variants found,with 0 &lt;   1 &lt;= allele copies
+##  13940 variants found,with 0 &lt;   2 &lt;= allele copies
+##  18454 variants found,with 0 &lt;   3 &lt;= allele copies
+##  21855 variants found,with 0 &lt;   4 &lt;= allele copies
+##  24692 variants found,with 0 &lt;   5 &lt;= allele copies
+##  26808 variants found,with 0 &lt;   6 &lt;= allele copies
+##  28989 variants found,with 0 &lt;   7 &lt;= allele copies
+##  30595 variants found,with 0 &lt;   8 &lt;= allele copies
+##  31853 variants found,with 0 &lt;   9 &lt;= allele copies
+##  32604 variants found,with 0 &lt;   10 &lt;= allele copies</code></pre>
+<pre class="r"><code>upper_limit_allele_copies &lt;- n_bottleneck*2
+allele_copies_listt &lt;- c(10,upper_limit_allele_copies)
+
+for (allele_copy_num in allele_copies_listt) {
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants &lt;- which(count &gt; allele_copy_num)
+  
+  cat(&quot;\n\n&quot;,length(candidate_variants),&quot;variants found,with more than&quot;, allele_copy_num, &quot;allele copies&quot;)
+
+
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants &lt;- which(count == allele_copy_num)
+  
+  cat(&quot;\n&quot;,length(candidate_variants),&quot;variants found,with&quot;, allele_copy_num, &quot;allele copies&quot;)
+}</code></pre>
+<pre><code>## 
+## 
+##  0 variants found,with more than 10 allele copies
+##  751 variants found,with 10 allele copies
+## 
+##  0 variants found,with more than 10 allele copies
+##  751 variants found,with 10 allele copies</code></pre>
 </div>
 <div id="defining-the-mate-selection-function---mate_selection_scenario" class="section level3">
 <h3>2.3.2 Defining the Mate selection function - Mate_Selection_scenario()</h3>
@@ -896,6 +1027,32 @@ if (Ref_pop_snp_chip == &quot;last_bottleneck_generation&quot;) {
       
         # Retrieves the genotype of the causative variant for each individual in the population  
         geno &lt;- pullSegSiteGeno(generations[[gen_ix - 1]], simParam = SP)[, causative_variant]
+
+        # Calculate allele frequency of the causative variant
+        f_causative[gen_ix-1] &lt;- sum(geno) / length(geno) / 2
+
+        # Check if the causative variant is lost (allele frequency drops to 0)
+        if (f_causative[gen_ix-1] == 0) {
+            cat(&quot;\nTerminating simulation: The causative variant has been completely lost by generation&quot;, gen_ix - 1, &quot;.\n&quot;)
+            return(list(f_causative[1:(gen_ix-1)], generations[[gen_ix-1]])) # Exit early
+        }
+        # Check if half the generations have passed and the allele frequency has dropped 20-fold
+        else if ( gen_ix == ceiling(n_generations_mate_selection / 2) &amp;&amp; 
+                 f_causative[gen_ix-1] &lt; (f_causative[1] / 20) ) {
+            cat(&quot;\nTerminating simulation: After half the generations (&quot;, gen_ix - 1, 
+                &quot;) the allele frequency has dropped more than 20-fold from its initial value.\n&quot;)
+            return(list(f_causative[1:(gen_ix-1)], generations[[gen_ix-1]])) # Exit early
+        }
+
+        
+        # # Calculate allele frequency of the causative variant
+        # f_causative[gen_ix-1] &lt;- sum(geno) / length(geno) / 2
+        # 
+        # # Check if the causative variant is lost (allele frequency drops to 0)
+        # if (f_causative[gen_ix] == 0) {
+        #     cat(&quot;Causative variant lost at generation&quot;, gen_ix - 1, &quot;\n&quot;)
+        #     return(list(f_causative[1:(gen_ix-1)], generations[[gen_ix - 1]])) # Exit early
+        # }
         # cat(&quot;\nGeneration&quot;, gen, &quot;Geno:&quot;,geno)  
         
         #     # Print out the genotype of each individual
@@ -909,10 +1066,18 @@ if (Ref_pop_snp_chip == &quot;last_bottleneck_generation&quot;) {
         #   }
         # }
         
+        # # Old fitness function
+        # fitness &lt;- rep(1-s, length(geno)) # If homozygous for the non-causative variant
+        # fitness[geno == 1] &lt;- 1 - (s/2) # If heterozygous for the selected allele of the causative variant
+        # fitness[geno == 2] &lt;- 1 # If homozygous for the selected allele of the causative variant
+
+        
         # Set fitness based on genotype
-        fitness &lt;- rep(1-s, length(geno))
-        fitness[geno == 1] &lt;- 1 - (s/2)
-        fitness[geno == 2] &lt;- 1
+        fitness &lt;- rep(1, length(geno)) # If homozygous for the non-causative variant
+        fitness[geno == 1] &lt;- 1 + (s/2) # If heterozygous for the selected allele of the causative variant
+        fitness[geno == 2] &lt;- 1 + s # If homozygous for the selected allele of the causative variant
+
+        
         
         # Initialize vectors for parents
         parent1 &lt;- integer(n_indv_breed_formation)
@@ -940,9 +1105,18 @@ if (Ref_pop_snp_chip == &quot;last_bottleneck_generation&quot;) {
         if (introduce_mutations == TRUE) {
           generations[[gen_ix]] &lt;- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
         }
-  
-        # Calculate allele frequency of the causative variant
-        f_causative[gen_ix] &lt;- sum(geno) / length(geno) / 2
+        
+        # # Retrieves the genotype of the causative variant for each individual in the population  
+        # geno &lt;- pullSegSiteGeno(generations[[gen_ix]], simParam = SP)[, causative_variant]
+        # 
+        # # Calculate allele frequency of the causative variant
+        # f_causative[gen_ix] &lt;- sum(geno) / length(geno) / 2
+        # 
+        # # Check if the causative variant is lost (allele frequency drops to 0)
+        # if (f_causative[gen_ix] == 0) {
+        #     cat(&quot;Causative variant lost at generation&quot;, gen_ix - 1, &quot;\n&quot;)
+        #     return(list(f_causative[1:(gen_ix)], generations[[gen_ix]])) # Exit early
+        # }
   }
     
   selection_scenario_pop_final_generation &lt;- generations[[n_generations_mate_selection+1]] # Final generation extracted
@@ -960,15 +1134,17 @@ disappearance_counter &lt;- 0
 # # Extract the highest IID in the population from the post bottleneck scenario
 # last_bottleneck_IID &lt;- max(last_bottleneck_generation@id)
 
-# Define the rerun mechanism
+
+# Function to randomly pick out a causative variant to be studied
+causative_variant &lt;- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold,chromosome_end_margin,model_chromosome_bp_length)
+# Print the chosen causative variant
+cat(&quot;Variant chosen:\n&quot;, causative_variant)</code></pre>
+<pre><code>## Variant chosen:
+##  10436</code></pre>
+<pre class="r"><code># Define the rerun mechanism
 success &lt;- FALSE
 while (!success) {
   
-  # Function to randomly pick out a causative variant to be studied
-  causative_variant &lt;- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold,chromosome_end_margin,model_chromosome_bp_length)
-  # Print the chosen causative variant
-  cat(&quot;Variant chosen:&quot;, causative_variant)
-
   # Sets the initial population for the selection scenario to the last generation of the bottleneck simulation.
   selection_scenario_pop &lt;- last_bottleneck_generation
   
@@ -999,17 +1175,13 @@ while (!success) {
       quit(status=1) # Terminate the script if the condition is met
       } 
     else {
-    cat(&quot;Causative variant disappeared, rerunning simulation...\n&quot;)
+    cat(&quot;Causative variant did not reach fixation, rerunning simulation...\n&quot;)
     cat(&quot;f_causative:&quot;, f_causative, &quot;\n&quot;)
-    
-    }
-    
-    
-    
-  }
-  
-}</code></pre>
-<pre><code>## Variant chosen: 61049</code></pre>
+        }
+        }
+  }</code></pre>
+<pre><code>## Causative variant did not reach fixation, rerunning simulation...
+## f_causative: 0.1 0.09189189 0.1040541 0.1121622 0.1175676 0.1256757 0.1297297 0.1486486 0.1675676 0.1783784 0.1918919 0.2094595 0.1945946 0.2121622 0.2743243 0.2905405 0.3135135 0.3554054 0.3756757 0.4040541 0.422973 0.4216216 0.4540541 0.4635135 0.4891892 0.4864865 0.4824324 0.5067568 0.5378378 0.5405405 0.5581081 0.5918919 0.5837838 0.6135135 0.6364865 0.6567568 0.6554054 0.6554054 0.65 0.6472973 0.6405405 0.6459459 0.6432432 0.6486486 0.6567568 0.6864865 0.6945946 0.7297297 0.7540541 0.7689189 0.7540541 0.7432432 0.7675676 0.7797297 0.7783784 0.7783784 0.777027 0.7716216 0.7608108 0.7662162 0.7837838 0.8175676 0.8216216 0.8297297 0.8445946 0.8513514 0.8635135 0.8756757 0.8797297 0.8702703 0.8797297 0.8797297 0.9094595 0.9121622 0.9216216 0.9094595 0.9135135 0.9283784 0.9297297 0.9445946 0.9432432 0.9337838 0.9364865 0.9324324 0.9256757 0.9256757 0.9364865 0.9459459 0.9567568 0.9608108 0.9635135 0.977027 0.9824324 0.9824324</code></pre>
 <pre class="r"><code>#last_mate_selection_generation &lt;- selection_scenario_pop[[n_generations_mate_selection]]
 
 cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></pre>
@@ -1019,7 +1191,7 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 ## Ploidy: 2 
 ## Individuals: 5 
 ## Chromosomes: 1 
-## Loci: 98347 
+## Loci: 38369 
 ## Traits: 0</code></pre>
 <pre class="r"><code>cat(&quot;\nPopulation after&quot;,n_generations_mate_selection,&quot;generations of selection scenario simulation:\n&quot;)</code></pre>
 <pre><code>## 
@@ -1029,7 +1201,7 @@ cat(&quot;Population before the selection scenario simulation:\n&quot;)</code></
 ## Ploidy: 2 
 ## Individuals: 370 
 ## Chromosomes: 1 
-## Loci: 98347 
+## Loci: 38369 
 ## Traits: 0</code></pre>
 <pre class="r"><code># Check if Ref_pop_snp_chip is equal to &quot;last_breed_formation_generation&quot;
 if (Ref_pop_snp_chip == &quot;last_breed_formation_generation&quot;) {
@@ -1040,21 +1212,7 @@ if (Ref_pop_snp_chip == &quot;last_breed_formation_generation&quot;) {
 
   )
   
-}
-
-
-
-# 
-
-# SP$addSnpChip(
-# 
-# nSnpPerChr = num_snp_markers_simulated_chromosome,
-# 
-#  minSnpFreq = min_MAF,
-# 
-# refPop = last_mate_selection_generation
-# 
-#  )</code></pre>
+}</code></pre>
 </div>
 </div>
 </div>
@@ -1093,74 +1251,74 @@ cat(&quot;First 10 markers of the SNP chip and their genetic map positions:\n&qu
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1_7</td>
-<td align="left">1_7</td>
+<td align="left">1_3</td>
+<td align="left">1_3</td>
 <td align="left">1</td>
-<td align="right">7</td>
-<td align="right">0.0000360</td>
+<td align="right">3</td>
+<td align="right">0.0000413</td>
 </tr>
 <tr class="even">
-<td align="left">1_8</td>
-<td align="left">1_8</td>
+<td align="left">1_28</td>
+<td align="left">1_28</td>
 <td align="left">1</td>
-<td align="right">8</td>
-<td align="right">0.0000372</td>
+<td align="right">28</td>
+<td align="right">0.0007276</td>
 </tr>
 <tr class="odd">
-<td align="left">1_15</td>
-<td align="left">1_15</td>
+<td align="left">1_29</td>
+<td align="left">1_29</td>
 <td align="left">1</td>
-<td align="right">15</td>
-<td align="right">0.0000801</td>
+<td align="right">29</td>
+<td align="right">0.0007524</td>
 </tr>
 <tr class="even">
-<td align="left">1_30</td>
-<td align="left">1_30</td>
+<td align="left">1_37</td>
+<td align="left">1_37</td>
 <td align="left">1</td>
-<td align="right">30</td>
-<td align="right">0.0001601</td>
+<td align="right">37</td>
+<td align="right">0.0010105</td>
 </tr>
 <tr class="odd">
-<td align="left">1_32</td>
-<td align="left">1_32</td>
+<td align="left">1_45</td>
+<td align="left">1_45</td>
 <td align="left">1</td>
-<td align="right">32</td>
-<td align="right">0.0001697</td>
+<td align="right">45</td>
+<td align="right">0.0012467</td>
 </tr>
 <tr class="even">
-<td align="left">1_34</td>
-<td align="left">1_34</td>
+<td align="left">1_53</td>
+<td align="left">1_53</td>
 <td align="left">1</td>
-<td align="right">34</td>
-<td align="right">0.0001867</td>
+<td align="right">53</td>
+<td align="right">0.0015886</td>
 </tr>
 <tr class="odd">
-<td align="left">1_49</td>
-<td align="left">1_49</td>
+<td align="left">1_62</td>
+<td align="left">1_62</td>
 <td align="left">1</td>
-<td align="right">49</td>
-<td align="right">0.0004765</td>
+<td align="right">62</td>
+<td align="right">0.0017576</td>
 </tr>
 <tr class="even">
-<td align="left">1_58</td>
-<td align="left">1_58</td>
+<td align="left">1_67</td>
+<td align="left">1_67</td>
 <td align="left">1</td>
-<td align="right">58</td>
-<td align="right">0.0005715</td>
+<td align="right">67</td>
+<td align="right">0.0018082</td>
 </tr>
 <tr class="odd">
-<td align="left">1_95</td>
-<td align="left">1_95</td>
+<td align="left">1_72</td>
+<td align="left">1_72</td>
 <td align="left">1</td>
-<td align="right">95</td>
-<td align="right">0.0007703</td>
+<td align="right">72</td>
+<td align="right">0.0019428</td>
 </tr>
 <tr class="even">
-<td align="left">1_103</td>
-<td align="left">1_103</td>
+<td align="left">1_76</td>
+<td align="left">1_76</td>
 <td align="left">1</td>
-<td align="right">103</td>
-<td align="right">0.0008269</td>
+<td align="right">76</td>
+<td align="right">0.0020244</td>
 </tr>
 </tbody>
 </table>
@@ -1190,26 +1348,7 @@ writePlink(last_mate_selection_generation,snpChip = 1,simParam=SP, baseName=outp
             traits = 1,
            use = &quot;rand&quot;
 
-           )
-
-
-# writePlink(last_mate_selection_generation,snpChip = 2, baseName=output_sim_files_basename,
-# 
-#             traits = 1,
-#            use = &quot;rand&quot;
-# 
-# 
-#            )
-
-
-
-# writePlink(last_mate_selection_generation,simParam=SP, baseName=output_sim_files_basename,
-# 
-#             traits = 1,
-#            use = &quot;rand&quot;
-# 
-# 
-#            )</code></pre>
+           )</code></pre>
 </div>
 <div id="convert-distances-to-basepair-in-the-.map-file" class="section level3">
 <h3>3.1.2: Convert distances to basepair in the .map file</h3>
@@ -1259,63 +1398,63 @@ cat(&quot;Showing the first 10 rows of the new .map file:\n&quot;)</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_7</td>
-<td align="right">0.0035981</td>
-<td align="right">3327</td>
+<td align="left">3_3</td>
+<td align="right">0.0041303</td>
+<td align="right">3820</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_8</td>
-<td align="right">0.0037156</td>
-<td align="right">3436</td>
+<td align="left">3_28</td>
+<td align="right">0.0727641</td>
+<td align="right">67292</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_15</td>
-<td align="right">0.0080108</td>
-<td align="right">7408</td>
+<td align="left">3_29</td>
+<td align="right">0.0752441</td>
+<td align="right">69585</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_30</td>
-<td align="right">0.0160080</td>
-<td align="right">14804</td>
+<td align="left">3_37</td>
+<td align="right">0.1010469</td>
+<td align="right">93447</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_32</td>
-<td align="right">0.0169682</td>
-<td align="right">15692</td>
+<td align="left">3_45</td>
+<td align="right">0.1246711</td>
+<td align="right">115295</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_34</td>
-<td align="right">0.0186740</td>
-<td align="right">17270</td>
+<td align="left">3_53</td>
+<td align="right">0.1588579</td>
+<td align="right">146910</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_49</td>
-<td align="right">0.0476486</td>
-<td align="right">44065</td>
+<td align="left">3_62</td>
+<td align="right">0.1757646</td>
+<td align="right">162545</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_58</td>
-<td align="right">0.0571520</td>
-<td align="right">52854</td>
+<td align="left">3_67</td>
+<td align="right">0.1808164</td>
+<td align="right">167217</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">3_95</td>
-<td align="right">0.0770294</td>
-<td align="right">71236</td>
+<td align="left">3_72</td>
+<td align="right">0.1942820</td>
+<td align="right">179670</td>
 </tr>
 <tr class="even">
 <td align="right">3</td>
-<td align="left">3_103</td>
-<td align="right">0.0826869</td>
-<td align="right">76468</td>
+<td align="left">3_76</td>
+<td align="right">0.2024417</td>
+<td align="right">187216</td>
 </tr>
 </tbody>
 </table>
@@ -1333,19 +1472,19 @@ gen_map &lt;- getGenMap(founderGenomes)
 causative_variant_relative_SNP_POS &lt;- gen_map[gen_map$id == causative_variant_SNP_ID, ]
 cat(&quot;Causative variant:\n&quot;,causative_variant_SNP_ID)</code></pre>
 <pre><code>## Causative variant:
-##  1_61049</code></pre>
+##  1_10436</code></pre>
 <pre class="r"><code>causative_variant_relative_SNP_POS</code></pre>
 <pre><code>##            id chr       pos
-## 61049 1_61049   1 0.6237305</code></pre>
+## 10436 1_10436   1 0.2542862</code></pre>
 <pre class="r"><code>cat(&quot;\n Relative postions of the causative variant:\n&quot;,causative_variant_relative_SNP_POS$pos)</code></pre>
 <pre><code>## 
 ##  Relative postions of the causative variant:
-##  0.6237305</code></pre>
+##  0.2542862</code></pre>
 <pre class="r"><code>causative_variant_SNP_pos_in_bp &lt;- round(causative_variant_relative_SNP_POS$pos * (model_chromosome_bp_length))
 cat(&quot;\n BP position of the causative variant:\n&quot;,causative_variant_SNP_pos_in_bp)</code></pre>
 <pre><code>## 
 ##  BP position of the causative variant:
-##  57682013</code></pre>
+##  23516146</code></pre>
 <pre class="r"><code># Check if the file exists
 if (file.exists(variant_positions_file)) {
     # Read the existing data from the file
@@ -1416,7 +1555,7 @@ write.table(f_causative, file = paste0(output_sim_files_basename, &#39;.txt&#39;
 cat(&quot;Number of times the causative variant disappeared:\n&quot;)</code></pre>
 <pre><code>## Number of times the causative variant disappeared:</code></pre>
 <pre class="r"><code>cat(&quot;Disappearance Counter:&quot;, disappearance_counter, &quot;\n&quot;)  # Print disappearance_counter value to standard output</code></pre>
-<pre><code>## Disappearance Counter: 0</code></pre>
+<pre><code>## Disappearance Counter: 1</code></pre>
 <pre class="r"><code># Check if the file exists
 if (file.exists(simulation_prune_count_file)) {
     # Read the existing data from the file

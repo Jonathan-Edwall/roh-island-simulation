@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# sleep 200
+
 
 ####################################  
 # Setting up the pipeline script
@@ -46,6 +48,8 @@ export empirical_processing=FALSE
 export results_dir=$HOME/results_HO
 export data_dir=$HOME/data_HO
 
+export max_parallel_jobs_neutral_model_simulations=20
+
 #���������������������
 #� Hyperoptimization parameters �
 #���������������������
@@ -59,11 +63,12 @@ export N_e_bottleneck=$3
 export n_generations_bottleneck=$4
 export n_simulated_generations_breed_formation=$5
 export n_individuals_breed_formation=$6
-export reference_population_for_snp_chip=$7
+export chr_specific_recombination_rate=$7
+# export reference_population_for_snp_chip=$7
+export reference_population_for_snp_chip="last_breed_formation_generation" 
 # export Introduce_mutations=${10}
 export Introduce_mutations=FALSE
-
-
+# export chr_specific_recombination_rate=TRUE
 
 # # Get parameters from command line arguments for the hyperoptimization
 # export chr_simulated=$1
@@ -167,7 +172,7 @@ if [ -f "$output_file" ]; then
     # echo "n_simulated_generations_breed_formation:$5"
     # echo "n_individuals_breed_formation:$6"
     # echo "reference_population_for_snp_chip:$7"
-    echo "Chosen SNP-density from the empirical dataset: $selected_row"
+    # echo "Chosen SNP-density from the empirical dataset: $selected_row"
     # Step 2: Extract the SNP density value from the selected row
     selected_chr_preprocessed_snp_density_mb=$(echo "$selected_row" | awk '{print $5}')
 fi
@@ -175,6 +180,9 @@ num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is
 export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_density_mb * $num_markers_raw_empirical_dataset_scaling_factor" | bc)
 
 echo "selected_chr_snp_density_mb: $selected_chr_snp_density_mb"
+
+
+
 
 end_step1=$(date +%s)
 runtime_step1=$((end_step1-pipeline_start))

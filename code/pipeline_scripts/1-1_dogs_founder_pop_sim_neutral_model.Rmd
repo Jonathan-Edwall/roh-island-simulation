@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-06-07"
+date: "2024-09-06"
 editor_options: 
   markdown: 
     wrap: 72
@@ -24,6 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
+use_chromosome_specific_recombination_rate <- as.logical(Sys.getenv("chr_specific_recombination_rate"))
 
 chr_simulated <- Sys.getenv("chr_simulated")
 chr_simulated
@@ -40,8 +41,7 @@ nInd_founder_population <- as.numeric(Sys.getenv("nInd_founder_population")) # F
 Inbred_ancestral_population <- as.logical(Sys.getenv("Inbred_ancestral_population"))
 introduce_mutations <- as.logical(Sys.getenv("Introduce_mutations"))
 
-# N_e_bottleneck <- 50
-N_e_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
+n_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
 n_generations_bottleneck <- as.numeric(Sys.getenv("n_generations_bottleneck"))
 
 n_generations_random_mating <- as.numeric(Sys.getenv("n_simulated_generations_breed_formation")) # The number of generations to simulate during the random mating scenario of modern dog breeds
@@ -85,31 +85,68 @@ output_sim_files_basename
 ```{r library()}
 library(AlphaSimR)
 library(knitr)
-
 ```
 
 # 1: Creating founder Haplotypes
 
-## 1.0: Defining chromosome lengths of model species
-
+## 1.0: Defining physical chromosome lengths of model species
+Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
+which can be found through this link:
+https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
 ```{r}
-# Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
-# which can be found through this link:
-# https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
-
 chromosome_lengths_bp <- c(
-"chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178, "chr5" = 89562946, 
-"chr6" = 78113029, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054, 
+"chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178	, "chr5" = 89562946, 
+"chr6" = 78113029	, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054, 
 "chr11" = 74805798, "chr12" = 72970719, "chr13" = 64299765, "chr14" = 61112200, "chr15" = 64676183, 
 "chr16" = 60362399, "chr17" = 65088165, "chr18" = 56472973, "chr19" = 55516201, "chr20" = 58627490, 
 "chr21" = 51742555, "chr22" = 61573679, "chr23" = 53134997, "chr24" = 48566227, "chr25" = 51730745, 
 "chr26" = 39257614, "chr27" = 46662488, "chr28" = 41733330, "chr29" = 42517134, "chr30" = 40643782, 
 "chr31" = 39901454, "chr32" = 40225481, "chr33" = 32139216, "chr34" = 42397973, "chr35" = 28051305, 
-"chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098)
+"chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098	
+)
+```
+## 1.1 Genetic chromosome lengths
+### 1.1.1 Defining recombination rates for the model species
+The used chromosomal recombination rates of the dog autosome comes from the canine linkage map produced by the paper Wong et al. 2010.
+The table from which the values comes from, can be found through this link:
+https://www.researchgate.net/figure/Physical-and-genetic-lengths-of-dog-chromosomes_tbl3_40453037
+
+```{r}
+chromosome_recombination_rates_cM_Mb <- c(
+"chr1" = 0.68, "chr2" = 0.88, "chr3" =0.69, "chr4" = 0.75, "chr5" = 0.85, 
+"chr6" = 0.71, "chr7" = 0.75 , "chr8" = 0.83, "chr9" = 1.11, "chr10" = 0.78, 
+"chr11" = 0.84, "chr12" = 0.87, "chr13" = 0.90, "chr14" = 0.89, "chr15" = 0.80, 
+"chr16" = 0.90, "chr17" = 0.89, "chr18" = 0.88, "chr19" = 0.93, "chr20" = 0.93, 
+"chr21" = 1.02, "chr22" = 0.84, "chr23" = 1.02, "chr24" = 1.13, "chr25" = 1.05, 
+"chr26" = 1.22, "chr27" = 1.18, "chr28" =1.31, "chr29" = 1.15, "chr30" = 1.36, 
+"chr31" = 1.29, "chr32" = 1.37, "chr33" = 1.53, "chr34" = 1.17, "chr35" = 2.15, 
+"chr36" = 1.54, "chr37" = 1.38, "chr38" = 2.22 	
+)
+
+```
+### 1.1.2 Defining physical chromosome lengths of model species
+```{r}
+# Extracting the physical length of the simulated chromosome 
+model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
+
+if (use_chromosome_specific_recombination_rate) {
+  # Extracting the recombination rate of the simulated chromosome 
+  model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
+  # Computing the genetic length of the simulated chromosome 
+  model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(model_chromosome_recombination_rate*10^-2)
+  model_chromosome_genetic_length_morgan
+} else {
+  # Setting the average recombination rate for dogs.
+  average_recombination_rate <- 0.97
+  # Computing the genetic length of the simulated chromosome 
+  model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(average_recombination_rate*10^-2)
+  model_chromosome_genetic_length_morgan
+}
 
 ```
 
-## 1.1: runMacs2() - Generating founder population
+
+## 1.2: runMacs2() - Generating founder population
 
 `runMacs2` Parameters:
 
@@ -132,35 +169,25 @@ chromosome_lengths_bp <- c(
 ```{r runMacs2()}
 #help(runMacs2)
 
-model_chromosome_bp_length <- chromosome_lengths_bp[chr_simulated]
+# model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
 
 
-founderGenomes <- runMacs2(nInd = nInd_founder_population ,
+founderGenomes <- runMacs2(nInd = n_bottleneck ,
                      nChr = 1,
                      Ne = N_e_burn_in,
-                     bp = model_chromosome_bp_length,
+                     bp = model_chromosome_physical_length_bp,
                      inbred = Inbred_ancestral_population,
-                     genLen = 1,
+                     genLen = model_chromosome_genetic_length_morgan,
+                     mutRate = 1*10^-8,
                      histNe = NULL,
                      histGen = NULL)
-
-
-# founderGenomes <- runMacs2(nInd = nInd_founder_population ,
-#                      nChr = 1,
-#                      Ne = N_e_burn_in,
-#                      bp = model_chromosome_bp_length,
-#                      genLen = 1,
-#                      histNe = NULL,
-#                      histGen = NULL)
-
-
 
 # Inspecting the founderGenomes object
 founderGenomes
 
 ```
 
-## 1.2: SimParam() - Setting Global Simulation Parameters
+## 1.3: SimParam() - Setting Global Simulation Parameters
 
 ```{r SimParam()}
 
@@ -172,7 +199,9 @@ SP <- SimParam$new(founderGenomes)
 
 ```
 
-### 1.2.1: \$setTrackRec() - Setting on recombination tracking for the simulation
+
+
+### 1.3.1: \$setTrackRec() - Setting on recombination tracking for the simulation
 
 Sets recombination tracking for the simulation. By default recombination
 tracking is turned off. **When turned on recombination tracking will
@@ -186,29 +215,29 @@ tracked.
 SP$setTrackRec(TRUE)
 ```
 
-## 1.3: newPop() - Creating two separate populations for bottleneck event
+## 1.4: newPop() - Creating two separate populations for bottleneck event
 
 ```{r newPop()}
 # Generate the initial founder population
 founderpop <- newPop(founderGenomes, simParam = SP)
 # # Set misc used for setting years of birth for the first individuals
-# current_generation <- 0
-# founderpop <- setMisc(x = founderpop,
+# current_generation = 0
+# founderpop = setMisc(x = founderpop,
 #                    node = "generation",
 #                    value = current_generation)
 # head(getMisc(x = founderpop, node = "generation"))
 
+
 # Split the founder population into two breeding groups
-breed1_founders <- founderpop[1:N_e_bottleneck] # 1:50
+# breed1_founders <- founderpop # 1:50
+breed1_founders <- founderpop[1:n_bottleneck] # 1:50
 cat("Population 1:\n")
 breed1_founders
 
-# breed2_founders <- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
-# cat("Population 2:\n")
+# breed2_founders <- founderpop[51:100]
 # breed2_founders
 
 ```
-
 # 2: Forward in time simulation
 
 ## 2.0: Defining Random Mating function (random_mating) - randCross()
@@ -273,11 +302,7 @@ random_mating_breed_formation <- function(pop, SP, n_gen,n_indv_breed_formation,
     return(final_generation)
 }
 
-
-
 ```
-
-
 ## 2.1: Bottleneck Simulation 
 
 ### 2.1.1 Simulating 5 generations of bottleneck (Random Mating)
@@ -322,15 +347,12 @@ bottleneck scenario.
 
 ```{r SimParam$addSnpChip()}
 
-model_chromosome_Mb_length <- model_chromosome_bp_length / (10^6)
+model_chromosome_Mb_length <- model_chromosome_physical_length_bp / (10^6)
 
 num_snp_markers_simulated_chromosome <- snp_density_Mb * model_chromosome_Mb_length
+# Convert to the closest integer
+num_snp_markers_simulated_chromosome <- round(num_snp_markers_simulated_chromosome)
 
-# SP$addSnpChip(
-#   nSnpPerChr = num_snp_markers_simulated_chromosome,
-#   minSnpFreq = min_MAF,
-#   refPop = last_bottleneck_generation
-#   )
 
 if (num_snp_markers_simulated_chromosome > founderGenomes@nLoci) {
   cat("Reference amount of SNP markers for ",chr_simulated, ": ",num_snp_markers_simulated_chromosome)
@@ -345,18 +367,31 @@ if (num_snp_markers_simulated_chromosome > founderGenomes@nLoci) {
   cat("\n New SNP density: ",new_SNP_density," markers/Mb")
 
 
+} else {
+  cat("Reference amount of SNP markers for ",chr_simulated, ": ",num_snp_markers_simulated_chromosome)
+  cat("\n",num_snp_markers_simulated_chromosome," < ",founderGenomes@nLoci)
+  cat("\n Burn in N_e: ", N_e_burn_in,"\n")
+
+  
 }
 
 
 
+
+# SP$addSnpChip(
+#   nSnpPerChr = num_snp_markers_simulated_chromosome,
+#   minSnpFreq = min_MAF,
+#   refPop = last_bottleneck_generation
+#   )
+
 # Check if Ref_pop_snp_chip is equal to last_bottleneck_generation
+
 if (Ref_pop_snp_chip == "last_bottleneck_generation") {
-  SP$addSnpChip(
-    nSnpPerChr = num_snp_markers_simulated_chromosome,
+  SP$addSnpChip(nSnpPerChr = num_snp_markers_simulated_chromosome,
     refPop = last_bottleneck_generation
   )
 }
-
+# nSnpPerChr = num_snp_markers_simulated_chromosome,
 
 
 
@@ -370,7 +405,7 @@ if (Ref_pop_snp_chip == "last_bottleneck_generation") {
 
 
 
-## 2.3 Modern dog breed - Random Mating Simulation
+## 2.3 Modern dog breed - Ranom Mating Simulation
 ### 2.3.1 Simulating 40 generations of Random Mating (Random Mating)
 ```{r Random Mating Breed Formation Simulation}
 # random_mating_generations <- random_mating_breed_formation(last_bottleneck_generation, SP, n_generations_random_mating,n_indv_breed_formation,introduce_mutations)
@@ -381,15 +416,10 @@ if (Ref_pop_snp_chip == "last_bottleneck_generation") {
 last_random_mating_generation <- random_mating_breed_formation(last_bottleneck_generation, SP, n_generations_random_mating,n_indv_breed_formation,introduce_mutations)
 
 
-
-
 # Check if Ref_pop_snp_chip is equal to "last_breed_formation_generation"
 if (Ref_pop_snp_chip == "last_breed_formation_generation") {
-  SP$addSnpChip(
-  nSnpPerChr = num_snp_markers_simulated_chromosome,
-
+  SP$addSnpChip(nSnpPerChr = num_snp_markers_simulated_chromosome,
   refPop = last_random_mating_generation
-
   )
   
 }
@@ -407,10 +437,11 @@ if (Ref_pop_snp_chip == "last_breed_formation_generation") {
 #   )
 
 
-
-
-
 ```
+
+
+
+
 
 # 3: Export to PLINK Extracting data to PLINK
 
@@ -420,9 +451,7 @@ Function that retrieves SNP genotype data & returns a matrix of SNP
 genotypes
 
 ```{r pullSnpGeno(), echo = FALSE}
-#pullSnpGeno(last_mate_selection_generation,simParam=SP)
-#snp_chip_genotypes <- pullSnpGeno(last_mate_selection_generation)
-#View(snp_chip_genotypes)
+#pullSnpGeno(last_random_mating_generation,simParam=SP)
 ```
 
 ## 3.0.2: Optional: getSnPMap() - Retrieves a table of the genetic map
@@ -439,11 +468,15 @@ data.frame with:
 -   **pos:** Genetic map position
 
 ```{r getSnPMap()}
-snp_chip_map <- getSnpMap(simParam=SP)
-# View(snp_chip_map)
+# SP$addSnpChip(5)
+# getSnpMap(snpChip=1,simParam=SP) 
 
-cat("First 10 markers of the SNP chip and their genetic map positions:\n")
-kable(head(snp_chip_map,10))
+#getSnpMap(simParam=SP)
+
+cat("First 10 markers and their genetic map positions:\n")
+kable(head(getSnpMap(simParam = SP), 10))
+#head(getSnpMap(simParam = SP), 10)
+
 
 ```
 
@@ -491,7 +524,8 @@ setwd(output_dir_simulation)
 writePlink(last_random_mating_generation,simParam=SP, baseName=output_sim_files_basename,
            
             traits = 1,
-           use = "rand"          
+           use = "rand"
+           
            
            )
 ```
@@ -521,7 +555,7 @@ map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
 
 # ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
 genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column) 
-base_pair_position_column <- round(genetic_distance_morgan_column * (model_chromosome_bp_length / 100))
+base_pair_position_column <- round(genetic_distance_morgan_column * (model_chromosome_physical_length_bp / 100))
 # Redefining the physical position column (4th column) with the new values defined in base_pair_position_column
 map_data$V4 <- base_pair_position_column
 

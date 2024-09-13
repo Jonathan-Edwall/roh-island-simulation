@@ -396,7 +396,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ####################################  
 # Parameters
 #################################### 
-
+hotspot_prefix &lt;- &quot;Hotspot_chr&quot;
 use_MAF_pruning &lt;- Sys.getenv(&quot;use_MAF_pruning&quot;)
 use_MAF_pruning</code></pre>
 <pre><code>## [1] &quot;TRUE&quot;</code></pre>
@@ -444,6 +444,8 @@ output_simulated_model_H_e_dir</code></pre>
 ## _CE_M                   
 ## _R_CHECK_COMPILATION_FLAGS_KNOWN_
 ##                         -Wformat -Werror=format-security -Wdate-time
+## allele_copies_threshold
+##                         1
 ## autosome_roh_freq_directory
 ##                         /home/jonathan/results/ROH-Hotspots/simulated/selection/Gosling_plots/autosome_roh_freq
 ## causative_variant_H_e_dir
@@ -453,6 +455,8 @@ output_simulated_model_H_e_dir</code></pre>
 ## causative_windows_allele_freq_dir
 ##                         /home/jonathan/results/causative_variant_windows/allele_freq
 ## chr_simulated           chr3
+## chr_specific_recombination_rate
+##                         FALSE
 ## CONDA_DEFAULT_ENV       bedtools
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/bedtools
@@ -464,7 +468,7 @@ output_simulated_model_H_e_dir</code></pre>
 ## data_dir                /home/jonathan/data
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:12.0
+## DISPLAY                 localhost:13.0
 ## document_sub_title      N_e=370, MAF 0.01 used, but only for
 ##                         H_E-computation
 ## EDITOR                  vi
@@ -493,7 +497,7 @@ output_simulated_model_H_e_dir</code></pre>
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
 ##                         FALSE
-## input_bed_file          /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_20_selection_model_s08_chr3_ROH_freq.bed
+## input_bed_file          /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_50_selection_model_s08_chr3_ROH_freq.bed
 ## input_pop_roh_freq_file
 ##                         /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_9_selection_model_s08_chr3_ROH_freq.bed
 ## input_selection_coefficient_variant_positions_file
@@ -508,8 +512,10 @@ output_simulated_model_H_e_dir</code></pre>
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAF_status_suffix       MAF_0_05
 ## MAKE                    make
-## max_parallel_jobs_selection_sim
+## max_parallel_jobs_neutral_model_simulations
 ##                         2
+## max_parallel_jobs_selection_sim
+##                         3
 ## min_MAF                 0.05
 ## MOTD_SHOWN              pam
 ## N_e_bottleneck          5
@@ -520,7 +526,7 @@ output_simulated_model_H_e_dir</code></pre>
 ## n_simulated_generations_breed_formation
 ##                         94
 ## n_simulation_replicates
-##                         20
+##                         50
 ## Ne_burn_in              3700
 ## Neutral_model_autosome_ROH_freq_dir
 ##                         /home/jonathan/results/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq
@@ -551,7 +557,7 @@ output_simulated_model_H_e_dir</code></pre>
 ## PATH                    /home/martin/anaconda3/envs/bedtools/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ## Pipeline_results_output_dir
 ##                         /home/jonathan/results/Pipeline_results_MAF_0_01
-## pop_roh_freq_bed_file   /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_20_selection_model_s08_chr3_ROH_freq.bed
+## pop_roh_freq_bed_file   /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_50_selection_model_s08_chr3_ROH_freq.bed
 ## pruned_replicates_count_dir
 ##                         /home/jonathan/data/raw/simulated/selection_model/pruned_counts
 ## PWD                     /home/jonathan
@@ -570,7 +576,7 @@ output_simulated_model_H_e_dir</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpzmLByx
+## R_SESSION_TMPDIR        /tmp/RtmpYOELRy
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -615,8 +621,8 @@ output_simulated_model_H_e_dir</code></pre>
 ## sim_scenario_id         selection_model_s08_chr3
 ## simulated_model_allele_frequency_dir
 ##                         /home/jonathan/results/PLINK/allele_freq/simulated/selection_model
-## SSH_CLIENT              172.21.30.174 51346 22
-## SSH_CONNECTION          172.21.30.174 51346 77.235.253.16 22
+## SSH_CLIENT              172.21.30.27 60872 22
+## SSH_CONNECTION          172.21.30.27 60872 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/3
 ## Sweep_test_dir          /home/jonathan/results/ROH-Hotspots/sweep_test_MAF_0_01
 ## sweep_test_type         Selection_Strength_testing
@@ -630,7 +636,7 @@ output_simulated_model_H_e_dir</code></pre>
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          6910
+## XDG_SESSION_ID          1454
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir_sweep_test)</code></pre>
@@ -647,8 +653,13 @@ knitr::opts_knit$set(root.dir = output_dir_sweep_test)</code></pre>
 # Pattern for finding files containing &quot;causative_variant_window&quot; and ending with &quot;.bed&quot;
 pattern &lt;- &quot;.*ROH_Hotspot_windows.*\\.bed$&quot;
 hotspot_window_bed_files &lt;- list.files(path = ROH_hotspots_dir, pattern = pattern)
+chr_number_pattern &lt;- &quot;.*CHR(\\d+)_.*&quot;
+
 # Extract the chromosome number and window number from the file names
-chr_numbers &lt;- as.numeric(sub(&quot;.*CHR(\\d+)_.*&quot;, &quot;\\1&quot;, hotspot_window_bed_files))
+chr_numbers &lt;- gsub(tolower(chr_number_pattern), &quot;\\1&quot;, tolower(hotspot_window_bed_files))
+
+# chr_numbers &lt;- as.numeric(sub(&quot;.*chr(\\d+)_.*&quot;, &quot;\\1&quot;, hotspot_window_bed_files))
+# chr_numbers &lt;- as.numeric(sub(&quot;.*&quot;,chr_prefix,&quot;(\\d+)_.*&quot;, &quot;\\1&quot;, hotspot_window_bed_files))
 # Order the bed_files vector by chromosome number and then by window number
 ordered_hotspot_window_bed_files &lt;- hotspot_window_bed_files[order(chr_numbers)]
 
@@ -659,8 +670,9 @@ empirical_hotspot_tables &lt;- list()
 # Loop through each .bed file (ROH-hotspot allele frequency window-file)
 for (file in ordered_hotspot_window_bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome &lt;- sub(&quot;.*CHR([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
-  window &lt;- sub(&quot;.*windows_([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
+  # chromosome &lt;- sub(&quot;.*&quot;,chr_prefix,&quot;([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
+  chromosome &lt;-gsub(tolower(chr_number_pattern), &quot;\\1&quot;, tolower(file))
+  window &lt;- sub(tolower(&quot;.*windows_([0-9]+)_.*&quot;), &quot;\\1&quot;, tolower(file))
   
   # # Create table name
   # table_name &lt;- paste(&quot;Hotspot_chr&quot;, chromosome, &quot;_window_&quot;, window, &quot;_allele_freq&quot;, sep = &quot;&quot;)
@@ -675,7 +687,7 @@ for (file in ordered_hotspot_window_bed_files) {
     # Extract row data
     row_data &lt;- bed_data[i, ]
     # Create hotspot name
-    hotspot_name &lt;- paste(&quot;Hotspot_chr&quot;, chromosome, &quot;_window_&quot;, window_counter, sep = &quot;&quot;)
+    hotspot_name &lt;- paste(hotspot_prefix, chromosome, &quot;_window_&quot;, window_counter, sep = &quot;&quot;)
     
     
     # Check if the hotspot_name already exists in the list
@@ -742,16 +754,16 @@ for (file in ordered_hotspot_window_bed_files) {
 <pre class="r"><code># Set the working directory to the directory with allele frequencies for the different ROH-hotspots
 setwd(ROH_hotspot_allele_freq_dir)
 
+# # Get a list of all .bed files in the directory
+# bed_files &lt;- list.files(path = ROH_hotspot_allele_freq_dir ,pattern = &quot;\\.bed$&quot;)
 # Get a list of all .bed files in the directory
-bed_files &lt;- list.files(path = ROH_hotspot_allele_freq_dir ,pattern = &quot;\\.bed$&quot;)
-
-# Get a list of all .bed files in the directory
-# bed_files &lt;- list.files(pattern = &quot;\\.bed$&quot;)
+bed_files &lt;- list.files(pattern = &quot;\\.bed$&quot;)
 
 
 # Extract the chromosome number and window number from the file names
-chr_numbers &lt;- as.numeric(sub(&quot;.*CHR(\\d+)_.*&quot;, &quot;\\1&quot;, bed_files))
-window_numbers &lt;- as.numeric(sub(&quot;.*windows_(\\d+)_.*&quot;, &quot;\\1&quot;, bed_files))
+chr_numbers &lt;- as.numeric(gsub(tolower(chr_number_pattern), &quot;\\1&quot;, tolower(bed_files)))
+# chr_numbers &lt;- as.numeric(sub(&quot;.*&quot;,chr_prefix,&quot;(\\d+)_.*&quot;, &quot;\\1&quot;, bed_files))
+window_numbers &lt;- as.numeric(sub(tolower(&quot;.*windows_(\\d+)_.*&quot;), &quot;\\1&quot;, tolower(bed_files)))
 
 # Order the bed_files vector by chromosome number and then by window number
 ordered_bed_files &lt;- bed_files[order(chr_numbers, window_numbers)]
@@ -765,13 +777,14 @@ no_marker_count &lt;- 0
 # Loop through each .bed file (ROH-hotspot allele frequency window-file)
 for (file in ordered_bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome &lt;- sub(&quot;.*CHR([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
-  window &lt;- sub(&quot;.*windows_([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
+  chromosome &lt;- gsub(tolower(chr_number_pattern), &quot;\\1&quot;, tolower(file))
+  # chromosome &lt;- sub(&quot;.*chr([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
+  window &lt;- sub(tolower(&quot;.*windows_([0-9]+)_.*&quot;), &quot;\\1&quot;, tolower(file))
   
   # Create table name
-  table_name &lt;- paste(&quot;Hotspot_chr&quot;, chromosome, &quot;_window_&quot;, window, &quot;_allele_freq&quot;, sep = &quot;&quot;)
+  table_name &lt;- paste(hotspot_prefix, chromosome, &quot;_window_&quot;, window, &quot;_allele_freq&quot;, sep = &quot;&quot;)
   # Create table name
-  hotspot_name &lt;- paste(&quot;Hotspot_chr&quot;, chromosome, &quot;_window_&quot;, window, sep = &quot;&quot;)
+  hotspot_name &lt;- paste(hotspot_prefix, chromosome, &quot;_window_&quot;, window, sep = &quot;&quot;)
 
   
   # Read the header line
@@ -858,20 +871,9 @@ for (file in ordered_bed_files) {
 }
 
 # View(empirical_hotspot_allele_Freq_tables)
-empirical_hotspot_allele_Freq_tables[[1]]</code></pre>
-<pre><code>## $name
-## [1] &quot;Hotspot_chr1_window_1_allele_freq&quot;
-## 
-## $filename
-## [1] &quot;labrador_retriever_CHR1_ROH_Hotspot_windows_1_allele_freq.bed&quot;
-## 
-## $data
-##    CHR     POS1     POS2            SNP A1 A2     MAF NCHROBS       H_e
-## 10   1 22003486 22003487   BICF2P945211  G  A 0.06532     444 0.1221066
-## 12   1 22018645 22018646 BICF2S22930824  A  G 0.06532     444 0.1221066
-## 14   1 22046657 22046658  BICF2S2394301  G  A 0.06818     440 0.1270630
-## 15   1 22051495 22051496 BICF2S23634186  A  G 0.06757     444 0.1260086</code></pre>
-<pre class="r"><code># markers_after_MAF_pruning &lt;- nrow(empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][&quot;H_e&quot;])
+
+
+# markers_after_MAF_pruning &lt;- nrow(empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][&quot;H_e&quot;])
 # cat(&quot;markers after_pruning:&quot;,markers_after_MAF_pruning,&quot;\n&quot;)
 # 
 # markers_with_he_01_or_less &lt;- length(empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][[&quot;H_e&quot;]][empirical_hotspot_allele_Freq_tables[[&quot;Hotspot_chr3_window_1&quot;]][[&quot;data&quot;]][[&quot;H_e&quot;]] &lt; 0.1])
@@ -927,8 +929,7 @@ for (file in bed_files) {
 
 
   
-  # Create a list with table name and corresponding data frame
-  table_info &lt;- list(name = table_name, data = empirical_genomewide_allele_freq_data)
+  table_info &lt;- list(filename = file, data = empirical_genomewide_allele_freq_data)
   
   # Append the table info to the list
   empirical_genomewide_tables &lt;- c(empirical_genomewide_tables, list(table_info))
@@ -957,7 +958,7 @@ frq_bed_files &lt;- list.files(pattern = pattern)
 
 
 # Extract the simulation number after &quot;sim_&quot;
-simulation_numbers &lt;- as.integer(sub(&quot;^sim_(\\d+)_.*&quot;, &quot;\\1&quot;, frq_bed_files))
+simulation_numbers &lt;- as.integer(sub(tolower(&quot;^sim_(\\d+)_.*&quot;), &quot;\\1&quot;, tolower(frq_bed_files)))
 # Sort the simulation-files based on the simulation number
 sorted_files &lt;- frq_bed_files[order(simulation_numbers)]
 
@@ -968,7 +969,7 @@ simulated_model_allele_freq_tables &lt;- list()
 for (file in sorted_files) {
  
   # Extract the table name from the file name
-  table_name &lt;- gsub(&quot;.frq$&quot;, &quot;&quot;, file)
+  table_name &lt;- gsub(tolower(&quot;.frq$&quot;), &quot;&quot;,tolower(file))
   
   column_names &lt;- c(&quot;CHR&quot;,&quot;POS1&quot;,&quot;POS2&quot;,&quot;SNP&quot;,&quot;A1&quot;,&quot;A2&quot;,&quot;MAF&quot;,&quot;NCHROBS&quot;)
   
@@ -1368,9 +1369,14 @@ simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mea
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>##  [1] 0.3548051 0.3807959 0.3694148 0.3474903 0.3734698 0.3680134 0.3279039
-##  [8] 0.3709860 0.3305303 0.3544690 0.3390147 0.3786283 0.3521036 0.3493350
-## [15] 0.3614991 0.3579012 0.3179644 0.3365582 0.3598352 0.3454352</code></pre>
+<pre><code>##  [1] 0.3355542 0.3445269 0.3488563 0.3580025 0.3466953 0.3412394 0.3451109
+##  [8] 0.3463047 0.3568676 0.3409889 0.3665166 0.3418162 0.3319117 0.3507720
+## [15] 0.3186174 0.3519228 0.3508092 0.3229129 0.3559067 0.3475549 0.3433094
+## [22] 0.3519257 0.3501718 0.3448307 0.3562863 0.3558891 0.3512465 0.3422611
+## [29] 0.3261164 0.3484996 0.3550195 0.3456271 0.3524205 0.3538846 0.3619821
+## [36] 0.3512160 0.3396880 0.3511226 0.3491735 0.3429312 0.3497195 0.3356658
+## [43] 0.3641934 0.3544027 0.3506293 0.3571030 0.3571362 0.3545025 0.3532313
+## [50] 0.3475446</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1507,104 +1513,254 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Simulation 9</td>
-<td align="right">0.1265058</td>
-<td align="right">0.3305303</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 17</td>
-<td align="right">0.1321667</td>
-<td align="right">0.3179644</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 10</td>
-<td align="right">0.1443591</td>
-<td align="right">0.3544690</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 11</td>
-<td align="right">0.1469711</td>
-<td align="right">0.3390147</td>
-</tr>
-<tr class="odd">
 <td align="left">Simulation 7</td>
-<td align="right">0.1561511</td>
-<td align="right">0.3279039</td>
+<td align="right">0.1399051</td>
+<td align="right">0.3451109</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 4</td>
-<td align="right">0.1582787</td>
-<td align="right">0.3474903</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 14</td>
-<td align="right">0.1656541</td>
-<td align="right">0.3493350</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 19</td>
-<td align="right">0.1690926</td>
-<td align="right">0.3598352</td>
-</tr>
-<tr class="odd">
 <td align="left">Simulation 18</td>
-<td align="right">0.1707701</td>
-<td align="right">0.3365582</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 20</td>
-<td align="right">0.1739796</td>
-<td align="right">0.3454352</td>
+<td align="right">0.1399051</td>
+<td align="right">0.3229129</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 1</td>
-<td align="right">0.1831602</td>
-<td align="right">0.3548051</td>
+<td align="left">Simulation 9</td>
+<td align="right">0.1444732</td>
+<td align="right">0.3568676</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 13</td>
-<td align="right">0.1896627</td>
-<td align="right">0.3521036</td>
-</tr>
-<tr class="odd">
 <td align="left">Simulation 15</td>
-<td align="right">0.1968705</td>
-<td align="right">0.3614991</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 2</td>
-<td align="right">0.1996260</td>
-<td align="right">0.3807959</td>
+<td align="right">0.1490095</td>
+<td align="right">0.3186174</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 16</td>
-<td align="right">0.2009034</td>
-<td align="right">0.3579012</td>
+<td align="left">Simulation 49</td>
+<td align="right">0.1523972</td>
+<td align="right">0.3532313</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 6</td>
-<td align="right">0.2094725</td>
-<td align="right">0.3680134</td>
+<td align="left">Simulation 1</td>
+<td align="right">0.1533342</td>
+<td align="right">0.3355542</td>
 </tr>
 <tr class="odd">
-<td align="left">Simulation 12</td>
-<td align="right">0.2226305</td>
-<td align="right">0.3786283</td>
+<td align="left">Simulation 48</td>
+<td align="right">0.1562855</td>
+<td align="right">0.3545025</td>
 </tr>
 <tr class="even">
-<td align="left">Simulation 8</td>
-<td align="right">0.2290748</td>
-<td align="right">0.3709860</td>
+<td align="left">Simulation 24</td>
+<td align="right">0.1576415</td>
+<td align="right">0.3448307</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 29</td>
+<td align="right">0.1580190</td>
+<td align="right">0.3261164</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 10</td>
+<td align="right">0.1597308</td>
+<td align="right">0.3409889</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 13</td>
+<td align="right">0.1646850</td>
+<td align="right">0.3319117</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 27</td>
+<td align="right">0.1646850</td>
+<td align="right">0.3512465</td>
 </tr>
 <tr class="odd">
 <td align="left">Simulation 3</td>
-<td align="right">0.2293874</td>
-<td align="right">0.3694148</td>
+<td align="right">0.1657953</td>
+<td align="right">0.3488563</td>
 </tr>
 <tr class="even">
+<td align="left">Simulation 12</td>
+<td align="right">0.1668925</td>
+<td align="right">0.3418162</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 40</td>
+<td align="right">0.1674707</td>
+<td align="right">0.3429312</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 45</td>
+<td align="right">0.1686404</td>
+<td align="right">0.3506293</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 41</td>
+<td align="right">0.1693385</td>
+<td align="right">0.3497195</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 37</td>
+<td align="right">0.1706670</td>
+<td align="right">0.3396880</td>
+</tr>
+<tr class="odd">
 <td align="left">Simulation 5</td>
-<td align="right">0.2365363</td>
-<td align="right">0.3734698</td>
+<td align="right">0.1708854</td>
+<td align="right">0.3466953</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 2</td>
+<td align="right">0.1711842</td>
+<td align="right">0.3445269</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 6</td>
+<td align="right">0.1722069</td>
+<td align="right">0.3412394</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 33</td>
+<td align="right">0.1728323</td>
+<td align="right">0.3524205</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 42</td>
+<td align="right">0.1733915</td>
+<td align="right">0.3356658</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 14</td>
+<td align="right">0.1745104</td>
+<td align="right">0.3507720</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 22</td>
+<td align="right">0.1754391</td>
+<td align="right">0.3519257</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 8</td>
+<td align="right">0.1778809</td>
+<td align="right">0.3463047</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 50</td>
+<td align="right">0.1792307</td>
+<td align="right">0.3475446</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 16</td>
+<td align="right">0.1796290</td>
+<td align="right">0.3519228</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 44</td>
+<td align="right">0.1798194</td>
+<td align="right">0.3544027</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 39</td>
+<td align="right">0.1810618</td>
+<td align="right">0.3491735</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 28</td>
+<td align="right">0.1823021</td>
+<td align="right">0.3422611</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 4</td>
+<td align="right">0.1834012</td>
+<td align="right">0.3580025</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 21</td>
+<td align="right">0.1843054</td>
+<td align="right">0.3433094</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 46</td>
+<td align="right">0.1851052</td>
+<td align="right">0.3571030</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 34</td>
+<td align="right">0.1865751</td>
+<td align="right">0.3538846</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 19</td>
+<td align="right">0.1883324</td>
+<td align="right">0.3559067</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 38</td>
+<td align="right">0.1886888</td>
+<td align="right">0.3511226</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 30</td>
+<td align="right">0.1916952</td>
+<td align="right">0.3484996</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 43</td>
+<td align="right">0.1918881</td>
+<td align="right">0.3641934</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 35</td>
+<td align="right">0.1919080</td>
+<td align="right">0.3619821</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 36</td>
+<td align="right">0.1939241</td>
+<td align="right">0.3512160</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 25</td>
+<td align="right">0.1962060</td>
+<td align="right">0.3562863</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 20</td>
+<td align="right">0.1986770</td>
+<td align="right">0.3475549</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 23</td>
+<td align="right">0.2019877</td>
+<td align="right">0.3501718</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 26</td>
+<td align="right">0.2040577</td>
+<td align="right">0.3558891</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 17</td>
+<td align="right">0.2052147</td>
+<td align="right">0.3508092</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 47</td>
+<td align="right">0.2064303</td>
+<td align="right">0.3571362</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 32</td>
+<td align="right">0.2070633</td>
+<td align="right">0.3456271</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 31</td>
+<td align="right">0.2116558</td>
+<td align="right">0.3550195</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 11</td>
+<td align="right">0.2150217</td>
+<td align="right">0.3665166</td>
 </tr>
 </tbody>
 </table>
@@ -1724,14 +1880,14 @@ dev.off()</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Hotspot_chr1_window_1</td>
-<td align="left">Yes</td>
-<td align="right">0.1243212</td>
-</tr>
-<tr class="even">
 <td align="left">Hotspot_chr28_window_1</td>
 <td align="left">No</td>
 <td align="right">0.1968694</td>
+</tr>
+<tr class="even">
+<td align="left">Hotspot_chr1_window_1</td>
+<td align="left">No</td>
+<td align="right">0.1978074</td>
 </tr>
 <tr class="odd">
 <td align="left">Hotspot_chr24_window_1</td>
@@ -1761,20 +1917,21 @@ dev.off()</code></pre>
 <tr class="even">
 <td align="left">Hotspot_chr11_window_1</td>
 <td align="left">No</td>
-<td align="right">0.2893144</td>
+<td align="right">0.2901620</td>
 </tr>
 <tr class="odd">
 <td align="left">Hotspot_chr8_window_1</td>
 <td align="left">No</td>
-<td align="right">0.3694559</td>
+<td align="right">0.3311450</td>
 </tr>
 </tbody>
 </table>
 <pre class="r"><code># Formatting the threshold value for the output file, to 3 decimals
-formatted_H_e_threshold_value &lt;- format(threshold_value, nsmall = 3)
+# formatted_H_e_threshold_value &lt;- format(threshold_value, nsmall = 3)
+formatted_H_e_threshold_value &lt;- round(threshold_value,5)
 
 # Define the filename with the output directory path
-filename &lt;- file.path(output_dir_sweep_test, paste(&quot;ROH_hotspots_&quot;, sweep_test_type,&quot;_&quot;,sim_scenario_id,&quot;_H_E_threshold_&quot;, formatted_H_e_threshold_value, &quot;.tsv&quot;, sep = &quot;&quot;))
+filename &lt;- file.path(output_dir_sweep_test, paste(&quot;ROH_hotspots_&quot;, sweep_test_type,&quot;_&quot;,sim_scenario_id,&quot;_H_E_thr_&quot;, formatted_H_e_threshold_value, &quot;.tsv&quot;, sep = &quot;&quot;))
 
 
 # # Saving the results in a .tsv-file

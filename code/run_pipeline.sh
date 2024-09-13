@@ -7,13 +7,19 @@
 
 # Function to handle user interruption
 handle_interrupt() {
-    echo "Pipeline interrupted. Exiting."
-    # Could potentially clean up the files created up until the script termination here
+    echo "Pipeline interrupted. Terminating all background jobs..."
+    
+    # Kill all background jobs (this will stop the .Rmd scripts running in parallel)
+    jobs -p | xargs kill
+    
+    # Optionally clean up any files created up until the interruption
     exit 1
 }
 
 # Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
-trap 'handle_interrupt' SIGINT
+trap 'handle_interrupt' SIGINT SIGTERM
+
+
 
 # Defining the working directory
 HOME=/home/jonathan
@@ -41,8 +47,9 @@ echo "Pipeline Runtimes:" > $runtime_log
 parallelize_simulations=TRUE
 # parallelize_simulations=FALSE
 # export max_parallel_jobs_selection_sim=4 
-export max_parallel_jobs_selection_sim=2 # If i do HO parallel
-export n_simulation_replicates=20
+export max_parallel_jobs_neutral_model_simulations=2
+export max_parallel_jobs_selection_sim=3 # If i do HO parallel
+export n_simulation_replicates=50
 export empirical_dog_breed="labrador_retriever"
 # Boolean value to determine whether to perform selection model simulations 
 # export empirical_processing=FALSE
@@ -54,19 +61,26 @@ export data_dir=$HOME/data
 # export selection_simulation=FALSE
 # export empirical_dog_breed="german_shepherd"
 # export selection_coefficient_list=(0.5 0.6 0.7 0.8)
+# export selection_coefficient_list=(0.7 0.8)
 # export selection_coefficient_list=(0.9)
 
 # export selection_coefficient_list=(0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
-export selection_coefficient_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+# export selection_coefficient_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+export selection_coefficient_list=(0.15 0.05)
+
 # export selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
 # export selection_coefficient_list=(0.3 0.4 0.5 0.6 0.7 0.8)
 # export selection_coefficient_list=(0.3 0.4 0.5 0.6 0.7 0.8)
-# export selection_coefficient_list=(0.4 0.6 0.8)
+# export selection_coefficient_list=(0.4)
+# export selection_coefficient_list=(0.2)
 # export selection_coefficient_list=(0.4 0.6 0.8)
 export fixation_threshold_causative_variant=0.99
+# export allele_copies_threshold=5
+export allele_copies_threshold=1
 
 
 # chr1	250	100	TRUE	85	14	60	650	last_bottleneck_generation	TRUE	0.16661	0.03818	0.216	0.5	1.29373
+
 
 #���������������������
 #� Hyperoptimization parameters �
@@ -83,6 +97,21 @@ export n_individuals_breed_formation=370 # [40-70]
 # export reference_population_for_snp_chip="last_bottleneck_generation" # Creating the SNP chip based out of the final bottleneck scenario gen
 export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
 export Introduce_mutations=FALSE # TRUE or FALSE
+export chr_specific_recombination_rate=FALSE
+
+# export chr_simulated="chr9" # "chr28" or "chr1"
+# export Ne_burn_in=885
+# export Inbred_ancestral_population=FALSE # TRUE or FALSE
+# export N_e_bottleneck=5 # [30,40,50,60,70]
+# export nInd_founder_population=$N_e_bottleneck # 50 or 100
+# export n_generations_bottleneck=1
+# export n_simulated_generations_breed_formation=74 # [40,45,50,55,60,65,70]
+# export n_individuals_breed_formation=215 # [40-70]
+# # Choose snp chip, either from "last_breed_formation_generation" or last_bottleneck_generation:
+# # export reference_population_for_snp_chip="last_bottleneck_generation" # Creating the SNP chip based out of the final bottleneck scenario gen
+# export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
+# export Introduce_mutations=FALSE # TRUE or FALSE
+# export chr_specific_recombination_rate=TRUE
 
 
 
@@ -102,6 +131,27 @@ export Introduce_mutations=FALSE # TRUE or FALSE
 # # export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
 # export Introduce_mutations=FALSE
 # # export Introduce_mutations=TRUE
+
+#### SAMS ####
+# export chr_specific_recombination_rate=FALSE
+# export chr_simulated="chr3" # "chr28" or "chr1"
+# export Ne_burn_in=2500
+# # export Inbred_ancestral_population=TRUE # TRUE or FALSE
+# export Inbred_ancestral_population=FALSE # TRUE or FALSE
+# export N_e_bottleneck=50 # [30,40,50,60,70]
+# export nInd_founder_population=$N_e_bottleneck # 50 or 100
+# export n_generations_bottleneck=5
+# export n_simulated_generations_breed_formation=40 # [40,45,50,55,60,65,70]
+# export n_individuals_breed_formation=200 # [40-70]
+# # Choose snp chip, either from "last_breed_formation_generation" or last_bottleneck_generation:
+# # export reference_population_for_snp_chip="last_bottleneck_generation" # Creating the SNP chip based out of the final bottleneck scenario gen
+# export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
+# export Introduce_mutations=FALSE
+
+
+
+
+
 
 
 
@@ -145,47 +195,65 @@ export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_densit
 
 echo "selected_chr_snp_density_mb: $selected_chr_snp_density_mb"
 
+# # Running the simulations with one selection coefficient at a time (with each selection coefficient being run in parallel however),
+# # Should hopefully mitigate the problem of the pipeline performance being bottlenecked by the extended runtimes for the simulations with the lower selection coefficients 
+# run_sel_coeff_sequentially=TRUE 
+# if [ "$parallelize_simulations" = TRUE ]; then
+#     echo "Parallelized simulations set to TRUE. Running the simulations in parallel."
+#     # Step 2
+#     script_name="1_pipeline_neutral_model_simulation.sh"
+#     echo "Step $step: Running $script_name"
+#     source "$script_dir/pipeline_scripts/$script_name"
+#     end_step2=$(date +%s)
+#     runtime_step2=$((end_step2-end_step1))
+#     echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
+#     ((step++))
 
-if [ "$parallelize_simulations" = TRUE ]; then
-    echo "Parallelized simulations set to TRUE. Running the simulations in parallel."
-    # Step 2
-    script_name="1_pipeline_neutral_model_simulation.sh"
-    echo "Step $step: Running $script_name"
-    source "$script_dir/pipeline_scripts/$script_name"
-    end_step2=$(date +%s)
-    runtime_step2=$((end_step2-end_step1))
-    echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
-    ((step++))
+#     if [ "$run_sel_coeff_sequentially" = TRUE ]; then
+#         # Step 3
+#         script_name="2_pipeline_selection_model_simulation_sequentially.sh"
+#         echo "Step $step: Running $script_name"
+#         source "$script_dir/pipeline_scripts/$script_name"
+#         end_step3=$(date +%s)
+#         runtime_step3=$((end_step3-end_step2))
+#         echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
+#         ((step++))
 
-    # Step 3
-    script_name="2_pipeline_selection_model_simulation.sh"
-    echo "Step $step: Running $script_name"
-    source "$script_dir/pipeline_scripts/$script_name"
-    end_step3=$(date +%s)
-    runtime_step3=$((end_step3-end_step2))
-    echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
-    ((step++))
-else
-    echo "Parallelized simulations set to FALSE. Running the simulations sequentially."
-    # Step 2
-    script_name="non_parallelized_1_pipeline_neutral_model_simulation.sh"
-    echo "Step $step: Running $script_name"
-    source "$script_dir/pipeline_scripts/$script_name"
-    end_step2=$(date +%s)
-    runtime_step2=$((end_step2-end_step1))
-    echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
-    ((step++))
+        
+#     else
+#         # Step 3
+#         script_name="2_pipeline_selection_model_simulation.sh"
+#         echo "Step $step: Running $script_name"
+#         source "$script_dir/pipeline_scripts/$script_name"
+#         end_step3=$(date +%s)
+#         runtime_step3=$((end_step3-end_step2))
+#         echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
+#         ((step++))
 
-    # Step 3
-    script_name="non_parallelized_2_pipeline_selection_model_simulation.sh"
-    echo "Step $step: Running $script_name"
-    source "$script_dir/pipeline_scripts/$script_name"
-    end_step3=$(date +%s)
-    runtime_step3=$((end_step3-end_step2))
-    echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
-    ((step++))
+#     fi
 
-fi
+
+# else
+#     echo "Parallelized simulations set to FALSE. Running the simulations sequentially."
+#     # Step 2
+#     script_name="non_parallelized_1_pipeline_neutral_model_simulation.sh"
+#     echo "Step $step: Running $script_name"
+#     source "$script_dir/pipeline_scripts/$script_name"
+#     end_step2=$(date +%s)
+#     runtime_step2=$((end_step2-end_step1))
+#     echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
+#     ((step++))
+
+#     # Step 3
+#     script_name="non_parallelized_2_pipeline_selection_model_simulation.sh"
+#     echo "Step $step: Running $script_name"
+#     source "$script_dir/pipeline_scripts/$script_name"
+#     end_step3=$(date +%s)
+#     runtime_step3=$((end_step3-end_step2))
+#     echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
+#     ((step++))
+
+# fi
 
 # Step 4
 script_name="2_1_1_plink_preprocessing_simulated_data.sh"
@@ -271,31 +339,40 @@ runtime_step11=$((end_step11-end_step10))
 echo "Step $step: $script_name Runtime: $runtime_step11 seconds" >> $runtime_log
 ((step++))
 
+# Step 11
+script_name="3_2_map_roh_hotspots_to_gene_annotations.sh"
+echo "Step $step: Running $script_name"
+source "$script_dir/$script_name"
+end_step12=$(date +%s)
+runtime_step12=$((end_step12-end_step11))
+echo "Step $step: $script_name Runtime: $runtime_step12 seconds" >> $runtime_log
+((step++))
+
 # Step 12
 script_name="3_pipeline_Selection_Causative_Variant_window_detection.sh"
 echo "Step $step: Running $script_name"
 source "$script_dir/pipeline_scripts/$script_name"
-end_step12=$(date +%s)
-runtime_step12=$((end_step12-end_step11))
-echo "Step $step: $script_name Runtime: $runtime_step12 seconds" >> $runtime_log
+end_step13=$(date +%s)
+runtime_step13=$((end_step13-end_step12))
+echo "Step $step: $script_name Runtime: $runtime_step13 seconds" >> $runtime_log
 ((step++))
 
 # Step 13
 script_name="4_1_allele_frequencies_for_He_Computation.sh"
 echo "Step $step: Running $script_name"
 source "$script_dir/$script_name"
-end_step13=$(date +%s)
-runtime_step13=$((end_step13-end_step12))
-echo "Step $step: $script_name Runtime: $runtime_step13 seconds" >> $runtime_log
+end_step14=$(date +%s)
+runtime_step14=$((end_step14-end_step13))
+echo "Step $step: $script_name Runtime: $runtime_step14 seconds" >> $runtime_log
 ((step++))
 
 # Step 14
 script_name="4_2_map_roh_hotspots_to_allele_frequencies.sh"
 echo "Step $step: Running $script_name"
 source "$script_dir/$script_name"
-end_step14=$(date +%s)
-runtime_step14=$((end_step14-end_step13))
-echo "Step $step: $script_name Runtime: $runtime_step14 seconds" >> $runtime_log
+end_step15=$(date +%s)
+runtime_step15=$((end_step15-end_step14))
+echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
 ((step++))
 
 # Step 15
@@ -305,41 +382,41 @@ echo "Step $step: $script_name Runtime: $runtime_step14 seconds" >> $runtime_log
 script_name="pipeline_results_for_different_maf.sh"
 echo "Step $step: Running $script_name"
 source "$script_dir/pipeline_scripts/$script_name"
-end_step15=$(date +%s)
-runtime_step15=$((end_step15-end_step14))
-echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
+end_step16=$(date +%s)
+runtime_step16=$((end_step16-end_step15))
+echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
 ((step++))
 
 # Step 16 (Optional estimation of N_e for the simulated datasets)
 script_name="simulated_models_n_e_estimation_with_GONE.sh"
 echo "Step $step: Running $script_name"
-start_step16=$(date +%s)
+start_step17=$(date +%s)
 source "$script_dir/$script_name"
-end_step16=$(date +%s)
-runtime_step16=$((end_step16-start_step16))
-echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
+end_step17=$(date +%s)
+runtime_step17=$((end_step17-start_step17))
+echo "Step $step: $script_name Runtime: $runtime_step17 seconds" >> $runtime_log
 ((step++))
 
 
 
 
-# # # Step 15
-# # script_name="4_pipeline_Sweep_test.sh"
-# # echo "Step $step: Running $script_name"
-# # bash "$script_dir/pipeline_scripts/$script_name"
-# # end_step15=$(date +%s)
-# # runtime_step15=$((end_step15-end_step14))
-# # echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
-# # ((step++))
+# # # # # Step 15
+# # # # script_name="4_pipeline_Sweep_test.sh"
+# # # # echo "Step $step: Running $script_name"
+# # # # bash "$script_dir/pipeline_scripts/$script_name"
+# # # # end_step15=$(date +%s)
+# # # # runtime_step15=$((end_step15-end_step14))
+# # # # echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
+# # # # ((step++))
 
-# # # Step 16
-# # script_name="pipeline_result_summary.sh"
-# # echo "Step $step: Running $script_name"
-# # bash "$script_dir/pipeline_scripts/$script_name"
-# # end_step16=$(date +%s)
-# # runtime_step16=$((end_step16-end_step15))
-# # echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
-# # ((step++))
+# # # # # Step 16
+# # # # script_name="pipeline_result_summary.sh"
+# # # # echo "Step $step: Running $script_name"
+# # # # bash "$script_dir/pipeline_scripts/$script_name"
+# # # # end_step16=$(date +%s)
+# # # # runtime_step16=$((end_step16-end_step15))
+# # # # echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
+# # # # ((step++))
 
 
 

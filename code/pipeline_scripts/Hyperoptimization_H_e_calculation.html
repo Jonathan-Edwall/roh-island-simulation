@@ -420,7 +420,9 @@ Sys.getenv()  </code></pre>
 ##                         -Wformat -Werror=format-security -Wdate-time
 ## autosome_roh_freq_directory
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq
-## chr_simulated           chr1
+## chr_simulated           chr2
+## chr_specific_recombination_rate
+##                         True
 ## CONDA_DEFAULT_ENV       plink
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/plink
@@ -431,7 +433,7 @@ Sys.getenv()  </code></pre>
 ## data_dir                /home/jonathan/data_HO
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:11.0
+## DISPLAY                 localhost:10.0
 ## EDITOR                  vi
 ## empirical_allele_frequency_dir
 ##                         /home/jonathan/results_HO/PLINK/allele_freq/empirical/labrador_retriever
@@ -448,7 +450,7 @@ Sys.getenv()  </code></pre>
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
 ##                         FALSE
-## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
+## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr2_ROH_freq.bed
 ## Introduce_mutations     FALSE
 ## LANG                    en_US.UTF-8
 ## LD_LIBRARY_PATH         /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server
@@ -459,20 +461,22 @@ Sys.getenv()  </code></pre>
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAF_status_suffix       MAF_0_05
 ## MAKE                    make
+## max_parallel_jobs_neutral_model_simulations
+##                         20
 ## min_MAF                 0.05
 ## MOTD_SHOWN              pam
-## N_e_bottleneck          6
+## N_e_bottleneck          15
 ## n_generations_bottleneck
-##                         2
+##                         4
 ## n_individuals_breed_formation
-##                         405
+##                         450
 ## n_simulated_generations_breed_formation
-##                         96
+##                         91
 ## n_simulation_replicates
 ##                         20
-## Ne_burn_in              3545
+## Ne_burn_in              1220
 ## nInd_founder_population
-##                         6
+##                         15
 ## OLDPWD                  /home/jonathan
 ## output_directory        /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral
 ## output_empirical_H_e_dir
@@ -481,7 +485,7 @@ Sys.getenv()  </code></pre>
 ##                         /home/jonathan/results_HO/expected_heterozygosity_MAF_0_05/simulated/neutral_model
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/plink/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
+## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr2_ROH_freq.bed
 ## PWD                     /home/jonathan
 ## R_ARCH                  
 ## R_BROWSER               xdg-open
@@ -498,7 +502,7 @@ Sys.getenv()  </code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpXxvVhY
+## R_SESSION_TMPDIR        /tmp/Rtmp9Iysiv
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -513,16 +517,16 @@ Sys.getenv()  </code></pre>
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/roh_hotspots_freq
 ## SED                     /bin/sed
 ## selected_chr_snp_density_mb
-##                         91.23
+##                         87.67
 ## selection_simulation    FALSE
 ## SHELL                   /bin/bash
 ## SHLVL                   2
-## sim_scenario_id         neutral_model_chr1
+## sim_scenario_id         neutral_model_chr2
 ## simulated_model_allele_frequency_dir
 ##                         /home/jonathan/results_HO/PLINK/allele_freq/simulated/neutral_model
-## SSH_CLIENT              172.21.30.174 56047 22
-## SSH_CONNECTION          172.21.30.174 56047 77.235.253.16 22
-## SSH_TTY                 /dev/pts/2
+## SSH_CLIENT              172.21.30.27 57512 22
+## SSH_CONNECTION          172.21.30.27 57512 77.235.253.16 22
+## SSH_TTY                 /dev/pts/0
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## use_MAF_pruning         TRUE
@@ -530,7 +534,7 @@ Sys.getenv()  </code></pre>
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          6777
+## XDG_SESSION_ID          762
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code># Set the working directory for notebook chunks</code></pre>
 </div>
@@ -567,8 +571,8 @@ empirical_genomewide_tables &lt;- list()
 # Loop through each .bed file (ROH-genomewide allele frequency window-file)
 for (file in bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome &lt;- sub(&quot;.*chr([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
-  window &lt;- sub(&quot;.*window_([0-9]+)_.*&quot;, &quot;\\1&quot;, file)
+  chromosome &lt;- sub(tolower(&quot;.*chr([0-9]+)_.*&quot;), &quot;\\1&quot;, tolower(file))
+  window &lt;- sub(tolower(&quot;.*window_([0-9]+)_.*&quot;), &quot;\\1&quot;, tolower(file))
   
   # Create table name
   table_name &lt;- paste(&quot;Hotspot_chr&quot;, chromosome, &quot;_window_&quot;, window, &quot;_allele_freq&quot;, sep = &quot;&quot;)
@@ -624,7 +628,7 @@ frq_bed_files &lt;- list.files(pattern = pattern)
 
 
 # Extract the simulation number after &quot;sim_&quot;
-simulation_numbers &lt;- as.integer(sub(&quot;^sim_(\\d+)_.*&quot;, &quot;\\1&quot;, frq_bed_files))
+simulation_numbers &lt;- as.integer(sub(tolower(&quot;^sim_(\\d+)_.*&quot;), &quot;\\1&quot;, tolower(frq_bed_files)))
 # Sort the simulation-files based on the simulation number
 sorted_files &lt;- frq_bed_files[order(simulation_numbers)]
 
@@ -635,7 +639,7 @@ simulated_model_allele_freq_tables &lt;- list()
 for (file in sorted_files) {
  
   # Extract the table name from the file name
-  table_name &lt;- gsub(&quot;.frq$&quot;, &quot;&quot;, file)
+  table_name &lt;- gsub(tolower(&quot;.frq$&quot;), &quot;&quot;, tolower(file))
   
   column_names &lt;- c(&quot;CHR&quot;,&quot;POS1&quot;,&quot;POS2&quot;,&quot;SNP&quot;,&quot;A1&quot;,&quot;A2&quot;,&quot;MAF&quot;,&quot;NCHROBS&quot;)
   
@@ -1006,9 +1010,9 @@ simulations_mean_he_window_based &lt;- sapply(Simulation_windows_avg_he_3_2, mea
 
 
 simulations_mean_he_window_based</code></pre>
-<pre><code>##  [1] 0.3487180 0.3560526 0.3532295 0.3519702 0.3507986 0.3490072 0.3689726
-##  [8] 0.3536676 0.3621941 0.3551631 0.3654658 0.3430045 0.3607342 0.3475013
-## [15] 0.3580872 0.3761830 0.3596429 0.3560166 0.3490798 0.3520946</code></pre>
+<pre><code>##  [1] 0.3448699 0.3492064 0.3316733 0.3434402 0.3413935 0.3359347 0.3450677
+##  [8] 0.3444478 0.3508109 0.3436040 0.3419699 0.3352482 0.3489558 0.3403083
+## [15] 0.3403866 0.3457157 0.3442115 0.3394816 0.3440651 0.3166914</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2></h2>
@@ -1118,104 +1122,104 @@ kable(sim_5th_percentiles_df,row.names = FALSE)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Simulation 14</td>
-<td align="right">0.1742209</td>
-<td align="right">0.3475013</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 19</td>
-<td align="right">0.1884179</td>
-<td align="right">0.3490798</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 1</td>
-<td align="right">0.1895114</td>
-<td align="right">0.3487180</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 5</td>
-<td align="right">0.1901890</td>
-<td align="right">0.3507986</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 3</td>
-<td align="right">0.1956440</td>
-<td align="right">0.3532295</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 12</td>
-<td align="right">0.1964072</td>
-<td align="right">0.3430045</td>
-</tr>
-<tr class="odd">
 <td align="left">Simulation 20</td>
-<td align="right">0.2003692</td>
-<td align="right">0.3520946</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 6</td>
-<td align="right">0.2009967</td>
-<td align="right">0.3490072</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 18</td>
-<td align="right">0.2018474</td>
-<td align="right">0.3560166</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 10</td>
-<td align="right">0.2109317</td>
-<td align="right">0.3551631</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 4</td>
-<td align="right">0.2140151</td>
-<td align="right">0.3519702</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 17</td>
-<td align="right">0.2180060</td>
-<td align="right">0.3596429</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 13</td>
-<td align="right">0.2190040</td>
-<td align="right">0.3607342</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 8</td>
-<td align="right">0.2190807</td>
-<td align="right">0.3536676</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 2</td>
-<td align="right">0.2210183</td>
-<td align="right">0.3560526</td>
-</tr>
-<tr class="even">
-<td align="left">Simulation 11</td>
-<td align="right">0.2219902</td>
-<td align="right">0.3654658</td>
-</tr>
-<tr class="odd">
-<td align="left">Simulation 9</td>
-<td align="right">0.2267821</td>
-<td align="right">0.3621941</td>
+<td align="right">0.1550158</td>
+<td align="right">0.3166914</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 16</td>
-<td align="right">0.2313954</td>
-<td align="right">0.3761830</td>
+<td align="right">0.1829473</td>
+<td align="right">0.3457157</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 5</td>
+<td align="right">0.1972596</td>
+<td align="right">0.3413935</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 6</td>
+<td align="right">0.1999878</td>
+<td align="right">0.3359347</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 17</td>
+<td align="right">0.2003552</td>
+<td align="right">0.3442115</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 10</td>
+<td align="right">0.2004665</td>
+<td align="right">0.3436040</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 3</td>
+<td align="right">0.2014272</td>
+<td align="right">0.3316733</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 18</td>
+<td align="right">0.2034661</td>
+<td align="right">0.3394816</td>
 </tr>
 <tr class="odd">
 <td align="left">Simulation 7</td>
-<td align="right">0.2330626</td>
-<td align="right">0.3689726</td>
+<td align="right">0.2040473</td>
+<td align="right">0.3450677</td>
 </tr>
 <tr class="even">
 <td align="left">Simulation 15</td>
-<td align="right">0.2348134</td>
-<td align="right">0.3580872</td>
+<td align="right">0.2043920</td>
+<td align="right">0.3403866</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 4</td>
+<td align="right">0.2064441</td>
+<td align="right">0.3434402</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 12</td>
+<td align="right">0.2075191</td>
+<td align="right">0.3352482</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 8</td>
+<td align="right">0.2097921</td>
+<td align="right">0.3444478</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 14</td>
+<td align="right">0.2131129</td>
+<td align="right">0.3403083</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 13</td>
+<td align="right">0.2133132</td>
+<td align="right">0.3489558</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 9</td>
+<td align="right">0.2164052</td>
+<td align="right">0.3508109</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 19</td>
+<td align="right">0.2168917</td>
+<td align="right">0.3440651</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 11</td>
+<td align="right">0.2174560</td>
+<td align="right">0.3419699</td>
+</tr>
+<tr class="odd">
+<td align="left">Simulation 1</td>
+<td align="right">0.2195882</td>
+<td align="right">0.3448699</td>
+</tr>
+<tr class="even">
+<td align="left">Simulation 2</td>
+<td align="right">0.2197214</td>
+<td align="right">0.3492064</td>
 </tr>
 </tbody>
 </table>

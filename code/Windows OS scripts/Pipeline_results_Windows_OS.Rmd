@@ -71,7 +71,9 @@ repository_path <- file.path(YOUR_GITHUB_ROOT_DIRECTORY,"Computational-modelling
 # simulated_data_dir_basename <- "simulated - HO9_V1"
 # simulated_data_dir_basename <- "simulated - H10_V1"
 # simulated_data_dir_basename <- "simulated - HO14_V3"
-simulated_data_dir_basename <- "simulated - HO15_1"
+# simulated_data_dir_basename <- "simulated - HO15_1"
+simulated_data_dir_basename <- "simulated - HO17_1_allele_copy"
+# simulated_data_dir_basename <- "simulated - HO17_2_allele_copies"
 
 
 #results_dir <- file.path(repository_path,"results - innan 24 maj")
@@ -83,7 +85,9 @@ simulated_data_dir_basename <- "simulated - HO15_1"
 # results_dir <- file.path(repository_path,"res_HO9_v1")
 # results_dir <- file.path(repository_path,"res_H10_v1")
 # results_dir <- file.path(repository_path,"res_HO14_3")
-results_dir <- file.path(repository_path,"resH15_1")
+# results_dir <- file.path(repository_path,"resH15_1")
+results_dir <- file.path(repository_path,"resH17_1_AC")
+# results_dir <- file.path(repository_path,"resH17_2_AC")
 # results_dir <- file.path(repository_path,"results")
 # results_dir <- file.path(repository_path,"res_Sams")
 
@@ -808,46 +812,46 @@ for (i in 1:length(sim_info$sim_name)) {
   }
 
   
-# 
-# # Create scatter plot
-# plot(causative_variant_window_data[["POS1"]], 
-#      causative_variant_window_data[["FREQUENCY"]], 
-#      main = paste("Causative Variant Window plot for", simname_from_file),
-#      xlab = "POS1", ylab = "Frequency", 
-#      col = "blue", pch = 16)
-# 
-# # Add horizontal line for variant_100k_subwindow_frequency
-# abline(h = variant_100k_window_frequency, col = "red")
-# 
-# # # Add legend for horizontal line
-# # legend("topright", legend = paste("Variant 100k-subwindow freq:", variant_100k_window_frequency),
-# #        col = "red", lwd = 1, text.font = 2)
-# 
-# # Add a point for the causative variant window
-# points(matching_row_causative_variant_freq$POS1, variant_100k_window_frequency, col = "cyan", pch = 16)
-# 
-# # # Add a legend for the causative variant window
-# # legend("topright",legend = paste("Causative Variant 100k Window Freq:", variant_100k_window_frequency),
-# #        col = "cyan", pch = 16,  text.font = 2, cex = 0.6)
-# 
+
+# Create scatter plot
+plot(causative_variant_window_data[["POS1"]],
+     causative_variant_window_data[["FREQUENCY"]],
+     main = paste("Causative Variant Window plot for", simname_from_file),
+     xlab = "POS1", ylab = "Frequency",
+     col = "blue", pch = 16)
+
+# Add horizontal line for variant_100k_subwindow_frequency
+abline(h = variant_100k_window_frequency, col = "red")
+
+# # Add legend for horizontal line
+# legend("topright", legend = paste("Variant 100k-subwindow freq:", variant_100k_window_frequency),
+#        col = "red", lwd = 1, text.font = 2)
+
+# Add a point for the causative variant window
+points(matching_row_causative_variant_freq$POS1, variant_100k_window_frequency, col = "cyan", pch = 16)
+
+# # Add a legend for the causative variant window
+# legend("topright",legend = paste("Causative Variant 100k Window Freq:", variant_100k_window_frequency),
+#        col = "cyan", pch = 16,  text.font = 2, cex = 0.6)
+
+legend("topright", legend = paste("Causative Variant 100k Window Freq:", variant_100k_window_frequency),
+       col = rgb(0, 1, 1, alpha = 0.5), pch = 16, text.font = 2, cex = 0.7)
+
+# # Add a legend for the causative variant window
+# legend("topright", legend = "Causative Variant 100k Window",
+#        col = "cyan", pch = 16, text.font = 2)
+
+#   # Create histogram
+# hist(causative_variant_window_data[["FREQUENCY"]], main = paste("Histogram of Frequency for", simname_from_file),
+#      xlab = "Frequency", ylab = "Frequency Count")
+#
+# # Add vertical line for variant_100k_subwindow_frequency
+# abline(v = variant_100k_window_frequency, col = "red")
+#
+# # Add legend
 # legend("topright", legend = paste("Causative Variant 100k Window Freq:", variant_100k_window_frequency),
-#        col = rgb(0, 1, 1, alpha = 0.5), pch = 16, text.font = 2, cex = 0.7)
-# 
-# # # Add a legend for the causative variant window
-# # legend("topright", legend = "Causative Variant 100k Window",
-# #        col = "cyan", pch = 16, text.font = 2)
-# 
-# #   # Create histogram
-# # hist(causative_variant_window_data[["FREQUENCY"]], main = paste("Histogram of Frequency for", simname_from_file),
-# #      xlab = "Frequency", ylab = "Frequency Count")
-# #   
-# # # Add vertical line for variant_100k_subwindow_frequency
-# # abline(v = variant_100k_window_frequency, col = "red")
-# # 
-# # # Add legend
-# # legend("topright", legend = paste("Causative Variant 100k Window Freq:", variant_100k_window_frequency),
-# #        col = "red", lwd = 1)
-# 
+#        col = "red", lwd = 1)
+
 
 
   # Create a list with table name and corresponding data frame
@@ -1050,11 +1054,6 @@ write_latex_table(
 # Print the table using kable
 kable(causative_variant_window_results_df_sorted,row.names = FALSE)
 ```
-
-
-
-
-
 
 # 1: ROH-Frequency
 
@@ -2360,7 +2359,7 @@ selection_testing_files <- list.files(path = Sweep_test_dir, pattern = pattern)
 # selection_testing_files
 
 # Extracting the ROH-hotspot threshold value from the suffix of the filename
-parts <- unlist(strsplit(selection_testing_files[1], "threshold_")) # Split the string by "threshold_"
+parts <- unlist(strsplit(selection_testing_files[1], "thr_")) # Split the string by "threshold_"
 # Extract the decimal number using regular expressions
 fifth_percentile_H_e_neutral_model <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
 
@@ -3001,7 +3000,10 @@ generate_H_e_plot <- function(hotspot_name, empirical_value) {
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_y_continuous(limits = c(min_y, max_y), 
-                       breaks = round(seq(min_y, max_y, length.out = 10), 5))
+                       breaks = round(seq(min_y, max_y, length.out = 10), 5),
+                       labels = scales::number_format(accuracy = 1/(10^Window_lengths_decimals)))  # Format y-axis to 3 decimal places
+                       
+                       
 
   # Print the plot
   print(p)

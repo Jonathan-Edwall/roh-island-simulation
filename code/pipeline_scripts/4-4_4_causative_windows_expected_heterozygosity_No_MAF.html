@@ -401,6 +401,8 @@ Sys.getenv()</code></pre>
 ## _CE_M                   
 ## _R_CHECK_COMPILATION_FLAGS_KNOWN_
 ##                         -Wformat -Werror=format-security -Wdate-time
+## allele_copies_threshold
+##                         1
 ## autosome_roh_freq_directory
 ##                         /home/jonathan/results/ROH-Hotspots/simulated/selection/Gosling_plots/autosome_roh_freq
 ## causative_variant_H_e_dir
@@ -408,6 +410,8 @@ Sys.getenv()</code></pre>
 ## causative_windows_allele_freq_dir
 ##                         /home/jonathan/results/causative_variant_windows/allele_freq
 ## chr_simulated           chr3
+## chr_specific_recombination_rate
+##                         FALSE
 ## CONDA_DEFAULT_ENV       bedtools
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/bedtools
@@ -419,7 +423,7 @@ Sys.getenv()</code></pre>
 ## data_dir                /home/jonathan/data
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:12.0
+## DISPLAY                 localhost:13.0
 ## EDITOR                  vi
 ## empirical_allele_frequency_dir
 ##                         /home/jonathan/results/PLINK/allele_freq/empirical/labrador_retriever
@@ -438,7 +442,7 @@ Sys.getenv()</code></pre>
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
 ##                         FALSE
-## input_bed_file          /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_20_selection_model_s08_chr3_ROH_freq.bed
+## input_bed_file          /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_50_selection_model_s08_chr3_ROH_freq.bed
 ## input_pop_roh_freq_file
 ##                         /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_9_selection_model_s08_chr3_ROH_freq.bed
 ## input_selection_coefficient_variant_positions_file
@@ -453,8 +457,10 @@ Sys.getenv()</code></pre>
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAF_status_suffix       No_MAF
 ## MAKE                    make
-## max_parallel_jobs_selection_sim
+## max_parallel_jobs_neutral_model_simulations
 ##                         2
+## max_parallel_jobs_selection_sim
+##                         3
 ## min_MAF                 0
 ## MOTD_SHOWN              pam
 ## N_e_bottleneck          5
@@ -465,7 +471,7 @@ Sys.getenv()</code></pre>
 ## n_simulated_generations_breed_formation
 ##                         94
 ## n_simulation_replicates
-##                         20
+##                         50
 ## Ne_burn_in              3700
 ## nInd_founder_population
 ##                         5
@@ -487,7 +493,7 @@ Sys.getenv()</code></pre>
 ##                         /home/jonathan/results/causative_variant_windows/causative_variant_window_lengths_s08_chr3.tsv
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/bedtools/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-## pop_roh_freq_bed_file   /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_20_selection_model_s08_chr3_ROH_freq.bed
+## pop_roh_freq_bed_file   /home/jonathan/results/Bedtools/coverage/simulated/selection_model/pop_roh_freq/sim_50_selection_model_s08_chr3_ROH_freq.bed
 ## PWD                     /home/jonathan
 ## R_ARCH                  
 ## R_BROWSER               xdg-open
@@ -504,7 +510,7 @@ Sys.getenv()</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/Rtmp8akxIm
+## R_SESSION_TMPDIR        /tmp/RtmpvB36Hs
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -536,8 +542,8 @@ Sys.getenv()</code></pre>
 ## sim_scenario_id         selection_model_s08_chr3
 ## simulated_model_allele_frequency_dir
 ##                         /home/jonathan/results/PLINK/allele_freq/simulated/selection_model
-## SSH_CLIENT              172.21.30.174 51346 22
-## SSH_CONNECTION          172.21.30.174 51346 77.235.253.16 22
+## SSH_CLIENT              172.21.30.27 60872 22
+## SSH_CONNECTION          172.21.30.27 60872 77.235.253.16 22
 ## SSH_TTY                 /dev/pts/3
 ## sweep_test_type         Selection_Strength_testing
 ## TAR                     /bin/tar
@@ -547,7 +553,7 @@ Sys.getenv()</code></pre>
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          6910
+## XDG_SESSION_ID          1454
 ## XDG_SESSION_TYPE        tty</code></pre>
 </div>
 <div id="loading-libraries" class="section level2">

@@ -25,7 +25,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ####################################  
 # Parameters
 #################################### 
-
+hotspot_prefix <- "Hotspot_chr"
 use_MAF_pruning <- Sys.getenv("use_MAF_pruning")
 use_MAF_pruning
 min_MAF <- as.numeric(Sys.getenv("min_MAF"))
@@ -73,13 +73,18 @@ library(knitr)
 ```
 
 # Loading Hotspot windows
-```{r}
+```{r Loading Hotspot windows}
 setwd(ROH_hotspots_dir)
 # Pattern for finding files containing "causative_variant_window" and ending with ".bed"
 pattern <- ".*ROH_Hotspot_windows.*\\.bed$"
 hotspot_window_bed_files <- list.files(path = ROH_hotspots_dir, pattern = pattern)
+chr_number_pattern <- ".*CHR(\\d+)_.*"
+
 # Extract the chromosome number and window number from the file names
-chr_numbers <- as.numeric(sub(".*CHR(\\d+)_.*", "\\1", hotspot_window_bed_files))
+chr_numbers <- gsub(tolower(chr_number_pattern), "\\1", tolower(hotspot_window_bed_files))
+
+# chr_numbers <- as.numeric(sub(".*chr(\\d+)_.*", "\\1", hotspot_window_bed_files))
+# chr_numbers <- as.numeric(sub(".*",chr_prefix,"(\\d+)_.*", "\\1", hotspot_window_bed_files))
 # Order the bed_files vector by chromosome number and then by window number
 ordered_hotspot_window_bed_files <- hotspot_window_bed_files[order(chr_numbers)]
 
@@ -90,8 +95,9 @@ empirical_hotspot_tables <- list()
 # Loop through each .bed file (ROH-hotspot allele frequency window-file)
 for (file in ordered_hotspot_window_bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome <- sub(".*CHR([0-9]+)_.*", "\\1", file)
-  window <- sub(".*windows_([0-9]+)_.*", "\\1", file)
+  # chromosome <- sub(".*",chr_prefix,"([0-9]+)_.*", "\\1", file)
+  chromosome <-gsub(tolower(chr_number_pattern), "\\1", tolower(file))
+  window <- sub(tolower(".*windows_([0-9]+)_.*"), "\\1", tolower(file))
   
   # # Create table name
   # table_name <- paste("Hotspot_chr", chromosome, "_window_", window, "_allele_freq", sep = "")
@@ -106,7 +112,7 @@ for (file in ordered_hotspot_window_bed_files) {
     # Extract row data
     row_data <- bed_data[i, ]
     # Create hotspot name
-    hotspot_name <- paste("Hotspot_chr", chromosome, "_window_", window_counter, sep = "")
+    hotspot_name <- paste(hotspot_prefix, chromosome, "_window_", window_counter, sep = "")
     
     
     # Check if the hotspot_name already exists in the list
@@ -178,20 +184,20 @@ calculate_expected_heterozygosity <- function(p) {
 
 ### 1.1.1: Empirical ROH-Hotspots
 
-```{r}
+```{r extracting empirical ROH-hotspots}
 # Set the working directory to the directory with allele frequencies for the different ROH-hotspots
 setwd(ROH_hotspot_allele_freq_dir)
 
+# # Get a list of all .bed files in the directory
+# bed_files <- list.files(path = ROH_hotspot_allele_freq_dir ,pattern = "\\.bed$")
 # Get a list of all .bed files in the directory
-bed_files <- list.files(path = ROH_hotspot_allele_freq_dir ,pattern = "\\.bed$")
-
-# Get a list of all .bed files in the directory
-# bed_files <- list.files(pattern = "\\.bed$")
+bed_files <- list.files(pattern = "\\.bed$")
 
 
 # Extract the chromosome number and window number from the file names
-chr_numbers <- as.numeric(sub(".*CHR(\\d+)_.*", "\\1", bed_files))
-window_numbers <- as.numeric(sub(".*windows_(\\d+)_.*", "\\1", bed_files))
+chr_numbers <- as.numeric(gsub(tolower(chr_number_pattern), "\\1", tolower(bed_files)))
+# chr_numbers <- as.numeric(sub(".*",chr_prefix,"(\\d+)_.*", "\\1", bed_files))
+window_numbers <- as.numeric(sub(tolower(".*windows_(\\d+)_.*"), "\\1", tolower(bed_files)))
 
 # Order the bed_files vector by chromosome number and then by window number
 ordered_bed_files <- bed_files[order(chr_numbers, window_numbers)]
@@ -205,13 +211,14 @@ no_marker_count <- 0
 # Loop through each .bed file (ROH-hotspot allele frequency window-file)
 for (file in ordered_bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome <- sub(".*CHR([0-9]+)_.*", "\\1", file)
-  window <- sub(".*windows_([0-9]+)_.*", "\\1", file)
+  chromosome <- gsub(tolower(chr_number_pattern), "\\1", tolower(file))
+  # chromosome <- sub(".*chr([0-9]+)_.*", "\\1", file)
+  window <- sub(tolower(".*windows_([0-9]+)_.*"), "\\1", tolower(file))
   
   # Create table name
-  table_name <- paste("Hotspot_chr", chromosome, "_window_", window, "_allele_freq", sep = "")
+  table_name <- paste(hotspot_prefix, chromosome, "_window_", window, "_allele_freq", sep = "")
   # Create table name
-  hotspot_name <- paste("Hotspot_chr", chromosome, "_window_", window, sep = "")
+  hotspot_name <- paste(hotspot_prefix, chromosome, "_window_", window, sep = "")
 
   
   # Read the header line
@@ -298,7 +305,6 @@ for (file in ordered_bed_files) {
 }
 
 # View(empirical_hotspot_allele_Freq_tables)
-empirical_hotspot_allele_Freq_tables[[1]]
 
 
 # markers_after_MAF_pruning <- nrow(empirical_hotspot_allele_Freq_tables[["Hotspot_chr3_window_1"]][["data"]]["H_e"])
@@ -362,8 +368,7 @@ for (file in bed_files) {
 
 
   
-  # Create a list with table name and corresponding data frame
-  table_info <- list(name = table_name, data = empirical_genomewide_allele_freq_data)
+  table_info <- list(filename = file, data = empirical_genomewide_allele_freq_data)
   
   # Append the table info to the list
   empirical_genomewide_tables <- c(empirical_genomewide_tables, list(table_info))
@@ -396,7 +401,7 @@ frq_bed_files <- list.files(pattern = pattern)
 
 
 # Extract the simulation number after "sim_"
-simulation_numbers <- as.integer(sub("^sim_(\\d+)_.*", "\\1", frq_bed_files))
+simulation_numbers <- as.integer(sub(tolower("^sim_(\\d+)_.*"), "\\1", tolower(frq_bed_files)))
 # Sort the simulation-files based on the simulation number
 sorted_files <- frq_bed_files[order(simulation_numbers)]
 
@@ -407,7 +412,7 @@ simulated_model_allele_freq_tables <- list()
 for (file in sorted_files) {
  
   # Extract the table name from the file name
-  table_name <- gsub(".frq$", "", file)
+  table_name <- gsub(tolower(".frq$"), "",tolower(file))
   
   column_names <- c("CHR","POS1","POS2","SNP","A1","A2","MAF","NCHROBS")
   
@@ -1075,10 +1080,11 @@ kable(ROH_hotspots_selection_testing, row.names = FALSE)
 
 
 # Formatting the threshold value for the output file, to 3 decimals
-formatted_H_e_threshold_value <- format(threshold_value, nsmall = 3)
+# formatted_H_e_threshold_value <- format(threshold_value, nsmall = 3)
+formatted_H_e_threshold_value <- round(threshold_value,5)
 
 # Define the filename with the output directory path
-filename <- file.path(output_dir_sweep_test, paste("ROH_hotspots_", sweep_test_type,"_",sim_scenario_id,"_H_E_threshold_", formatted_H_e_threshold_value, ".tsv", sep = ""))
+filename <- file.path(output_dir_sweep_test, paste("ROH_hotspots_", sweep_test_type,"_",sim_scenario_id,"_H_E_thr_", formatted_H_e_threshold_value, ".tsv", sep = ""))
 
 
 # # Saving the results in a .tsv-file

@@ -139,9 +139,19 @@ run_simulation() {
         cat "$simulation_prune_count_file"
     done
 }
+#############################################
+###### Running selection coefficients sequentially     #####
+###### (One selection coefficient at a time         #####
+###### ,which should mitigate bottleneck of lower s)  #####
+#############################################
 
 
+
+#############################################
+###### Running selection coefficients in parallel    ######
+#############################################
 cd $output_dir_selection_simulation
+counter_start=4 # Default 1: Modify this value of you want to resume the simulations at a specific technical replicate.
 
 if [ "$selection_simulation" = TRUE ]; then
     cd $output_dir_selection_simulation

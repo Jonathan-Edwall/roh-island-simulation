@@ -250,7 +250,7 @@ fi
 
 # Output the sum
 echo "Total number of markers in the preprocessed empirical dataset: $num_markers_preprocessed_dataset"
-echo "Selected chromosome (chr$chr_simulated) has after the preprocessing the following SNP density per Mb: $selected_chr_preprocessed_snp_density_mb"
+echo "Selected chromosome (chr$chr_number) has after the preprocessing the following SNP density per Mb: $selected_chr_preprocessed_snp_density_mb"
 echo "selected_chr_preprocessed_snp_density_mb in plink_preprocessing_empirical_data.sh: $selected_chr_preprocessed_snp_density_mb"
 
 # Ending the timer 

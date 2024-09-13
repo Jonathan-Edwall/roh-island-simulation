@@ -92,8 +92,8 @@ empirical_genomewide_tables <- list()
 # Loop through each .bed file (ROH-genomewide allele frequency window-file)
 for (file in bed_files) {
   # Extract chromosome number and window number from file name
-  chromosome <- sub(".*chr([0-9]+)_.*", "\\1", file)
-  window <- sub(".*window_([0-9]+)_.*", "\\1", file)
+  chromosome <- sub(tolower(".*chr([0-9]+)_.*"), "\\1", tolower(file))
+  window <- sub(tolower(".*window_([0-9]+)_.*"), "\\1", tolower(file))
   
   # Create table name
   table_name <- paste("Hotspot_chr", chromosome, "_window_", window, "_allele_freq", sep = "")
@@ -154,7 +154,7 @@ frq_bed_files <- list.files(pattern = pattern)
 
 
 # Extract the simulation number after "sim_"
-simulation_numbers <- as.integer(sub("^sim_(\\d+)_.*", "\\1", frq_bed_files))
+simulation_numbers <- as.integer(sub(tolower("^sim_(\\d+)_.*"), "\\1", tolower(frq_bed_files)))
 # Sort the simulation-files based on the simulation number
 sorted_files <- frq_bed_files[order(simulation_numbers)]
 
@@ -165,7 +165,7 @@ simulated_model_allele_freq_tables <- list()
 for (file in sorted_files) {
  
   # Extract the table name from the file name
-  table_name <- gsub(".frq$", "", file)
+  table_name <- gsub(tolower(".frq$"), "", tolower(file))
   
   column_names <- c("CHR","POS1","POS2","SNP","A1","A2","MAF","NCHROBS")
   

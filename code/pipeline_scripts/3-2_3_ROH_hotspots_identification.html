@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-05-24" />
+<meta name="date" content="2024-09-09" />
 
 <title>ROH-hotspot identification</title>
 
@@ -343,7 +343,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">ROH-hotspot identification</h1>
-<h4 class="date">2024-05-24</h4>
+<h4 class="date">2024-09-09</h4>
 
 </div>
 
@@ -351,8 +351,12 @@ pre code {
 <ul>
 <li><a href="#preparation">0: Preparation</a><ul>
 <li><a href="#gapless-roh-hotspot-windows">1.2: Gapless ROH-hotspot windows</a></li>
-<li><a href="#merging-together-roh-hotspot-windows-within-2mb">1.3: Merging together ROH-hotspot windows within 2Mb</a></li>
-<li><a href="#visualization-of-roh-hotspots">1.4: Visualization of ROH Hotspots</a></li>
+<li><a href="#expanding-hotspots-thats-10-lower">1.3 Expanding hotspots thats 10 % lower!</a></li>
+<li><a href="#merging-together-roh-hotspot-windows-within-2mb">1.4: Merging together ROH-hotspot windows within 2Mb</a></li>
+<li><a href="#creating-the-final-roh-hotspots-by-adding-adjacent-windows-under-the-hotspot-threshold">1.5 Creating the final ROH-hotspots by adding adjacent windows under the hotspot-threshold</a><ul>
+<li><a href="#extracting-the-roh-frequencies-for-the-final-roh-hotspot-windows">1.5.1 Extracting the ROH-frequencies for the final ROH-hotspot windows</a></li>
+</ul></li>
+<li><a href="#visualization-of-roh-hotspots">1.5: Visualization of ROH Hotspots</a></li>
 </ul></li>
 <li><a href="#exporting-roh-frequency-files-for-gosling-visualizations">2: Exporting ROH-frequency files for Gosling Visualizations</a><ul>
 <li><a href="#formatting-the-threshold-for-the-filename-to-three-decimals">2.0: Formatting the Threshold for the filename, to three decimals</a></li>
@@ -384,7 +388,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 input_file &lt;- Sys.getenv(&quot;input_bed_file&quot;)
 input_file</code></pre>
-<pre><code>## [1] &quot;/home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed&quot;</code></pre>
+<pre><code>## [1] &quot;/home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr2_ROH_freq.bed&quot;</code></pre>
 <pre class="r"><code>Sys.getenv()  #wtf</code></pre>
 <pre><code>## _CE_CONDA               
 ## _CE_M                   
@@ -392,7 +396,9 @@ input_file</code></pre>
 ##                         -Wformat -Werror=format-security -Wdate-time
 ## autosome_roh_freq_directory
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq
-## chr_simulated           chr1
+## chr_simulated           chr2
+## chr_specific_recombination_rate
+##                         True
 ## CONDA_DEFAULT_ENV       bedtools
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/bedtools
@@ -404,7 +410,7 @@ input_file</code></pre>
 ## data_dir                /home/jonathan/data_HO
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:11.0
+## DISPLAY                 localhost:10.0
 ## EDITOR                  vi
 ## empirical_data_basename
 ##                         LR_fs
@@ -415,7 +421,7 @@ input_file</code></pre>
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
 ##                         FALSE
-## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
+## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr2_ROH_freq.bed
 ## Introduce_mutations     FALSE
 ## LANG                    en_US.UTF-8
 ## LD_LIBRARY_PATH         /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server
@@ -425,24 +431,26 @@ input_file</code></pre>
 ## LOGNAME                 jonathan
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAKE                    make
+## max_parallel_jobs_neutral_model_simulations
+##                         20
 ## MOTD_SHOWN              pam
-## N_e_bottleneck          6
+## N_e_bottleneck          15
 ## n_generations_bottleneck
-##                         2
+##                         4
 ## n_individuals_breed_formation
-##                         405
+##                         450
 ## n_simulated_generations_breed_formation
-##                         96
+##                         91
 ## n_simulation_replicates
 ##                         20
-## Ne_burn_in              3545
+## Ne_burn_in              1220
 ## nInd_founder_population
-##                         6
+##                         15
 ## OLDPWD                  /home/jonathan
 ## output_directory        /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/bedtools/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
+## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr2_ROH_freq.bed
 ## PWD                     /home/jonathan
 ## R_ARCH                  
 ## R_BROWSER               xdg-open
@@ -459,7 +467,7 @@ input_file</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpIs4q3p
+## R_SESSION_TMPDIR        /tmp/RtmpWgd82d
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -474,20 +482,20 @@ input_file</code></pre>
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/roh_hotspots_freq
 ## SED                     /bin/sed
 ## selected_chr_snp_density_mb
-##                         91.23
+##                         87.67
 ## selection_simulation    FALSE
 ## SHELL                   /bin/bash
 ## SHLVL                   2
-## SSH_CLIENT              172.21.30.174 56047 22
-## SSH_CONNECTION          172.21.30.174 56047 77.235.253.16 22
-## SSH_TTY                 /dev/pts/2
+## SSH_CLIENT              172.21.30.27 57512 22
+## SSH_CONNECTION          172.21.30.27 57512 77.235.253.16 22
+## SSH_TTY                 /dev/pts/0
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          6777
+## XDG_SESSION_ID          762
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code>## Extracting the prefix of the file used  
 # Extracting the basename (filename without extension) from the file path
@@ -496,8 +504,12 @@ filename &lt;- basename(input_file)
 prefix &lt;- strsplit(filename, &quot;_ROH_freq.bed&quot;)[[1]][1]
 # Output the prefix
 print(prefix)</code></pre>
-<pre><code>## [1] &quot;sim_20_neutral_model_chr1&quot;</code></pre>
-<pre class="r"><code>#################################### 
+<pre><code>## [1] &quot;sim_20_neutral_model_chr2&quot;</code></pre>
+<pre class="r"><code>chr_prefix &lt;- &quot;CHR&quot;
+
+
+
+#################################### 
 # Defining the output dirs
 #################################### 
 
@@ -523,7 +535,9 @@ Sys.getenv()</code></pre>
 ##                         -Wformat -Werror=format-security -Wdate-time
 ## autosome_roh_freq_directory
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq
-## chr_simulated           chr1
+## chr_simulated           chr2
+## chr_specific_recombination_rate
+##                         True
 ## CONDA_DEFAULT_ENV       bedtools
 ## CONDA_EXE               /home/martin/anaconda3/bin/conda
 ## CONDA_PREFIX            /home/martin/anaconda3/envs/bedtools
@@ -535,7 +549,7 @@ Sys.getenv()</code></pre>
 ## data_dir                /home/jonathan/data_HO
 ## DBUS_SESSION_BUS_ADDRESS
 ##                         unix:path=/run/user/1008/bus
-## DISPLAY                 localhost:11.0
+## DISPLAY                 localhost:10.0
 ## EDITOR                  vi
 ## empirical_data_basename
 ##                         LR_fs
@@ -546,7 +560,7 @@ Sys.getenv()</code></pre>
 ## HOME                    /home/jonathan
 ## Inbred_ancestral_population
 ##                         FALSE
-## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
+## input_bed_file          /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr2_ROH_freq.bed
 ## Introduce_mutations     FALSE
 ## LANG                    en_US.UTF-8
 ## LD_LIBRARY_PATH         /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server
@@ -556,24 +570,26 @@ Sys.getenv()</code></pre>
 ## LOGNAME                 jonathan
 ## LS_COLORS               rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 ## MAKE                    make
+## max_parallel_jobs_neutral_model_simulations
+##                         20
 ## MOTD_SHOWN              pam
-## N_e_bottleneck          6
+## N_e_bottleneck          15
 ## n_generations_bottleneck
-##                         2
+##                         4
 ## n_individuals_breed_formation
-##                         405
+##                         450
 ## n_simulated_generations_breed_formation
-##                         96
+##                         91
 ## n_simulation_replicates
 ##                         20
-## Ne_burn_in              3545
+## Ne_burn_in              1220
 ## nInd_founder_population
-##                         6
+##                         15
 ## OLDPWD                  /home/jonathan
 ## output_directory        /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral
 ## PAGER                   /usr/bin/pager
 ## PATH                    /home/martin/anaconda3/envs/bedtools/bin:/home/martin/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr1_ROH_freq.bed
+## pop_roh_freq_bed_file   /home/jonathan/results_HO/Bedtools/coverage/simulated/neutral_model/pop_roh_freq/sim_20_neutral_model_chr2_ROH_freq.bed
 ## PWD                     /home/jonathan
 ## R_ARCH                  
 ## R_BROWSER               xdg-open
@@ -590,7 +606,7 @@ Sys.getenv()</code></pre>
 ## R_PLATFORM              x86_64-pc-linux-gnu
 ## R_PRINTCMD              /usr/bin/lpr
 ## R_RD4PDF                times,inconsolata,hyper
-## R_SESSION_TMPDIR        /tmp/RtmpIs4q3p
+## R_SESSION_TMPDIR        /tmp/RtmpWgd82d
 ## R_SHARE_DIR             /usr/share/R/share
 ## R_STRIP_SHARED_LIB      strip --strip-unneeded
 ## R_STRIP_STATIC_LIB      strip --strip-debug
@@ -605,20 +621,20 @@ Sys.getenv()</code></pre>
 ##                         /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/roh_hotspots_freq
 ## SED                     /bin/sed
 ## selected_chr_snp_density_mb
-##                         91.23
+##                         87.67
 ## selection_simulation    FALSE
 ## SHELL                   /bin/bash
 ## SHLVL                   2
-## SSH_CLIENT              172.21.30.174 56047 22
-## SSH_CONNECTION          172.21.30.174 56047 77.235.253.16 22
-## SSH_TTY                 /dev/pts/2
+## SSH_CLIENT              172.21.30.27 57512 22
+## SSH_CONNECTION          172.21.30.27 57512 77.235.253.16 22
+## SSH_TTY                 /dev/pts/0
 ## TAR                     /bin/tar
 ## TERM                    xterm-256color
 ## USER                    jonathan
 ## XDG_DATA_DIRS           /usr/local/share:/usr/share:/var/lib/snapd/desktop
 ## XDG_RUNTIME_DIR         /run/user/1008
 ## XDG_SESSION_CLASS       user
-## XDG_SESSION_ID          6777
+## XDG_SESSION_ID          762
 ## XDG_SESSION_TYPE        tty</code></pre>
 <pre class="r"><code>################################### 
 #Defining Input parameters
@@ -644,11 +660,6 @@ colnames(data) &lt;- c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quo
 # Extracting the frequency data for the genomic windows
 values &lt;- data$FREQUENCY
 
-## Uncomment the code below if you want to find ROH-hotspots relative to other ROH-windows.
-#Only windows associated with ROH-segments in the population, are allowed
-# # In other words, windows with frequency larger than 0
-# values &lt;- subset(data, FREQUENCY &gt; 0)$FREQUENCY 
-
 # Sort the values in descending order to find the top 1%
 sorted_values &lt;- sort(values, decreasing = TRUE)
 
@@ -662,19 +673,15 @@ top_1_percent_ROH &lt;- data[data$FREQUENCY &gt;= threshold, ]
 # Print the top 1% of ROH regions
 print(top_1_percent_ROH)</code></pre>
 <pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY
-## 249   1 24800001 24900000   223  0.550617
-## 250   1 24900001 25000000   226  0.558025
-## 251   1 25000001 25100000   224  0.553086
-## 253   1 25200001 25300000   222  0.548148
-## 254   1 25300001 25400000   219  0.540741
-## 256   1 25500001 25600000   233  0.575309
-## 257   1 25600001 25700000   231  0.570370
-## 260   1 25900001 26000000   220  0.543210
-## 261   1 26000001 26100000   221  0.545679
-## 262   1 26100001 26200000   221  0.545679
-## 263   1 26200001 26300000   222  0.548148
-## 264   1 26300001 26400000   221  0.545679
-## 265   1 26400001 26500000   218  0.538272</code></pre>
+## 585   2 58400001 58500000   390  0.866667
+## 586   2 58500001 58600000   371  0.824444
+## 587   2 58600001 58700000   371  0.824444
+## 588   2 58700001 58800000   371  0.824444
+## 589   2 58800001 58900000   371  0.824444
+## 590   2 58900001 59000000   390  0.866667
+## 591   2 59000001 59100000   391  0.868889
+## 592   2 59100001 59200000   391  0.868889
+## 593   2 59200001 59300000   394  0.875556</code></pre>
 <div id="gapless-roh-hotspot-windows" class="section level2">
 <h2>1.2: Gapless ROH-hotspot windows</h2>
 <p>Here, directly adjacent ROH-hotspot windows are merged together. For these ROH-hotspot windows, no gaps are allowed within the ROH-hotspot window.</p>
@@ -707,8 +714,8 @@ if (!is.null(prev_row)) {
   merged_top_1_percent_ROH &lt;- rbind(merged_top_1_percent_ROH, prev_row)
 }
 
-# Calculate the length in kilobases (kb)
-merged_top_1_percent_ROH$Length_kb &lt;- (merged_top_1_percent_ROH$POS2 - merged_top_1_percent_ROH$POS1 + 1) / 1000
+# Calculate the length in Megabases (Mb)
+merged_top_1_percent_ROH$Length_mb &lt;- (merged_top_1_percent_ROH$POS2 - merged_top_1_percent_ROH$POS1 + 1) / 10^6
 
 # Compute distance to previous and next window
 merged_top_1_percent_ROH$Distance_to_prev_kb &lt;- c(NA, diff(merged_top_1_percent_ROH$POS1)/1000)
@@ -716,38 +723,91 @@ merged_top_1_percent_ROH$Distance_to_next_kb &lt;- c(diff(merged_top_1_percent_R
 
 # Print the merged top 1% ROH data
 print(merged_top_1_percent_ROH)</code></pre>
-<pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY Length_kb Distance_to_prev_kb
-## 249   1 24800001 24900000   223  0.550617       100                  NA
-## 250   1 24900001 25000000   226  0.558025       100                 100
-## 251   1 25000001 25100000   224  0.553086       100                 100
-## 253   1 25200001 25300000   222  0.548148       100                 200
-## 254   1 25300001 25400000   219  0.540741       100                 100
-## 256   1 25500001 25600000   233  0.575309       100                 200
-## 257   1 25600001 25700000   231  0.570370       100                 100
-## 260   1 25900001 26000000   220  0.543210       100                 300
-## 261   1 26000001 26200000   221  0.545679       200                 100
-## 263   1 26200001 26300000   222  0.548148       100                 200
-## 264   1 26300001 26400000   221  0.545679       100                 100
-## 265   1 26400001 26500000   218  0.538272       100                 100
+<pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY Length_mb Distance_to_prev_kb
+## 585   2 58400001 58500000   390  0.866667       0.1                  NA
+## 586   2 58500001 58900000   371  0.824444       0.4                 100
+## 590   2 58900001 59000000   390  0.866667       0.1                 400
+## 591   2 59000001 59200000   391  0.868889       0.2                 100
+## 593   2 59200001 59300000   394  0.875556       0.1                 200
 ##     Distance_to_next_kb
-## 249                 100
-## 250                 100
-## 251                 200
-## 253                 100
-## 254                 200
-## 256                 100
-## 257                 300
-## 260                 100
-## 261                 200
-## 263                 100
-## 264                 100
-## 265                  NA</code></pre>
+## 585                 100
+## 586                 400
+## 590                 100
+## 591                 200
+## 593                  NA</code></pre>
+</div>
+<div id="expanding-hotspots-thats-10-lower" class="section level2">
+<h2>1.3 Expanding hotspots thats 10 % lower!</h2>
+<pre class="r"><code># # Assuming merged_top_1_percent_ROH and data are data frames
+# 
+# incorporate_adjacent_windows &lt;- function(merged_df, data_df, threshold) {
+#   merged_df$Incorporated &lt;- FALSE  # Track incorporated windows
+#   
+#   for (i in 1:nrow(merged_df)) {
+#     current_row &lt;- merged_df[i, ]
+#     chrom &lt;- current_row$CHR
+#     pos1 &lt;- current_row$POS1
+#     pos2 &lt;- current_row$POS2
+# 
+#     # Find corresponding 100kbp window in data
+#     data_pos1_index &lt;- which(data_df$CHR == chrom &amp; data_df$POS1 == pos1)
+# 
+#     if (length(data_pos1_index) &gt; 0) {
+#       index &lt;- data_pos1_index[1]
+#       
+#       # Check lower index condition
+#       while (index - 1 &gt;= 1) {
+#         lower_row &lt;- data_df[index - 1, ]
+#         if (lower_row$FREQUENCY &gt;= threshold - 10) {
+#           # Incorporate this window
+#           merged_df[i, &quot;POS1&quot;] &lt;- lower_row$POS1
+#           merged_df[i, &quot;Incorporated&quot;] &lt;- TRUE
+#           index &lt;- index - 1
+#         } else {
+#           break
+#         }
+#       }
+#     }
+#     
+#     # Check if the next ROH-hotspot is close enough to skip POS2 check
+#     if (i &lt; nrow(merged_df)) {
+#       next_row &lt;- merged_df[i + 1, ]
+#       if (next_row$POS1 - pos2 &gt; 100) {
+#         # Find corresponding 100kbp window for POS2
+#         data_pos2_index &lt;- which(data_df$CHR == chrom &amp; data_df$POS1 == pos2)
+#         
+#         if (length(data_pos2_index) &gt; 0) {
+#           index &lt;- data_pos2_index[1]
+#           
+#           # Check higher index condition
+#           while (index + 1 &lt;= nrow(data_df)) {
+#             higher_row &lt;- data_df[index + 1, ]
+#             if (higher_row$FREQUENCY &gt;= threshold - 10) {
+#               # Incorporate this window
+#               merged_df[i, &quot;POS2&quot;] &lt;- higher_row$POS2
+#               merged_df[i, &quot;Incorporated&quot;] &lt;- TRUE
+#               index &lt;- index + 1
+#             } else {
+#               break
+#             }
+#           }
+#         }
+#       }
+#     }
+#   }
+#   
+#   return(merged_df)
+# }
+# 
+# 
+# ROH_hotspots_df &lt;- incorporate_adjacent_windows(merged_top_1_percent_ROH, data, threshold)
+# print(ROH_hotspots_df)</code></pre>
 </div>
 <div id="merging-together-roh-hotspot-windows-within-2mb" class="section level2">
-<h2>1.3: Merging together ROH-hotspot windows within 2Mb</h2>
+<h2>1.4: Merging together ROH-hotspot windows within 2Mb</h2>
 <p>For these ROH-hotspot windows, gaps of up to 2 Megabases are allowed, when linking together “up to 2Mb adjacent” ROH-hotspot windows.</p>
 <pre class="r"><code># Initialize an empty dataframe to store linked windows
-linked_hotspot_windows &lt;- data.frame(CHR = character(), POS1 = integer(), POS2 = integer(), Length_kb = numeric())
+linked_hotspot_windows &lt;- data.frame(CHR = character(), POS1 = integer(), POS2 = integer(), Length_Mb = numeric())
 
 # Initialize variables to keep track of linked window
 current_window &lt;- NULL
@@ -761,8 +821,8 @@ for (i in 1:nrow(merged_top_1_percent_ROH)) {
   if (is.null(current_window) || current_row$POS1 - current_window$POS2 &gt; max_hotspot_windows_gap || current_row$CHR != current_window$CHR) {
     if (!is.null(current_window)) {
       # Calculate Length_kb for the completed window and add it to the linked dataframe
-      current_window$Length_kb &lt;- (current_window$POS2 - current_window$POS1 + 1) / 1000
-      linked_hotspot_windows &lt;- rbind(linked_hotspot_windows, current_window[, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;Length_kb&quot;)])
+      current_window$Length_Mb &lt;- (current_window$POS2 - current_window$POS1 + 1) / 10^6
+      linked_hotspot_windows &lt;- rbind(linked_hotspot_windows, current_window[, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;Length_Mb&quot;)])
     }
     # Start a new window
     current_window &lt;- current_row
@@ -772,41 +832,171 @@ for (i in 1:nrow(merged_top_1_percent_ROH)) {
   }
 }
 
+
+# # Iterate over each row in the merged dataframe
+# for (i in 1:nrow(ROH_hotspots_df)) {
+#   # Get the current row
+#   current_row &lt;- ROH_hotspots_df[i, ]
+#   
+#   # If it&#39;s the first row or if it&#39;s not within the specified distance from the previous window, start a new window
+#   if (is.null(current_window) || current_row$POS1 - current_window$POS2 &gt; max_hotspot_windows_gap || current_row$CHR != current_window$CHR) {
+#     if (!is.null(current_window)) {
+#       # Calculate Length_kb for the completed window and add it to the linked dataframe
+#       current_window$Length_kb &lt;- (current_window$POS2 - current_window$POS1 + 1) / 1000
+#       linked_hotspot_windows &lt;- rbind(linked_hotspot_windows, current_window[, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;Length_kb&quot;)])
+#     }
+#     # Start a new window
+#     current_window &lt;- current_row
+#   } else {
+#     # Extend the current window
+#     current_window$POS2 &lt;- current_row$POS2
+#   }
+# }
+
+
+
 # Add the last window to the linked dataframe
 if (!is.null(current_window)) {
-  current_window$Length_kb &lt;- (current_window$POS2 - current_window$POS1 + 1) / 1000
-  linked_hotspot_windows &lt;- rbind(linked_hotspot_windows, current_window[, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;Length_kb&quot;)])
+  current_window$Length_Mb &lt;- (current_window$POS2 - current_window$POS1 + 1) / 10^6
+  linked_hotspot_windows &lt;- rbind(linked_hotspot_windows, current_window[, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;, &quot;Length_Mb&quot;)])
 }
 
 # Print the linked windows
 print(linked_hotspot_windows)</code></pre>
-<pre><code>##     CHR     POS1     POS2 Length_kb
-## 249   1 24800001 26500000      1700</code></pre>
+<pre><code>##     CHR     POS1     POS2 Length_Mb
+## 585   2 58400001 59300000       0.9</code></pre>
+</div>
+<div id="creating-the-final-roh-hotspots-by-adding-adjacent-windows-under-the-hotspot-threshold" class="section level2">
+<h2>1.5 Creating the final ROH-hotspots by adding adjacent windows under the hotspot-threshold</h2>
+<p>Adjacent 100kbp subwindows with ROH-frequencies &gt;= maximum threshold of a window - 0.1, are incorporated to the hotspots in each direction, until noamore subwindows not reaching this criteria are not found.</p>
+<pre class="r"><code># Assuming merged_top_1_percent_ROH and data are data frames
+
+incorporate_adjacent_windows &lt;- function(merged_df, data_df, threshold) {
+  # new_threshold &lt;- threshold - 0.1
+  merged_df$Incorporated &lt;- FALSE  # Track incorporated windows
+  
+  for (i in 1:nrow(merged_df)) {
+    
+    current_row &lt;- merged_df[i, ]
+    chrom &lt;- current_row$CHR
+    pos1 &lt;- current_row$POS1
+    pos2 &lt;- current_row$POS2
+    # max(data$FREQUENCY[data$CHR == 1 &amp; data$POS1 &gt;= 21900001 &amp; data$POS2 &lt;= 24000000])
+    threshold_frequency &lt;- max(data_df$FREQUENCY[data_df$CHR == chrom &amp; data_df$POS1 &gt;= pos1 &amp; data_df$POS2 &lt;= pos2])
+    new_threshold &lt;- threshold_frequency - 0.1
+
+    # Find corresponding 100kbp window in data
+    data_pos1_index &lt;- which(data_df$CHR == chrom &amp; data_df$POS1 == pos1)
+
+    if (length(data_pos1_index) &gt; 0) {
+      index &lt;- data_pos1_index[1]
+      
+      # Check lower index condition
+      while (index - 1 &gt;= 1) {
+        lower_row &lt;- data_df[index - 1, ]
+        # if (lower_row$CHR == chrom &amp;&amp; lower_row$POS2 == merged_df[i, &quot;POS1&quot;] - 1 &amp;&amp; lower_row$FREQUENCY &gt;= new_threshold) {
+
+        if (lower_row$CHR == chrom &amp;&amp; lower_row$FREQUENCY &gt;= new_threshold) {
+          # Incorporate this window
+          merged_df[i, &quot;POS1&quot;] &lt;- lower_row$POS1
+          merged_df[i, &quot;Incorporated&quot;] &lt;- TRUE
+          index &lt;- index - 1
+        } else {
+          break
+        }
+      }
+    }
+    
+    # Check if the next ROH-hotspot is close enough to skip POS2 check
+    if (i &lt; nrow(merged_df)) {
+      next_row &lt;- merged_df[i+1, ]
+      if (next_row$POS1 - pos2 &gt; 10^5) {
+        # Find corresponding 100kbp window for POS2
+        data_pos2_index &lt;- which(data_df$CHR == chrom &amp; data_df$POS2 == pos2)
+        
+        if (length(data_pos2_index) &gt; 0) {
+          index &lt;- data_pos2_index[1]
+          
+          # Check higher index condition
+          while (index + 1 &lt;= nrow(data_df)) {
+            higher_row &lt;- data_df[index + 1, ]
+            if (higher_row$CHR == chrom &amp;&amp; higher_row$FREQUENCY &gt;= new_threshold) {
+              # Incorporate this window
+              merged_df[i, &quot;POS2&quot;] &lt;- higher_row$POS2
+              merged_df[i, &quot;Incorporated&quot;] &lt;- TRUE
+              index &lt;- index + 1
+            } else {
+              break
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  return(merged_df)
+}
+
+
+ROH_hotspots_df &lt;- incorporate_adjacent_windows(linked_hotspot_windows, data, threshold)
+ROH_hotspots_df$Length_Mb &lt;- (ROH_hotspots_df$POS2-ROH_hotspots_df$POS1+1)/10^6
+print(ROH_hotspots_df)</code></pre>
+<pre><code>##     CHR     POS1     POS2 Length_Mb Incorporated
+## 585   2 58400001 59300000       0.9        FALSE</code></pre>
+<div id="extracting-the-roh-frequencies-for-the-final-roh-hotspot-windows" class="section level3">
+<h3>1.5.1 Extracting the ROH-frequencies for the final ROH-hotspot windows</h3>
+<pre class="r"><code># Initialize an empty dataframe to store linked windows
+ROH_hotspot_windows_frequencies &lt;- data.frame(CHR = character(), POS1 = integer(), POS2 = integer(),COUNT = integer(),FREQUENCY = numeric())
+
+for (i in 1:nrow(ROH_hotspots_df)) {
+  
+  
+ ROH_hotspot_100kbp_windows &lt;- data[data$CHR == ROH_hotspots_df$CHR[i] &amp; data$POS1 &gt;= ROH_hotspots_df$POS1[i] &amp; data$POS2 &lt;= ROH_hotspots_df$POS2[i], ]
+ ROH_hotspot_100kbp_windows$Hotspot_interval &lt;- c(rep(paste0(&quot;[&quot;, ROH_hotspots_df$POS1[i], &quot;,&quot;, ROH_hotspots_df$POS2[i], &quot;]&quot;),nrow(ROH_hotspot_100kbp_windows)))
+ ROH_hotspot_100kbp_windows$Length_Mb &lt;- (ROH_hotspots_df$POS2[i] - ROH_hotspots_df$POS1[i] + 1) / 10^6
+  
+  ROH_hotspot_windows_frequencies &lt;- rbind(ROH_hotspot_windows_frequencies,ROH_hotspot_100kbp_windows)
+  
+  
+}
+
+ROH_hotspot_windows_frequencies</code></pre>
+<pre><code>##     CHR     POS1     POS2 COUNT FREQUENCY    Hotspot_interval Length_Mb
+## 585   2 58400001 58500000   390  0.866667 [58400001,59300000]       0.9
+## 586   2 58500001 58600000   371  0.824444 [58400001,59300000]       0.9
+## 587   2 58600001 58700000   371  0.824444 [58400001,59300000]       0.9
+## 588   2 58700001 58800000   371  0.824444 [58400001,59300000]       0.9
+## 589   2 58800001 58900000   371  0.824444 [58400001,59300000]       0.9
+## 590   2 58900001 59000000   390  0.866667 [58400001,59300000]       0.9
+## 591   2 59000001 59100000   391  0.868889 [58400001,59300000]       0.9
+## 592   2 59100001 59200000   391  0.868889 [58400001,59300000]       0.9
+## 593   2 59200001 59300000   394  0.875556 [58400001,59300000]       0.9</code></pre>
+</div>
 </div>
 <div id="visualization-of-roh-hotspots" class="section level2">
-<h2>1.4: Visualization of ROH Hotspots</h2>
-<pre class="r"><code># Create scatter plots for each chromosome
-for (CHR in unique(data$CHR)) {
-  # Subset data for the current chromosome
-  chr_data &lt;- data[data$CHR == CHR, ]
-  chr_merged_data &lt;- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == CHR, ]
-
-  # # Create scatter plot
-  # p &lt;- ggplot() +
-  #   geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = &quot;ROH-segments&quot;), alpha = 0.5) +
-  #   geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = &quot;ROH hotspots&quot;), alpha = 0.5) +
-  #   geom_hline(aes(yintercept = threshold, color = &quot;ROH hotspot threshold&quot;), linetype = &quot;dashed&quot;) +
-  #   labs(title = paste(&quot;Scatter Plot for Chromosome&quot;, CHR),
-  #        x = &quot;Position&quot;,
-  #        y = &quot;FREQUENCY&quot;,
-  #        color = &quot;Legend&quot;) +
-  #   scale_color_manual(values = c(&quot;ROH-segments&quot; = &quot;gray&quot;, &quot;ROH hotspots&quot; = &quot;blue&quot;, &quot;ROH hotspot threshold&quot; = &quot;red&quot;),
-  #                      labels = c(&quot;ROH-segments&quot; = &quot;ROH-segments&quot;, &quot;ROH hotspots&quot; = &quot;ROH hotspots&quot;, &quot;ROH hotspot threshold&quot; = &quot;ROH hotspot threshold&quot;)) +
-  #   theme_minimal()
-  # 
-  # # Print the plot
-  # print(p)
-}</code></pre>
+<h2>1.5: Visualization of ROH Hotspots</h2>
+<pre class="r"><code># # Create scatter plots for each chromosome
+# for (CHR in unique(data$CHR)) {
+#   # Subset data for the current chromosome
+#   chr_data &lt;- data[data$CHR == CHR, ]
+#   chr_merged_data &lt;- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == CHR, ]
+#   
+#   # Create scatter plot
+#   p &lt;- ggplot() +
+#     geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = &quot;ROH-segments&quot;), alpha = 0.5) +
+#     geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = &quot;ROH hotspots&quot;), alpha = 0.5) +
+#     geom_hline(aes(yintercept = threshold, color = &quot;ROH hotspot threshold&quot;), linetype = &quot;dashed&quot;) +
+#     labs(title = paste(&quot;Scatter Plot for Chromosome&quot;, CHR),
+#          x = &quot;Position&quot;,
+#          y = &quot;FREQUENCY&quot;,
+#          color = &quot;Legend&quot;) +
+#     scale_color_manual(values = c(&quot;ROH-segments&quot; = &quot;gray&quot;, &quot;ROH hotspots&quot; = &quot;blue&quot;, &quot;ROH hotspot threshold&quot; = &quot;red&quot;),
+#                        labels = c(&quot;ROH-segments&quot; = &quot;ROH-segments&quot;, &quot;ROH hotspots&quot; = &quot;ROH hotspots&quot;, &quot;ROH hotspot threshold&quot; = &quot;ROH hotspot threshold&quot;)) +
+#     theme_minimal()
+# 
+#   # Print the plot
+#   print(p)
+# }</code></pre>
 </div>
 </div>
 <div id="exporting-roh-frequency-files-for-gosling-visualizations" class="section level1">
@@ -821,12 +1011,12 @@ for (CHR in unique(data$CHR)) {
 split_window &lt;- function(data) {
   # Create a new dataframe to store the split rows
   new_data &lt;- data.frame(
-    CHR = data$CHR,
+    CHR = rep(data$CHR,2),
     POS = c(data$POS1, data$POS2),
     COUNT = rep(data$COUNT, 2),
     FREQUENCY = rep(data$FREQUENCY, 2),
-    Length_kb = rep(data$Length_kb, 2),
-    Hotspot_interval = c(paste0(&quot;[&quot;, data$POS1, &quot;,&quot;, data$POS2, &quot;]&quot;), paste0(&quot;[&quot;, data$POS1, &quot;,&quot;, data$POS2, &quot;]&quot;))
+    Length_Mb = rep(data$Length_Mb, 2),
+    Hotspot_interval = rep(data$Hotspot_interval,2)
   )
   return(new_data)
 }
@@ -835,9 +1025,9 @@ split_window &lt;- function(data) {
 split_data &lt;- list()
 
 # Iterate over each chromosome
-for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
+for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
   # Subset data for the current chromosome
-  chr_data &lt;- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == Chromosome, ]
+  chr_data &lt;- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == Chromosome, ]
   
   # Split each window into two rows
   split_data[[Chromosome]] &lt;- split_window(chr_data)
@@ -847,22 +1037,30 @@ for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
 split_data_combined &lt;- do.call(rbind, split_data)
 
 # Export the combined split dataframe to TSV files for each chromosome
-for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
+for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
   # Subset the split data for the current chromosome
   chr_split_data &lt;- split_data_combined[split_data_combined$CHR == Chromosome, ]
   
-  # Define the filename with the output directory path
-  filename &lt;- file.path(output_dir_roh_hotspots_freq, paste(prefix,&quot;_CHR&quot;, Chromosome, &quot;_ROH_Hotspot_freq.tsv&quot;, sep = &quot;&quot;))
-  # Create the directory if it doesn&#39;t exist
-  dir.create(dirname(filename), recursive = TRUE, showWarnings = FALSE)
-  
-  # Check if the dataframe is not empty before writing to the file
-  if (nrow(chr_split_data) &gt; 0) {
-    # Write data to TSV file without quotes and with tab separation
-    write.table(chr_split_data, file = filename, sep = &quot;\t&quot;, row.names = FALSE, quote = FALSE)
+  # Checking if the prefix of the input file contains &quot;chr&quot; And Naming the outputfile 
+  if (grepl(&quot;_chr[0-9]+&quot;, prefix)) {
+    # If &#39;_chr&#39; followed by a number exists in the prefix
+    filename &lt;- file.path(output_dir_roh_hotspots_freq, paste(prefix, &quot;_ROH_Hotspot_freq.tsv&quot;, sep = &quot;&quot;))
+  } else {
+    # If &#39;_chr&#39; followed by a number does not exist in the prefix
+    filename &lt;- file.path(output_dir_roh_hotspots_freq, paste(prefix, &quot;_chr&quot;, Chromosome, &quot;_ROH_Hotspot_freq.tsv&quot;, sep = &quot;&quot;))
   }
   
+  # Create the directory if it doesn&#39;t exist
+  dir.create(dirname(filename), recursive = TRUE, showWarnings = FALSE)
+    
+  # Write data to TSV file without quotes and with tab separation
+  write.table(chr_split_data, file = filename, sep = &quot;\t&quot;, row.names = FALSE, quote = FALSE)
+  
+  # Print message indicating successful export
+  cat(&quot;Exported ROH-hotspot ROH-frequencies to&quot;, filename, &quot;\n&quot;)
+
 }</code></pre>
+<pre><code>## Exported ROH-hotspot ROH-frequencies to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/roh_hotspots_freq/sim_20_neutral_model_chr2_ROH_Hotspot_freq.tsv</code></pre>
 </div>
 <div id="roh-frequency-into-.tsv-files-for-all-chr" class="section level2">
 <h2>2.2: ROH-frequency into .tsv files (For all chr)</h2>
@@ -886,26 +1084,36 @@ for (Chromosome in unique(data$CHR)) {
   # Subset data for the current chromosome
   chr_data &lt;- data[data$CHR == Chromosome, ]
   
-  # Check if any window has non-zero counts (If there exists any ROH-windows in the current chromosome)
-  if (any(chr_data$COUNT != 0)) {
-    # Split each window into two rows
-    split_data[[Chromosome]] &lt;- split_window(chr_data)
-    
-    # Define the filename with the output directory path
-    filename &lt;- file.path(output_dir_autosome_roh_freq, paste(prefix, &quot;_CHR&quot;, Chromosome, &quot;_ROH_freq&quot;, &quot;_threshold_&quot;, formatted_threshold, &quot;.tsv&quot;, sep = &quot;&quot;))
-    
-    # Check if the dataframe is not empty before writing to the file
-    if (nrow(split_data[[Chromosome]]) &gt; 0) {
-      # Write data to TSV file without quotes and with tab separation
-      write.table(split_data[[Chromosome]], file = filename, sep = &quot;\t&quot;, row.names = FALSE, quote = FALSE)
-    }
-    
-    
+  # Split each window into two rows
+  split_data[[Chromosome]] &lt;- split_window(chr_data)
+}
+
+# Combine all split dataframes into one
+split_data_combined &lt;- do.call(rbind, split_data)
+
+# Export the combined split dataframe to TSV files for each chromosome
+for (Chromosome in unique(data$CHR)) {
+  # Subset the split data for the current chromosome
+  chr_split_data &lt;- split_data_combined[split_data_combined$CHR == Chromosome, ]   
+  
+  # Checking if the prefix of the input file contains &quot;chr&quot; And Naming the outputfile 
+  if (grepl(&quot;_chr[0-9]+&quot;, prefix)) {
+    # If &#39;_chr&#39; followed by a number exists in the prefix
+    filename &lt;- file.path(output_dir_autosome_roh_freq, paste(prefix,&quot;_ROH_freq&quot;, &quot;_threshold_&quot;, formatted_threshold,&quot;.tsv&quot;, sep = &quot;&quot;))
   } else {
-    # Print message indicating no non-zero counts for the chromosome
-    print(paste(&quot;Skipping chromosome&quot;,Chromosome,&quot;due to no ROH-windows found on the chromosome&quot;))
+    # If &#39;_chr&#39; followed by a number does not exist in the prefix
+    filename &lt;- file.path(output_dir_autosome_roh_freq, paste(prefix,&quot;_chr&quot;, Chromosome,&quot;_ROH_freq&quot;, &quot;_threshold_&quot;, formatted_threshold,&quot;.tsv&quot;, sep = &quot;&quot;))
   }
+
+  
+  # Write data to TSV file without quotes and with tab separation
+  write.table(chr_split_data, file = filename, sep = &quot;\t&quot;, row.names = FALSE, quote = FALSE)
+  
+  # Print message indicating successful export
+  cat(&quot;Exported autosome ROH-frequencies to&quot;, filename, &quot;\n&quot;)
+
 }</code></pre>
+<pre><code>## Exported autosome ROH-frequencies to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/Gosling_plots/autosome_roh_freq/sim_20_neutral_model_chr2_ROH_freq_threshold_0.824444.tsv</code></pre>
 </div>
 </div>
 <div id="exporting-roh-hotspot-windows-into-.bed-files" class="section level1">
@@ -914,47 +1122,55 @@ for (Chromosome in unique(data$CHR)) {
 <h2>3.2: Gapless ROH-hotspot windows</h2>
 <pre class="r"><code># Iterate over unique chromosomes
 
-for (Chromosome in unique(merged_top_1_percent_ROH$CHR)) {
+for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
   # Subset data for the current chromosome
-  chr_data &lt;- merged_top_1_percent_ROH[merged_top_1_percent_ROH$CHR == Chromosome, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;)]
+  chr_data &lt;- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == Chromosome, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;)]
   
-  # Define the filename with the output directory path
-  filename &lt;- file.path(output_dir_gapless_roh_hotspots, paste(prefix,&quot;_CHR&quot;, Chromosome,&quot;_ROH_Hotspot_gapless_windows.bed&quot;, sep = &quot;&quot;)) 
-  
-  # Check if the dataframe is not empty before writing to the file
-  if (nrow(chr_data) &gt; 0) {
-      # Write data to .bed file
-      write.table(chr_data, file = filename, sep = &quot;\t&quot;, quote = FALSE, col.names = FALSE, row.names = FALSE)
-    }
+  # Checking if the prefix of the input file contains &quot;chr&quot; And Naming the outputfile 
+  if (grepl(&quot;_chr[0-9]+&quot;, prefix)) {
+    # If &#39;_chr&#39; followed by a number exists in the prefix
+    filename &lt;- file.path(output_dir_gapless_roh_hotspots, paste(prefix,&quot;_ROH_Hotspot_gapless_windows.bed&quot;, sep = &quot;&quot;))
+  } else {
+    # If &#39;_chr&#39; followed by a number does not exist in the prefix
+    # Define the filename with the output directory path
+    filename &lt;- file.path(output_dir_gapless_roh_hotspots, paste(prefix,&quot;_chr&quot;, Chromosome,&quot;_ROH_Hotspot_gapless_windows.bed&quot;, sep = &quot;&quot;)) 
 
+  }
+  
+  # Write data to .bed file
+  write.table(chr_data, file = filename, sep = &quot;\t&quot;, quote = FALSE, col.names = FALSE, row.names = FALSE)
   
   # Print message indicating successful export
   cat(&quot;Exported&quot;, nrow(chr_data), &quot;hotspot windows to&quot;, filename, &quot;\n&quot;)
 }</code></pre>
-<pre><code>## Exported 12 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/gapless_roh_hotspots/sim_20_neutral_model_chr1_CHR1_ROH_Hotspot_gapless_windows.bed</code></pre>
+<pre><code>## Exported 9 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/gapless_roh_hotspots/sim_20_neutral_model_chr2_ROH_Hotspot_gapless_windows.bed</code></pre>
 </div>
 <div id="mb-roh-hotspot-windows" class="section level2">
 <h2>3.2: 2Mb ROH-hotspot windows</h2>
 <pre class="r"><code># Iterate over unique chromosomes
-for (Chromosome in unique(linked_hotspot_windows$CHR)) {
+for (Chromosome in unique(ROH_hotspots_df$CHR)) {
   # Subset data for the current chromosome
-  chr_data &lt;- linked_hotspot_windows[linked_hotspot_windows$CHR == Chromosome, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;)]
+  chr_data &lt;- ROH_hotspots_df[ROH_hotspots_df$CHR == Chromosome, c(&quot;CHR&quot;, &quot;POS1&quot;, &quot;POS2&quot;)]
   
-  # Define the filename with the output directory path
-  filename &lt;- file.path(output_dir, paste(prefix,&quot;_CHR&quot;, Chromosome,&quot;_ROH_Hotspot_windows.bed&quot;, sep = &quot;&quot;)) 
-  
-  # Check if the dataframe is not empty before writing to the file
-  if (nrow(chr_data) &gt; 0) {
-    # Write data to .bed file
-    write.table(chr_data, file = filename, sep = &quot;\t&quot;, quote = FALSE, col.names = FALSE, row.names = FALSE)
-  }
+  # Checking if the prefix of the input file contains &quot;chr&quot; And Naming the outputfile 
+  if (grepl(&quot;_chr[0-9]+&quot;, prefix)) {
+    # If &#39;_chr&#39; followed by a number exists in the prefix
+    filename &lt;- file.path(output_dir, paste(prefix,&quot;_ROH_Hotspot_windows.bed&quot;, sep = &quot;&quot;)) 
+  } else {
+    # If &#39;_chr&#39; followed by a number does not exist in the prefix
+    # Define the filename with the output directory path
+    filename &lt;- file.path(output_dir, paste(prefix,&quot;_chr&quot;, Chromosome,&quot;_ROH_Hotspot_windows.bed&quot;, sep = &quot;&quot;)) 
 
+  }
   
+  
+  # Write data to .bed file
+  write.table(chr_data, file = filename, sep = &quot;\t&quot;, quote = FALSE, col.names = FALSE, row.names = FALSE)
   
   # Print message indicating successful export
   cat(&quot;Exported&quot;, nrow(chr_data), &quot;hotspot windows to&quot;, filename, &quot;\n&quot;)
 }</code></pre>
-<pre><code>## Exported 1 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/sim_20_neutral_model_chr1_CHR1_ROH_Hotspot_windows.bed</code></pre>
+<pre><code>## Exported 1 hotspot windows to /home/jonathan/results_HO/ROH-Hotspots/simulated/neutral/sim_20_neutral_model_chr2_ROH_Hotspot_windows.bed</code></pre>
 </div>
 </div>
 

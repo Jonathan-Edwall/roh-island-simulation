@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-06-30"
+date: "2024-09-06"
 editor_options: 
   markdown: 
     wrap: 72
@@ -23,19 +23,22 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
+allele_copies_threshold <- as.numeric(Sys.getenv("allele_copies_threshold"))
+# allele_copies_threshold <- 5 
+cat("The selected causative Variant must have <=",allele_copies_threshold," allele copies\n")
 
 chromosome_end_margin <- 0.15 # The chosen causative variant must be positioned at least within  15 % of the chromosome ends
 s <- as.numeric(Sys.getenv("selection_coefficient")) # using as.numeric, otherwise class(s) = "character"
 # Print the value of selection_coefficient
 cat("Selection Coefficient:", s, "\n")
-allele_copies_threshold <- 5 # 10 default (candidate_variants = less than 10)
+
 # min_allowed_gen_before_variant_lost <- 10 # Pruning replicates where the causative variant gets lost within this timespan
 fixation_threshold_causative_variant <- as.numeric(Sys.getenv("fixation_threshold_causative_variant"))
 # fixation_threshold_causative_variant <- 0.99
 disappearance_threshold_value_to_terminate_script <- as.numeric(Sys.getenv("disappearance_threshold_value_to_terminate_script"))
 
 
-
+use_chromosome_specific_recombination_rate <- as.logical(Sys.getenv("chr_specific_recombination_rate"))
 # min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 chr_simulated <- Sys.getenv("chr_simulated")
 chr_simulated
@@ -49,8 +52,7 @@ nInd_founder_population <- as.numeric(Sys.getenv("nInd_founder_population")) # F
 
 Inbred_ancestral_population <- as.logical(Sys.getenv("Inbred_ancestral_population"))
 
-# N_e_bottleneck <- 50
-N_e_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
+n_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
 
 n_generations_bottleneck <- as.numeric(Sys.getenv("n_generations_bottleneck")) # 5 default
 
@@ -103,13 +105,11 @@ library(knitr)
 
 # 1: Creating founder Haplotypes
 
-## 1.0: Defining chromosome lengths of model species
-
+## 1.0: Defining physical chromosome lengths of model species
+Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
+which can be found through this link:
+https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
 ```{r}
-# Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
-# which can be found through this link:
-# https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
-
 chromosome_lengths_bp <- c(
 "chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178	, "chr5" = 89562946, 
 "chr6" = 78113029	, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054, 
@@ -121,8 +121,48 @@ chromosome_lengths_bp <- c(
 "chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098	
 )
 ```
+## 1.1 Genetic chromosome lengths
+### 1.1.1 Defining recombination rates for the model species
+The used chromosomal recombination rates of the dog autosome comes from the canine linkage map produced by the paper Wong et al. 2010.
+The table from which the values comes from, can be found through this link:
+https://www.researchgate.net/figure/Physical-and-genetic-lengths-of-dog-chromosomes_tbl3_40453037
 
-## 1.1: runMacs2() - Generating founder population
+```{r}
+chromosome_recombination_rates_cM_Mb <- c(
+"chr1" = 0.68, "chr2" = 0.88, "chr3" =0.69, "chr4" = 0.75, "chr5" = 0.85, 
+"chr6" = 0.71, "chr7" = 0.75 , "chr8" = 0.83, "chr9" = 1.11, "chr10" = 0.78, 
+"chr11" = 0.84, "chr12" = 0.87, "chr13" = 0.90, "chr14" = 0.89, "chr15" = 0.80, 
+"chr16" = 0.90, "chr17" = 0.89, "chr18" = 0.88, "chr19" = 0.93, "chr20" = 0.93, 
+"chr21" = 1.02, "chr22" = 0.84, "chr23" = 1.02, "chr24" = 1.13, "chr25" = 1.05, 
+"chr26" = 1.22, "chr27" = 1.18, "chr28" =1.31, "chr29" = 1.15, "chr30" = 1.36, 
+"chr31" = 1.29, "chr32" = 1.37, "chr33" = 1.53, "chr34" = 1.17, "chr35" = 2.15, 
+"chr36" = 1.54, "chr37" = 1.38, "chr38" = 2.22 	
+)
+
+```
+### 1.1.2 Defining physical chromosome lengths of model species
+```{r}
+# Extracting the physical length of the simulated chromosome 
+model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
+
+if (use_chromosome_specific_recombination_rate) {
+  # Extracting the recombination rate of the simulated chromosome 
+  model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
+  cat("Recombination rate:",model_chromosome_recombination_rate)
+  # Computing the genetic length of the simulated chromosome 
+  model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(model_chromosome_recombination_rate*10^-2)
+  cat("Genetic Length in Morgan:",model_chromosome_genetic_length_morgan)
+} else {
+  # Setting the average recombination rate for dogs.
+  average_recombination_rate <- 0.97
+  # Computing the genetic length of the simulated chromosome 
+  model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(average_recombination_rate*10^-2)
+  model_chromosome_genetic_length_morgan
+}
+
+```
+
+## 1.2: runMacs2() - Generating founder population
 
 `runMacs2` Parameters:
 
@@ -147,13 +187,18 @@ chromosome_lengths_bp <- c(
 
 model_chromosome_bp_length <- chromosome_lengths_bp[chr_simulated] 
 
+n_bottleneck
+N_e_burn_in
+model_chromosome_physical_length_bp
+model_chromosome_genetic_length_morgan
 
-founderGenomes <- runMacs2(nInd = nInd_founder_population ,
+founderGenomes <- runMacs2(nInd = n_bottleneck ,
                      nChr = 1,
                      Ne = N_e_burn_in,
-                     bp = model_chromosome_bp_length,
+                     bp = model_chromosome_physical_length_bp,
                      inbred = Inbred_ancestral_population,
-                     genLen = 1,
+                     genLen = model_chromosome_genetic_length_morgan,
+                     mutRate = 1*10^-8,
                      histNe = NULL,
                      histGen = NULL)
 
@@ -163,7 +208,7 @@ founderGenomes
 
 ```
 
-## 1.2: SimParam() - Setting Global Simulation Parameters
+## 1.3: SimParam() - Setting Global Simulation Parameters
 
 ```{r SimParam()}
 
@@ -175,7 +220,7 @@ SP <- SimParam$new(founderGenomes)
 
 ```
 
-### 1.2.1: \$setTrackRec() - Setting on recombination tracking for the simulation
+### 1.3.1: \$setTrackRec() - Setting on recombination tracking for the simulation
 
 Sets recombination tracking for the simulation. By default recombination
 tracking is turned off. **When turned on recombination tracking will
@@ -189,7 +234,7 @@ tracked.
 SP$setTrackRec(TRUE)
 ```
 
-## 1.3: newPop() - Creating two separate populations for bottleneck event
+## 1.4: newPop() - Creating two separate populations for bottleneck event
 
 ```{r newPop()}
 # Generate the initial founder population
@@ -202,11 +247,11 @@ founderpop <- newPop(founderGenomes, simParam = SP)
 # head(getMisc(x = founderpop, node = "generation"))
 # 
 # Split the founder population into two breeding groups
-breed1_founders <- founderpop[1:N_e_bottleneck] # 1:50
+breed1_founders <- founderpop[1:n_bottleneck] # 1:50
 cat("Population 1:\n")
 breed1_founders
 
-# breed2_founders <- founderpop[(N_e_bottleneck + 1):(2 * N_e_bottleneck)] # 51:100
+# breed2_founders <- founderpop[(n_bottleneck + 1):(2 * n_bottleneck)] # 51:100
 # cat("Population 2:\n")
 # breed2_founders
 
@@ -366,7 +411,7 @@ find_causative_variant <- function(population,SP, allele_copies_threshold,chromo
   count <- colSums(pullSegSiteGeno(last_bottleneck_generation, simParam = SP))
   
   # Find candidate variants (less than or equal to the threshold)
-  candidate_variants <- which(count <= allele_copies_threshold)
+  candidate_variants <- which(0 < count & count <= allele_copies_threshold)
   
   # Find a candidate variant within 
   success <- FALSE
@@ -384,9 +429,6 @@ find_causative_variant <- function(population,SP, allele_copies_threshold,chromo
       success <- TRUE
       causative_variant <- variant
     }    
-
-  
-  
     # # Relative position: Check if the causative variant has been fixated  
     # if (variant_relative_SNP_POS$pos >= lower_boundary_chromosome_margin &&  variant_relative_SNP_POS$pos <= upper_boundary_chromosome_margin) {
     #   success <- TRUE
@@ -395,11 +437,64 @@ find_causative_variant <- function(population,SP, allele_copies_threshold,chromo
     
   }
 
-  
-  
-
   return(causative_variant)
 }
+
+# Extract the genetic map 
+gen_map <- getGenMap(founderGenomes)
+
+# Count occurrences of each variant
+count <- colSums(pullSegSiteGeno(last_bottleneck_generation, simParam = SP))
+
+
+allele_copies_list <- c(0,1,2,3,4,5,6,7,8,9,10)
+
+for (allele_copy_num in allele_copies_list) {
+  
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants <- which(count == allele_copy_num)
+  
+  cat("\n",length(candidate_variants),"variants found,with", allele_copy_num, "allele copies")
+}
+
+
+# for (allele_copy_num in allele_copies_list) {
+#   
+#   # Find candidate variants (less than or equal to the threshold)
+#   candidate_variants <- which(count <=  allele_copy_num)
+#   
+#   cat("\n",length(candidate_variants),"variants found,with", allele_copy_num, "allele copies")
+# }
+
+
+
+for (allele_copy_num in allele_copies_list) {
+  
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants <- which(0 < count & count <= allele_copy_num)
+  
+  cat("\n",length(candidate_variants),"variants found,with 0 <  ", allele_copy_num, "<= allele copies")
+}
+
+
+upper_limit_allele_copies <- n_bottleneck*2
+allele_copies_listt <- c(10,upper_limit_allele_copies)
+
+for (allele_copy_num in allele_copies_listt) {
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants <- which(count > allele_copy_num)
+  
+  cat("\n\n",length(candidate_variants),"variants found,with more than", allele_copy_num, "allele copies")
+
+
+  # Find candidate variants (less than or equal to the threshold)
+  candidate_variants <- which(count == allele_copy_num)
+  
+  cat("\n",length(candidate_variants),"variants found,with", allele_copy_num, "allele copies")
+}
+
+
+
 ```
 
 
@@ -423,6 +518,32 @@ Mate_Selection_scenario <- function(selection_scenario_pop,SP, n_generations_mat
       
         # Retrieves the genotype of the causative variant for each individual in the population  
         geno <- pullSegSiteGeno(generations[[gen_ix - 1]], simParam = SP)[, causative_variant]
+
+        # Calculate allele frequency of the causative variant
+        f_causative[gen_ix-1] <- sum(geno) / length(geno) / 2
+
+        # Check if the causative variant is lost (allele frequency drops to 0)
+        if (f_causative[gen_ix-1] == 0) {
+            cat("\nTerminating simulation: The causative variant has been completely lost by generation", gen_ix - 1, ".\n")
+            return(list(f_causative[1:(gen_ix-1)], generations[[gen_ix-1]])) # Exit early
+        }
+        # Check if half the generations have passed and the allele frequency has dropped 20-fold
+        else if ( gen_ix == ceiling(n_generations_mate_selection / 2) && 
+                 f_causative[gen_ix-1] < (f_causative[1] / 1) ) {
+            cat("\nTerminating simulation: After half the generations (", gen_ix - 1, 
+                ") the allele frequency has dropped more than 20-fold from its initial value.\n")
+            return(list(f_causative[1:(gen_ix-1)], generations[[gen_ix-1]])) # Exit early
+        }
+
+        
+        # # Calculate allele frequency of the causative variant
+        # f_causative[gen_ix-1] <- sum(geno) / length(geno) / 2
+        # 
+        # # Check if the causative variant is lost (allele frequency drops to 0)
+        # if (f_causative[gen_ix] == 0) {
+        #     cat("Causative variant lost at generation", gen_ix - 1, "\n")
+        #     return(list(f_causative[1:(gen_ix-1)], generations[[gen_ix - 1]])) # Exit early
+        # }
         # cat("\nGeneration", gen, "Geno:",geno)  
         
         #     # Print out the genotype of each individual
@@ -436,10 +557,18 @@ Mate_Selection_scenario <- function(selection_scenario_pop,SP, n_generations_mat
         #   }
         # }
         
+        # # Old fitness function
+        # fitness <- rep(1-s, length(geno)) # If homozygous for the non-causative variant
+        # fitness[geno == 1] <- 1 - (s/2) # If heterozygous for the selected allele of the causative variant
+        # fitness[geno == 2] <- 1 # If homozygous for the selected allele of the causative variant
+
+        
         # Set fitness based on genotype
-        fitness <- rep(1-s, length(geno))
-        fitness[geno == 1] <- 1 - (s/2)
-        fitness[geno == 2] <- 1
+        fitness <- rep(1, length(geno)) # If homozygous for the non-causative variant
+        fitness[geno == 1] <- 1 + (s/2) # If heterozygous for the selected allele of the causative variant
+        fitness[geno == 2] <- 1 + s # If homozygous for the selected allele of the causative variant
+
+        
         
         # Initialize vectors for parents
         parent1 <- integer(n_indv_breed_formation)
@@ -467,9 +596,18 @@ Mate_Selection_scenario <- function(selection_scenario_pop,SP, n_generations_mat
         if (introduce_mutations == TRUE) {
           generations[[gen_ix]] <- AlphaSimR::mutate(generations[[gen_ix]], simParam = SP)
         }
-  
-        # Calculate allele frequency of the causative variant
-        f_causative[gen_ix] <- sum(geno) / length(geno) / 2
+        
+        # # Retrieves the genotype of the causative variant for each individual in the population  
+        # geno <- pullSegSiteGeno(generations[[gen_ix]], simParam = SP)[, causative_variant]
+        # 
+        # # Calculate allele frequency of the causative variant
+        # f_causative[gen_ix] <- sum(geno) / length(geno) / 2
+        # 
+        # # Check if the causative variant is lost (allele frequency drops to 0)
+        # if (f_causative[gen_ix] == 0) {
+        #     cat("Causative variant lost at generation", gen_ix - 1, "\n")
+        #     return(list(f_causative[1:(gen_ix)], generations[[gen_ix]])) # Exit early
+        # }
   }
     
   selection_scenario_pop_final_generation <- generations[[n_generations_mate_selection+1]] # Final generation extracted
@@ -488,15 +626,17 @@ disappearance_counter <- 0
 # # Extract the highest IID in the population from the post bottleneck scenario
 # last_bottleneck_IID <- max(last_bottleneck_generation@id)
 
+
+# Function to randomly pick out a causative variant to be studied
+causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold,chromosome_end_margin,model_chromosome_bp_length)
+# Print the chosen causative variant
+cat("Variant chosen:\n", causative_variant)
+
+
 # Define the rerun mechanism
 success <- FALSE
 while (!success) {
   
-  # Function to randomly pick out a causative variant to be studied
-  causative_variant <- find_causative_variant(last_bottleneck_generation, SP, allele_copies_threshold,chromosome_end_margin,model_chromosome_bp_length)
-  # Print the chosen causative variant
-  cat("Variant chosen:", causative_variant)
-
   # Sets the initial population for the selection scenario to the last generation of the bottleneck simulation.
   selection_scenario_pop <- last_bottleneck_generation
   
@@ -528,16 +668,11 @@ while (!success) {
       quit(status=1) # Terminate the script if the condition is met
       } 
     else {
-    cat("Causative variant disappeared, rerunning simulation...\n")
+    cat("Causative variant did not reach fixation, rerunning simulation...\n")
     cat("f_causative:", f_causative, "\n")
-    
-    }
-    
-    
-    
+        }
+        }
   }
-  
-}
 
 
 ```
@@ -563,23 +698,7 @@ if (Ref_pop_snp_chip == "last_breed_formation_generation") {
   
 }
 
-
-
-# 
-
-# SP$addSnpChip(
-# 
-# nSnpPerChr = num_snp_markers_simulated_chromosome,
-# 
-#  minSnpFreq = min_MAF,
-# 
-# refPop = last_mate_selection_generation
-# 
-#  )
-
 ```
-
-
 # 3: Export files
 
 ## 3.1: Export to PLINK (Extracting data to PLINK)
@@ -656,7 +775,7 @@ snpChip = 1, useQtl = FALSE, simParam = NULL, ... )
 -   **simParam** an object of SimParam ... additional arguments if using
     a function for traits
 
-```{r writePlink}
+```{r}
 # Setting the directory where the .map and .ped files will be stored in
 setwd(output_dir_simulation)
 
@@ -668,28 +787,10 @@ writePlink(last_mate_selection_generation,snpChip = 1,simParam=SP, baseName=outp
 
            )
 
-
-# writePlink(last_mate_selection_generation,snpChip = 2, baseName=output_sim_files_basename,
-# 
-#             traits = 1,
-#            use = "rand"
-# 
-# 
-#            )
-
-
-
-# writePlink(last_mate_selection_generation,simParam=SP, baseName=output_sim_files_basename,
-# 
-#             traits = 1,
-#            use = "rand"
-# 
-# 
-#            )
 ```
 ### 3.1.2: Convert distances to basepair in the .map file
 
-```{r gen_dist_to_bp_conversion }
+```{r}
 # Setting the working directory as the output directory
 setwd(output_dir_simulation)
 

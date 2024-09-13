@@ -5,7 +5,7 @@ output:
     toc: true
     toc_depth: 3  
     output_dir: output_dir
-date: "2024-09-03"
+date: "2024-09-09"
 editor_options: 
   markdown: 
     wrap: 72
@@ -38,10 +38,19 @@ empirical_dog_breed <- "labrador_retriever"
 #################################### 
 
 Coverage_dir <- file.path(results_dir,"Bedtools/coverage")
-pop_roh_freq_dir <- file.path(Coverage_dir,"empirical",empirical_dog_breed,"pop_roh_freq")
+data_source <- "simulated"
+simulation_type <- "neutral_model"
+pop_roh_freq_dir <- file.path(Coverage_dir,data_source,simulation_type,"pop_roh_freq")
 
 # input_file <- file.path(repository_path,"res_test/Bedtools/coverage/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/pop_roh_freq/german_shepherd_ROH_freq.bed")
-input_file <- file.path(pop_roh_freq_dir,"labrador_retriever_ROH_freq.bed")
+input_file <- file.path(pop_roh_freq_dir,"sim_1_neutral_model_chr1_ROH_freq.bed")
+
+
+# data_source <- "empirical"
+# pop_roh_freq_dir <- file.path(Coverage_dir,data_source,empirical_dog_breed,"pop_roh_freq")
+# 
+# # input_file <- file.path(repository_path,"res_test/Bedtools/coverage/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813/pop_roh_freq/german_shepherd_ROH_freq.bed")
+# input_file <- file.path(pop_roh_freq_dir,"labrador_retriever_ROH_freq.bed")
 
 ## Extracting the prefix of the file used  
 # Extracting the basename (filename without extension) from the file path
@@ -57,7 +66,8 @@ print(prefix)
 # Defining the output dirs
 #################################### 
 
-output_dir <- file.path(results_dir,"ROH-Hotspots","empirical",empirical_dog_breed)
+# output_dir <- file.path(results_dir,"ROH-Hotspots",data_source,empirical_dog_breed)
+output_dir <- file.path(results_dir,"ROH-Hotspots",data_source,simulation_type)
 # Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir)
 
@@ -419,28 +429,28 @@ ROH_hotspot_windows_frequencies
 ## 1.5: Visualization of ROH Hotspots
 
 ```{r ROH hotspots visualization}
-# Create scatter plots for each chromosome
-for (CHR in unique(data$CHR)) {
-  # Subset data for the current chromosome
-  chr_data <- data[data$CHR == CHR, ]
-  chr_merged_data <- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == CHR, ]
-  
-  # Create scatter plot
-  p <- ggplot() +
-    geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = "ROH-segments"), alpha = 0.5) +
-    geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = "ROH hotspots"), alpha = 0.5) +
-    geom_hline(aes(yintercept = threshold, color = "ROH hotspot threshold"), linetype = "dashed") +
-    labs(title = paste("Scatter Plot for Chromosome", CHR),
-         x = "Position",
-         y = "FREQUENCY",
-         color = "Legend") +
-    scale_color_manual(values = c("ROH-segments" = "gray", "ROH hotspots" = "blue", "ROH hotspot threshold" = "red"),
-                       labels = c("ROH-segments" = "ROH-segments", "ROH hotspots" = "ROH hotspots", "ROH hotspot threshold" = "ROH hotspot threshold")) +
-    theme_minimal()
-
-  # Print the plot
-  print(p)
-}
+# # Create scatter plots for each chromosome
+# for (CHR in unique(data$CHR)) {
+#   # Subset data for the current chromosome
+#   chr_data <- data[data$CHR == CHR, ]
+#   chr_merged_data <- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == CHR, ]
+#   
+#   # Create scatter plot
+#   p <- ggplot() +
+#     geom_point(data = chr_data, aes(x = POS1, y = FREQUENCY, color = "ROH-segments"), alpha = 0.5) +
+#     geom_point(data = chr_merged_data, aes(x = POS1, y = FREQUENCY, color = "ROH hotspots"), alpha = 0.5) +
+#     geom_hline(aes(yintercept = threshold, color = "ROH hotspot threshold"), linetype = "dashed") +
+#     labs(title = paste("Scatter Plot for Chromosome", CHR),
+#          x = "Position",
+#          y = "FREQUENCY",
+#          color = "Legend") +
+#     scale_color_manual(values = c("ROH-segments" = "gray", "ROH hotspots" = "blue", "ROH hotspot threshold" = "red"),
+#                        labels = c("ROH-segments" = "ROH-segments", "ROH hotspots" = "ROH hotspots", "ROH hotspot threshold" = "ROH hotspot threshold")) +
+#     theme_minimal()
+# 
+#   # Print the plot
+#   print(p)
+# }
 
 
 ```
@@ -490,19 +500,25 @@ for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
   # Subset the split data for the current chromosome
   chr_split_data <- split_data_combined[split_data_combined$CHR == Chromosome, ]
   
-  # Define the filename with the output directory path
-  filename <- file.path(output_dir_roh_hotspots_freq, paste(prefix,"_chr", Chromosome, "_ROH_Hotspot_freq.tsv", sep = ""))
+  # Checking if the prefix of the input file contains "chr" And Naming the outputfile 
+  if (grepl("_chr[0-9]+", prefix)) {
+    # If '_chr' followed by a number exists in the prefix
+    filename <- file.path(output_dir_roh_hotspots_freq, paste(prefix, "_ROH_Hotspot_freq.tsv", sep = ""))
+  } else {
+    # If '_chr' followed by a number does not exist in the prefix
+    filename <- file.path(output_dir_roh_hotspots_freq, paste(prefix, "_chr", Chromosome, "_ROH_Hotspot_freq.tsv", sep = ""))
+  }
+  
   # Create the directory if it doesn't exist
   dir.create(dirname(filename), recursive = TRUE, showWarnings = FALSE)
     
   # Write data to TSV file without quotes and with tab separation
   write.table(chr_split_data, file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
   
+  # Print message indicating successful export
+  cat("Exported ROH-hotspot ROH-frequencies to", filename, "\n")
 
 }
-
-
-
 
 ```
 
@@ -541,11 +557,22 @@ for (Chromosome in unique(data$CHR)) {
   # Subset the split data for the current chromosome
   chr_split_data <- split_data_combined[split_data_combined$CHR == Chromosome, ]   
   
-    # Define the filename with the output directory path
-  filename <- file.path(output_dir_autosome_roh_freq, paste(prefix,"_chr", Chromosome,"_ROH_freq", "_threshold_", formatted_threshold,".tsv", sep = ""))
+  # Checking if the prefix of the input file contains "chr" And Naming the outputfile 
+  if (grepl("_chr[0-9]+", prefix)) {
+    # If '_chr' followed by a number exists in the prefix
+    filename <- file.path(output_dir_autosome_roh_freq, paste(prefix,"_ROH_freq", "_threshold_", formatted_threshold,".tsv", sep = ""))
+  } else {
+    # If '_chr' followed by a number does not exist in the prefix
+    filename <- file.path(output_dir_autosome_roh_freq, paste(prefix,"_chr", Chromosome,"_ROH_freq", "_threshold_", formatted_threshold,".tsv", sep = ""))
+  }
+
   
   # Write data to TSV file without quotes and with tab separation
   write.table(chr_split_data, file = filename, sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  # Print message indicating successful export
+  cat("Exported autosome ROH-frequencies to", filename, "\n")
+
 }
 
 
@@ -562,8 +589,16 @@ for (Chromosome in unique(ROH_hotspot_windows_frequencies$CHR)) {
   # Subset data for the current chromosome
   chr_data <- ROH_hotspot_windows_frequencies[ROH_hotspot_windows_frequencies$CHR == Chromosome, c("CHR", "POS1", "POS2")]
   
-  # Define the filename with the output directory path
-  filename <- file.path(output_dir_gapless_roh_hotspots, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_gapless_windows.bed", sep = "")) 
+  # Checking if the prefix of the input file contains "chr" And Naming the outputfile 
+  if (grepl("_chr[0-9]+", prefix)) {
+    # If '_chr' followed by a number exists in the prefix
+    filename <- file.path(output_dir_gapless_roh_hotspots, paste(prefix,"_ROH_Hotspot_gapless_windows.bed", sep = ""))
+  } else {
+    # If '_chr' followed by a number does not exist in the prefix
+    # Define the filename with the output directory path
+    filename <- file.path(output_dir_gapless_roh_hotspots, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_gapless_windows.bed", sep = "")) 
+
+  }
   
   # Write data to .bed file
   write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)
@@ -581,8 +616,17 @@ for (Chromosome in unique(ROH_hotspots_df$CHR)) {
   # Subset data for the current chromosome
   chr_data <- ROH_hotspots_df[ROH_hotspots_df$CHR == Chromosome, c("CHR", "POS1", "POS2")]
   
-  # Define the filename with the output directory path
-  filename <- file.path(output_dir, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_windows.bed", sep = "")) 
+  # Checking if the prefix of the input file contains "chr" And Naming the outputfile 
+  if (grepl("_chr[0-9]+", prefix)) {
+    # If '_chr' followed by a number exists in the prefix
+    filename <- file.path(output_dir, paste(prefix,"_ROH_Hotspot_windows.bed", sep = "")) 
+  } else {
+    # If '_chr' followed by a number does not exist in the prefix
+    # Define the filename with the output directory path
+    filename <- file.path(output_dir, paste(prefix,"_chr", Chromosome,"_ROH_Hotspot_windows.bed", sep = "")) 
+
+  }
+  
   
   # Write data to .bed file
   write.table(chr_data, file = filename, sep = "\t", quote = FALSE, col.names = FALSE, row.names = FALSE)

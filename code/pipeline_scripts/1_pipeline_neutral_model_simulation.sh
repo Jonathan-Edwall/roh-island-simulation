@@ -30,8 +30,9 @@ mkdir -p $output_dir_neutral_simulation
 ###Output: 
 #����������������������������������������������������������������������������
 cd $output_dir_neutral_simulation
+
 # Number of parallel jobs to run at a time
-max_parallel_jobs=10
+# max_parallel_jobs_neutral_model_simulations=20 # Variable defined in the main script!
 
 # Function to run a single simulation
 run_simulation() {
@@ -71,7 +72,7 @@ do
     run_simulation $counter $knit_document_check &  # Run the job in the background
     
     # If the number of background jobs reaches the limit, wait for one to finish
-    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_neutral_model_simulations ]; do
         wait -n
     done
 done
