@@ -9,11 +9,11 @@ script_start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
-#cd $HOME
+# HOME=/home/jonathan
+cd $HOME
 
-script_directory=$HOME/code/pipeline_scripts
-
+# pipeline_scripts_dir=$HOME/code/pipeline_scripts
+# pipeline_scripts_dir=$script_dir/pipeline_scripts
 ######################################  
 ####### Defining parameter values #######
 ######################################
@@ -26,11 +26,10 @@ script_directory=$HOME/code/pipeline_scripts
 # MAF_status_suffix="MAF_0_01" # Imported from H_e_calc_for_multiple_MAF_HO.sh
 
 # $results_dir/expected_heterozygosity_$MAF_status_suffix
-
 ######################################  
 ####### Defining the INPUT files #######
 ######################################  
-results_dir=$HOME/results_HO # Variable Defined in run_pipeline_hyperoptimize_neutral_model.sh
+# results_dir=$HOME/results_HO # Variable Defined in run_pipeline_hyperoptimize_neutral_model.sh
 PLINK_allele_freq_dir=$results_dir/PLINK/allele_freq
 
 #�������������
@@ -53,7 +52,6 @@ neutral_model_allele_freq_dir=$simulated_allele_freq_plink_output_dir/neutral_mo
 ######################################  
 ####### Defining the OUTPUT files #######
 ######################################  
-# expected_heterozygosity_dir=$results_dir/expected_heterozygosity
 export expected_heterozygosity_dir="$results_dir/expected_heterozygosity_$MAF_status_suffix"
 mkdir -p $expected_heterozygosity_dir
 
@@ -69,6 +67,23 @@ mkdir -p $neutral_model_H_e_dir
 ##############################################################################################  
 ############ RESULTS ###########################################################################
 ############################################################################################## 
+max_parallel_jobs=32
+
+# Function to run the R Markdown script for a given simulation scenario
+H_e_calculation() {
+    local simulation_scenario=$1
+    local simulation_model_allele_frequency_dir=$2
+    local simulation_model_H_e_dir=$3
+
+    export empirical_allele_frequency_dir="$Empirical_breed_allele_freq_dir"
+    export output_empirical_H_e_dir="$Empirical_breed_H_e_dir"
+
+    export simulated_model_allele_frequency_dir="$simulation_model_allele_frequency_dir"
+    export sim_scenario_id="$simulation_scenario"
+    export output_simulated_model_H_e_dir="$simulation_model_H_e_dir"    
+    # Render the R Markdown document with the current simulation scenario
+    Rscript -e "rmarkdown::render('$pipeline_scripts_dir/Hyperoptimization_H_e_calculation.Rmd')"
+}
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
@@ -77,30 +92,20 @@ mkdir -p $neutral_model_H_e_dir
 # simulation_scenarios_neutral_model=$(find $neutral_model_allele_freq_dir -maxdepth 1 -type f -name "*.bed" | sed -E 's/.*sim_[0-9]+_(.*)_allele_freq\.bed/\1/' | sort -u)
 readarray -t simulation_scenarios_neutral_model < <(find "$neutral_model_allele_freq_dir" -maxdepth 1 -type f -name "*.bed" | sed -E 's/.*sim_[0-9]+_(.*)_allele_freq\.bed/\1/' | sort -u)
 
-# Loop over each input bed file
+# Loop over each input simulation scenario
 for simulation_scenario in "${simulation_scenarios_neutral_model[@]}"; do
-    echo "$simulation_scenario"
-    
-    # Construct the params list
-    export empirical_allele_frequency_dir="$Empirical_breed_allele_freq_dir"
-    export simulated_model_allele_frequency_dir="$neutral_model_allele_freq_dir"
-    export sim_scenario_id="$simulation_scenario"
-    export output_empirical_H_e_dir="$Empirical_breed_H_e_dir"
-    export output_simulated_model_H_e_dir="$neutral_model_H_e_dir"
+    H_e_calculation $simulation_scenario $neutral_model_allele_freq_dir $neutral_model_H_e_dir &
 
-    echo "empirical_allele_frequency_dir: $empirical_allele_frequency_dir "
-    echo "simulated_model_allele_frequency_dir: $simulated_model_allele_frequency_dir "
-    echo "sim_scenario_id: $sim_scenario_id "
-    echo "output_empirical_H_e_dir: $Empirical_breed_H_e_dir "
-    echo "output_simulated_model_H_e_dir: $neutral_model_H_e_dir "
-    
-    # Render the R Markdown document with the current input bed file
-    Rscript -e "rmarkdown::render('$script_directory/Hyperoptimization_H_e_calculation.Rmd')"
-    # Rscript -e "rmarkdown::render('$script_directory/4-4_3_selective_sweep_test_expected_heterozygosity.Rmd')"
-    
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+        wait -n
+    done
 done
 
-echo "Sweep test done for selection testing."
+# Wait for all background jobs to finish
+wait
+echo "All simulation scenarios processed."
+
 echo "The results are stored in: $expected_heterozygosity_dir"
 
 

@@ -1,4 +1,3 @@
-
 #!/bin/bash -l
 
 # Start the timer 
@@ -8,10 +7,9 @@ script_start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
-#cd $HOME
+# HOME=/home/jonathan
+cd $HOME
 
-script_directory=$HOME/code/pipeline_scripts
 ######################################  
 ####### Defining parameter values #######
 ######################################
@@ -91,44 +89,80 @@ mkdir -p $selection_model_H_e_dir
 export causative_variant_H_e_dir="$selection_model_causative_variant_windows_dir/H_e_$MAF_status_suffix"
 mkdir -p $causative_variant_H_e_dir
 
-
 ##############################################################################################  
 ############ RESULTS ###########################################################################
-############################################################################################## 
+##############################################################################################
+# Function to run the R Markdown script for a given simulation scenario
+H_e_calculation() {
+    local simulation_scenario=$1
+    local simulation_model_allele_frequency_dir=$2
+    local simulation_model_H_e_dir=$3
+    local sweep_test_type=$4
+    local output_dir_sweep_test=$5
+    local knit_document_check=$6 # Variable that controls the knitting of the .rmd file   
+
+
+
+    export ROH_hotspots_dir="$empirical_roh_hotspots_dir"
+    export empirical_roh_hotspots_allele_frequency_dir="$Empirical_breed_roh_hotspots_allele_frequency_dir"
+    export empirical_allele_frequency_dir="$Empirical_breed_allele_freq_dir"
+    export output_empirical_H_e_dir="$Empirical_breed_H_e_dir"
+
+    export sim_scenario_id="$simulation_scenario"
+    export simulated_model_allele_frequency_dir="$simulation_model_allele_frequency_dir"
+    export output_simulated_model_H_e_dir="$simulation_model_H_e_dir"
+    export sweep_test_type="$sweep_test_type"
+    export output_dir_sweep_test="$output_dir_sweep_test"
+
+
+    # echo "Processing simulation scenario: $simulation_scenario"
+    # echo "empirical_allele_frequency_dir: $empirical_allele_frequency_dir "
+    # echo "simulated_model_allele_frequency_dir: $simulated_model_allele_frequency_dir "
+    # echo "sim_scenario_id: $sim_scenario_id "
+    # echo "output_empirical_H_e_dir: $output_empirical_H_e_dir "
+    # echo "output_simulated_model_H_e_dir: $output_simulated_model_H_e_dir "
+    
+    # Render the R Markdown document with the current simulation scenario
+    if [ "$knit_document_check" -eq 1 ]; then
+        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/4-4_3_selective_sweep_test_expected_heterozygosity.Rmd')"
+    else
+        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/4-4_3_selective_sweep_test_expected_heterozygosity.Rmd', run_pandoc=FALSE)" # Run the .rmd script without knitting!
+    fi         
+
+
+}
+
+
+max_parallel_jobs=30
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 # Extract unique simulation prefixes
 # simulation_scenarios_neutral_model=$(find $neutral_model_allele_freq_dir -maxdepth 1 -type f -name "*.bed" | sed -E 's/.*sim_[0-9]+_(.*)_allele_freq\.bed/\1/' | sort -u)
 readarray -t simulation_scenarios_neutral_model < <(find "$neutral_model_allele_freq_dir" -maxdepth 1 -type f -name "*.bed" | sed -E 's/.*sim_[0-9]+_(.*)_allele_freq\.bed/\1/' | sort -u)
-
-# Loop over each input bed file
+counter=0
+# Loop over each input simulation scenario
 for simulation_scenario in "${simulation_scenarios_neutral_model[@]}"; do
-    echo "$simulation_scenario"
-    
-    # Construct the params list
-    export ROH_hotspots_dir="$empirical_roh_hotspots_dir"
-    export empirical_roh_hotspots_allele_frequency_dir="$Empirical_breed_roh_hotspots_allele_frequency_dir"
-    export empirical_allele_frequency_dir="$Empirical_breed_allele_freq_dir"
-    export simulated_model_allele_frequency_dir="$neutral_model_allele_freq_dir"
-    export sim_scenario_id="$simulation_scenario"
-    export sweep_test_type="Selection_testing"
-    export output_dir_sweep_test="$selection_testing_results_dir"
-    export output_empirical_H_e_dir="$Empirical_breed_H_e_dir"
-    export output_simulated_model_H_e_dir="$neutral_model_H_e_dir"
+    ((counter++)) 
+    if [ "$counter" -eq 1 ]; then
+        knit_document_check=1  # Only knit for the first simulation
+    else
+        knit_document_check=0  # Just run the script for all other cases
+    fi 
 
-    echo "empirical_roh_hotspots_allele_frequency_dir: $empirical_roh_hotspots_allele_frequency_dir"
-    echo "empirical_allele_frequency_dir: $empirical_allele_frequency_dir "
-    echo "simulated_model_allele_frequency_dir: $simulated_model_allele_frequency_dir "
-    echo "sim_scenario_id: $sim_scenario_id "
-    echo "sweep_test_type: $sweep_test_type "
-    echo "output_dir_sweep_test: $selection_testing_results_dir "
-    echo "output_empirical_H_e_dir: $Empirical_breed_H_e_dir "
-    echo "output_simulated_model_H_e_dir: $neutral_model_H_e_dir "
-    
-    # Render the R Markdown document with the current input bed file
-    Rscript -e "rmarkdown::render('$script_directory/4-4_3_selective_sweep_test_expected_heterozygosity.Rmd')"
+    sweep_test_type="Selection_testing"
+
+    H_e_calculation $simulation_scenario $neutral_model_allele_freq_dir $neutral_model_H_e_dir $sweep_test_type $selection_testing_results_dir $knit_document_check &
+
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+        wait -n
+    done
 done
+
+# Wait for all background jobs to finish
+wait
+# echo "All neutral model simulations processed."
 
 echo "Sweep test done for selection testing."
 echo "The results are stored in: $selection_testing_results_dir"
@@ -141,32 +175,29 @@ if [ "$selection_simulation" = TRUE ]; then
     readarray -t simulation_scenarios_selection_model < <(find "$selection_model_allele_freq_dir" -maxdepth 1 -type f -name "*.bed" | sed -E 's/.*sim_[0-9]+_(.*)_allele_freq\.bed/\1/' | sort -u)
     # echo "$simulation_scenarios"
     # Loop over each input bed file
+    counter=0
+
+    # Loop over each input simulation scenario
     for simulation_scenario in "${simulation_scenarios_selection_model[@]}"; do
-        echo "$simulation_scenario"
-    
-        # Construct the params list
-        export ROH_hotspots_dir="$empirical_roh_hotspots_dir"
-        export empirical_roh_hotspots_allele_frequency_dir="$Empirical_breed_roh_hotspots_allele_frequency_dir"
-        export empirical_allele_frequency_dir="$Empirical_breed_allele_freq_dir"
-        export simulated_model_allele_frequency_dir="$selection_model_allele_freq_dir"
-        export sim_scenario_id="$simulation_scenario"
-        export sweep_test_type="Selection_Strength_testing"
-        export output_dir_sweep_test="$selection_strength_testing_results_dir"
-        export output_empirical_H_e_dir="$Empirical_breed_H_e_dir"
-        export output_simulated_model_H_e_dir="$selection_model_H_e_dir"
+        ((counter++)) 
+        if [ "$counter" -eq 1 ]; then
+            knit_document_check=1  # Only knit for the first simulation
+        else
+            knit_document_check=0  # Just run the script for all other cases
+        fi 
 
+        sweep_test_type="Selection_Strength_testing"
 
-        echo "empirical_roh_hotspots_allele_frequency_dir: $empirical_roh_hotspots_allele_frequency_dir"
-        echo "empirical_allele_frequency_dir: $empirical_allele_frequency_dir "
-        echo "simulated_model_allele_frequency_dir: $simulated_model_allele_frequency_dir "
-        echo "sim_scenario_id: $sim_scenario_id "
-        echo "sweep_test_type: $sweep_test_type "
-        echo "output_dir_sweep_test: $selection_strength_testing_results_dir "
+        H_e_calculation $simulation_scenario $selection_model_allele_freq_dir $selection_model_H_e_dir $sweep_test_type $selection_strength_testing_results_dir $knit_document_check &
 
-        # Render the R Markdown document with the current input bed file
-        Rscript -e "rmarkdown::render('$script_directory/4-4_3_selective_sweep_test_expected_heterozygosity.Rmd')"
+        # Control the number of parallel jobs
+        while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+            wait -n
+        done
     done
 
+    # Wait for all background jobs to finish
+    wait
     echo "Sweep test done for selection strength testing."
     echo "The results are stored in: $selection_strength_testing_results_dir"
     #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -177,14 +208,12 @@ if [ "$selection_simulation" = TRUE ]; then
     export causative_windows_allele_freq_dir="$causative_windows_allele_freq_dir"
 
     # Modify the pipeline_result_summary.sh script call to include the MAF status suffix in the output file name
-    output_file="$script_directory/4-4_4_causative_windows_expected_heterozygosity_${MAF_status_suffix}.html"
+    output_file="$pipeline_scripts_dir/4-4_4_causative_windows_expected_heterozygosity_${MAF_status_suffix}.html"
     # Render the R Markdown document with the current input bed file
-    Rscript -e "rmarkdown::render('$script_directory/4-4_4_causative_windows_expected_heterozygosity.Rmd', output_file = '$output_file')"
+    Rscript -e "rmarkdown::render('$pipeline_scripts_dir/4-4_4_causative_windows_expected_heterozygosity.Rmd', output_file = '$output_file')"
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
 fi
-
-
 
 # Ending the timer 
 script_end=$(date +%s)

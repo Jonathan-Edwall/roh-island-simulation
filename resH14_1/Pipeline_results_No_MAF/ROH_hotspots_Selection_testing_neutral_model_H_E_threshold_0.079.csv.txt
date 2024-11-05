@@ -1,9 +1,0 @@
-Hotspot_chr1_window_1 & Yes & 0.044\\
-Hotspot_chr28_window_1 & Yes & 0.072\\
-Hotspot_chr6_window_1 & No & 0.091\\
-Hotspot_chr11_window_2 & No & 0.113\\
-Hotspot_chr15_window_1 & No & 0.115\\
-Hotspot_chr24_window_1 & No & 0.121\\
-Hotspot_chr13_window_1 & No & 0.125\\
-Hotspot_chr11_window_1 & No & 0.15\\
-Hotspot_chr8_window_1 & No & 0.156\\

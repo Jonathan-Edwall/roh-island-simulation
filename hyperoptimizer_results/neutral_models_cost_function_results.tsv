@@ -1,2 +1,0 @@
-Chr	NeBurnIn	nBottleneck	nGenBottleneck	nGenBreed	nBreed	SNPchipRefPop	Chr_specific_recomb_rate	Mutations	Sim_F_ROH	F_ROH_CI	Sim_ROH_hotspot_thr	ROH_hotspot_thr_CI	H_e_No_MAF	H_e_No_MAF_ci	H_e_5th_perc_No_MAF	H_e_MAF_0_05	H_e_MAF_0_05_ci	H_e_5th_perc_MAF_0_05	Sim_Cost_Result
-chr3	2500	50	5	40	200	last_breed_formation_generation	FALSE	TRUE	0.155	(0.15, 0.16)	0.3	(0.279, 0.321)	0.16389	(0.16273, 0.16504)	0.04437	0.32759	(0.32605, 0.32913)	0.18256	4.20219

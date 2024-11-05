@@ -10,7 +10,6 @@ editor_options:
   markdown: 
     wrap: 72
 ---
-
 # 0: Preparation
 Defining the input and output files
 
@@ -20,37 +19,27 @@ rm(list = ls())
 
 knitr::opts_chunk$set(echo = TRUE)
 
-####################################  
-# Defining the working directory
 #################################### 
+# Defining Input parameters
+#################################### 
+dropoff_from_causative_variant_percentage <- 0.1 # Adjacent windows with ROH-frequencies less than 10 % from the original causative window (or larger) are incorporated into the causative variant window
 
-# Set the path to your GitHub folder
-YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
-
-# Defining the relative path in the repository
-repository_path <- file.path(YOUR_GITHUB_ROOT_DIRECTORY,"Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations")
-
-results_dir <- file.path(repository_path,"results")
-
+####################################  
+# Defining the Input Directories
+#################################### 
+results_dir <- file.path(repository_path,"results_test")
 ROH_hotspots_dir <- file.path(results_dir,"ROH-Hotspots")
 
-raw_selection_data_dir <- file.path(repository_path,"data/raw/simulated/selection_model")
+simulated_data_name <- "simulated_test"
+# raw_simulated_data_dir <- file.path(repository_path,"data/raw/simulated_test")
+raw_selection_data_dir <- file.path(repository_path,"data/raw",simulated_data_name,"selection_model")
 
 variant_position_dir <- file.path(raw_selection_data_dir,"variant_position")
 variant_freq_plots_dir <- file.path(raw_selection_data_dir,"variant_freq_plots")
-
-output_dir <- file.path(results_dir,"causative_variant")
-if (!dir.exists(output_dir)) {
-  # Create the working directory if it doesn't exist
-  dir.create(output_dir, recursive = TRUE)
-}
-
 selection_pop_roh_freq_dir <- file.path(results_dir,"Bedtools/coverage/simulated/selection_model/pop_roh_freq")
-
 ####################################  
-# Defining the input file
+# Defining the input files
 #################################### 
-
 #input_pop_roh_freq_file <- file.path(selection_pop_roh_freq_dir,"sim_5_selection_model_s08_chr3_ROH_freq.bed")
 input_pop_roh_freq_file <- file.path(selection_pop_roh_freq_dir,"sim_5_selection_model_s03_chr3_ROH_freq.bed")
 
@@ -61,64 +50,38 @@ filename <- basename(input_pop_roh_freq_file)
 prefix <- strsplit(filename, "_ROH_freq.bed")[[1]][1]
 # Output the prefix
 print(prefix)
-
-
 #input_selection_coefficient_variant_positions_file <- file.path(variant_position_dir,"variant_position_s_0.8.tsv")
 input_selection_coefficient_variant_positions_file <- file.path(variant_position_dir,"variant_position_s03_chr3.tsv")
-
 chr_simulated="chr3"
 # Extract the chromosome number and convert and convert it to numeric
 chr_number <- as.numeric(sub(tolower("chr"), "", tolower(chr_simulated)))
 
-
-
 #################################### 
-# Defining the output dirs
+# Defining the output 
 #################################### 
-
+output_dir <- file.path(results_dir,"causative_variant_windows")
+if (!dir.exists(output_dir)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_dir, recursive = TRUE)
+}
 #output_variant_window_lengths_file <- file.path(output_dir,"causative_variant_window_lengths_s_0.8.tsv") 
-output_variant_window_lengths_file <- file.path(output_dir,"causative_variant_window_lengths_s_0.3.tsv") 
-
-
-
-
-
-
-
-
-
+output_variant_window_lengths_file <- file.path(output_dir,"causative_variant_window_lengths_s_0.3.tsv")
 
 # Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir)
-
-#################################### 
-# Defining Input parameters
-#################################### 
-# roh_hotspot_threshold_percentage <- 0.01 # 0.01 represents top 1 % most homozygous region
-# max_hotspot_windows_gap <- 2*10^6 # ROH-hotspot windows that are less than 2Mb apart are merged together (see section 1.3)
-dropoff_from_causative_variant_percentage <- 0.1 # 0.01 represents top 1 % most homozygous region
-
-
 
 # # Verify the current working directory
 # getwd()
 
 ```
-
 ## Loading libraries
-
 ```{r library()}
 library(knitr)
-
 ```
-
-
 # 1: Locate variant position
 ```{r}
-
 # Read the data without treating "#" as a comment
 Variant_positions_table <- read.table(input_selection_coefficient_variant_positions_file, header = FALSE, sep = "\t", comment.char = "")
-
 # Check if the output_sim_files_basename already exists in the file
 existing_row_index <- which(Variant_positions_table$V1 == prefix)
 existing_row_index
@@ -130,20 +93,14 @@ if (length(existing_row_index) > 0) {
 }
 
 variant_position_bp
-# Find row where data$V1 = 
-
- # then: variant_pos = $V2 of that row.
-
-
 ```
 # 2: Locate window with causative variant
 ```{r}
 # Read the data without treating "#" as a comment
 Pop_roh_freq_table <- read.table(input_pop_roh_freq_file, header = TRUE, sep = "\t", comment.char = "")
-View(Pop_roh_freq_table)
+#View(Pop_roh_freq_table)
 # Assigning column names
 colnames(Pop_roh_freq_table) <- c("CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
-
 
 # Find the row where the variant_position_bp is within POS1 and POS2, and CHR equals chr_number
 row_with_variant_chr <- Pop_roh_freq_table[Pop_roh_freq_table$POS1 <= variant_position_bp &
@@ -153,16 +110,11 @@ row_with_variant_chr <- Pop_roh_freq_table[Pop_roh_freq_table$POS1 <= variant_po
 if (nrow(row_with_variant_chr) == 0) {
   stop("No row found with the specified variant position and chromosome number.")
 }
-
 # Display the row
 print(row_with_variant_chr)
-
-
 ```
 # 3: Find Causative variant window
 ```{r}
-
-
 # Get the index of the row_with_variant_chr in the original table
 variant_row_index <- which(Pop_roh_freq_table$POS1 == row_with_variant_chr$POS1 &
                            Pop_roh_freq_table$POS2 == row_with_variant_chr$POS2 &
@@ -196,51 +148,30 @@ incorporate_windows_to_causative_window <- function(start_index, direction) {
 incorporate_windows_to_causative_window(variant_row_index, -1)  # Look backwards
 incorporate_windows_to_causative_window(variant_row_index, 1)   # Look forwards
 
-View(causative_variant_window_table)
+#View(causative_variant_window_table)
 
 # Sort the data frame based on F_ROH column
 causative_variant_window_table_sorted <- causative_variant_window_table[order(as.numeric(causative_variant_window_table$POS1)), ]
-
-
 # Display the variant window table
 print(causative_variant_window_table_sorted)
-
-View(causative_variant_window_table_sorted)
+#View(causative_variant_window_table_sorted)
 
 length_window <- max(causative_variant_window_table_sorted$POS2) - min(causative_variant_window_table_sorted$POS1) + 1
 length_window_MB <- length_window / (10^6)
 length_window_MB
-
 # Define column names for the table
-
 column_names <- c("#CHR", "POS1", "POS2", "COUNT", "FREQUENCY")
-
-
-
 # Set the column names of the table
-
 colnames(causative_variant_window_table_sorted) <- column_names
-
-
-
 filename <- file.path(output_dir, paste(prefix, "_causative_variant_window_", length_window_MB, "_MB", ".bed", sep = ""))
   
-
 # Set the column names of the table
-
 colnames(causative_variant_window_table_sorted) <- column_names
-
-
-
 # Write data to TSV file without quotes and with tab separation
-
 write.table(causative_variant_window_table_sorted, file = filename, quote = FALSE, col.names = TRUE, row.names = FALSE, sep = "\t")
-
 ```
-
-#4: export window lengths
+#4: Export Window Lengths
 ```{r}
-
 # Check if the file exists
 if (file.exists(output_variant_window_lengths_file)) {
     # Read the existing data from the file
@@ -264,12 +195,9 @@ if (length(existing_row_index) > 0) {
 
 # Define column names for the table
 column_names <- c("#Simulation name", "Length (bp)")
-
 # Set the column names of the table
 colnames(causative_variant_window_lengths_table) <- column_names
 
 # Write the updated data back to the file
-
 write.table(causative_variant_window_lengths_table, file = output_variant_window_lengths_file, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
-
 ```

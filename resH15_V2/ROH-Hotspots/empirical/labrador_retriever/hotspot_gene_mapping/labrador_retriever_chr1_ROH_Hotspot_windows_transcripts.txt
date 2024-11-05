@@ -1,3 +1,0 @@
-1	ncbiRefSeq	transcript	21788833	22418604	.	-	.	gene_id"DCC";	transcript_id	"XM_022416893.1";	gene_name	"DCC";
-1	ncbiRefSeq	transcript	21788833	22483786	.	-	.	gene_id"DCC";	transcript_id	"XM_014110301.2";	gene_name	"DCC";
-1	ncbiRefSeq	transcript	21788833	22494849	.	-	.	gene_id"DCC";	transcript_id	"XM_014110275.2";	gene_name	"DCC";

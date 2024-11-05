@@ -1,6 +1,0 @@
-Model,F_ROH,Lower_CI,Upper_CI,Standard_Deviation,Coefficient_of_variation,Error_percentage
-Sams,0.155,0.15,0.16,0.01038,6.7,33.6
-First\_HO\_1,0.225,0.214,0.237,0.02461,10.9,3.4
-First\_HO\_3,0.225,0.211,0.24,0.03282,14.6,3.4
-Empirical,0.233,NA,NA,NA,NA,NA
-Second\_HO\_1,0.24,0.227,0.252,0.02828,11.8,2.6

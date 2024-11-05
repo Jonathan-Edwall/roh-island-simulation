@@ -4,20 +4,14 @@
 # Start the timer 
 script_start=$(date +%s)
 
-
-
-
 ####################################  
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
-#cd $HOME
+# HOME=/home/jonathan
+cd $HOME
 
-script_directory=$HOME/code/pipeline_scripts
-
-
-
+# pipeline_scripts_dir=$script_dir/pipeline_scripts
 
 ######################################  
 ####### Defining the INPUT files #######
@@ -69,6 +63,12 @@ mkdir -p $roh_hotspots_freq_empirical_breed_dir # Creating subdirectory if it do
 #�������������
 #� Simulated � 
 #�������������
+preprocessed_data_dir=$data_dir/preprocessed
+preprocessed_simulated_data_dir=$preprocessed_data_dir/simulated
+preprocessed_neutral_model_dir=$preprocessed_simulated_data_dir/neutral_model
+preprocessed_selection_model_dir=$preprocessed_simulated_data_dir/selection_model
+
+
 simulated_roh_hotspots_dir=$ROH_hotspots_dir/simulated
 ##### Neutral Model #####
 Neutral_model_ROH_hotspots_dir=$simulated_roh_hotspots_dir/neutral
@@ -99,13 +99,6 @@ roh_hotspots_freq_selection_model_dir=$Selection_model_ROH_hotspots_dir/Gosling_
 mkdir -p $roh_hotspots_freq_selection_model_dir # Creating subdirectory if it doesn't already exist
 
 
-######################################  
-####### Defining parameter values #######
-######################################
-
-
-
-
 ##############################################################################################  
 ############ RESULTS ###########################################################################
 ############################################################################################## 
@@ -129,10 +122,13 @@ if [ "$empirical_processing" = TRUE ]; then
         export gapless_roh_hotspots_directory="$gapless_roh_hotspots_empirical_breed_dir"
         export autosome_roh_freq_directory="$autosome_roh_freq_empirical_breed_dir"
         export roh_hotspots_freq_directory="$roh_hotspots_freq_empirical_breed_dir"
+
+        export simulation_processing=FALSE
         
         # Render the R Markdown document with the current input bed file
-        Rscript -e "rmarkdown::render('$script_directory/3-2_3_ROH_hotspots_identification.Rmd')"
+        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd')"
     done
+    wait
 
     echo "ROH-Hotspots detected for the German Shepherd"
     echo "The results are stored in: $roh_hotspots_output_empirical_breed_dir"
@@ -141,31 +137,77 @@ else
     echo "Empirical data has been set to not be processed, since files have already been created."
 fi
 
+max_parallel_jobs=16
+# Function to process ROH hotspots for a given set of bed files
+process_roh_hotspots() {
+    local bed_file=$1
+    local output_directory=$2  # Output directory for the results
+    local gapless_roh_hotspots_simulation_model_dir=$3
+    local autosome_roh_freq_simulation_model_dir=$4
+    local roh_hotspots_freq_simulation_model_dir=$5
+    local knit_document_check=$6 # Variable that controls the knitting of the .rmd file   
+    local max_length_chromosome=$7
+
+    export pop_roh_freq_bed_file="$bed_file"
+    export input_bed_file="$pop_roh_freq_bed_file"
+    export max_length_chromosome="$max_length_chromosome"
+
+    echo "Processing: $pop_roh_freq_bed_file"
+    export simulation_processing=TRUE
+
+    
+    # Construct the params list
+    export input_bed_file="$pop_roh_freq_bed_file"
+    export output_directory="$output_directory"
+    export gapless_roh_hotspots_directory="$gapless_roh_hotspots_simulation_model_dir"  # Adjust as needed
+    export autosome_roh_freq_directory="$autosome_roh_freq_simulation_model_dir"  # Adjust as needed
+    export roh_hotspots_freq_directory="$roh_hotspots_freq_simulation_model_dir"  # Adjust as needed
+
+    if [ "$knit_document_check" -eq 1 ]; then
+        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd')"
+    else
+        # Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd'), run_pandoc=FALSE)" # Run the .rmd script without knitting!
+        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd', run_pandoc=FALSE)"
+
+    fi         
+
+}
+
+
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+
 # Generate the list of .bed files in the directory
 readarray -t Neutral_model_bed_files < <(ls "$roh_frequencies_neutral_model_dir"/*.bed | sort -Vu)
 
-
-
+counter=0
 # Loop over each input bed file
 for bed_file in "${Neutral_model_bed_files[@]}"; do
-    export pop_roh_freq_bed_file="$bed_file"
-    echo "$pop_roh_freq_bed_file"
-    
-    # Construct the params list
-    export input_bed_file="$pop_roh_freq_bed_file"
-    export output_directory="$Neutral_model_ROH_hotspots_dir"
-    export gapless_roh_hotspots_directory="$gapless_roh_hotspots_neutral_model_dir"
-    export autosome_roh_freq_directory="$autosome_roh_freq_neutral_model_dir"
-    export roh_hotspots_freq_directory="$roh_hotspots_freq_neutral_model_dir"
-    
-    # Render the R Markdown document with the current input bed file
-    Rscript -e "rmarkdown::render('$script_directory/3-2_3_ROH_hotspots_identification.Rmd')"
+    ((counter++)) 
+    if [ "$counter" -eq 1 ]; then
+        knit_document_check=1  # Only knit for the first simulation
+    else
+        knit_document_check=0  # Just run the script for all other cases
+    fi
+
+    filename=$(basename "$bed_file")
+    # Extract the simulation name
+    simulation_name="${filename%_ROH_freq.bed}"
+    autosome_lengths_file="${preprocessed_neutral_model_dir}/${simulation_name}_autosome_lengths_and_marker_density.tsv"
+    max_length_chromosome=$(awk 'NR==2 {print $2}' $autosome_lengths_file) 
+
+    process_roh_hotspots $bed_file $Neutral_model_ROH_hotspots_dir $gapless_roh_hotspots_neutral_model_dir $autosome_roh_freq_neutral_model_dir $roh_hotspots_freq_neutral_model_dir $knit_document_check $max_length_chromosome &
+    # Control the number of parallel jobs
+    while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
+        wait -n
+    done
+
 done
 
+# Wait for all background jobs to finish
+wait
 echo "ROH-Hotspots detected for the Neutral Model Simulations"
 echo "The results are stored in: $Neutral_model_ROH_hotspots_dir"
 
@@ -175,23 +217,32 @@ echo "The results are stored in: $Neutral_model_ROH_hotspots_dir"
 if [ "$selection_simulation" = TRUE ]; then
     # Generate the list of .bed files in the directory
     readarray -t Selection_models_bed_files < <(ls "$roh_frequencies_selection_model_dir"/*.bed | sort -Vu)
-
+    counter=0
     # Loop over each input bed file
     for bed_file in "${Selection_models_bed_files[@]}"; do
-        export pop_roh_freq_bed_file="$bed_file"
-        echo "$pop_roh_freq_bed_file"
-        
-        # Construct the params list
-        export input_bed_file="$pop_roh_freq_bed_file"
-        export output_directory="$Selection_model_ROH_hotspots_dir"
-        export gapless_roh_hotspots_directory="$gapless_roh_hotspots_selection_model_dir"
-        export autosome_roh_freq_directory="$autosome_roh_freq_selection_model_dir"
-        export roh_hotspots_freq_directory="$roh_hotspots_freq_selection_model_dir"
-        
-        # Render the R Markdown document with the current input bed file
-        Rscript -e "rmarkdown::render('$script_directory/3-2_3_ROH_hotspots_identification.Rmd')"
+        ((counter++)) 
+        if [ "$counter" -eq 1 ]; then
+            knit_document_check=1  # Only knit for the first simulation
+        else
+            knit_document_check=0  # Just run the script for all other cases
+        fi
+
+        filename=$(basename "$bed_file")
+        # Extract the simulation name
+        simulation_name="${filename%_ROH_freq.bed}"
+        autosome_lengths_file="${preprocessed_selection_model_dir}/${simulation_name}_autosome_lengths_and_marker_density.tsv"
+        max_length_chromosome=$(awk 'NR==2 {print $2}' $autosome_lengths_file)
+
+        process_roh_hotspots "$bed_file" "$Selection_model_ROH_hotspots_dir" "$gapless_roh_hotspots_selection_model_dir" "$autosome_roh_freq_selection_model_dir" "$roh_hotspots_freq_selection_model_dir" $knit_document_check $max_length_chromosome &
+
+        # Control the number of parallel jobs
+        while [ "$(jobs -r | wc -l)" -ge "$max_parallel_jobs" ]; do
+            wait -n
+        done
     done
 
+    # Wait for all background jobs to finish
+    wait
     echo "ROH-Hotspots detected for the Selection Model Simulations"
     echo "The results are stored in: $Selection_model_ROH_hotspots_dir"
 

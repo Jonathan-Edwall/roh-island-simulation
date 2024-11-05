@@ -13,21 +13,21 @@ script_start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
+# HOME=/home/jonathan
 cd $HOME
 
-pipeline_script_dir=$HOME/code/pipeline_scripts
+# pipeline_script_dir=$HOME/code/pipeline_scripts
 
 
-# Function to handle user interruption
-handle_interrupt() {
-    echo "Pipeline interrupted. Exiting."
-    # Could potentially clean up the files created up until the script termination here
-    exit 1
-}
+# # Function to handle user interruption
+# handle_interrupt() {
+#     echo "Pipeline interrupted. Exiting."
+#     # Could potentially clean up the files created up until the script termination here
+#     exit 1
+# }
 
-# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
-trap 'handle_interrupt' SIGINT
+# # Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
+# trap 'handle_interrupt' SIGINT
 
 #################################### 
 # Defining Simulation parameters
@@ -40,20 +40,6 @@ mkdir -p $output_dir_selection_simulation/pruned_counts  # Creating a subdirecto
 mkdir -p $output_dir_selection_simulation/variant_position  # Creating a subdirectory for storing the position of the selected causative variant
 mkdir -p $output_dir_selection_simulation/variant_freq_plots
 # selection_coefficient_list=(0.8) # Defined in run_pipeline.sh
-
-
-# selection_coefficient_list=(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
-# selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
-# selection_coefficient_list=(0.3 0.4 0.5 0.6 0.7 0.8)
-
-# selection_coefficient_list=(0.2 0.4 0.6 0.8)
-# selection_coefficient_list=(0.6 0.7 0.8)
-
-# selection_coefficient_list=(0.4 0.5 0.6 0.7 0.8)
-# selection_coefficient_list=(0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
-
-# selection_coefficient_list=(0.6 0.7)
-# selection_coefficient_list=(0.8)
 
 #¤¤¤¤¤¤¤¤¤¤¤ If running this script outside of run_pipeline.sh, then define these variables below: ¤¤¤¤¤¤¤¤¤¤¤ 
 # n_simulation_replicates=1
@@ -73,7 +59,7 @@ mkdir -p $output_dir_selection_simulation/variant_freq_plots
 
 # Function to run a single simulation for a specific selection coefficient
 run_simulation() {
-    disappearance_threshold_value_to_terminate_script=20   # After 20 failed tries, the script gets rerun
+    disappearance_threshold_value_to_terminate_script=100   # After 20 failed tries, the script gets rerun
     local counter=$1
     local selection_coefficient=$2
     local knit_document_check=$3 # Variable that controls the knitting of the .rmd file   
@@ -151,7 +137,7 @@ run_simulation() {
 ###### Running selection coefficients in parallel    ######
 #############################################
 cd $output_dir_selection_simulation
-counter_start=4 # Default 1: Modify this value of you want to resume the simulations at a specific technical replicate.
+counter_start=1 # Default 1: Modify this value of you want to resume the simulations at a specific technical replicate.
 
 if [ "$selection_simulation" = TRUE ]; then
     cd $output_dir_selection_simulation

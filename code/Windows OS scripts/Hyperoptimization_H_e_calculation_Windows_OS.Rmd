@@ -1,0 +1,472 @@
+---
+title: "Expected heterozygosity Calculation for the Hyperparameter Optimization"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3   # Adjust depth as needed
+date: "2024-06-26"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+# 0: Preparation
+## Defining the input and output directories
+```{r}
+# Clean the working environment
+rm(list = ls())
+knitr::opts_chunk$set(echo = TRUE)
+
+# Set the path to your GitHub folder
+YOUR_GITHUB_ROOT_DIRECTORY <- "C:/Users/jonat/GitHub"
+# Defining the relative path in the repository
+repository_path <- file.path(YOUR_GITHUB_ROOT_DIRECTORY,"Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations")
+
+####################################  
+# Defining Input parameters
+#################################### 
+window_size <- 100 * 10^3 # Define the window size for the binning of genomic regions
+# min_MAF <- 0.05
+min_MAF <- 0.01
+# use_MAF_pruning <- TRUE
+use_MAF_pruning <- FALSE
+
+# empirical_dog_breed <- "german_shepherd"
+empirical_dog_breed <- "labrador_retriever"
+
+
+####################################  
+# Defining the input files
+#################################### 
+sim_scenario_id <- "neutral_model_chr3"
+
+####################################  
+# Defining the Input Directories
+#################################### 
+results_dir <- file.path(repository_path,"results_test")
+expected_heterozygosity_results_dir <- file.path(results_dir,"expected_heterozygosity")
+
+empirical_genomewide_allele_freq_dir <- file.path(results_dir,"PLINK/allele_freq/empirical/labrador_retriever")
+simulated_model_allele_freq_dir <- file.path(results_dir,"PLINK/allele_freq/simulated/neutral_model")
+
+####################################  
+# Defining Output Directories
+#################################### 
+output_empirical_H_e_dir <- file.path(expected_heterozygosity_results_dir,"empirical/labrador_retriever")
+if (!dir.exists(output_empirical_H_e_dir)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_empirical_H_e_dir,recursive = TRUE)
+}
+
+output_simulated_model_H_e_dir <- file.path(expected_heterozygosity_results_dir,"simulated/selection_model")
+if (!dir.exists(output_simulated_model_H_e_dir)) {
+  # Create the working directory if it doesn't exist
+  dir.create(output_simulated_model_H_e_dir,recursive = TRUE)
+}
+
+```
+## Loading libraries
+```{r library()}
+library(knitr)
+```
+# Expected Heterozygosity
+Takes a list of H_e for a window and computes H_e for each SNP individually
+```{r}
+calculate_expected_heterozygosity <- function(p) {
+  # Calculate expected heterozygosity
+  heterozygosity <- 2 * p * (1 - p)
+  
+  return(heterozygosity)
+}
+```
+# 1: Loading the frequency files
+## 1.1 Empirical data
+### 1.1.2: Empirical - Genomewide
+```{r}
+# # Set the working directory to the directory with allele frequencies for the different ROH-genomewides
+# setwd(empirical_genomewide_allele_freq_dir)
+# 
+# # Get a list of all .bed files in the directory
+# bed_files <- list.files(path = empirical_genomewide_allele_freq_dir, pattern = "\\.bed$")
+# 
+# # Create an empty list to store information for the different ROH-genomewides in
+# empirical_genomewide_tables <- list()
+# 
+# # Loop through each .bed file (ROH-genomewide allele frequency window-file)
+# for (file in bed_files) {
+#   # Extract chromosome number and window number from file name
+#   chromosome <- sub(tolower(".*chr([0-9]+)_.*"), "\\1", tolower(file))
+#   window <- sub(tolower(".*window_([0-9]+)_.*"), "\\1", tolower(file))
+#   
+#   # Create table name
+#   table_name <- paste("Hotspot_chr", chromosome, "_window_", window, "_allele_freq", sep = "")
+#   
+#   # Read the header line
+#   con <- file(file, "r")
+#   header <- readLines(con, n = 1)
+#   close(con)
+#   
+#   # Remove "#" from the header and split it into column names
+#   column_names <- sub("#", "", header)
+#   column_names <- strsplit(column_names, "\t")[[1]]
+#   
+#   # Read the .bed file into a data frame, skipping commented lines
+#   empirical_genomewide_allele_freq_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+#   
+#   # Check if pruning markers by MAF should be done
+#   if (use_MAF_pruning == TRUE) {
+#     
+#     # Remove rows where MAF < min_MAF
+#     empirical_genomewide_allele_freq_data <- empirical_genomewide_allele_freq_data[empirical_genomewide_allele_freq_data$MAF >= min_MAF, ]
+#   }
+#   
+#   empirical_genomewide_allele_freq_data$H_e <- sapply(empirical_genomewide_allele_freq_data$MAF, calculate_expected_heterozygosity)
+# 
+# 
+#   
+#   # Create a list with table name and corresponding data frame
+#   table_info <- list(name = table_name, data = empirical_genomewide_allele_freq_data)
+#   
+#   # Append the table info to the list
+#   empirical_genomewide_tables <- c(empirical_genomewide_tables, list(table_info))
+# }
+# 
+# # View(empirical_genomewide_tables)
+
+```
+## 1.2: Neutral Model Data
+```{r}
+# Set the working directory to the directory containing the frequency files for the simulated data
+setwd(simulated_model_allele_freq_dir)
+
+# Create a pattern for finding all the allele frequency files associated with the studied simulation scenario
+pattern <- paste0(".*", sim_scenario_id, "_allele_freq\\.bed$")
+
+# Find all .bed files following the specified pattern
+frq_bed_files <- list.files(path = simulated_model_allele_freq_dir ,pattern = pattern)
+# Extract the simulation number after "sim_"
+simulation_numbers <- as.integer(sub(tolower("^sim_(\\d+)_.*"), "\\1", tolower(frq_bed_files)))
+# Sort the simulation-files based on the simulation number
+sorted_files <- frq_bed_files[order(simulation_numbers)]
+
+# Initialize an empty list to store Simulated model tables
+simulated_model_allele_freq_tables <- list()
+
+# Loop through each .frq file
+for (file in sorted_files) {
+  # Extract the table name from the file name
+  table_name <- gsub(tolower(".frq$"), "", tolower(file))
+  column_names <- c("CHR","POS1","POS2","SNP","A1","A2","MAF","NCHROBS")
+  # Read the .tsv frequency file into a data frame
+  allele_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  # Check if pruning markers by MAF should be done
+  if (use_MAF_pruning == TRUE) {
+    # Remove rows where MAF < min_MAF
+    allele_freq_data <- allele_freq_data[allele_freq_data$MAF >= min_MAF, ]
+  }
+  
+  # Calculate expected heterozygosity for all the markers 
+  # And store it in a new column called #H_e
+  allele_freq_data$H_e <- sapply(allele_freq_data$MAF, calculate_expected_heterozygosity)
+  # Create a list with table name and corresponding data frame
+  table_info <- list(name = table_name, data = allele_freq_data)
+  # Append the table info to the list
+  simulated_model_allele_freq_tables <- c(simulated_model_allele_freq_tables, list(table_info))
+}
+# View(simulated_model_allele_freq_tables)
+```
+#2: Computing window-based average expected heterozygosity Step 1:
+Create genomic windows Step 2: Compute the average H_e for each genomic
+window individually
+## 3.1: Empirical data
+### 3.1.2 Genomewide
+```{r}
+# 
+# ########################################################################
+# # Step 1: Create genomic windows
+# ########################################################################
+# 
+# # Initialize an empty list to store windows for each empirical_genomewide
+# empirical_genomewide_windows <- list()
+# 
+# # Iterating through each empirical_genomewide
+# for (index in seq_along(empirical_genomewide_tables)) {
+#   # Get the SNP positions, chromosome positions, and H_e values for the current empirical_genomewide
+#   snp_positions <- empirical_genomewide_tables[[index]][["data"]][["POS1"]]
+#   chr_positions <- empirical_genomewide_tables[[index]][["data"]][["CHR"]]
+#   he_values <- empirical_genomewide_tables[[index]][["data"]][["H_e"]]
+#   
+#   # Determine unique chromosomes present in the data
+#   unique_chromosomes <- unique(chr_positions)
+#   
+#   # Iterate through each chromosome
+#   for (chromosome in unique_chromosomes) {
+#     # Filter SNP positions and H_e values for the current chromosome
+#     chr_snp_positions <- snp_positions[chr_positions == chromosome]
+#     chr_he_values <- he_values[chr_positions == chromosome]
+#     
+#     # Determine the number of windows needed for the current chromosome
+#     num_windows <- ceiling(max(chr_snp_positions) / window_size)
+#     
+#     # Initialize an empty list to store windows for the current chromosome
+#     chr_windows <- list()
+#     
+#     # Iterate through each window
+#     for (window_index in seq_len(num_windows)) {
+#       # Determine the start and end positions of the current window
+#       window_start <- (window_index - 1) * window_size + 1
+#       window_end <- window_start + window_size - 1
+#       
+#       # Find the indices of SNPs within the current window
+#       snp_indices <- which(chr_snp_positions >= window_start & chr_snp_positions <= window_end)
+#       
+#       # Skip the window if there are no SNPs within it
+#       if (length(snp_indices) == 0) {
+#         next
+#       }
+# 
+#       else {
+# 
+#       
+#       # Extract the SNP positions and H_e values for the current window
+#       window_snp_positions <- chr_snp_positions[snp_indices]
+#       window_he_values <- chr_he_values[snp_indices]
+#       
+#       # Create a sub-table for the current window
+#       window_data <- data.frame(POS = window_snp_positions, H_e = window_he_values)
+#       
+#       # # Append the sub-table to the list of windows for the current chromosome
+#       # chr_windows[[window_index]] <- window_data
+#       # Append the sub-table to the list of windows for the current chromosome
+#       chr_windows[[length(chr_windows) + 1]] <- window_data
+# 
+#       
+#       
+#     }
+#     }
+#     
+#     # Append the list of windows for the current chromosome to the main list
+#     empirical_genomewide_windows[[chromosome]] <- chr_windows
+#   }
+# }
+
+# View the resulting windows
+# View(empirical_genomewide_windows)
+
+```
+
+
+```{r}
+
+# #######################################################################
+# # Step 2: Compute the average H_e for each genomic window individually
+# #######################################################################
+# 
+# # Create a list to store the average H_e values for each empirical_genomewide
+# Empirical_genomewide_window_he_3_1 <- list()
+# 
+# # Iterate over each empirical_genomewide
+# for (i in seq_along(empirical_genomewide_windows)) {
+#     # Create a vector to store the average H_e values for each window in the current empirical_genomewide
+#     Empirical_genomewide_window_he_3_1[[i]] <- numeric(length(empirical_genomewide_windows[[i]]))
+#     
+#     # Iterate over each window in the current empirical_genomewide
+#     for (j in seq_along(empirical_genomewide_windows[[i]])) {
+#         # Calculate the average H_e value for the current window
+# 
+#         # Using "na.rm = TRUE" To remove windows not having SNP-markers in them
+#         window_avg_he <- mean(empirical_genomewide_windows[[i]][[j]][["H_e"]], na.rm = TRUE) 
+#         
+#         # Store the average H_e value for the current window
+#         Empirical_genomewide_window_he_3_1[[i]][j] <- window_avg_he
+#     }
+#     # Removing NaN values for the current empirical_genomewide
+#     # (Windows without any markers)
+#     Empirical_genomewide_window_he_3_1[[i]] <- Empirical_genomewide_window_he_3_1[[i]][!is.na(Empirical_genomewide_window_he_3_1[[i]])]
+# 
+# }
+# 
+# # View(Empirical_genomewide_window_he_3_1)
+# 
+# # Calculating the mean H_e value for each chromosome
+# # sapply applies the mean-function on each chr in Simulation_windows_avg_he_3_2
+# empirical_chromosomes_mean_he_window_based <- sapply(Empirical_genomewide_window_he_3_1, mean)
+# 
+# cat("Average H_e of each chromosome in the empirical dataset:") 
+# print(empirical_chromosomes_mean_he_window_based)
+# 
+# 
+# #################################################################################
+# # Step 3: Compute the genomwide average H_e for the empirical data (window-based)
+# #################################################################################
+# 
+# empirical_genomewides_mean_he_window_based <- mean(empirical_chromosomes_mean_he_window_based)
+# cat("Average H_e of the empirical dataset:")
+# print(empirical_genomewides_mean_he_window_based)
+
+
+```
+## 3.2: NeutralSimulated data (Neutral)
+```{r}
+########################################################################
+# Step 1: Create genomic windows
+########################################################################
+# Initialize an empty list to store windows for each simulation
+simulation_windows <- list()
+# Iterating through each simulation
+for (sim_index in seq_along(simulated_model_allele_freq_tables)) {
+  # Get the SNP positions and H_e values for the current simulation
+  snp_positions <- simulated_model_allele_freq_tables[[sim_index]][["data"]][["POS1"]]
+  he_values <- simulated_model_allele_freq_tables[[sim_index]][["data"]][["H_e"]]
+  # Determine the number of windows needed
+  num_windows <- ceiling(max(snp_positions) / window_size)
+  # Initialize an empty list to store windows for the current simulation
+  sim_windows <- list()
+  
+  # Iterate through each window
+  for (window_index in seq_len(num_windows)) {
+    # Determine the start and end positions of the current window
+    window_start <- (window_index - 1) * window_size +1
+    window_end <- window_start + window_size - 1
+    # Find the indices of SNPs within the current window
+    snp_indices <- which(snp_positions >= window_start & snp_positions <= window_end)
+    
+    # Skip the window if there are no SNPs within it
+    if (length(snp_indices) == 0) {
+      next
+    }
+    
+    else {
+        # Extract the SNP positions and H_e values for the current window
+        window_snp_positions <- snp_positions[snp_indices]
+        window_he_values <- he_values[snp_indices]
+        # Create a sub-table for the current window
+        window_data <- data.frame(POS = window_snp_positions, H_e = window_he_values)
+        # Append the sub-table to the list of windows for the current simulation
+        sim_windows[[length(sim_windows) + 1]] <- window_data
+    }
+  }
+  # Append the list of windows for the current simulation to the main list
+  simulation_windows[[sim_index]] <- sim_windows
+}
+# View(simulation_windows)
+#######################################################################
+# Step 2: Compute the average H_e for each genomic window individually
+#######################################################################
+# Create a list to store the average H_e values for each simulation
+Simulation_windows_avg_he_3_2 <- list()
+# Iterate over each simulation
+for (i in seq_along(simulation_windows)) {
+    # Create a vector to store the average H_e values for each window in the current simulation
+    Simulation_windows_avg_he_3_2[[i]] <- numeric(length(simulation_windows[[i]]))
+    
+    # Iterate over each window in the current simulation
+    for (j in seq_along(simulation_windows[[i]])) {
+        # Calculate the average H_e value for the current window
+        # Using "na.rm = TRUE" To remove windows not having SNP-markers in them
+        window_avg_he <- mean(simulation_windows[[i]][[j]][["H_e"]], na.rm = TRUE) 
+        # Store the average H_e value for the current window
+        Simulation_windows_avg_he_3_2[[i]][j] <- window_avg_he
+    }
+    # Removing NaN values for the current simulation
+    # (Windows without any markers)
+    Simulation_windows_avg_he_3_2[[i]] <- Simulation_windows_avg_he_3_2[[i]][!is.na(Simulation_windows_avg_he_3_2[[i]])]
+
+}
+
+# Calculate the mean H_e value for each simulation
+# sapply applies the mean-function on each chr in Simulation_windows_avg_he_3_2 
+simulations_mean_he_window_based <- sapply(Simulation_windows_avg_he_3_2, mean)
+simulations_mean_he_window_based
+```
+# 4: Sweep test (Selection testing)
+## 4.1 Computing 5th percentiles of H_e distribution
+### 4.1.1 Empirical dataset - H_e
+```{r}
+# # 
+# # # Check if pruning markers by MAF should be done
+# # if (use_MAF_pruning == TRUE) {
+# #     MAF_setting_text <- paste0("MAF >= ", min_MAF)
+# #     # Remove rows where MAF < min_MAF
+# #     hotspot_allele_freq_data <- hotspot_allele_freq_data[hotspot_allele_freq_data$MAF >= min_MAF, ]
+# # } else {
+# #     MAF_setting_text <- "No MAF-pruning"
+# # }
+# # 
+# # # Calculate the 5th percentile
+# # empirical_dataset_percentile_5 <- quantile(unlist(Empirical_genomewide_window_he_3_1), 0.05)
+# 
+# 
+# 
+# # # Determine the number of bins you want
+# # num_bins <- 100  
+# # 
+# # histogram_title <-  paste0(empirical_dog_breed," H_e Distribution (",MAF_setting_text,") - Windowsize: ",window_size,"bp ")
+# # image_name <- paste0("H_e_distribution_",empirical_dog_breed,".png")
+# # 
+# # # Save the plot as a PNG file with specified path
+# # png(file.path(output_empirical_H_e_dir, image_name), width = 1200, height = 900, res = 120)
+# # 
+# # # Create a histogram with custom breaks
+# # # Using unlist to 
+# # hist(unlist(Empirical_genomewide_window_he_3_1), breaks = num_bins, main = histogram_title, xlab = "H_e")
+# # 
+# # 
+# # # Add a vertical line at the 5th percentile with increased thickness
+# # abline(v = empirical_dataset_percentile_5, col = "blue", lty = 2, lwd = 2)
+# # 
+# # # Add a vertical line for the mean H_e with increased thickness
+# # abline(v = empirical_genomewides_mean_he_window_based, col = "red", lty = 2, lwd = 2)
+# # 
+# # # Combine legends into one with matching line thickness
+# # legend("topright", 
+# #        legend = c(paste("5th percentile: ", round(empirical_dataset_percentile_5, H_e_decimals_plots)),
+# #                   paste("Average H_e: ", round(empirical_genomewides_mean_he_window_based, H_e_decimals_plots))),
+# #        col = c("blue", "red"), 
+# #        lty = 2, 
+# #        lwd = 2,
+# #        inset = c(0, 0.02))
+# # 6
+# # # Save the plot
+# # dev.off()
+# 
+# 
+# # Initialize an empty data frame to store the results
+# empirical_5th_percentiles_df <- data.frame(Fifth_Percentile = empirical_dataset_percentile_5,Avg_H_e = empirical_genomewides_mean_he_window_based, stringsAsFactors = FALSE)
+# 
+# # Define the filename with the output directory path
+# filename <- file.path(output_empirical_H_e_dir, paste0("H_e_distribution_",empirical_dog_breed,".tsv"))
+# 
+# # # Saving the results in a .tsv-file
+# write.table(empirical_5th_percentiles_df, filename, sep = "\t", row.names = FALSE,quote = FALSE)
+```
+### 4.1.2: Neutral model - H_e distribution
+*Using the first simulation from Simulation_windows_avg_he_3_2*
+```{r}
+setwd(output_simulated_model_H_e_dir)
+# Determine the number of bins you want
+num_bins <- 100  
+
+# Initialize an empty data frame to store the results
+sim_5th_percentiles_df <- data.frame(Simulation = character(), Fifth_Percentile = numeric(),Avg_H_e = numeric(), stringsAsFactors = FALSE)
+
+# Loop through each simulation
+for (i in seq_along(Simulation_windows_avg_he_3_2)) {
+  # Calculate the 5th percentile
+  percentile_5 <- quantile(Simulation_windows_avg_he_3_2[[i]], 0.05)
+  simulated_model_allele_freq_tables[[i]]$H_e_5th_percentile <- percentile_5
+  sim_window_based_H_e_avg <- mean(Simulation_windows_avg_he_3_2[[i]])
+  # Add the simulation name and the fifth percentile value to the data frame
+  sim_5th_percentiles_df[i, "Simulation"] <- paste("Simulation", i)
+  sim_5th_percentiles_df[i, "Fifth_Percentile"] <- percentile_5
+  sim_5th_percentiles_df[i, "Avg_H_e"] <- sim_window_based_H_e_avg
+}
+# Sort the data frame by Fifth_Percentile values in ascending order
+sim_5th_percentiles_df <- sim_5th_percentiles_df[order(sim_5th_percentiles_df$Fifth_Percentile), ]
+
+kable(sim_5th_percentiles_df,row.names = FALSE)
+
+filename <- file.path(output_simulated_model_H_e_dir, paste0(sim_scenario_id,"_5th_percentiles_of_H_e_distribution.tsv"))
+# # Saving the results in a .tsv-file
+write.table(sim_5th_percentiles_df, filename, sep = "\t", row.names = FALSE,quote = FALSE)
+
+```

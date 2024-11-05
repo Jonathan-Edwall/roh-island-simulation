@@ -6,7 +6,6 @@ output:
 
 # 0: Preparation
 Defining the input and output files
-
 ```{r setup,echo = FALSE}
 
 #echo = FALSE # Hides the code.
@@ -16,51 +15,40 @@ Defining the input and output files
 
 # Clean the working environment
 rm(list = ls())
-
 knitr::opts_chunk$set(echo = TRUE)
 
-empirical_species <- "Labrador Retriever"
-document_title <- paste(empirical_species,"Cost function results for Hyperoptimization of the Neutral Model")
-
+#################################### 
+# Defining Input parameters
+#################################### 
+empirical_dog_breed <- Sys.getenv("empirical_dog_breed") 
+document_title <- paste(empirical_dog_breed,"Cost function results for Hyperoptimization of the Neutral Model")
 document_sub <- paste("No MAF-based pruning used")
 
-############################################ 
-# Input Parameters 
-############################################ 
 # Parameters used for displaying the result
 ROH_frequency_decimals <- 1
 H_e_values_decimals <- 5
 F_ROH_values_decimals <- 3
 decimals_output_values <- 5
-empirical_dog_breed <- Sys.getenv("empirical_dog_breed") 
 
-
-
-
+histogram_line_sizes <- 3
+empirical_data_color <- "darkgreen"
+neutral_model_color <- "blue" 
+################## Population History Parameters ##################
 chr <- Sys.getenv("chr_simulated")
-
 Ne_burn_in <- as.numeric(Sys.getenv("Ne_burn_in"))
-
 nInd_fo <- as.numeric(Sys.getenv("nInd_founder_population"))
-
 Inbred_fo <- Sys.getenv("Inbred_ancestral_population")
 
 N_e_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
-
 n_generations_bottleneck <- as.numeric(Sys.getenv("n_generations_bottleneck"))
-
-
 n_gen_breed <- as.numeric(Sys.getenv("n_simulated_generations_breed_formation"))
-
 n_breed <- as.numeric(Sys.getenv("n_individuals_breed_formation"))
-
 
 snp_chip <- Sys.getenv("reference_population_for_snp_chip")
 Introduce_mutations <- Sys.getenv("Introduce_mutations")
 chr_specific_recomb_rate <- Sys.getenv("chr_specific_recombination_rate")
-
 ####################################  
-# Defining the input file
+# Defining the Input Directories
 #################################### 
 expected_heterozygosity_dir_NO_MAF <- Sys.getenv("expected_heterozygosity_dir_NO_MAF")
 expected_heterozygosity_dir_MAF_0_05 <- Sys.getenv("expected_heterozygosity_dir_MAF_0_05")
@@ -68,52 +56,32 @@ expected_heterozygosity_dir_MAF_0_05 <- Sys.getenv("expected_heterozygosity_dir_
 ############### 
 ## Empirical ###
 ###############
-
 ### ROH hotspots ###
 Empirical_data_ROH_hotspots_dir  <- Sys.getenv("Empirical_data_ROH_hotspots_dir")
 Empirical_data_autosome_ROH_freq_dir <- Sys.getenv("Empirical_data_autosome_ROH_freq_dir")
 ### Inbreeding coefficient ###
 Empirical_data_F_ROH_dir  <- Sys.getenv("Empirical_data_F_ROH_dir")
 ### Expected Heterozygosity distribution ###
-# Empirical_data_H_e_dir <- Sys.getenv("Empirical_data_H_e_dir")
-
 Empirical_data_H_e_dir_NO_MAF <- file.path(expected_heterozygosity_dir_NO_MAF,"empirical",empirical_dog_breed)
-
 Empirical_data_H_e_dir_MAF_0_05 <- file.path(expected_heterozygosity_dir_MAF_0_05,"empirical",empirical_dog_breed)
-
 ############### 
 ## Simulated ###
 ###############
-
 ### ROH hotspots ###
 Neutral_model_ROH_hotspots_dir <- Sys.getenv("Neutral_model_ROH_hotspots_dir")
 Neutral_model_autosome_ROH_freq_dir <- Sys.getenv("Neutral_model_autosome_ROH_freq_dir")
-
 ### Inbreeding coefficient ###
 Neutral_model_F_ROH_dir  <- Sys.getenv("Neutral_model_F_ROH_dir")
-
 ### Expected Heterozygosity distribution ###
-# Neutral_model_H_e_dir <- Sys.getenv("Neutral_model_H_e_dir")
-
 Neutral_model_H_e_dir_NO_MAF <- file.path(expected_heterozygosity_dir_NO_MAF,"simulated/neutral_model")
-
 Neutral_model_H_e_dir_MAF_0_05 <- file.path(expected_heterozygosity_dir_MAF_0_05,"simulated/neutral_model")
-
-histogram_line_sizes <- 3
-empirical_data_color <- "darkgreen"
-neutral_model_color <- "blue" 
-
 # #################################### 
 # # Defining the output dirs
 # #################################### 
 hyperoptimizer_results_dir <- Sys.getenv("hyperoptimizer_results_dir") 
 # Define the filename with the output directory path
-simulation_results_file <- file.path(hyperoptimizer_results_dir, paste("neutral_models_cost_function_results",".tsv", sep = ""))
-
-
-
+simulation_results_file <- Sys.getenv("sim_cost_results_file_full_path") 
 ```
-
 ---
 title: "`r document_title`"
 subtitle: "`r document_sub`"
@@ -135,7 +103,7 @@ library(ggplot2)
 
 # Standard Error Confidence interval function
 Confidence level <=> konfidensgrad
-```{r}
+```{r SE_CI_fun}
 # Function to calculate standard error and its confidence interval
 standard_error_confidence_interval_fun <- function(observed_data, confidence_level = 0.95) {
   if ( length(observed_data) > 1 ) {
@@ -164,15 +132,9 @@ standard_error_confidence_interval_fun <- function(observed_data, confidence_lev
 } 
 
 ```
-
-
 # 1: ROH-Frequency
-
 ## 1.1 : Autosome ROH-frequencies
-
-
 ### 1.1.1 : Empirical - ROH frequency
-
 ```{r Empirical - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
 
 setwd(Empirical_data_autosome_ROH_freq_dir)
@@ -276,12 +238,8 @@ for (file in sorted_neutral_model_ROH_freq_files) {
   # Append the table info to the list
   ROH_freq_tables_Neutral_Model <- c(ROH_freq_tables_Neutral_Model, list(table_info))
 }
-
-# ROH_freq_tables_Neutral_Model$ROH_hotspot_threshold <- neutral_model_ROH_hotspot_threshold
-
 # Extract all ROH-hotspot thresholds from ROH_freq_tables_Neutral_Model
 all_ROH_hotspot_thresholds <- unlist(lapply(ROH_freq_tables_Neutral_Model, function(table) table$ROH_Hotspot_threshold))
-
 
 # Remove any non-numeric values
 all_ROH_hotspot_thresholds <- all_ROH_hotspot_thresholds[!is.na(all_ROH_hotspot_thresholds) & is.numeric(all_ROH_hotspot_thresholds)]
@@ -296,11 +254,8 @@ if (length(all_ROH_hotspot_thresholds) == 0) {
 
 ROH_freq_tables_Neutral_Model$Avg_ROH_hotspot_threshold <- Avg_ROH_hotspot_threshold
 
-
 # Calculate the confidence interval of the point estimate ROH-hotspot threshold across all 20 simulations
 ROH_freq_tables_Neutral_Model$SE_CI_ROH_hotspot_threshold <- standard_error_confidence_interval_fun(all_ROH_hotspot_thresholds)
-
-
 #View(ROH_freq_tables_Neutral_Model)
 ```
 
@@ -320,8 +275,6 @@ empirical_model_value <- round(100*ROH_freq_table_Empirical_Data[["ROH_hotspot_t
 empirical_lower_ci <- NA # Placeholder for confidence interval lower bound
 empirical_upper_ci <- NA # Placeholder for confidence interval upper bound
 
-
-
 # Combine all values into a data frame
 ROH_hotspot_threshold_values <- data.frame(
   Model = c("Neutral", "Empirical"),
@@ -330,11 +283,8 @@ ROH_hotspot_threshold_values <- data.frame(
   Upper_CI = c(neutral_upper_ci, empirical_upper_ci)
 )
 
-
 # Sort the data frame based on the ROH-hotspot threshold
 ROH_hotspot_threshold_values_sorted <- ROH_hotspot_threshold_values[order(ROH_hotspot_threshold_values$Avg_ROH_hotspot_threshold), ]
-
-
 
 # Print the table using knitr::kable()
 knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
@@ -354,7 +304,6 @@ chr_numbers <- sub(tolower(chromosome_number_pattern), "\\1", tolower(empirical_
 # Sort the files based on chromosome numbers
 empirical_roh_hotspot_bed_files <- empirical_roh_hotspot_bed_files[order(as.numeric(chr_numbers))]
 
-
 # Create an empty list to store information for the different ROH-hotspots in
 empirical_hotspot_tables <- list()
 
@@ -362,12 +311,7 @@ empirical_hotspot_tables <- list()
 for (file in empirical_roh_hotspot_bed_files) {
   # Extract chromosome number and window number from file name
   chromosome <- as.numeric(sub(tolower(chromosome_number_pattern), "\\1", tolower(file)))
-  # window <- sub(".*windows_([0-9]+)_.*", "\\1", file)
-  
-  # # Create table name
-  # table_name <- paste("Hotspot_chr", chromosome, "_window_", window, sep = "")
   column_names <- c("CHR","POS1","POS2")
-  
   # Read the .bed file into a data frame, skipping commented lines
   chromosome_bed_file_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   
@@ -377,13 +321,11 @@ for (file in empirical_roh_hotspot_bed_files) {
     CHR = chromosome_bed_file_data[i, ][1],
     POS1 = chromosome_bed_file_data[i, ][2],
     POS2 = chromosome_bed_file_data[i, ][3] )
-    
     Hotspot_length_bp <- Hotspot_region_data$POS2-Hotspot_region_data$POS1 + 1
     Hotspot_length_Mb <- Hotspot_length_bp / 1e6
-    
     Hotspot_name <- paste("Hotspot_chr",chromosome, "_window_",i, sep = "")
     
-      # Find the row where the variant_position_bp is within POS1 and POS2, and CHR equals chr_number
+    # Find the row where the variant_position_bp is within POS1 and POS2, and CHR equals chr_number
       roh_freq_windows_in_hotspot <- ROH_freq_table_Empirical_Data[[chromosome]][["data"]][ Hotspot_region_data$POS1 <= ROH_freq_table_Empirical_Data[[chromosome]][["data"]]$POS1 & ROH_freq_table_Empirical_Data[[chromosome]][["data"]]$POS2 <= Hotspot_region_data$POS2, ]
     
     avg_frequency <- mean(roh_freq_windows_in_hotspot$FREQUENCY)
@@ -401,18 +343,11 @@ for (file in empirical_roh_hotspot_bed_files) {
     empirical_hotspot_tables[[Hotspot_name]] <- c(empirical_hotspot_tables[[Hotspot_name]], table_info)
       
         }
-
 }
-
 # View(empirical_hotspot_tables)
-
 ```
-
-
 # 2: Inbreeding coefficient
-
 ## 2.1 Empirical data
-
 ```{r echo = FALSE,warning = FALSE}
 # Set the working directory to the directory containing the F_ROH files for the empirical data
 setwd(Empirical_data_F_ROH_dir)
@@ -479,14 +414,10 @@ abline(v = F_ROH_table_Empirical_Data[["Avg_F_ROH"]], col = empirical_data_color
 legend("topright", legend = empirical_avg_F_ROH_legend_text,
        col = empirical_data_color, lty = 1, cex = 0.8, text.col = "black")
 
-
 # Print the overall average Avg_F_ROH
 cat("Overall Average Avg_F_ROH for ",empirical_population_name,":",F_ROH_table_Empirical_Data[["Avg_F_ROH"]], "//n")
 
-
-# View the modified data structure
 #View(F_ROH_table_Empirical_Data)
-
 ```
 
 ## 2.2 Neutral Model
@@ -543,21 +474,16 @@ for (i in 1:length(sim_info$sim_name)) {
   F_ROH_tables_Neutral_Model <- c(F_ROH_tables_Neutral_Model, list(table_info))
 }
 
-
 # Calculating Population F_ROH for each simulation (subtable)
-
 # Loop through each table in F_ROH_tables_Neutral_Model
 for (i in seq_along(F_ROH_tables_Neutral_Model)) {
   
   # Calculate the population average from the "F_ROH" column in the current simulation (subtable)
   F_ROH_tables_Neutral_Model[[i]]$Population_F_ROH <- mean(F_ROH_tables_Neutral_Model[[i]]$data$F_ROH)
   
-  
 }
 
 #View(F_ROH_tables_Neutral_Model)
-
-
 # Extract all population F_ROH values from F_ROH_tables_Neutral_Model
 All_Population_F_ROH <- unlist(lapply(F_ROH_tables_Neutral_Model, function(table) table$Population_F_ROH))
 
@@ -592,7 +518,6 @@ if (F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH > F_ROH_table_Emp
   empirical_line_location <- "topright"
 }
 
-
 # Add a red vertical line for the point estimate F_ROH across all 20 simulations
 abline(v = F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH, col = neutral_model_color, lwd = histogram_line_sizes)
 
@@ -610,8 +535,6 @@ legend(empirical_line_location, legend = empirical_avg_F_ROH_legend_text,
 # Reset par settings to default after plotting
 par(mfrow = c(1, 1))
 
-
-
 # Print the Point estimate of F_ROH across all 20 simulations
 cat("Point estimate F_ROH across all 20 simulations:", F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH, "//n")
 
@@ -619,14 +542,9 @@ print(paste("Bootstrap 95% Confidence Interval: [",
             F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
             F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[2], "]", sep = ""))
 
-
 ```
-
-## 2.4 F_ROH summary
-
+## 2.3 F_ROH summary
 ```{r echo = FALSE,warning = FALSE}
-
-
 # Extract neutral model values and CI bounds
 neutral_avg_F_ROH <- F_ROH_tables_Neutral_Model[["Estimated_Mean_Population_F_ROH"]]
 neutral_lower_ci <- F_ROH_tables_Neutral_Model[["SE_CI_Estimated_Mean_Population_F_ROH"]][1]
@@ -653,12 +571,10 @@ F_ROH_values$Upper_CI <- as.numeric(round(F_ROH_values$Upper_CI,F_ROH_values_dec
 # Sort the data frame based on F_ROH column
 F_ROH_values_sorted <- F_ROH_values[order(as.numeric(F_ROH_values$F_ROH)), ]
 
-
 # Print the table using knitr::kable()
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
-
 ```
-### 2.4.1 Visualizing F_ROH
+### 2.3.1 Visualizing F_ROH
 ```{r echo = FALSE,warning = FALSE}
 # # Remove the empirical model from the plotting data
 # plotting_data <- F_ROH_values[F_ROH_values$Model != "Empirical", ]
@@ -697,13 +613,8 @@ knitr::kable(F_ROH_values_sorted, row.names = FALSE)
 # print(outside_models)
 
 ```
-
-
-
 # 3: Expected Heterozygosity
-
 ## 3.1 Empirical data - No MAF
-
 ```{r Expected Heterozygosity - Empirical data, echo = FALSE,warning = FALSE}
 setwd(Empirical_data_H_e_dir_NO_MAF)
 # Pattern for finding the specific file containing "5th_percentiles_of_H_e_distribution.tsv"
@@ -726,8 +637,6 @@ empirical_H_e_distribution_table_NO_MAF <- read.table(file, header = TRUE, sep =
 ## 3.1 Empirical data - MAF 0.01
 ```{r Expected Heterozygosity - Empirical data MAF 0.01, echo = FALSE,warning = FALSE}
 setwd(Empirical_data_H_e_dir_MAF_0_05)
-# Pattern for finding the specific file containing "5th_percentiles_of_H_e_distribution.tsv"
-# pattern <- "^.*5th_percentiles_of_H_e_distribution.tsv$"
 pattern <- "^.*H_e_distribution_.*.tsv$"
 empirical_H_e_distribution_file <- list.files(path = Empirical_data_H_e_dir_MAF_0_05, pattern = pattern)
 
@@ -735,7 +644,6 @@ empirical_H_e_distribution_file <- list.files(path = Empirical_data_H_e_dir_MAF_
 if (length(empirical_H_e_distribution_file) != 1) {
   stop("There should be exactly one file matching the pattern.")
 }
-
 # Read the file
 file <- empirical_H_e_distribution_file[1]
 
@@ -743,10 +651,6 @@ file <- empirical_H_e_distribution_file[1]
 empirical_H_e_distribution_table_MAF_0_05 <- read.table(file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 
 ```
-
-
-
-
 ## 3.2 Neutral Model - No MAF
 ```{r Expected Heterozygosity - Neutral Model, echo = FALSE,warning = FALSE }
 setwd(Neutral_model_H_e_dir_NO_MAF)
@@ -777,15 +681,12 @@ H_e_5th_percentiles_Neutral_model_NO_MAF$Estimated_Avg_Window_based_H_e <- mean(
 # Calculate the  confidence interval of the point estimate Avg H_e across all 20 simulations
 H_e_5th_percentiles_Neutral_model_NO_MAF$SE_CI_Estimated_Mean_H_e <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Neutral_model_NO_MAF[["results"]][["Avg_H_e"]])
 
-
-
 # Calculate the bootstrap confidence interval of the point estimate F_ROH across all 20 simulations
 # Store the bootstrap confidence interval in the F_ROH_tables_Neutral_Model
 # H_e_5th_percentiles_Neutral_model_NO_MAF$SE_CI_Estimated_Mean_H_e_5th_percentile <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Neutral_model_NO_MAF[["results"]][["Fifth_Percentile"]])
 
 #View(H_e_5th_percentiles_Neutral_model_NO_MAF)
 ```
-
 ## 3.2 Neutral Model - MAF 0.01
 ```{r Expected Heterozygosity - Neutral Model - MAF 0.01, echo = FALSE,warning = FALSE}
 setwd(Neutral_model_H_e_dir_MAF_0_05)
@@ -818,7 +719,6 @@ H_e_5th_percentiles_Neutral_model_MAF_0_05$SE_CI_Estimated_Mean_H_e <- standard_
 
 #View(H_e_5th_percentiles_Neutral_model_MAF_0_05)
 ```
-
 ## 3.4 Genomewide 5th percentile comparison - Expected Heterozygosity Summary - NO MAF
 ```{r Expected Heterozygosity Summary, echo = FALSE,warning = FALSE}
 
@@ -830,9 +730,7 @@ neutral_upper_ci <- H_e_5th_percentiles_Neutral_model_NO_MAF[["SE_CI_Estimated_M
 
 # Extract empirical model value
 empirical_avg_H_e <- empirical_H_e_distribution_table_NO_MAF$Avg_H_e
-# empirical_avg_H_e <- NA
 empirical_avg_H_e_5th_percentile <- empirical_H_e_distribution_table_NO_MAF$Fifth_Percentile
-# empirical_avg_H_e_5th_percentile <- NA
 empirical_lower_ci <- NA # Placeholder for confidence interval lower bound
 empirical_upper_ci <- NA # Placeholder for confidence interval upper bound
 
@@ -855,12 +753,10 @@ H_e_5th_percentile_values_NO_MAF$Upper_CI <- round(H_e_5th_percentile_values_NO_
 # Sort the data frame based on H_e_5th_percentile column
 H_e_5th_percentile_values_NO_MAF_sorted <- H_e_5th_percentile_values_NO_MAF[order(as.numeric(H_e_5th_percentile_values_NO_MAF$H_e_5th_percentile)), ]
 
-
 # Print the table using knitr::kable()
 knitr::kable(H_e_5th_percentile_values_NO_MAF_sorted, row.names = FALSE)
 
 ```
-
 ## 3.4 Genomewide 5th percentile comparison - Expected Heterozygosity Summary - MAF 0.05
 ```{r Expected Heterozygosity Summary - MAF 0.01, echo = FALSE,warning = FALSE}
 # Extract neutral model values and CI bounds
@@ -871,9 +767,7 @@ neutral_upper_ci <- H_e_5th_percentiles_Neutral_model_MAF_0_05[["SE_CI_Estimated
 
 # Extract empirical model value
 empirical_avg_H_e <- empirical_H_e_distribution_table_MAF_0_05$Avg_H_e
-# empirical_avg_H_e <- NA
 empirical_avg_H_e_5th_percentile <- empirical_H_e_distribution_table_MAF_0_05$Fifth_Percentile
-# empirical_avg_H_e_5th_percentile <- NA
 empirical_lower_ci <- NA # Placeholder for confidence interval lower bound
 empirical_upper_ci <- NA # Placeholder for confidence interval upper bound
 
@@ -895,21 +789,13 @@ H_e_5th_percentile_values_MAF_0_05$Upper_CI <- round(H_e_5th_percentile_values_M
 # Sort the data frame based on H_e_5th_percentile column
 H_e_5th_percentile_values_MAF_0_05_sorted <- H_e_5th_percentile_values_MAF_0_05[order(as.numeric(H_e_5th_percentile_values_MAF_0_05$H_e_5th_percentile)), ]
 
-
 # Print the table using knitr::kable()
 knitr::kable(H_e_5th_percentile_values_MAF_0_05_sorted, row.names = FALSE)
 ```
-
-
-
-
-
 # 4: Summary
-
 ## 4.0 General comparison
 ### 4.0.1 ROH-hotspot threshold comparison
 ```{r echo = FALSE,warning = FALSE}
-
 cat("\n ROH-hotspot threshold comparison between the different datasets")
 # Print the table using knitr::kable()
 knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
@@ -920,53 +806,33 @@ knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
 ```
 
-# Cost function computation
-
-## Extracting the simulation values
-
+# 5: Extracting the simulation values 
 ```{r}
 ######################## H_E - NO MAF ######################## 
 reference_Avg_H_e_No_MAF <- H_e_5th_percentile_values_NO_MAF_sorted$Avg_H_e[H_e_5th_percentile_values_NO_MAF_sorted$Model=="Empirical"]
-# reference_Avg_H_e_No_MAF <- 0.244588241178689
 neutral_model_Avg_H_e_No_MAF <- H_e_5th_percentile_values_NO_MAF_sorted$Avg_H_e[H_e_5th_percentile_values_NO_MAF_sorted$Model=="Neutral"]
 neutral_model_Avg_H_e_No_MAF_lower_ci <- H_e_5th_percentile_values_NO_MAF_sorted$Lower_CI[H_e_5th_percentile_values_NO_MAF_sorted$Model=="Neutral"]
 neutral_model_Avg_H_e_No_MAF_upper_ci <- H_e_5th_percentile_values_NO_MAF_sorted$Upper_CI[H_e_5th_percentile_values_NO_MAF_sorted$Model=="Neutral"]
-# neutral_model_Avg_H_e_No_MAF <- 0.16407 # H05
-# neutral_model_Avg_H_e_No_MAF <- 0.1678 # H06
-# neutral_model_Avg_H_e_No_MAF <- 0.159 # test
-
 reference_H_e_5th_percentile_No_MAF <- H_e_5th_percentile_values_NO_MAF_sorted$H_e_5th_percentile[H_e_5th_percentile_values_NO_MAF_sorted$Model=="Empirical"]
 # reference_H_e_5th_percentile_No_MAF <- 0.0742
 neutral_model_5th_percentile_No_MAF <- H_e_5th_percentile_values_NO_MAF_sorted$H_e_5th_percentile[H_e_5th_percentile_values_NO_MAF_sorted$Model=="Neutral"]
-# neutral_model_5th_percentile_No_MAF <- 0.03083 # H05
-# neutral_model_5th_percentile_No_MAF <- 0.02891 # H06
-
-
 ######################## H_E - MAF 0.01 ######################## 
 reference_Avg_H_e_MAF_0_05 <- H_e_5th_percentile_values_MAF_0_05_sorted$Avg_H_e[H_e_5th_percentile_values_MAF_0_05_sorted$Model=="Empirical"]
 neutral_model_Avg_H_e_MAF_0_05 <- H_e_5th_percentile_values_MAF_0_05_sorted$Avg_H_e[H_e_5th_percentile_values_MAF_0_05_sorted$Model=="Neutral"]
 neutral_model_Avg_H_e_MAF_0_05_lower_ci <- H_e_5th_percentile_values_MAF_0_05_sorted$Lower_CI[H_e_5th_percentile_values_MAF_0_05_sorted$Model=="Neutral"]
 neutral_model_Avg_H_e_MAF_0_05_upper_ci <- H_e_5th_percentile_values_MAF_0_05_sorted$Upper_CI[H_e_5th_percentile_values_MAF_0_05_sorted$Model=="Neutral"]
 
-
 reference_H_e_5th_percentile_MAF_0_05 <- H_e_5th_percentile_values_MAF_0_05_sorted$H_e_5th_percentile[H_e_5th_percentile_values_MAF_0_05_sorted$Model=="Empirical"]
 # reference_H_e_5th_percentile_MAF_0_05 <- 0.0742
 neutral_model_5th_percentile_MAF_0_05 <- H_e_5th_percentile_values_MAF_0_05_sorted$H_e_5th_percentile[H_e_5th_percentile_values_MAF_0_05_sorted$Model=="Neutral"]
-
-
 ######################## F_ROH ######################## 
 reference_F_ROH <- F_ROH_values_sorted$F_ROH[F_ROH_values_sorted$Model=="Empirical"]
 # reference_F_ROH <- 0.233
 neutral_model_F_ROH <- F_ROH_values_sorted$F_ROH[F_ROH_values_sorted$Model=="Neutral"]
 neutral_model_F_ROH_lower_ci <- F_ROH_values_sorted$Lower_CI[F_ROH_values_sorted$Model=="Neutral"]
 neutral_model_F_ROH_upper_ci <- F_ROH_values_sorted$Upper_CI[F_ROH_values_sorted$Model=="Neutral"]
-# neutral_model_F_ROH <- 0.232 # H05
-# neutral_model_F_ROH <- 0.255 # H06
-# neutral_model_F_ROH <- 0.15 # test
-
 ######################## ROH-Hotspot Threshold ######################## 
 reference_ROH_hotspot_threshold <- ROH_hotspot_threshold_values_sorted$Avg_ROH_hotspot_threshold[ROH_hotspot_threshold_values_sorted$Model=="Empirical"]
-
 
 reference_ROH_hotspot_threshold <- ifelse(reference_ROH_hotspot_threshold == 0,
 
@@ -974,20 +840,16 @@ reference_ROH_hotspot_threshold <- ifelse(reference_ROH_hotspot_threshold == 0,
 
                                                 reference_ROH_hotspot_threshold / 100)
 
-# reference_ROH_hotspot_threshold <- 0.554 
-
 neutral_model_ROH_hotspot_threshold <- ROH_hotspot_threshold_values_sorted$Avg_ROH_hotspot_threshold[ROH_hotspot_threshold_values_sorted$Model=="Neutral"]
 
 neutral_model_ROH_hotspot_threshold <- ifelse(neutral_model_ROH_hotspot_threshold == 0,
                                                  0,
                                                 neutral_model_ROH_hotspot_threshold / 100)
 
-
 neutral_model_ROH_hotspot_threshold_lower_ci <- ROH_hotspot_threshold_values_sorted$Lower_CI[ROH_hotspot_threshold_values_sorted$Model=="Neutral"]
 neutral_model_ROH_hotspot_threshold_lower_ci <- ifelse(neutral_model_ROH_hotspot_threshold_lower_ci == 0,
                                                  0,
                                                 neutral_model_ROH_hotspot_threshold_lower_ci / 100)
-
 
 neutral_model_ROH_hotspot_threshold_upper_ci <- ROH_hotspot_threshold_values_sorted$Upper_CI[ROH_hotspot_threshold_values_sorted$Model=="Neutral"]
 
@@ -995,71 +857,9 @@ neutral_model_ROH_hotspot_threshold_upper_ci <- ifelse(neutral_model_ROH_hotspot
                                                  0,
                                                 neutral_model_ROH_hotspot_threshold_upper_ci / 100)
 
-
 ```
-### Hard coding new neutral model
-```{r}
-# # ######################## H_E - NO MAF ######################## 
-# # # neutral_model_Avg_H_e_No_MAF <- 0.24459 # H11_V1
-# # # neutral_model_5th_percentile_No_MAF <- 0.09425 # H11_V1
-# # neutral_model_Avg_H_e_No_MAF <- 0.24056 # H11_V6
-# # neutral_model_5th_percentile_No_MAF <- 0.09442 # H11_V6
-# # neutral_model_Avg_H_e_No_MAF <- 0.23842 # H13_1
-# # neutral_model_5th_percentile_No_MAF <- 0.07991 # H13_1
-# # neutral_model_Avg_H_e_No_MAF <- 0.2364 # H13_2
-# # neutral_model_5th_percentile_No_MAF <- 0.07818 # H13_2
-# # neutral_model_Avg_H_e_No_MAF <- 0.24376 # H14_initial
-# # neutral_model_5th_percentile_No_MAF <- 0.07599 # H14_initial
-# # neutral_model_Avg_H_e_No_MAF <- 0.24384 # H14_3
-# # neutral_model_5th_percentile_No_MAF <- 0.08144 # H14_3
-# # neutral_model_Avg_H_e_No_MAF <- 0.24081 # H14_2
-# # neutral_model_5th_percentile_No_MAF <- 0.0767 # H14_2
-# neutral_model_Avg_H_e_No_MAF <- 0.24317 # H14_v1
-# neutral_model_5th_percentile_No_MAF <- 0.07662 # H14_v1
-# 
-# # ######################## H_E - MAF 0.05 ######################## 
-# # # neutral_model_Avg_H_e_MAF_0_05 <- 0.3504  # H11_V1
-# # # neutral_model_5th_percentile_MAF_0_05 <- 0.2177  # H11_V1
-# # neutral_model_Avg_H_e_MAF_0_05 <- 0.35241  # H11_V6
-# # neutral_model_5th_percentile_MAF_0_05 <- 0.22056  # H11_V6
-# # neutral_model_Avg_H_e_MAF_0_05 <- 0.35412  # H13_1
-# # neutral_model_5th_percentile_MAF_0_05 <- 0.21593  # H13_1
-# # neutral_model_Avg_H_e_MAF_0_05 <- 0.3541  # H13_2
-# # neutral_model_5th_percentile_MAF_0_05 <- 0.21443  # H13_2
-# # neutral_model_Avg_H_e_MAF_0_05 <- 0.35836  # H14_initial
-# # neutral_model_5th_percentile_MAF_0_05 <- 0.21068  # H14_initial
-# # neutral_model_Avg_H_e_MAF_0_05 <- 0.35753  # H14_3
-# # neutral_model_5th_percentile_MAF_0_05 <- 0.2153  # H14_3
-# # neutral_model_Avg_H_e_MAF_0_05 <- 0.35886  # H14_2
-# # neutral_model_5th_percentile_MAF_0_05 <- 0.2132 # H14_2
-# neutral_model_Avg_H_e_MAF_0_05 <- 0.35821  # H14_v1
-# neutral_model_5th_percentile_MAF_0_05 <- 0.21066 # H14_v1
-# 
-# 
-# # 
-# # ######################## F_ROH ######################## 
-# # # neutral_model_F_ROH <- 0.234 # H11_V1
-# # neutral_model_F_ROH <- 0.239 # H11_V6
-# # neutral_model_F_ROH <- 0.237 # H13_1
-# # neutral_model_F_ROH <- 0.24 # H13_2
-# # neutral_model_F_ROH <- 0.23 # H14_initial
-# # neutral_model_F_ROH <- 0.233 # H14_1
-# # neutral_model_F_ROH <- 0.231 # H14_2
-# neutral_model_F_ROH <- 0.235 #H14_v1
-# # ######################## ROH-Hotspot Threshold ######################## 
-# # # neutral_model_ROH_hotspot_threshold <- 0.483 # H11_V1
-# # neutral_model_ROH_hotspot_threshold <- 0.518 # H11_V6
-# # neutral_model_ROH_hotspot_threshold <- 0.511 # H13_1
-# # neutral_model_ROH_hotspot_threshold <- 0.529 # H13_2
-# # neutral_model_ROH_hotspot_threshold <- 0.516 # H14_initial
-# # neutral_model_ROH_hotspot_threshold <- 0.557 # H14_3
-# neutral_model_ROH_hotspot_threshold <- 0.55 # H14_v1
-# 
-
-
-```
-
-## Compute CI diff to empirical data
+# 6: Computing the metric values
+## 6.1: Computing the precision (CI_Width)
 ```{r}
 ######################## H_E - NO MAF ######################## 
 neutral_Avg_H_e_CI_width_NO_MAF <- neutral_model_Avg_H_e_No_MAF_upper_ci - neutral_model_Avg_H_e_No_MAF_lower_ci
@@ -1067,7 +867,6 @@ cat("\n\n neutral_model_Avg_H_e_No_MAF_upper_ci - neutral_model_Avg_H_e_No_MAF_l
 ######################## H_E - MAF 0.01 ######################## 
 neutral_Avg_H_e_CI_width_MAF_0_05 <- neutral_model_Avg_H_e_MAF_0_05_upper_ci - neutral_model_Avg_H_e_MAF_0_05_lower_ci
 cat("\n\n neutral_model_Avg_H_e_MAF_0_05_upper_ci - neutral_model_Avg_H_e_MAF_0_05_lower_ci = \n ",neutral_model_Avg_H_e_MAF_0_05_upper_ci,"-",neutral_model_Avg_H_e_MAF_0_05_lower_ci,"=",neutral_Avg_H_e_CI_width_MAF_0_05)
-
 ######################## F_ROH ######################## 
 neutral_F_ROH_CI_width <- neutral_model_F_ROH_upper_ci - neutral_model_F_ROH_lower_ci
 cat("\n\n neutral_model_F_ROH_upper_ci - neutral_model_F_ROH_lower_ci = \n",neutral_model_F_ROH_upper_ci,"-",neutral_model_F_ROH_lower_ci,"=",neutral_F_ROH_CI_width)
@@ -1076,9 +875,8 @@ neutral_ROH_hotspot_threshold_CI_width <- neutral_model_ROH_hotspot_threshold_up
 cat("\n\n neutral_model_ROH_hotspot_threshold_upper_ci - neutral_model_ROH_hotspot_threshold_lower_ci = \n ",neutral_model_ROH_hotspot_threshold_upper_ci,"-",neutral_model_ROH_hotspot_threshold_lower_ci,"=",neutral_ROH_hotspot_threshold_CI_width)
 ```
 
-
-## Compute absolute difference to empirical data
-
+## 6.2: Compute metric-deviations from the empirical dataset
+### 6.2.1: Compute absolute difference to empirical data
 ```{r}
 ######################## H_E - NO MAF ######################## 
 H_e_5th_percentile_diff_NO_MAF <- reference_H_e_5th_percentile_No_MAF- neutral_model_5th_percentile_No_MAF
@@ -1101,44 +899,30 @@ ROH_hotspot_threshold_diff <- reference_ROH_hotspot_threshold - neutral_model_RO
 cat("\n\nEmpirical ROH-Hotspot threshold - Neutral Model ROH-Hotspot threshold = \n ",reference_ROH_hotspot_threshold,"-",neutral_model_ROH_hotspot_threshold,"=",ROH_hotspot_threshold_diff)
 
 ```
-# Cost function computation
-
-```{r Percentage deviation calc}
+### 6.2.2: Accuracy - Percentual deviation
+```{r Accuracy - Percentage deviation calc}
 
 ######################## H_E - NO MAF ######################## 
-
-# Calculate percentage deviation for H_e_5th_percentile
-percentage_deviation_H_e_5th_percentile_NO_MAF <- ifelse(H_e_5th_percentile_diff_NO_MAF == 0, 
-                                                 0, 
-                                                 abs(H_e_5th_percentile_diff_NO_MAF) / reference_H_e_5th_percentile_No_MAF)
-
 # Calculate percentage deviation for Average H_e
 percentage_deviation_Avg_H_e_NO_MAF <- ifelse(Avg_H_e_diff_NO_MAF == 0, 
                                                  0, 
                                                  abs(Avg_H_e_diff_NO_MAF) / reference_Avg_H_e_No_MAF)
 
-# Calculate CI width percentage for Average H_e
-ci_width_percentage_Avg_H_e_NO_MAF <- ifelse(neutral_Avg_H_e_CI_width_NO_MAF == 0, 
-                                                 0, 
-                                                 neutral_Avg_H_e_CI_width_NO_MAF / neutral_model_Avg_H_e_No_MAF)
-
+# # Calculate percentage deviation for H_e_5th_percentile
+# percentage_deviation_H_e_5th_percentile_NO_MAF <- ifelse(H_e_5th_percentile_diff_NO_MAF == 0, 
+#                                                  0, 
+#                                                  abs(H_e_5th_percentile_diff_NO_MAF) / reference_H_e_5th_percentile_No_MAF)
 
 ######################## H_E - MAF 0.01 ######################## 
-# Calculate percentage deviation for H_e_5th_percentile
-percentage_deviation_H_e_5th_percentile_MAF_0_05 <- ifelse(H_e_5th_percentile_diff_MAF_0_05 == 0, 
-                                                 0, 
-                                                 abs(H_e_5th_percentile_diff_MAF_0_05) / reference_H_e_5th_percentile_MAF_0_05)
-
 # Calculate percentage deviation for Average H_e
 percentage_deviation_Avg_H_e_MAF_0_05 <- ifelse(Avg_H_e_diff_MAF_0_05 == 0, 
                                                  0, 
                                                  abs(Avg_H_e_diff_MAF_0_05) / reference_Avg_H_e_MAF_0_05)
 
-# Calculate CI width percentage for Average H_e
-ci_width_percentage_Avg_H_e_MAF_0_05 <- ifelse(neutral_Avg_H_e_CI_width_MAF_0_05 == 0, 
-                                                 0, 
-                                                 neutral_Avg_H_e_CI_width_MAF_0_05 / neutral_model_Avg_H_e_MAF_0_05)
-
+# # Calculate percentage deviation for H_e_5th_percentile
+# percentage_deviation_H_e_5th_percentile_MAF_0_05 <- ifelse(H_e_5th_percentile_diff_MAF_0_05 == 0, 
+#                                                  0, 
+#                                                  abs(H_e_5th_percentile_diff_MAF_0_05) / reference_H_e_5th_percentile_MAF_0_05)
 
 ######################## F_ROH ######################## 
 # Calculate percentage deviation for F_ROH
@@ -1146,215 +930,47 @@ percentage_deviation_F_ROH <- ifelse(F_ROH_diff == 0,
                                      0, 
                                      abs(F_ROH_diff) / reference_F_ROH)
 
-
-# Calculate CI width percentage for F_ROH
-ci_width_percentage_F_ROH <- ifelse(neutral_F_ROH_CI_width == 0, 
-                                                 0, 
-                                                 neutral_F_ROH_CI_width / neutral_model_F_ROH)
-
-
 ######################## ROH-Hotspot Threshold ########################
 # Calculate percentage deviation for ROH_hotspot_threshold
 percentage_deviation_ROH_hotspot_threshold <- ifelse(ROH_hotspot_threshold_diff == 0, 
                                                     0, 
                                                     abs(ROH_hotspot_threshold_diff) / reference_ROH_hotspot_threshold)
 
+```
+### 6.2.3: Precision - Percentual Deviation
+```{r Precision - Percentage deviation calc}
+######################## H_E - NO MAF ######################## 
+# Calculate CI width percentage for Average H_e
+ci_width_percentage_Avg_H_e_NO_MAF <- ifelse(neutral_Avg_H_e_CI_width_NO_MAF == 0, 
+                                                 0, 
+                                                 neutral_Avg_H_e_CI_width_NO_MAF / neutral_model_Avg_H_e_No_MAF)
+
+######################## H_E - MAF 0.01 ########################
+# Calculate CI width percentage for Average H_e
+ci_width_percentage_Avg_H_e_MAF_0_05 <- ifelse(neutral_Avg_H_e_CI_width_MAF_0_05 == 0, 
+                                                 0, 
+                                                 neutral_Avg_H_e_CI_width_MAF_0_05 / neutral_model_Avg_H_e_MAF_0_05)
+
+######################## F_ROH ########################
 # Calculate CI width percentage for F_ROH
+ci_width_percentage_F_ROH <- ifelse(neutral_F_ROH_CI_width == 0, 
+                                                 0, 
+                                                 neutral_F_ROH_CI_width / neutral_model_F_ROH)
+
+######################## ROH-Hotspot Threshold ########################
+# Calculate CI width percentage for ROH Hotspot Threshold
 ci_width_percentage_ROH_hotspot_threshold <- ifelse(neutral_ROH_hotspot_threshold_CI_width == 0, 
                                                  0, 
                                                  neutral_ROH_hotspot_threshold_CI_width / neutral_model_ROH_hotspot_threshold)
 
-# H_e_weight <- 2
-```
-
-## Experimenting
-
-```{r}
-# Avg_H_e_diff_NO_MAF <- 0.004588241
-# Avg_H_e_diff_NO_MAF
-# reference_Avg_H_e_No_MAF <- 0.2445882
-# neutral_model_Avg_H_e_No_MAF <- 0.24
-# 
-# percentage_diff_H_e <- neutral_model_Avg_H_e_No_MAF / reference_Avg_H_e_No_MAF
-# percentage_diff_H_e
-# 
-# H_e_percentage <- abs(1 - percentage_diff_H_e)
-# H_e_percentage
-
 
 ```
-
-
-
-### Using MAF = 0
-```{r experimenting Cost Function}
-# # neutral_model_Avg_H_e_No_MAF <- 0.235
-# # neutral_model_F_ROH <- 0.245
-# # neutral_model_ROH_hotspot_threshold <- 0.52
-# 
-# cat("\n Neutral H_e NO MAF:",neutral_model_Avg_H_e_No_MAF,"\n Neutral F_ROH:",neutral_model_F_ROH,"\n ROH Hotspot:",neutral_model_ROH_hotspot_threshold)
-# 
-# Avg_H_e_diff_NO_MAF <- reference_Avg_H_e_No_MAF - neutral_model_Avg_H_e_No_MAF
-# cat("\nEmpirical H_e - Neutral Model H_e NO MAF= ",reference_Avg_H_e_No_MAF,"-",neutral_model_Avg_H_e_No_MAF,"\t=",Avg_H_e_diff_NO_MAF)
-# F_ROH_diff <- reference_F_ROH - neutral_model_F_ROH
-# cat("\nEmpirical F_ROH - Neutral Model F_ROH = ",reference_F_ROH,"-",neutral_model_F_ROH,"\t=",F_ROH_diff)
-# ROH_hotspot_threshold_diff <- reference_ROH_hotspot_threshold - neutral_model_ROH_hotspot_threshold
-# cat("\nEmpirical ROH-Hotspot threshold - Neutral Model ROH-Hotspot threshold =  ",reference_ROH_hotspot_threshold,"-",neutral_model_ROH_hotspot_threshold,"\t=",ROH_hotspot_threshold_diff)
-# 
-# 
-# # Calculate percentage deviation for Average H_e
-# percentage_deviation_Avg_H_e_NO_MAF <- ifelse(Avg_H_e_diff_NO_MAF == 0,  0, 
-#                                                  abs(Avg_H_e_diff_NO_MAF) / reference_Avg_H_e_No_MAF)
-# # Calculate percentage deviation for F_ROH
-# percentage_deviation_F_ROH <- ifelse(F_ROH_diff == 0,0, 
-#                                      abs(F_ROH_diff) / reference_F_ROH)
-# # Calculate percentage deviation for ROH_hotspot_threshold
-# percentage_deviation_ROH_hotspot_threshold <- ifelse(ROH_hotspot_threshold_diff == 0,   0, 
-#                                                     abs(ROH_hotspot_threshold_diff) / reference_ROH_hotspot_threshold)
-# H_e_weight <- 4
-# F_ROH_Weight <- 1
-# ROH_hotspot_Weight <- 1
-# cat("\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n H_e_weight",H_e_weight ,"Percentage diff \n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-# H_e_num <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF
-# F_ROH_num <- F_ROH_Weight*percentage_deviation_F_ROH
-# ROH_hotspot_num <- ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold 
-# # Output the cost (percentage deviation)
-# cost <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF  + F_ROH_Weight*percentage_deviation_F_ROH + ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold
-# cost <- round(cost,decimals_output_values)
-# cat("\nCost=",H_e_weight,"*",percentage_deviation_Avg_H_e_NO_MAF,"+",F_ROH_Weight,"*",percentage_deviation_F_ROH,"+",ROH_hotspot_Weight,"*",percentage_deviation_ROH_hotspot_threshold,"=",H_e_num,"+",F_ROH_num,"+",ROH_hotspot_num,"\n=",cost)
-# 
-# H_e_weight <- 4
-# F_ROH_Weight <- 1.5
-# ROH_hotspot_Weight <- 1
-# 
-# cat("\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n H_e_weight",H_e_weight ,"Percentage diff \n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-# H_e_num <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF
-# F_ROH_num <- F_ROH_Weight*percentage_deviation_F_ROH
-# ROH_hotspot_num <- ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold 
-# # Output the cost (percentage deviation)
-# cost <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF  + F_ROH_Weight*percentage_deviation_F_ROH + ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold
-# cost <- round(cost,decimals_output_values)
-# cat("\nCost=",H_e_weight,"*",percentage_deviation_Avg_H_e_NO_MAF,"+",F_ROH_Weight,"*",percentage_deviation_F_ROH,"+",ROH_hotspot_Weight,"*",percentage_deviation_ROH_hotspot_threshold,"=",H_e_num,"+",F_ROH_num,"+",ROH_hotspot_num,"\n=",cost)
-
-```
-### Using MAF >= 0.01
-```{r}
-# reference_Avg_H_e_MAF_0_05 <- 0.316
-# neutral_model_Avg_H_e_MAF_0_05 <- 0.316
-# neutral_model_F_ROH <- 0.228
-# neutral_model_ROH_hotspot_threshold <- 0.455
-# 
-# 
-# cat("\n Neutral H_e:",neutral_model_Avg_H_e_MAF_0_05,"\n Neutral F_ROH:",neutral_model_F_ROH,"\n ROH Hotspot:",neutral_model_ROH_hotspot_threshold)
-# 
-# Avg_H_e_diff_NO_MAF <- reference_Avg_H_e_MAF_0_05 - neutral_model_Avg_H_e_MAF_0_05
-# cat("\nEmpirical H_e - Neutral Model H_e = ",reference_Avg_H_e_MAF_0_05,"-",neutral_model_Avg_H_e_MAF_0_05,"\t=",Avg_H_e_diff_NO_MAF)
-# F_ROH_diff <- reference_F_ROH - neutral_model_F_ROH
-# cat("\nEmpirical F_ROH - Neutral Model F_ROH = ",reference_F_ROH,"-",neutral_model_F_ROH,"\t=",F_ROH_diff)
-# ROH_hotspot_threshold_diff <- reference_ROH_hotspot_threshold - neutral_model_ROH_hotspot_threshold
-# cat("\nEmpirical ROH-Hotspot threshold - Neutral Model ROH-Hotspot threshold =  ",reference_ROH_hotspot_threshold,"-",neutral_model_ROH_hotspot_threshold,"\t=",ROH_hotspot_threshold_diff)
-# # Calculate percentage deviation for Average H_e
-# percentage_deviation_Avg_H_e_NO_MAF <- ifelse(Avg_H_e_diff_NO_MAF == 0,  0, 
-#                                                  abs(Avg_H_e_diff_NO_MAF) / reference_Avg_H_e_MAF_0_05)
-# # Calculate percentage deviation for F_ROH
-# percentage_deviation_F_ROH <- ifelse(F_ROH_diff == 0,0, 
-#                                      abs(F_ROH_diff) / reference_F_ROH)
-# # Calculate percentage deviation for ROH_hotspot_threshold
-# percentage_deviation_ROH_hotspot_threshold <- ifelse(ROH_hotspot_threshold_diff == 0,   0, 
-#                                                     abs(ROH_hotspot_threshold_diff) / reference_ROH_hotspot_threshold)
-# H_e_weight <- 4
-# F_ROH_Weight <- 1
-# ROH_hotspot_Weight <- 1
-# cat("\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n H_e_weight",H_e_weight ,"Percentage diff \n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-# H_e_num <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF
-# F_ROH_num <- F_ROH_Weight*percentage_deviation_F_ROH
-# ROH_hotspot_num <- ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold 
-# # Output the cost (percentage deviation)
-# cost <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF  + F_ROH_Weight*percentage_deviation_F_ROH + ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold
-# cost <- round(cost,decimals_output_values)
-# cat("\nCost=",H_e_weight,"*",percentage_deviation_Avg_H_e_NO_MAF,"+",F_ROH_Weight,"*",percentage_deviation_F_ROH,"+",ROH_hotspot_Weight,"*",percentage_deviation_ROH_hotspot_threshold,"=",H_e_num,"+",F_ROH_num,"+",ROH_hotspot_num,"\n=",cost)
-# 
-# H_e_weight <- 4
-# F_ROH_Weight <- 1.5
-# ROH_hotspot_Weight <- 1.5
-# 
-# cat("\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n H_e_weight",H_e_weight ,"Percentage diff \n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-# H_e_num <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF
-# F_ROH_num <- F_ROH_Weight*percentage_deviation_F_ROH
-# ROH_hotspot_num <- ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold 
-# # Output the cost (percentage deviation)
-# cost <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF  + F_ROH_Weight*percentage_deviation_F_ROH + ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold
-# cost <- round(cost,decimals_output_values)
-# cat("\nCost=",H_e_weight,"*",percentage_deviation_Avg_H_e_NO_MAF,"+",F_ROH_Weight,"*",percentage_deviation_F_ROH,"+",ROH_hotspot_Weight,"*",percentage_deviation_ROH_hotspot_threshold,"=",H_e_num,"+",F_ROH_num,"+",ROH_hotspot_num,"\n=",cost)
-```
-
-
-
-### Cost function with H_e_5th_percentile
-```{r Cost_function_H_e_5th}
-H_e_weight <- 2
-
-# Output the cost (percentage deviation)
-Cost_H_e_5th <- H_e_weight*percentage_deviation_H_e_5th_percentile_NO_MAF + percentage_deviation_F_ROH + percentage_deviation_ROH_hotspot_threshold
-Cost_H_e_5th <- round(Cost_H_e_5th,decimals_output_values)
-cat("\n Cost=",H_e_weight,"*",percentage_deviation_H_e_5th_percentile_NO_MAF,"+",percentage_deviation_F_ROH,"+",percentage_deviation_ROH_hotspot_threshold,"=\n",Cost_H_e_5th)
-```
-
-### Cost function with Average H_e
-```{r Cost_function_Avg_H_e}
-H_e_weight <- 2
-# Output the cost (percentage deviation)
-Cost_Avg_H_e <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF + percentage_deviation_F_ROH + percentage_deviation_ROH_hotspot_threshold
-Cost_Avg_H_e <- round(Cost_Avg_H_e,decimals_output_values)
-cat("\n Cost=",H_e_weight,"*",percentage_deviation_Avg_H_e_NO_MAF,"+",percentage_deviation_F_ROH,"+",percentage_deviation_ROH_hotspot_threshold,"=\n",Cost_Avg_H_e)
-```
-
-### 27 June Cost function
-```{r June_Cost_Function}
-H_e_weight <- 2
-# Output the cost (percentage deviation)
-cost_june <- H_e_weight*percentage_deviation_Avg_H_e_NO_MAF + percentage_deviation_H_e_5th_percentile_NO_MAF + percentage_deviation_F_ROH + percentage_deviation_ROH_hotspot_threshold
-cost_june <- round(cost_june,decimals_output_values)
-cat("\n Cost June=",H_e_weight,"*",percentage_deviation_Avg_H_e_NO_MAF,"+",percentage_deviation_H_e_5th_percentile_NO_MAF,"+",percentage_deviation_F_ROH,"+",percentage_deviation_ROH_hotspot_threshold,"=\n",cost_june)
-
-```
-## Cost function MAF 0.05 & No MAF
-```{r Cost_Function_NO_CI}
-H_e_weight_NO_MAF <- 4
-H_e_weight_MAF_0_05 <- 1
-F_ROH_Weight <- 3
-ROH_hotspot_Weight <- 2
-
-cat("\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n H_e_weight_NO_MAF",H_e_weight_NO_MAF ,"Percentage diff \n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-H_e_num_No_MAF <- H_e_weight_NO_MAF*percentage_deviation_Avg_H_e_NO_MAF
-cat("\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n H_e_weight_MAF_0_05",H_e_weight_MAF_0_05 ,"Percentage diff \n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤")
-H_e_num_MAF_0_05 <- H_e_weight_MAF_0_05*percentage_deviation_Avg_H_e_MAF_0_05
-
-F_ROH_num <- F_ROH_Weight*percentage_deviation_F_ROH
-ROH_hotspot_num <- ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold 
-# Output the cost (percentage deviation)
-cost_NO_CI <- H_e_weight_NO_MAF*percentage_deviation_Avg_H_e_NO_MAF + H_e_weight_MAF_0_05*percentage_deviation_Avg_H_e_MAF_0_05  + F_ROH_Weight*percentage_deviation_F_ROH + ROH_hotspot_Weight*percentage_deviation_ROH_hotspot_threshold
-
-
-cost_NO_CI <- round(cost_NO_CI,decimals_output_values)
-cat("\nCost=",H_e_weight_NO_MAF,"*",percentage_deviation_Avg_H_e_NO_MAF,"+",H_e_weight_MAF_0_05,"*",percentage_deviation_Avg_H_e_MAF_0_05,"+",F_ROH_Weight,"*",percentage_deviation_F_ROH,"+",ROH_hotspot_Weight,"*",percentage_deviation_ROH_hotspot_threshold,"=",H_e_num_No_MAF,"+",H_e_num_MAF_0_05,"+",F_ROH_num,"+",ROH_hotspot_num,"\n=",cost_NO_CI)
-
-
-```
-## Cost function using CI
-```{r Cost_function_CI}
-ci_width_percentage_Avg_H_e_NO_MAF
-
-ci_width_percentage_Avg_H_e_MAF_0_05
-
-ci_width_percentage_F_ROH
-
-ci_width_percentage_ROH_hotspot_threshold
-
+# 7: Computing Cost Function Value
+```{r Cost_function_computation}
 accuracy <- 1
-precision <- 1
+precision <- 0.5
 
-H_e_weight_NO_MAF <- 4
+H_e_weight_NO_MAF <- 5
 H_e_weight_MAF_0_05 <- 1
 F_ROH_Weight <- 3
 ROH_hotspot_Weight <- 2
@@ -1389,10 +1005,9 @@ cat("=", ROH_hotspot_Weight, "* (", accuracy, "*", percentage_deviation_ROH_hots
 
 # Print the final cost value
 cat("\nTotal Cost =", cost, "\n")
-
-
 ```
-# Formatting CI for display
+# 7: Exporting the Results
+## 7.1: Formatting CI for the output file
 ```{r}
 F_ROH_ci <- c(neutral_model_F_ROH_lower_ci, neutral_model_F_ROH_upper_ci)
 # Format the vector as a string in the format "(lower_ci, upper_ci)"
@@ -1411,8 +1026,7 @@ ROH_hotspot_ci <- c(neutral_model_ROH_hotspot_threshold_lower_ci,neutral_model_R
 ROH_hotspot_ci <- paste0("(", format(ROH_hotspot_ci[1], nsmall = 2), ", ", format(ROH_hotspot_ci[2], nsmall = 2), ")")
 
 ```
-
-# Exporting the results
+## 7.2 Exporting the results
 ```{r Export Results}
 # Create an empty data frame if the file does not exist
 column_names <- c("Chr","NeBurnIn","nBottleneck","nGenBottleneck","nGenBreed","nBreed","SNPchipRefPop","Chr_specific_recomb_rate","Mutations","Sim_F_ROH","F_ROH_CI","Sim_ROH_hotspot_thr","ROH_hotspot_thr_CI","H_e_No_MAF","H_e_No_MAF_ci","H_e_5th_perc_No_MAF","H_e_MAF_0_05","H_e_MAF_0_05_ci","H_e_5th_perc_MAF_0_05","Sim_Cost_Result")

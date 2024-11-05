@@ -9,10 +9,11 @@ script_start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
-#cd $HOME
+# HOME=/home/jonathan
+cd $HOME
 
-script_directory=$HOME/code/pipeline_scripts
+# pipeline_scripts_dir=$HOME/code/pipeline_scripts
+# pipeline_scripts_dir=$script_dir/pipeline_scripts # Defined in run_pipeline_hyperoptimize_neutral_model.sh
 
 ######################################  
 ####### Defining parameter values #######
@@ -46,7 +47,6 @@ script_directory=$HOME/code/pipeline_scripts
 ROH_hotspots_dir=$results_dir/ROH-Hotspots
 
 plink_ROH_dir=$results_dir/PLINK/ROH
-# expected_heterozygosity_dir=$results_dir/expected_heterozygosity # Imported from Hyperoptimization_H_e_calculation.sh
 
 ### Raw data
 # data_dir=$HOME/results # Variable Defined in run_pipeline_hyperoptimize_neutral_model.sh
@@ -84,7 +84,7 @@ Neutral_model_H_e_dir="$expected_heterozygosity_dir/simulated/neutral_model"
 ######################################  
 ####### Defining the OUTPUT files #######
 ######################################  
-hyperoptimizer_results_dir=$HOME/hyperoptimizer_results
+# hyperoptimizer_results_dir=$HOME/hyperoptimizer_results # Variable Defined in run_pipeline_hyperoptimize_neutral_model.sh
 mkdir -p $hyperoptimizer_results_dir
 
 ##############################################################################################  
@@ -121,18 +121,13 @@ export Neutral_model_autosome_ROH_freq_dir="$Neutral_model_autosome_ROH_freq_dir
 ### Inbreeding coefficient ###
 export Neutral_model_F_ROH_dir="$Neutral_model_F_ROH_dir"
 
-### Expected Heterozygosity distribution ###
-# export Neutral_model_H_e_dir="$Neutral_model_H_e_dir"
-
-
 # Output_dir
 export hyperoptimizer_results_dir="$hyperoptimizer_results_dir"
 
-# # Modify the pipeline_result_summary.sh script call to include the MAF status suffix in the output file name
-# output_file="$Pipeline_results_output_dir/pipeline_results_${MAF_status_suffix}.html"
+export sim_cost_results_file_full_path="${hyperoptimizer_results_dir}/${HO_results_file}" # HO_results_file defined in the main script
 
-# Rscript -e "rmarkdown::render('$script_directory/Hyperoptimization_cost_function_results_neutral_model.Rmd', output_file = '$output_file')"
-Rscript -e "rmarkdown::render('$script_directory/Hyperoptimization_cost_function_results_neutral_model.Rmd')"
+# Rscript -e "rmarkdown::render('$pipeline_scripts_dir/Hyperoptimization_cost_function_results_neutral_model.Rmd', output_file = '$output_file')"
+Rscript -e "rmarkdown::render('$pipeline_scripts_dir/Hyperoptimization_cost_function_results_neutral_model.Rmd')"
 
 # Ending the timer 
 script_end=$(date +%s)

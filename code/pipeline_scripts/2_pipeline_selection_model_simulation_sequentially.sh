@@ -1,4 +1,3 @@
- 
 #!/bin/bash -l
 
 # Start the timer 
@@ -13,10 +12,10 @@ script_start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
+# HOME=/home/jonathan
 cd $HOME
 
-pipeline_script_dir=$HOME/code/pipeline_scripts
+# pipeline_script_dir=$HOME/code/pipeline_scripts
 
 
 # # Function to handle user interruption
@@ -87,60 +86,87 @@ run_simulation_sel_coefficients_sequentially() {
     # If running selection coefficient by selection coefficient (sequentially)
     # Create unique prune count and variant position files for each replicate
     export simulation_prune_count_file="${pruned_counts_technical_replicate_dir}/pruned_replicates_count_s$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}_rep${counter}.tsv"
+    export simulation_status_file="${pruned_counts_technical_replicate_dir}/temp_sim_status_file$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}_rep${counter}.tsv"
     export variant_positions_file="${variant_position_technical_replicate_dir}/variant_position_s$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}_rep${counter}.tsv"
 
     # export disappearance_threshold_value_to_terminate_script="$disappearance_threshold_value_to_terminate_script"
 
+    # Create the simulation status file if it doesn't exist
+    touch "$simulation_status_file"
+
+
     while true
     do
         if [ "$knit_document_check" -eq 1 ]; then
-            Rscript -e "rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd')"
+            Rscript -e "rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd',quiet=TRUE)"
+            # Suppress both warnings and errors
+            # Rscript -e "rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd')" 2>/dev/null
+            # Rscript -e "options(warn=-1); rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd')"
+
+            
         else
             # Rscript -e "source('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd')"
-            Rscript -e "rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd', run_pandoc=FALSE)" # Run the .rmd script without knitting!
+            # Rscript -e "rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd', run_pandoc=FALSE)" # Run the .rmd script without knitting!
+            Rscript -e "rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd', run_pandoc=FALSE,quiet=TRUE)" # Run the .rmd script without knitting!
+
+            # Suppress both warnings and errors
+            # Rscript -e "rmarkdown::render('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd', run_pandoc=FALSE)" 2>/dev/null
+            # Rscript -e "options(warn=-1); source('$pipeline_script_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd')"
+
 
         fi
         exit_status=$?
 
+        # Write success status to simulation status file
         if [ $exit_status -eq 0 ]; then
             echo "Simulation $counter with selection coefficient $selection_coefficient completed successfully"
             break
-        else
-            echo -e  "\n Simulation $counter with selection coefficient $selection_coefficient didn't fixate after $disappearance_threshold_value_to_terminate_script tries"
-            echo -e "\n Rerunning the script.."
-            # Update the prune count file
-            if [ -f "$simulation_prune_count_file" ]; then
-                temp_file=$(mktemp)
-                updated=0
-                while IFS=$'\t' read -r basename count; do
-                    if [[ "$basename" == "$output_sim_files_basename" ]]; then
-                        count=$((count + $disappearance_threshold_value_to_terminate_script))
-                        updated=1
+        else          
+            # Check the contents of the simulation status file
+            if [ -f "$simulation_status_file" ]; then
+                simulation_status=$(cat "$simulation_status_file")
+                if [ "$simulation_status" == "TRUE" ]; then
+                    # Update the prune count file
+                    if [ -f "$simulation_prune_count_file" ]; then
+                        temp_file=$(mktemp)
+                        updated=0
+                        while IFS=$'\t' read -r basename count; do
+                            if [[ "$basename" == "$output_sim_files_basename" ]]; then
+                                count=$((count + $disappearance_threshold_value_to_terminate_script))
+                                updated=1
+                            fi
+                            echo -e "$basename\t$count" >> "$temp_file"
+                        done < "$simulation_prune_count_file"
+
+                        if [ $updated -eq 0 ]; then
+                            echo -e "$output_sim_files_basename\t$disappearance_threshold_value_to_terminate_script" >> "$temp_file"
+                        fi
+
+                        mv "$temp_file" "$simulation_prune_count_file"
+                        echo -e  "\n Simulation $counter with selection coefficient $selection_coefficient didn't fixate after $disappearance_threshold_value_to_terminate_script tries"
+                        echo -e "\n Rerunning the script.."
+
+
+                    else
+                        echo -e "$output_sim_files_basename\t$disappearance_threshold_value_to_terminate_script" > "$simulation_prune_count_file"
                     fi
-                    echo -e "$basename\t$count" >> "$temp_file"
-                done < "$simulation_prune_count_file"
+                # echo "Exit status of R Markdown script: $exit_status"
+                echo "Contents of prune count file after update:"
+                cat "$simulation_prune_count_file"
 
-                if [ $updated -eq 0 ]; then
-                    echo -e "$output_sim_files_basename\t$disappearance_threshold_value_to_terminate_script" >> "$temp_file"
                 fi
-
-                mv "$temp_file" "$simulation_prune_count_file"
-            else
-                echo -e "$output_sim_files_basename\t$disappearance_threshold_value_to_terminate_script" > "$simulation_prune_count_file"
             fi
         fi
 
-        echo "Exit status of R Markdown script: $exit_status"
-        echo "Contents of prune count file after update:"
-        cat "$simulation_prune_count_file"
     done
+    rm $simulation_status_file
 }
 #############################################
 ###### Running selection coefficients sequentially     #####
 ###### (One selection coefficient at a time         #####
 ###### to mitigate bottleneck of the lower s runs)  #####
 #############################################
-if [ "$selection_simulation" = TRUE ]; then
+if [ "$selection_simulation" = "TRUE" ]; then
     cd $output_dir_selection_simulation
     # Loop over each selection coefficient
     for selection_coefficient in "${selection_coefficient_list[@]}"
@@ -174,6 +200,7 @@ if [ "$selection_simulation" = TRUE ]; then
         rm $variant_positions_file
         cat "${variant_position_technical_replicate_dir}/variant_position_s$(echo $selection_coefficient | sed 's/\.//')_${chr_simulated}"*  > $variant_positions_file
     done
+    wait
     # Ending the timer
     script_end=$(date +%s)
     script_runtime=$((script_end-script_start))
@@ -184,4 +211,3 @@ if [ "$selection_simulation" = TRUE ]; then
 else
     echo "Selection simulation is set to FALSE. Exiting."
 fi
-

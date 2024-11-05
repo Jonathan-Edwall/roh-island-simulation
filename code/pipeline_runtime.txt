@@ -1,5 +1,0 @@
-Pipeline Runtimes:
-Step 1: 2_1_1_plink_preprocessing_empirical_data.sh Runtime: 19 seconds
-Step 2: 2_1_1_plink_preprocessing_simulated_data.sh Runtime: 1726223155 seconds
-Step 3: 2_2_1_plink_ROH_computation.sh Runtime: 16 seconds
-Step 4: 2_2_2_F_ROH_computation.sh Runtime: 242 seconds

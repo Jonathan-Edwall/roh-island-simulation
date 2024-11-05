@@ -1,4 +1,3 @@
-
 #!/bin/bash -l
 
 # Start the timer 
@@ -9,10 +8,10 @@ start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
-#cd $HOME
+# HOME=/home/jonathan
+cd $HOME
 
-script_directory=$HOME/code/pipeline_scripts
+# pipeline_scripts_dir=$script_dir/pipeline_scripts
 
 ######################################  
 ####### Defining parameter values #######
@@ -137,7 +136,7 @@ export document_sub_title="$result_file_sub_title" # Imported from pipeline_resu
 
 # Modify the pipeline_result_summary.sh script call to include the MAF status suffix in the output file name
 output_file="$Pipeline_results_output_dir/pipeline_results_${MAF_status_suffix}.html"
-Rscript -e "rmarkdown::render('$script_directory/pipeline_results.Rmd', output_file = '$output_file')"
+Rscript -e "rmarkdown::render('$pipeline_scripts_dir/pipeline_results.Rmd', output_file = '$output_file')"
 
 
 # Ending the timer 

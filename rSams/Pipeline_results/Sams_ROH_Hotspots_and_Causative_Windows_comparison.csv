@@ -1,8 +1,0 @@
-Model,Lengths_Mb,ROH_Freq,H_e,Under_selection
-s=0.8,3.96,88.3,0.023,Yes
-s=0.6,2.81,91.3,0.014,Yes
-s=0.7,2.52,85.3,0.025,Yes
-s=0.5,2.36,86.9,0.025,Yes
-s=0.4,2.13,91,0.016,Yes
-Hotspot\_chr28\_window\_1,1.4,75,0.118,Yes
-Hotspot\_chr1\_window\_1,0.2,61.9,0.096,Yes

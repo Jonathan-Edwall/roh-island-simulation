@@ -8,10 +8,10 @@ script_start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-HOME=/home/jonathan
+# HOME=/home/jonathan
 cd $HOME
 
-pipeline_script_dir=$HOME/code/pipeline_scripts
+# pipeline_script_dir=$HOME/code/pipeline_scripts
 
 #################################### 
 # Defining Simulation parameters
