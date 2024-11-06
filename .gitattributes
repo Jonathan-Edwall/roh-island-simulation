@@ -2,7 +2,7 @@
 * linguist-vendored
 # Automatically detects line endings for text files
 * text=auto 
-# Only include scripts from the /code directory
-code/* linguist-vendored=false
+# Only include scripts from the /code directory, including subdirectories
+code/** linguist-vendored=false
 # Interpret .Rmd files as R-scripts
 *.Rmd linguist-language=R
