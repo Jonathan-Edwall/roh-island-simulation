@@ -9,6 +9,8 @@ Scripts in `/pipeline_scripts` and `/remove_files_scripts` do not require modifi
 
 The `/Windows OS scripts` folder contains .rmd scripts made during the development of the .rmd scripts within `/pipeline_scripts`. These scripts may be useful for testing modifications of these scripts locally in a GUI environment, such as RStudio.
 
+The scripts in the `/gosling_scripts` folder generate Gosling.js. plots for visualizing the empirical ROH hotspots. These plots are not essential for the pipeline analysis, but can be a useful tool for visualizing the ROH frequency of these hotspots and their surrounding regions.
+
 ## Prerequisites
 To make the scripts in this pipeline executable, follow these steps:
 - Navigate to the `/code` directory.

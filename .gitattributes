@@ -1,2 +1,8 @@
-* text=auto
+# Mark every file in the repository as vendored (not part of the codebase)
+* linguist-vendored
+# Automatically detects line endings for text files
+* text=auto 
+# Only include scripts from the /code directory
+code/* linguist-vendored=false
+# Interpret .Rmd files as R-scripts
 *.Rmd linguist-language=R
