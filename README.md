@@ -23,16 +23,16 @@ To ensure that the population history of the simulated models aligns well with t
 ## Getting Started
 Clone the repository and navigate to the /code directory to access provided scripts:
 ``` bash
-git clone https://github.com/Jonathan-Edwall/Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations.git
+git clone https://github.com/Jonathan-Edwall/roh-island-simulation.git
 ```
 
 ## Requirements
 This pipeline was developed and tested with the following software versions (though other versions may work):
-- R v4.2.2
-- [AlphaSimR v1.5.3](https://cran.r-project.org/web/packages/AlphaSimR/readme/README.html) 
+- R v4.3.3
+- [AlphaSimR v1.4.2](https://cran.r-project.org/web/packages/AlphaSimR/readme/README.html) 
 - Bedtools v2.30.0
 - Optuna v4.0.0
-- Python v3.9.19
+- Python v3.9.7
 - PLINK v1.90b6.21
 - Selenium (optional for OMIA phenotype search)
 
@@ -44,12 +44,13 @@ To install the conda environment from the conda-lock file, do the following step
 ``` bash
 conda install conda-forge::conda-lock
 ```
-2. **Install the environment from the `conda-lock` file**
+2. **Install the environment from the `conda-lock` file:**
+
 The `roh_island_sim_env_lock_file.yml` lock file can be found in the root directory of this repository. Assuming that the lock file is in the current working directory, you can use the following command to install the environment: 
 ``` bash
 conda-lock install --name roh_island_sim_env roh_island_sim_env_lock_file.yml
 ```
 Once the environment is set up, you can run the pipeline using this Conda environment.
 
-*Note:*
+**Note:**
 The pipeline assumes the conda environment is named `roh_island_sim_env`. If you choose a different environment name, be sure to update the environment name in the relevant bash files in the `/code` directory.
