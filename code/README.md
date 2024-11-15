@@ -15,7 +15,6 @@ The scripts in the `/gosling_scripts` folder generate Gosling.js. plots for visu
 To make the scripts in this pipeline executable, follow these steps:
 - Navigate to the `/code` directory.
 - Run the following command to make all `.sh`, `.py`, and `.Rmd` files executable:
-
 ```bash
   find . -type f \( -name "*.sh" -o -name "*.py" -o -name "*.Rmd" \) -exec chmod +x {} \; 
 ```
@@ -37,17 +36,16 @@ To map ROH hotspots to phenotypes, set `phenotype_file` to the correct BED file 
 
 ### Prerequisites
 
-Before starting the hyperparameter optimization, the empirical reference values need to be collected, which can be achieved in the following way:
+Before starting the hyperparameter optimization, gather the empirical reference values using the following steps:
 
 1. Run **`run_pipeline.sh`**: It is recommended to run with one technical replicate (`n_simulation_replicates=1`) and disable selection model simulations (`selection_simulation=FALSE`), to quickly generate the empirical reference values, which will be used as parameters in the cost function of the hyperparameter optimization run.
-2. Run **`Retrieve_empirical_data_for_HO.sh`**: This script will copy the data files containing information about the reference values and save it in the directory of the Hyperparameter Optimization data and results.
+2. Run **`Retrieve_empirical_data_for_HO.sh`**: This script copies the data files containing information about the reference values and saves them in the directory designated for the Hyperparameter Optimization data and results.
 
 Once these steps are complete, you can proceed with hyperparameter optimization.
 
 ### Scripts
-
 - **`optuna_hyperoptimize_pipeline.py`**: Main script for performing hyperparameter optimization.
-  - **`run_pipeline_hyperoptimize_neutral_model.sh`**: Runs the analysis pipeline for the neutral model under trial in the optimization.
+  - **`run_pipeline_hyperoptimize_neutral_model.sh`**: Runs the analysis pipeline for the neutral model under trial in each optimization trial.
 
 - **`optuna_hyperoptimize_pipeline_refined_optimization_top_n_perc_results.py`**: Script for refined optimization using the top `n` percent of results. This script can be used to increase the technical replicates to get a more well informed results from a prior hyperparameter optimization run.
   - **`run_pipeline_hyperoptimize_neutral_model_refined_optimization_top_n_perc_results.sh`**: Executes the analysis pipeline for the neutral model under trial in the hyperparameter optimization run.
@@ -55,4 +53,9 @@ Once these steps are complete, you can proceed with hyperparameter optimization.
 - **`optuna_hyperoptimize_pipeline_grid_search_categorical_attributes.py`**: Alternative script using grid search for categorical parameters.
   - **`run_pipeline_hyperoptimize_neutral_model_grid_search_categorical_attributes.sh`**: Executes the analysis pipeline for the neutral model under trial in the hyperparameter optimization run.
 
-
+### Running the scripts
+To execute these scripts, ensure that the required conda environment is activated.
+For example, **`optuna_hyperoptimize_pipeline.py`** can be run in the following way:
+``` bash
+conda activate roh_island_sim_env && python optuna_hyperoptimize_pipeline.py
+```

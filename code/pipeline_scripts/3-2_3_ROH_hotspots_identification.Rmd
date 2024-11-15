@@ -63,11 +63,19 @@ Sys.getenv()
 # # Verify the current working directory
 # getwd()
 ```
+## Loading libraries
+```{r library()}
+# Check and install ggplot2 if it's not already installed
+if (!require(ggplot2)) {
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+  install.packages("ggplot2")
+}
+
+```
+
 #1: ROH-Hotspots extraction
 ```{r ROH-Hotspot extraction}
-# Load the MASS package for fitdistr function
-library(MASS)
-library(ggplot2)
+
 # Read the data without treating "#" as a comment
 data <- read.table(input_file, header = TRUE, sep = "\t", comment.char = "")
 # Assigning column names
@@ -285,7 +293,7 @@ ROH_hotspot_windows_frequencies
 ## 2.0: Formatting the Threshold for the filename
 ```{r ,eval=TRUE}
 # formatted_threshold <- format(threshold, nsmall = 3)
-formatted_threshold <- round(threshold,5)
+formatted_threshold <- round(threshold,3)
 ```
 ## 2.1: ROH Hotspot-frequency into .tsv files
 ```{r Export ROH Hotspot-frequency,eval=TRUE}

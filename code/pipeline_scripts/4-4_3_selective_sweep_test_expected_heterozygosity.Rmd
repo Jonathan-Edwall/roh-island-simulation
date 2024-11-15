@@ -64,6 +64,7 @@ knitr::opts_knit$set(root.dir = output_dir_sweep_test)
 ## Loading libraries
 ```{r library()}
 library(knitr)
+library(ggplot2)
 ```
 # Expected heterozygosity
 Takes a list of H_e for a window and computes H_e for each SNP individually
@@ -151,6 +152,8 @@ setwd(ROH_hotspot_allele_freq_dir)
 # Get a list of all .bed files in the directory
 pattern <- "\\.bed$"
 bed_files <- list.files(path = ROH_hotspot_allele_freq_dir, pattern = pattern)
+
+# bed_files <- list.files(pattern = "\\.bed$")
 # Extract the chromosome number and window number from the file names
 chr_numbers <- as.numeric(gsub(tolower(chr_number_pattern), "\\1", tolower(bed_files)))
 # chr_numbers <- as.numeric(sub(".*",chr_prefix,"(\\d+)_.*", "\\1", bed_files))

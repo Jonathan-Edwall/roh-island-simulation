@@ -97,7 +97,7 @@ editor_options:
 ---
 
 ## Loading libraries
-```{r Loading Libraries }
+```{r Loading Libraries ,echo = FALSE}
 if (!require(knitr)) install.packages("knitr", dependencies = TRUE)
 library(knitr)
 if (!require(ggplot2)) install.packages("ggplot2", dependencies = TRUE)

@@ -4,16 +4,6 @@
 # Start the timer 
 script_start=$(date +%s)
 
-
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate bedtools
-# # /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
-
-# # bedtools intersect -h  # Documentation about the merge function
-
-# wait 
 # empirical_dog_breed=labrador_retriever # Defined in run_pipeline.sh
 
 ####################################  

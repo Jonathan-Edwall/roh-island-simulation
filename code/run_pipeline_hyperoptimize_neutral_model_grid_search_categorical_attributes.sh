@@ -1,42 +1,24 @@
 #!/bin/bash
 
-# Function to handle user interruption
-handle_interrupt() {
-    echo "Pipeline interrupted. Exiting."
-    # Could potentially clean up the files created up until the script termination here
-    exit 1
-}
-
-# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
-trap 'handle_interrupt' SIGINT
-
 ####################################  
 # Setting up the pipeline script
 #################################### 
-conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
+conda_env_full_path=""
+# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
+source $conda_env_full_path
+conda activate roh_island_sim_env
 
 # Defining the working directory
-export HOME="/home/jonathan"
-cd $HOME
+# export HOME="/home/jonathan"
+export HOME="$(dirname "$(dirname "$(realpath "$0")")")"
 
 export script_dir="$HOME/code"
 export pipeline_scripts_dir="$script_dir/pipeline_scripts"
 remove_files_scripts_dir="$script_dir/remove_files_scripts"
 
-# Create a runtime log file
-runtime_log="$script_dir/Hyperoptimization_pipeline_runtime_grid_search_categorical_attributes.txt"
-
-# Remove the existing runtime logfile if it exists
-if [ -e "$runtime_log" ]; then
-    rm "$runtime_log"
-fi
-
-
-# Start the timer 
-pipeline_start=$(date +%s)
-
-echo "Pipeline Runtimes:" > $runtime_log
-
+export results_dir="$HOME/results_HO"
+export data_dir="$HOME/data_HO"
+export hyperoptimizer_results_dir="$HOME/hyperoptimizer_results" 
 ######################################  
 ####### Defining parameter values #######
 ######################################
@@ -46,10 +28,6 @@ export max_parallel_jobs_neutral_model_simulations=30
 export empirical_dog_breed="labrador_retriever"
 export empirical_data_basename="LR_fs"
 
-export results_dir="$HOME/results_HO"
-export data_dir="$HOME/data_HO"
-
-export hyperoptimizer_results_dir="$HOME/hyperoptimizer_results" 
 #���������������������
 #� Grid Search sampling
 #� Hyperoptimization parameters �
@@ -74,6 +52,32 @@ export chr_specific_recombination_rate=$8
 # export reference_population_for_snp_chip=$7
 # export Introduce_mutations=${10}
 
+# Function to handle user interruption
+handle_interrupt() {
+    echo "Pipeline interrupted. Exiting."
+    # Could potentially clean up the files created up until the script termination here
+    exit 1
+}
+
+# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
+trap 'handle_interrupt' SIGINT
+
+# Create a runtime log file
+runtime_log="$script_dir/Hyperoptimization_pipeline_runtime_grid_search_categorical_attributes.txt"
+
+# Remove the existing runtime logfile if it exists
+if [ -e "$runtime_log" ]; then
+    rm "$runtime_log"
+fi
+
+# Start the timer 
+pipeline_start=$(date +%s)
+echo "Pipeline Runtimes:" > $runtime_log
+cd $HOME
+
+#���������������������
+#� Pipeline Run �
+#���������������������
 
 # Step 1
 step=1

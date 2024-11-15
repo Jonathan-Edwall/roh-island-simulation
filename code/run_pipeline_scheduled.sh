@@ -1,43 +1,15 @@
 #!/bin/bash
 
-
-# Function to handle user interruption
-handle_interrupt() {
-    echo "Pipeline interrupted. Exiting."
-    # Could potentially clean up the files created up until the script termination here
-    exit 1
-}
-
-# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
-trap 'handle_interrupt' SIGINT
-
 ####################################  
 # Setting up the pipeline script
 #################################### 
-
-# Defining the working directory
-cd $HOME
-
-# Remove the existing runtime logfile if it exists
-if [ -e "$runtime_log" ]; then
-    rm "$runtime_log"
-fi
-
-
-# Start the timer 
-pipeline_start=$(date +%s)
-
-echo "Pipeline Runtimes:" > $runtime_log
+source $conda_env_full_path  # Source Conda initialization script
+# Activate the conda environment
+conda activate roh_island_sim_env
 
 ######################################  
 ####### Defining parameter values #######
 ######################################
-parallelize_simulations=TRUE
-# parallelize_simulations=FALSE
-# Option to run the simulations one selection coefficient at a time (with each selection coefficient being run in parallel however),
-# to mitigate the problem of the pipeline performance being bottlenecked by the extended runtimes of the lower selection coefficients 
-run_sel_coeff_sequentially=TRUE
-
 export max_parallel_jobs_neutral_model_simulations=30
 export max_parallel_jobs_selection_sim=8 # 7 works
 export n_simulation_replicates=50
@@ -58,9 +30,28 @@ export Introduce_mutations=TRUE
 ####################################  
 # Defining the input files
 #################################### 
-#�������������
-#� Empirical �
-#�������������
+# Function to handle user interruption
+handle_interrupt() {
+    echo "Pipeline interrupted. Exiting."
+    # Could potentially clean up the files created up until the script termination here
+    exit 1
+}
+# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
+trap 'handle_interrupt' SIGINT
+
+# Remove the existing runtime logfile if it exists
+if [ -e "$runtime_log" ]; then
+    rm "$runtime_log"
+fi
+# Start the timer 
+pipeline_start=$(date +%s)
+echo "Pipeline Runtimes:" > $runtime_log
+# Changing the working directory
+cd $HOME
+
+#���������������������
+#� Pipeline Run �
+#���������������������
 
 # Step 1
 step=1
@@ -71,67 +62,27 @@ end_step1=$(date +%s)
 runtime_step1=$((end_step1-pipeline_start))
 echo "Step $step: $script_name Runtime: $runtime_step1 seconds" >> $runtime_log
 ((step++))
-
-
 num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is used for the SNP chip in alphasimr
-
-
 # echo "num_markers_raw_empirical_dataset_scaling_factor: $num_markers_raw_empirical_dataset_scaling_factor"
-
 export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_density_mb * $num_markers_raw_empirical_dataset_scaling_factor" | bc)
 echo "selected_chr_snp_density_mb: $selected_chr_snp_density_mb"
 
-
-if [ "$parallelize_simulations" = "TRUE" ]; then
-    echo "Parallelized simulations set to TRUE. Running the simulations in parallel."
-    # Step 2
-    script_name="1_pipeline_neutral_model_simulation.sh"
-    echo "Step $step: Running $script_name"
-    source "$pipeline_scripts_dir/$script_name"
-    end_step2=$(date +%s)
-    runtime_step2=$((end_step2-end_step1))
-    echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
-    ((step++))
-
-    if [ "$run_sel_coeff_sequentially" = "TRUE" ]; then
-        # Step 3
-        script_name="2_pipeline_selection_model_simulation_sequentially.sh"
-        echo "Step $step: Running $script_name"
-        source "$pipeline_scripts_dir/$script_name"
-        end_step3=$(date +%s)
-        runtime_step3=$((end_step3-end_step2))
-        echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
-        ((step++))        
-    else
-        # Step 3
-        script_name="2_pipeline_selection_model_simulation.sh"
-        echo "Step $step: Running $script_name"
-        source "$pipeline_scripts_dir/$script_name"
-        end_step3=$(date +%s)
-        runtime_step3=$((end_step3-end_step2))
-        echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
-        ((step++))
-    fi
-else
-    echo "Parallelized simulations set to FALSE. Running the simulations sequentially."
-    # Step 2
-    script_name="non_parallelized_1_pipeline_neutral_model_simulation.sh"
-    echo "Step $step: Running $script_name"
-    source "$pipeline_scripts_dir/$script_name"
-    end_step2=$(date +%s)
-    runtime_step2=$((end_step2-end_step1))
-    echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
-    ((step++))
-
-    # Step 3
-    script_name="non_parallelized_2_pipeline_selection_model_simulation.sh"
-    echo "Step $step: Running $script_name"
-    source "$pipeline_scripts_dir/$script_name"
-    end_step3=$(date +%s)
-    runtime_step3=$((end_step3-end_step2))
-    echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
-    ((step++))
-fi
+# Step 2
+script_name="1_pipeline_neutral_model_simulation.sh"
+echo "Step $step: Running $script_name"
+source "$pipeline_scripts_dir/$script_name"
+end_step2=$(date +%s)
+runtime_step2=$((end_step2-end_step1))
+echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
+((step++))
+# Step 3
+script_name="2_pipeline_selection_model_simulation_sequentially.sh"
+echo "Step $step: Running $script_name"
+source "$pipeline_scripts_dir/$script_name"
+end_step3=$(date +%s)
+runtime_step3=$((end_step3-end_step2))
+echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
+((step++))        
 
 # Step 4
 script_name="2_1_1_plink_preprocessing_simulated_data.sh"
@@ -254,6 +205,7 @@ runtime_step16=$((end_step16-end_step15))
 echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
 ((step++))
 
+
 # # Step 17 (Optional estimation of N_e for the simulated datasets)
 # script_name="simulated_models_n_e_estimation_with_GONE.sh"
 # echo "Step $step: Running $script_name"
@@ -274,8 +226,6 @@ echo "Step $step: $script_name Runtime: $runtime_step16 seconds" >> $runtime_log
 # runtime_step18=$((end_step18-start_step18))
 # echo "Step $step: $script_name Runtime: $runtime_step18 seconds" >> $runtime_log
 # ((step++))
-
-
 
 
 final_step=$(date +%s)

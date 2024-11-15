@@ -3,11 +3,6 @@
 # script_start the timer 
 script_start=$(date +%s)
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate plink
-
 ####################################  
 # Defining the working directory
 #################################### 
@@ -22,8 +17,6 @@ header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
 
 # # Boolean value to determine whether to run the selection simulation code
 # selection_simulation=TRUE # Defined in run_pipeline.sh
-
-
 ####################################  
 # Defining the input files
 #################################### 
@@ -101,19 +94,31 @@ if [ "$empirical_processing" = TRUE ]; then
             
         ##############################
         # Adding POS to the outputfile
-        ##############################          
+        ##############################  
+        # .frq example - header row:
+        # CHR                         SNP   A1   A2          MAF  NCHROBS
+        # 1   chrUn_AAEX03019240_128183    0    C            0      442
         
-        # Sorting the input files based on the 2nd column (SNP identifier) using process substitution
-        # Then performing a join operation (based on the 2nd column) to associate markers SNP-markers in the outputfile with their base-pair positions
-        # tail -n +2 is used on the .frq file since it involves a header line.
+        #.bim example - No header row:
+        # 1       chrUn_AAEX03019240_128183       0       23974   0       C
+
+        # Step 1: Creating temporary files to ensure that the .frq and .bim file are formatted the same way
+        extracted_freq="${empirical_breed_allele_freq_plink_output_dir}/extracted_freq.txt"
+        extracted_bim="${empirical_breed_allele_freq_plink_output_dir}/extracted_bim.txt"
+        awk 'NR > 1 {print $1, $2, $3, $4, $5, $6}' "${empirical_breed_allele_freq_plink_output_dir}/${population_name}_allele_freq.frq" > "$extracted_freq"
+        awk '{print $1, $2, $3, $4, $5, $6}' "${preprocessed_empirical_breed_dir}/${population_name}.bim" > "$extracted_bim"
+        # Step 2: Perform the join, sort, and clean the output
         join -1 2 -2 2 \
         -o 1.1,2.4,1.2,1.3,1.4,1.5,1.6 \
-        <(tail -n +2 "${empirical_breed_allele_freq_plink_output_dir}/${population_name}_allele_freq.frq" | sort -k2,2) \
-        <(sort -k2,2 "${preprocessed_empirical_breed_dir}/${population_name}.bim") | \
+        <(sort -k2,2 "$extracted_freq") \
+        <(sort -k2,2 "$extracted_bim") | \
         sort -k1,1n -k2,2n | \
-        awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7}' | \
+        awk -v OFS='\t' '{print $1, $2, $2+1, $3, $4, $5, $6, $7}' | \
         sed 's/[[:space:]]\+$//' |  # Remove trailing whitespace, including tabs
-        sed '1i'"$header" > "${empirical_breed_allele_freq_plink_output_dir}/${population_name}_allele_freq.bed"
+        sed "1i$header" > "${empirical_breed_allele_freq_plink_output_dir}/${population_name}_allele_freq.bed"
+        # Step 3: Clean up temporary files
+        rm "$extracted_freq"
+        rm "$extracted_bim"
 
     echo "Added physical positions for the markers in ${population_name}_allele_freq.frq"
     echo "The output file is stored in: ${empirical_breed_allele_freq_plink_output_dir}/${population_name}_allele_freq.bed"
@@ -140,19 +145,24 @@ for simulation_file in $preprocessed_neutral_model_dir/*.bim; do
           
     ##############################
     # Adding POS to the outputfile
-    ##############################          
-              
-    # Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
-    # Then performing join-operation to associate markers SNP-markers in the outputfile with their base-pair positions
+    ##############################    
+    # Step 1: Creating temporary files to ensure that the .frq and .bim file are formatted the same way
+    extracted_freq="${simulated_neutral_model_allele_freq_plink_output_dir}/extracted_freq.txt"
+    extracted_bim="${simulated_neutral_model_allele_freq_plink_output_dir}/extracted_bim.txt"
+    awk 'NR > 1 {print $1, $2, $3, $4, $5, $6}' "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq" > "$extracted_freq"
+    awk '{print $1, $2, $3, $4, $5, $6}' "${preprocessed_neutral_model_dir}/${simulation_name}.bim" > "$extracted_bim"
+    # Step 2: Perform the join, sort, and clean the output
     join -1 2 -2 2 \
     -o 1.1,2.4,1.2,1.3,1.4,1.5,1.6 \
-    <(tail -n +2 "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq" | sort -k2,2) \
-    <(sort -k2,2 "${preprocessed_neutral_model_dir}/${simulation_name}.bim") | \
+    <(sort -k2,2 "$extracted_freq") \
+    <(sort -k2,2 "$extracted_bim") | \
     sort -k1,1n -k2,2n | \
-    awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7}' | \
+    awk -v OFS='\t' '{print $1, $2, $2+1, $3, $4, $5, $6, $7}' | \
     sed 's/[[:space:]]\+$//' |  # Remove trailing whitespace, including tabs
-    sed '1i'"$header" > "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
-    
+    sed "1i$header" > "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
+    # Step 3: Clean up temporary files
+    rm "$extracted_freq"
+    rm "$extracted_bim"         
     echo "Added physical positions for the markers in ${simulation_name}_allele_freq.frq"
     echo "The output file is stored in: ${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
     
@@ -175,31 +185,29 @@ if [ "$selection_simulation" = TRUE ]; then
             
         ##############################
         # Adding POS to the outputfile
-        ##############################          
-            
-        # Sorting the input-files based on the 2nd column (SNP identifier) using process substitution
-        # Then performing join-operation to associate markers SNP-markers in the outputfile with their base-pair positions
+        ##############################    
+        # Step 1: Creating temporary files to ensure that the .frq and .bim file are formatted the same way
+        extracted_freq="${simulated_selection_model_allele_freq_plink_output_dir}/extracted_freq.txt"
+        extracted_bim="${simulated_selection_model_allele_freq_plink_output_dir}/extracted_bim.txt"
+        awk 'NR > 1 {print $1, $2, $3, $4, $5, $6}' "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq" > "$extracted_freq"
+        awk '{print $1, $2, $3, $4, $5, $6}' "${preprocessed_selection_model_dir}/${simulation_name}.bim" > "$extracted_bim"
+        # Step 2: Perform the join, sort, and clean the output
         join -1 2 -2 2 \
         -o 1.1,2.4,1.2,1.3,1.4,1.5,1.6 \
-        <(tail -n +2 "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.frq" | sort -k2,2) \
-        <(sort -k2,2 "${preprocessed_selection_model_dir}/${simulation_name}.bim") | \
+        <(sort -k2,2 "$extracted_freq") \
+        <(sort -k2,2 "$extracted_bim") | \
         sort -k1,1n -k2,2n | \
-        awk -v OFS='\t' '{print $1,$2,$2+1,$3,$4,$5,$6,$7}' | \
+        awk -v OFS='\t' '{print $1, $2, $2+1, $3, $4, $5, $6, $7}' | \
         sed 's/[[:space:]]\+$//' |  # Remove trailing whitespace, including tabs
-        sed '1i'"$header" > "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
-        
-        echo "Added physical positions for the markers in ${simulation_name}_allele_freq.frq"
-        echo "The output file is stored in: ${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
-        
+        sed "1i$header" > "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq.bed"
+        # Step 3: Clean up temporary files
+        rm "$extracted_freq"
+        rm "$extracted_bim"     
     done
 
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
 fi
-
-
-
-
 
 # script_ending the timer 
 script_end=$(date +%s)

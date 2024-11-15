@@ -91,8 +91,23 @@ output_sim_files_basename <- paste0("Neutral_simulation_", chr_simulated)
 ```
 ## Loading libraries
 ```{r library()}
+# Check and install AlphaSimR if it's not already installed
+if (!require(AlphaSimR)) {
+  install.packages("AlphaSimR", dependencies = TRUE)
+}
 library(AlphaSimR)
+
+# Check and install knitr if it's not already installed
+if (!require(knitr)) {
+  install.packages("knitr", dependencies = TRUE)
+}
 library(knitr)
+
+# Check and install rmarkdown if it's not already installed
+if (!require(rmarkdown)) {
+  install.packages("rmarkdown", dependencies = TRUE)
+}
+library(rmarkdown)
 ```
 # 1: Creating founder Haplotypes
 ## 1.0: Defining physical chromosome lengths of model species

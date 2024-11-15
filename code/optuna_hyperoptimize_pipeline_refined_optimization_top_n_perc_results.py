@@ -6,27 +6,28 @@ import pandas as pd
 import signal
 import sys
 
+n_results=5
+HO_input_results_file = f"neutral_models_cost_function_results.tsv"
+# Dynamically determine the root directory one level up from the current script's directory
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+path_to_results_folder = f"{root_dir}/hyperoptimizer_results"
+
+HO_input_results_file_full_path = f"{path_to_results_folder}/{HO_input_results_file}"
+
+HO_id = "HO_top"
+HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
+HO_results_file_full_path = f"{path_to_results_folder}/{HO_results_file}"
+
 # Function to handle user interruption
 def signal_handler(sig, frame):
     print('Optimization interrupted. Exiting.')
     sys.exit(0)
-
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
 
-n_results=200
-HO_input_results_file = f"neutral_models_cost_function_results.tsv"
-# path_to_results_folder = "/home/jonathan/hyperoptimizer_results"
-path_to_results_folder = ""
-HO_input_results_file_full_path = f"{path_to_results_folder}/{HO_input_results_file}"
-
-HO_id = "HO_top_10_perc_50_TC"
-HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
-HO_results_file_full_path = f"{path_to_results_folder}/{HO_results_file}"
-
 # Load the top 10 % results based on "Sim_Cost_Result"
 def load_top_n_results(n,HO_input_results_file_full_path):
-    df = pd.read_csv(HO_input_results_file_full_path, sep="\t", header=0)
+    df = pd.read_csv(HO_input_results_file_full_path, sep="\t")
     top_n = df.sort_values("Sim_Cost_Result").head(n)
     return top_n
 
@@ -46,8 +47,7 @@ def objective(trial):
             f.write(f"{chr_simulated}\t{Ne_burn_in}\t{n_bottleneck}\t{n_generations_bottleneck}\t{n_simulated_generations_breed_formation}\t{n_individuals_breed_formation}\t{chr_specific_recombination_rate}\n")
 
     try:
-        # Fetch the current trial number to select the corresponding row from the top 100 results
-        trial_number = trial.number
+        trial_number = trial.number       
         row = top_n_results.iloc[trial_number]
         # Extract parameters for the current trial
         chr_simulated = str(row['Chr'])
@@ -93,12 +93,9 @@ def objective(trial):
             last_row['Chr_specific_recomb_rate'].lower() == str(chr_specific_recombination_rate).lower()
         ):
             raise RuntimeError("Trial parameters do not match the last row of the results file.")           
-
-
         # Extract the cost function value
         cost_value = float(last_row["Sim_Cost_Result"])
         return cost_value
-
     except Exception as e:
         print(f"\n{'!' * 10}\n Error during trial: {e}\n{'!' * 10}\n")
         # Log the failed parameters
@@ -106,14 +103,11 @@ def objective(trial):
                               n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, chr_specific_recombination_rate)
         return float('inf')
 
-
 # Load top n results
 top_n_results=load_top_n_results(n_results,HO_input_results_file_full_path)
-
 # start_entry = 119
 # # Slice to keep entries start_entry (10) to top_n_results (200) (corresponding to index 9 to 199)
 # top_n_results= top_n_results.iloc[start_entry-1:top_n_results]
-
 
 # Create the study using a fixed sampler since trials are based on the top 100 results
 study = optuna.create_study(direction='minimize')

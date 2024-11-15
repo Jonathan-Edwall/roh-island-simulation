@@ -44,7 +44,7 @@ run_simulation() {
     export Ne_burn_in="$Ne_burn_in"  #Variable defined in run_pipeline.sh
     export nInd_founder_population="$nInd_founder_population" #Variable defined in run_pipeline.sh
     export Inbred_ancestral_population="$Inbred_ancestral_population" #Variable defined in run_pipeline.sh
-    export N_e_bottleneck="$N_e_bottleneck"  #Variable defined in run_pipeline.sh
+    export N_e_bottleneck="$N_e_bottleneck"  #Variable defined in run_pipeline.shs
     export n_simulated_generations_breed_formation="$n_simulated_generations_breed_formation" #Variable defined in run_pipeline.sh 
     export n_individuals_breed_formation="$n_individuals_breed_formation" #Variable defined in run_pipeline.sh 
     export reference_population_for_snp_chip="$reference_population_for_snp_chip" #Variable defined in run_pipeline.sh 
@@ -53,11 +53,15 @@ run_simulation() {
     export selected_chr_snp_density_mb="$selected_chr_snp_density_mb" #Variable defined in run_pipeline.sh
     export Introduce_mutations="$Introduce_mutations" #Variable defined in run_pipeline.sh
 
+    # # Check if rmarkdown is installed, if not, install it
+    # Rscript -e "if (!require('rmarkdown')) install.packages('rmarkdown', repos = 'https://cloud.r-project.org/')"
+
     if [ "$knit_document_check" -eq 1 ]; then
-        Rscript -e "rmarkdown::render('$pipeline_script_dir/1-1_dogs_founder_pop_sim_neutral_model.Rmd')"
+        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/1-1_dogs_founder_pop_sim_neutral_model.Rmd')"
     else
-        Rscript -e "rmarkdown::render('$pipeline_script_dir/1-1_dogs_founder_pop_sim_neutral_model.Rmd', run_pandoc=FALSE)" # Run the .rmd script without knitting!
+        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/1-1_dogs_founder_pop_sim_neutral_model.Rmd', run_pandoc=FALSE)" # Run the .rmd script without knitting!
     fi         
+
     echo "Simulation $counter of $n_simulation_replicates completed"
 }
 

@@ -3,25 +3,24 @@
 ####################################  
 # Setting up the pipeline script
 #################################### 
-
 # Function to handle user interruption
 handle_interrupt() {
     echo "$(date +'%Y-%m-%d %H:%M:%S') - Pipeline interrupted. Terminating all background jobs..." >> script.log
-    
     # Kill all background jobs (this will stop the .Rmd scripts running in parallel)
     jobs -p | xargs kill
-    
     # Optionally clean up any files created up until the interruption
     exit 1
 }
 
 # Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
 trap 'handle_interrupt' SIGINT SIGTERM
-
-export conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
+export conda_env_full_path=""
+# export conda_env_full_path="/home/jonteehh/pipeline/anaconda3/etc/profile.d/conda.sh"
 
 # Defining the working directory
-export HOME="/home/jonathan"
+# export HOME="/home/jonathan"
+export HOME="$(dirname "$(dirname "$(realpath "$0")")")"
+
 cd $HOME
 
 export script_dir="$HOME/code"
@@ -37,9 +36,7 @@ export HOME=/home/jonathan
 script_dir=$HOME/code
 cd $script_dir
 export data_dir="$HOME/data"
-
 raw_data_dir="$data_dir/raw"
-
 preprocessed_data_dir="$data_dir/preprocessed"
 
 # Logging when the script starts

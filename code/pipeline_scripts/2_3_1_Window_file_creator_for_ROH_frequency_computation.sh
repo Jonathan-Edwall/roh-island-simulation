@@ -64,20 +64,16 @@ if [ "$empirical_processing" = TRUE ]; then
 else
     echo "Empirical data has been set to not be processed, since files have already been created."
 fi
-
-
 #���������������������
 #� 100kbp window files based on�
 #� the canine reference assembly�
 #� UU_Cfam_GSD_1.0          �
 #���������������������
 canine_reference_assembly_output_window_file=$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed
-
 # Remove the existing output file if it exists
 if [ -e "$canine_reference_assembly_output_window_file" ]; then
     rm "$canine_reference_assembly_output_window_file"
 fi
-
 ###############################################################################################  
 # RESULTS
 ############################################################################################### 
@@ -108,11 +104,8 @@ if [ "$empirical_processing" = TRUE ]; then
 else
     echo ""
 fi
-
-
 # Sort the output file by genomic coordinates
 sort -k1,1n -k2,2n -o "$empirical_breed_output_window_file" "$empirical_breed_output_window_file"
-
 echo "Window file written to $empirical_breed_output_window_file"
 #���������������������
 #� 100kbp window files based on�
@@ -137,7 +130,6 @@ for chrom in "${!chromosome_lengths_bp[@]}"; do
         ((window_start += window_size_bp))
     done
 done
-
 # Sort the output file by genomic coordinates
 sort -k1,1n -k2,2n -o "$canine_reference_assembly_output_window_file" "$canine_reference_assembly_output_window_file"
 echo "Window file written to $canine_reference_assembly_output_window_file"

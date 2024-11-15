@@ -4,16 +4,6 @@
 # Start the timer 
 script_start=$(date +%s)
 
-
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate bedtools
-# /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
-
-# bedtools intersect -h  # Documentation about the merge function
-
-
 # empirical_dog_breed="empirical_breed" # Defined in run_pipeline.sh
 
 ####################################  
@@ -68,17 +58,13 @@ for roh_hotspot_file in $empirical_breed_roh_hotspots_dir/*.bed; do
     echo "Processing file: $roh_hotspot_file"
     prefix=$(basename "$roh_hotspot_file" .bed) # Extracting basename without the .bed extension
     output_file="${phenotype_mapping_output_dir}/${prefix}_phenotypes.bed"   
-
     # Run bedtools intersect-function        
     bedtools intersect \
     -wa -header \
     -a "$phenotype_file" \
     -b "$roh_hotspot_file" \
     > "$output_file"    
-
 done
-
-
 # Ending the timer 
 script_end=$(date +%s)
 # Calculating the script_runtime of the script

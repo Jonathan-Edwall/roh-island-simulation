@@ -8,6 +8,9 @@ script_start=$(date +%s)
 ######################################  
 ####### Defining parameter values #######
 ######################################
+# Max number of parallel jobs to run at a time 
+max_parallel_jobs=$(nproc)
+
 # Defining the header of the output file
 autosome_lengths_header="#Chromosome\tLength(bp)\tLength(KB)"
 F_ROH_header="#IID\tF_ROH\tROH_length_kB\tKBAVG"
@@ -81,9 +84,6 @@ mkdir -p $selection_model_F_ROH_results_dir
 #########################################################
 ##### Computing F_ROH #####
 #########################################################
-# Number of parallel jobs to run at a time
-# max_parallel_jobs=50
-max_parallel_jobs=32
 
 # Function to compute F_ROH for a single .hom file
 process_hom_file() {

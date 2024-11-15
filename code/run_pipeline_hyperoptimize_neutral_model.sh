@@ -1,58 +1,35 @@
 #!/bin/bash
 
-# Function to handle user interruption
-handle_interrupt() {
-    echo "Pipeline interrupted. Exiting."
-    # Could potentially clean up the files created up until the script termination here
-    exit 1
-}
-
-# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
-trap 'handle_interrupt' SIGINT
-
 ####################################  
 # Setting up the pipeline script
 #################################### 
-conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
+conda_env_full_path=""
+# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
+source $conda_env_full_path
+conda activate roh_island_sim_env
 
 # Defining the working directory
-export HOME="/home/jonathan"
-cd $HOME
+# export HOME="/home/jonathan"
+export HOME="$(dirname "$(dirname "$(realpath "$0")")")"
 
 export script_dir="$HOME/code"
 export pipeline_scripts_dir="$script_dir/pipeline_scripts"
 remove_files_scripts_dir="$script_dir/remove_files_scripts"
 
-# Create a runtime log file
-runtime_log="$script_dir/Hyperoptimization_pipeline_runtime.txt"
-
-
-# Remove the existing runtime logfile if it exists
-if [ -e "$runtime_log" ]; then
-    rm "$runtime_log"
-fi
-
-
-# Start the timer 
-pipeline_start=$(date +%s)
-
-echo "Pipeline Runtimes:" > $runtime_log
-
+export data_dir="$HOME/data_HO"
+export results_dir="$HOME/results_HO"
+export hyperoptimizer_results_dir="$HOME/hyperoptimizer_results" 
 ######################################  
 ####### Defining parameter values #######
 ######################################
 export n_simulation_replicates=20
 export max_parallel_jobs_neutral_model_simulations=20
 
-# export empirical_dog_breed="labrador_retriever"
-# export empirical_data_basename="LR_fs"
-export empirical_dog_breed="german_shepherd"
-export empirical_raw_data_basename="GSD_fs"
+export empirical_dog_breed="labrador_retriever"
+export empirical_data_basename="LR_fs"
+# export empirical_dog_breed="german_shepherd"
+# export empirical_raw_data_basename="GSD_fs"
 
-export data_dir="$HOME/data_HO"
-export results_dir="$HOME/results_HO"
-
-export hyperoptimizer_results_dir="$HOME/hyperoptimizer_results" 
 #���������������������
 #� Hyperoptimization parameters �
 #���������������������
@@ -91,7 +68,26 @@ export chr_specific_recombination_rate=$8
 # export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
 # export Introduce_mutations=FALSE
 
+# Function to handle user interruption
+handle_interrupt() {
+    echo "Pipeline interrupted. Exiting."
+    # Could potentially clean up the files created up until the script termination here
+    exit 1
+}
+# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
+trap 'handle_interrupt' SIGINT
 
+# Create a runtime log file
+runtime_log="$script_dir/Hyperoptimization_pipeline_runtime.txt"
+# Remove the existing runtime logfile if it exists
+if [ -e "$runtime_log" ]; then
+    rm "$runtime_log"
+fi
+
+# Start the timer 
+pipeline_start=$(date +%s)
+echo "Pipeline Runtimes:" > $runtime_log
+cd $HOME
 
 #���������������������
 #� Pipeline Run �
@@ -99,13 +95,6 @@ export chr_specific_recombination_rate=$8
 # Step 1
 step=1
 script_name="2_1_1_plink_preprocessing_empirical_data.sh"
-# echo "Step $step: Running $script_name"
-# source "$pipeline_scripts_dir/$script_name"
-# end_step1=$(date +%s)
-# runtime_step1=$((end_step1-pipeline_start))
-# echo "Step $step: $script_name Runtime: $runtime_step1 seconds" >> $runtime_log
-# ((step++))
-
 preprocessed_data_dir=$data_dir/preprocessed
 preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
 output_file="${preprocessed_empirical_breed_dir}/${empirical_dog_breed}_filtered_autosome_lengths_and_marker_density.tsv"
@@ -114,7 +103,6 @@ echo "$output_file"
 if [ -f "$output_file" ]; then
     # Remove "chr" prefix from the simulated chromosome (i.e chr3 becomes 3)
     chr_num=$(echo "$chr_simulated" | sed 's/chr//')
-
     ### Extracting the SNP Density of the selected chromosome that will be simulated ###
     # Step 1: Find the row where column 1 is equal to the chromosome number in $chr_number
     selected_row=$(awk -v chr="$chr_num" '$1 == chr' "$output_file")
@@ -123,14 +111,11 @@ if [ -f "$output_file" ]; then
 fi
 num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is used for the SNP chip in alphasimr
 export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_density_mb * $num_markers_raw_empirical_dataset_scaling_factor" | bc)
-
 echo "selected_chr_snp_density_mb: $selected_chr_snp_density_mb"
-
 end_step1=$(date +%s)
 runtime_step1=$((end_step1-pipeline_start))
 echo "Step $step: Empirical data preprocessing Runtime: $runtime_step1 seconds" >> $runtime_log
 ((step++))
-
 
 # Step 2
 script_name="1_pipeline_neutral_model_simulation.sh"
@@ -247,7 +232,6 @@ for ((i=1; i<step; i++)); do
 done
 
 echo "Total Pipeline Runtime: $total_runtime seconds"
-
 
 source "$remove_files_scripts_dir/pipeline_remove_all_simulation_files_HO.sh"
 echo "Move on to next trial"

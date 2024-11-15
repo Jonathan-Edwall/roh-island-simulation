@@ -3,29 +3,25 @@ import subprocess
 import optuna
 import json
 import pandas as pd
-
-
 import signal
-
 import sys
+
+HO_id = "test" # Name the Hyperparameter Optimization run
+number_of_trials=5
+HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
+
+# Dynamically determine the root directory one level up from the current script's directory
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+path_to_results_folder = f"{root_dir}/hyperoptimizer_results"
+HO_results_file_full_path = f"{path_to_results_folder}/{HO_results_file}"
+
 
 # Function to handle user interruption
 def signal_handler(sig, frame):
-
     print('Optimization interrupted. Exiting.')
-
     sys.exit(0)
-
 # Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
-
-HO_id = "" # Name the Hyperparameter Optimization run
-number_of_trials=2000
-HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
-path_to_results_folder = ""
-# path_to_results_folder = "/home/jonathan/hyperoptimizer_results"
-HO_results_file_full_path = f"{path_to_results_folder}/{HO_results_file}"
-
 # Define the objective function
 def objective(trial):
     # Define the directory and the path to the file where you want to log the failed rows
@@ -33,11 +29,9 @@ def objective(trial):
     failed_trials_file = os.path.join(output_dir, f"failed_trials_{HO_id}.tsv")
     # Define the header with tab separation
     header = "Chr\tNeBurnIn\tnBottleneck\tnGenBottleneck\tnGenBreed\tnBreed\tChrSpecificRecombRate\n"
-
     # Function to append the failed parameters to the file
     def log_failed_parameters(chr_simulated, Ne_burn_in,n_bottleneck, n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, chr_specific_recombination_rate):
         file_exists = os.path.isfile(failed_trials_file)
-        
         with open(failed_trials_file, 'a') as f:
             if not file_exists:
                 f.write(header)
@@ -65,13 +59,10 @@ def objective(trial):
         # Check if the pipeline ran successfully
         if result.returncode != 0:
             raise RuntimeError(f"Pipeline failed: {result.stderr}")
-
         # Read the cost function value from the last row of the results file
         df = pd.read_csv(HO_results_file_full_path, sep="\t")
-
         # Validate that the current trial is found in the last row of the cost_value results file. If not, the trial is faulty and should be skipped!
         last_row = df.iloc[-1].astype(str)
-
         print(f"Comparing trial parameters to last row of results file:")
         print(f"chr_simulated: {str(chr_simulated).lower()} == {last_row['Chr'].lower()}")
         print(f"Ne_burn_in: {str(Ne_burn_in).lower()} == {last_row['NeBurnIn'].lower()}")
@@ -101,12 +92,10 @@ def objective(trial):
         # # Log the failed parameters
         # log_failed_parameters(chr_simulated, Ne_burn_in, n_bottleneck,
         #                 n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, reference_population_for_snp_chip)
-
         return float('inf')
     
 # Create an Optuna study object
 study = optuna.create_study(direction='minimize')
-
 # Check if there already exists a file for the study
 # If yes, then load the previous trials, before continuing
 if os.path.exists(HO_results_file_full_path):    
@@ -125,7 +114,6 @@ if os.path.exists(HO_results_file_full_path):
             # Converting the chr specific recombination rate from a string to boolean
             'chr_specific_recombination_rate': True if str(row['Chr_specific_recomb_rate']).lower() == 'true' else False
         }
-        
         # Add the trial to the study
         study.add_trial(
             optuna.create_trial(
@@ -142,17 +130,12 @@ if os.path.exists(HO_results_file_full_path):
                 value=row['Sim_Cost_Result']
             )
         )
-
-
 # Run the optimization
 study.optimize(objective, n_trials=number_of_trials)
-
-
 # Save the best hyperparameters
 best_params = study.best_params
 HO_best_params_file = f"best_hyperparameters_{HO_id}.json"
 with open(HO_best_params_file, 'w') as f:
     json.dump(best_params, f)
-
 print("Best hyperparameters:", best_params)
 

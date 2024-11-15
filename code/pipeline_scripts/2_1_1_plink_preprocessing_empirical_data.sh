@@ -5,8 +5,9 @@ script_start=$(date +%s)
 
 # Activate conda environment
 # conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate plink
+# source $conda_env_full_path  # Source Conda initialization script
+# conda activate plink
+# conda activate $PLINK_environment
 
 ######################################  
 ####### Defining parameter values #######

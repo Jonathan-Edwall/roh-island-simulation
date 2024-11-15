@@ -13,6 +13,10 @@ cd $HOME
 ######################################  
 ####### Defining parameter values #######
 ######################################
+# Max number of parallel jobs to run at a time 
+# max_parallel_jobs=$(printf "%.0f" $(( $(nproc) / 2 )))
+max_parallel_jobs=1
+
 # export use_MAF_pruning=TRUE
 # export use_MAF_pruning=FALSE
 # export <=0.01
@@ -132,8 +136,6 @@ H_e_calculation() {
 
 }
 
-
-max_parallel_jobs=30
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤

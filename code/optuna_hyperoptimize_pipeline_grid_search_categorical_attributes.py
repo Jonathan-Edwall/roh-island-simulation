@@ -3,27 +3,13 @@ import subprocess
 import optuna
 import json
 import pandas as pd
-
-
 import signal
-
 import sys
 
-# Function to handle user interruption
-def signal_handler(sig, frame):
-
-    print('Optimization interrupted. Exiting.')
-
-    sys.exit(0)
-
-# Register the signal handler
-signal.signal(signal.SIGINT, signal_handler)
-
-
 HO_id = f"HO_grid_search_top_1_perc_results"
-
-path_to_results_folder = ""
-# path_to_results_folder = "/home/jonathan/hyperoptimizer_results"
+# Dynamically determine the root directory one level up from the current script's directory
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+path_to_results_folder = f"{root_dir}/hyperoptimizer_results"
 pop_histories_top_results_file="HO_top_results_population_histories.tsv"
 pop_histories_top_results_file_full_path=f"{path_to_results_folder}/{pop_histories_top_results_file}"
 
@@ -32,6 +18,14 @@ pop_histories = pd.read_csv(pop_histories_top_results_file_full_path, sep="\t", 
 
 # Global variable to store the current population history
 current_pop_history = None
+
+# Function to handle user interruption
+def signal_handler(sig, frame):
+    print('Optimization interrupted. Exiting.')
+    sys.exit(0)
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
+
 # Define the objective function
 def objective(trial):
     # Define the directory and the path to the file where you want to log the failed rows
@@ -55,7 +49,6 @@ def objective(trial):
         # # Extract parameters
         chr_simulated = trial.suggest_categorical('chr_simulated', ["chr1", "chr2", "chr3", "chr9", "chr20", "chr21", "chr28", "chr38"])
         chr_specific_recombination_rate = trial.suggest_categorical('chr_specific_recombination_rate', [True, False])
-
         # Extract parameters for the current trial
         Ne_burn_in = current_pop_history['NeBurnIn']
         n_bottleneck = current_pop_history['nBottleneck']

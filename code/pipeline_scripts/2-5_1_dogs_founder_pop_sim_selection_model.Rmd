@@ -802,9 +802,20 @@ if (run_chunks) {
   # It  will seem like they all belong to chromosome 1, like "1_21".
   # (will be useful if you one would simulate more chromosomes than one)
   map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
-  # ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
   
-  genetic_distance_morgan_column <- map_data$V3 / 100 # Extracting the genetic distance column of map_data (3rd column)
+  # ¤¤¤¤¤ .map-file Column 3: Correcting genetic distance column ¤¤¤¤¤
+  max_original_genetic_dist <- max(map_data$V3)
+  cat("Max genetic distance:",max_original_genetic_dist)
+  cat("Simulated Genetic length:",model_chromosome_genetic_length_morgan)
+  
+  if (ceiling(max_original_genetic_dist) > model_chromosome_genetic_length_morgan*80) {
+    genetic_distance_morgan_column <- map_data$V3 / 100 # Extracting the genetic distance column of map_data (3rd column) 
+  } else if (ceiling(max_original_genetic_dist) > model_chromosome_genetic_length_morgan*8) {
+     genetic_distance_morgan_column <- map_data$V3 / 10 # Extracting the genetic distance column of map_data (3rd column) 
+  } else {
+    genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column) 
+  }
+  # ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
   
   base_pair_position_column <- round( (genetic_distance_morgan_column/model_chromosome_genetic_length_morgan) * model_chromosome_physical_length_bp)
   
@@ -840,9 +851,13 @@ if (run_chunks) {
   cat("Causative variant:\n",causative_variant_SNP_ID)
   causative_variant_relative_SNP_POS
   cat("\n Relative postions of the causative variant:\n",causative_variant_relative_SNP_POS$pos)
+  cat("\n Simulated Genetic Length:",model_chromosome_genetic_length_morgan)
+  cat("\n Simulated Physical Length:",model_chromosome_physical_length_bp)
+
   
   causative_variant_SNP_pos_in_bp <- round( (causative_variant_relative_SNP_POS$pos/ model_chromosome_genetic_length_morgan) * model_chromosome_physical_length_bp)
-  causative_variant_SNP_pos_in_bp
+  cat("Phyiscal Position of the causative variant:",causative_variant_SNP_pos_in_bp)
+  
   # Check if the file exists
   if (file.exists(variant_positions_file)) {
       # Read the existing data from the file

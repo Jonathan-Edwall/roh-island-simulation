@@ -4,20 +4,17 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate bedtools # /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
-
 ######################################  
 ####### Defining parameter values #######
 ######################################
 # Defining the header of the output file
 header="#CHR\tPOS1\tPOS2"
 
-# # Boolean value to determine whether to run the selection simulation code
-# selection_simulation=TRUE # Defined in run_pipeline.sh
+# Max number of parallel jobs to run at a time when creating individual hom files
+max_parallel_jobs_create_indv_hom_files=$(nproc)
 
+# Max number of parallel jobs to run at a time when creating individual bed files
+max_parallel_jobs_make_indv_bed=$(nproc)
 
 ####################################  
 # Defining the working directory
@@ -76,20 +73,9 @@ mkdir -p $selection_model_indv_bed_files_dir
 ###############################################################################################  
 # RESULTS
 ############################################################################################### 
-
-
-
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 # Creating individual .hom files
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-# Number of parallel jobs to run at a time
-# max_parallel_jobs_create_indv_hom_files=50
-max_parallel_jobs_create_indv_hom_files=32
-
-# max_parallel_jobs_make_indv_bed=550
-# max_parallel_jobs_make_indv_bed=1000
-# max_parallel_jobs_make_indv_bed=50
-max_parallel_jobs_make_indv_bed=32
 create_indv_hom_files() {
     local hom_file=$1
     local simulation_model_indv_files_dir=$2
@@ -115,7 +101,6 @@ create_indv_hom_files() {
 
 }
 
-
 # Function to convert a single .hom file to .bed format
 convert_indv_hom_to_bed() {
     local hom_file=$1
@@ -127,7 +112,6 @@ convert_indv_hom_to_bed() {
     awk 'BEGIN {OFS="\t"} {print $4,$7,$8}' "$hom_file" | sed '1i'"$header" > "${simulation_model_indv_bed_files_dir}/${individual_id}.bed"
     # echo "Processed $hom_file"
 }
-
 
 # Combined function to create BED files directly from the .hom file
 create_indv_bed_files() {

@@ -28,10 +28,28 @@ git clone https://github.com/Jonathan-Edwall/Computational-modelling-of-genomic-
 
 ## Requirements
 This pipeline was developed and tested with the following software versions (though other versions may work):
-- AlphaSimR v1.5.3
 - R v4.2.2
+- [AlphaSimR v1.5.3](https://cran.r-project.org/web/packages/AlphaSimR/readme/README.html) 
 - Bedtools v2.30.0
 - Optuna v4.0.0
-- Python v3.9.7
+- Python v3.9.19
 - PLINK v1.90b6.21
 - Selenium (optional for OMIA phenotype search)
+
+### Setting Up the Anaconda Environment
+To quickly install the necessary dependencies, the `conda-lock` file `roh_island_sim_env_lock_file.yml` can be used to create a conda environment named `roh_island_sim_env`, using the same package versions as the pipeline was developed under.  
+
+To install the conda environment from the conda-lock file, do the following steps:
+1. **Ensure `conda-lock` package is installed:**
+``` bash
+conda install conda-forge::conda-lock
+```
+2. **Install the environment from the `conda-lock` file**
+The `roh_island_sim_env_lock_file.yml` lock file can be found in the root directory of this repository. Assuming that the lock file is in the current working directory, you can use the following command to install the environment: 
+``` bash
+conda-lock install --name roh_island_sim_env roh_island_sim_env_lock_file.yml
+```
+Once the environment is set up, you can run the pipeline using this Conda environment.
+
+*Note:*
+The pipeline assumes the conda environment is named `roh_island_sim_env`. If you choose a different environment name, be sure to update the environment name in the relevant bash files in the `/code` directory.

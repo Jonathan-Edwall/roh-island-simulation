@@ -68,6 +68,7 @@ if (length(existing_row_index) > 0) {
 
 variant_position_bp
 ```
+
 # 2: Locate window with causative variant
 ```{r}
 # Read the data without treating "#" as a comment
@@ -87,6 +88,7 @@ if (nrow(row_with_variant_chr) == 0) {
 # Display the row
 print(row_with_variant_chr)
 ```
+
 # 3: Find Causative variant window
 ```{r}
 # Get the index of the row_with_variant_chr in the original table
@@ -144,6 +146,7 @@ colnames(causative_variant_window_table_sorted) <- column_names
 # Write data to TSV file without quotes and with tab separation
 write.table(causative_variant_window_table_sorted, file = filename, quote = FALSE, col.names = TRUE, row.names = FALSE, sep = "\t")
 ```
+
 #4: Export Window Lengths
 ```{r}
 # Check if the file exists

@@ -19,6 +19,11 @@ trap 'handle_interrupt' SIGINT
 ######################################  
 ####### Defining parameter values #######
 ######################################
+# Max number of parallel jobs to run at a time 
+# max_parallel_jobs=$(nproc)
+# max_parallel_jobs=$((nproc / 4))
+max_parallel_jobs=1
+
 
 # # Boolean value to determine whether to run the selection simulation code
 # selection_simulation=TRUE # Defined in run_pipeline.sh
@@ -31,7 +36,6 @@ trap 'handle_interrupt' SIGINT
 # HOME=/home/jonathan
 
 
-# pipeline_scripts_dir=$HOME/code/pipeline_scripts
 # pipeline_scripts_dir=$script_dir/pipeline_scripts
 
 
@@ -67,27 +71,20 @@ mkdir -p $output_dir # Creating subdirectory if it doesn't already exist
 ##############################################################################################  
 ############ RESULTS ###########################################################################
 ############################################################################################## 
-
-max_parallel_jobs=4
 find_causative_variant_windows() {
     local bed_file=$1
     local input_selection_coefficient_variant_positions_file=$2
     local output_variant_window_lengths_file=$3
     local knit_document_check=$4 # Variable that controls the knitting of the .rmd file   
-
-
     export pop_roh_freq_bed_file="$bed_file"
     export input_bed_file="$pop_roh_freq_bed_file"
-
     echo "Processing: $pop_roh_freq_bed_file"
-    
     # Construct the params list
     export input_pop_roh_freq_file="$bed_file"
     export chr_simulated="$chr_simulated" #Variable defined in run_pipeline.sh
     export input_selection_coefficient_variant_positions_file=$input_selection_coefficient_variant_positions_file
     export output_dir=$output_dir
     export output_variant_window_lengths_file=$output_variant_window_lengths_file
-
     if [ "$knit_document_check" -eq 1 ]; then
         Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3_Selection_Causative_Variant_window_detection.Rmd')"
     else
@@ -99,7 +96,6 @@ find_causative_variant_windows() {
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-
 if [ "$selection_simulation" = TRUE ]; then
     # Generate the list of .bed files in the directory
     selection_models_pop_roh_files=("$selection_pop_roh_freq_dir"/*_ROH_freq.bed)
@@ -119,7 +115,6 @@ if [ "$selection_simulation" = TRUE ]; then
         else
             knit_document_check=0  # Just run the script for all other cases
         fi 
-
         find_causative_variant_windows $bed_file $input_selection_coefficient_variant_positions_file $output_variant_window_lengths_file $knit_document_check &
         # Control the number of parallel jobs
         while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
@@ -134,11 +129,9 @@ if [ "$selection_simulation" = TRUE ]; then
 else
     echo "Selection simulation is set to FALSE. Skipping Causative Window creation"
 fi
-
 # Ending the timer 
 script_end=$(date +%s)
 # Calculating the runtime of the script
 script_runtime=$((script_end-script_start))
-
 echo "Runtime: $script_runtime seconds"
 

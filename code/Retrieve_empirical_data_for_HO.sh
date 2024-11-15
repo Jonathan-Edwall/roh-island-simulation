@@ -5,13 +5,13 @@
 # Defining the working directory
 #################################### 
 
-HOME="/home/jonathan"
-script_directory="$HOME/code/pipeline_scripts"
+# HOME="/home/jonathan/pipeline/Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations"
+HOME="$(dirname "$(dirname "$(realpath "$0")")")"
 
 ######################################  
 ####### Defining parameter values #######
 ######################################
-empirical_dog_breed="german_shepherd"
+empirical_dog_breed="labrador_retriever"
 input_data_dir="$HOME/data" 
 input_results_dir="$HOME/results" 
 HO_results_dir="$HOME/results_HO"

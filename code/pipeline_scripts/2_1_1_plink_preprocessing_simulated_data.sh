@@ -5,12 +5,15 @@ script_start=$(date +%s)
 
 # Activate conda environment
 # conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate plink
+# source $conda_env_full_path  # Source Conda initialization script
+# conda activate plink
 
 ######################################  
 ####### Defining parameter values #######
 ######################################
+# Max number of parallel jobs to run at a time 
+max_parallel_jobs=$(nproc)
+
 
 # # Boolean value to determine whether to run the selection simulation code
 # selection_simulation=TRUE # Defined in run_pipeline.sh
@@ -164,7 +167,7 @@ compute_autosome_lengths() {
 
 
 
-max_parallel_jobs=20
+
 
 
 ##�������������������������

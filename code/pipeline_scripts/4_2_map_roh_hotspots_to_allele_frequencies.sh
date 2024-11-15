@@ -8,7 +8,7 @@ script_start=$(date +%s)
 # Activate conda environment
 # conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
 source $conda_env_full_path  # Source Conda initialization script
-conda activate bedtools
+# conda activate bedtools
 # /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
 
 # bedtools intersect -h  # Documentation about the merge function
@@ -95,23 +95,25 @@ if [ "$empirical_processing" = TRUE ]; then
         # Loop through each ROH hotspot window for the current file
         while IFS= read -r line; do
             output_file="${hotspots_allele_freq_output_dir}/${prefix}_${counter}_allele_freq.bed"
+            hotspot_temp_file="${hotspots_allele_freq_output_dir}/temp.bed"
             # Create a temporary BED file for the current genomic interval
-            echo -e "$line" > temp.bed
+            echo -e "$line" > $hotspot_temp_file
             
             # Run bedtools intersect-function        
             bedtools intersect \
                 -wa -header \
                 -a <(tail -n +2 "$empirical_allele_freq_w_positions_file") \
-                -b temp.bed \
+                -b $hotspot_temp_file \
                 | sed '1i'"$header" >> "$output_file"  # Append output to the file instead of overwriting
-            
             ((counter++))
         done < "$roh_hotspot_file"
     done
 else
     echo "Empirical data has been set to not be processed, since files have already been created."
 fi
+rm $hotspot_temp_file
 
+wait 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -129,22 +131,25 @@ if [ "$selection_simulation" = TRUE ]; then
 
         # Loop through each ROH hotspot window for the current file
         while IFS= read -r line; do
+            causative_window_temp_file="${causative_windows_allele_freq_output_dir}/temp.bed"
+
             # Create a temporary BED file for the current genomic interval
-            echo -e "$line" > temp.bed
+            echo -e "$line" > $causative_window_temp_file
             
             # Run bedtools intersect-function        
             bedtools intersect \
                 -wa -header \
                 -a <(tail -n +2 "$allele_freq_w_positions_file") \
-                -b temp.bed \
+                -b $causative_window_temp_file \
                 >> "$output_file"  # Append output to the file instead of overwriting
-            
+                
             ((counter++))
         done < "$causative_variant_file"
     done
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
 fi
+rm $causative_window_temp_file
 
 # Ending the timer 
 script_end=$(date +%s)

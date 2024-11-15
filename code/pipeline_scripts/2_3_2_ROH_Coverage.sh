@@ -6,8 +6,8 @@ script_start=$(date +%s)
 
 # Activate conda environment
 # conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate bedtools
+# source $conda_env_full_path  # Source Conda initialization script
+# conda activate bedtools
 # /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
 # bedtools coverage -h  # Documentation about the merge function
 
@@ -15,6 +15,12 @@ conda activate bedtools
 ####### Defining parameter values #######
 ######################################
 overlap_fraction=1.0 # 100 % of the genomic 100k bp-window ("a-file") needs to be overlapping with the roh-segment ("b-file") 
+# Max number of parallel jobs to run at a time during the individual coverage count
+max_parallel_jobs=$(nproc)
+# Max number of parallel jobs to run at a time during the population ROH-frequency count
+max_parallel_jobs_population_roh_freq=$(nproc)
+
+
 # empirical_processing=FALSE # is imported from run_pipeline.sh! (the main script)
 # $n_individuals_breed_formation is imported from run_pipeline.sh! (the main script)
 
@@ -142,9 +148,6 @@ awk -v chr="$simulated_chr_number" 'NR == 1 || $1 == chr' "$window_files_dir/can
 # Population ROH-frequency file for the 100kbp bp windows, found in ./pop_roh_freq
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
-# Number of parallel jobs to run at a time
-max_parallel_jobs=32
-
 # Function to run bedtools coverage for a single individual file
 process_coverage_file() {
     local indv_roh_file=$1
@@ -168,9 +171,9 @@ process_coverage_file() {
 
 
 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-#¤¤¤¤ Empirical Data (German Shepherd) ¤¤¤¤ 
-#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+#¤¤¤¤ Empirical Data  ¤¤¤¤ 
+#¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 if [ "$empirical_processing" = TRUE ]; then
     # Running coverage command for every individual to count to which roh-segments an individuals maps to.
     for indv_roh_file in $empirical_breed_indv_bed_files_dir/*.bed; do
@@ -224,13 +227,10 @@ echo "Coverage calculations completed for the neutral model, results stored in $
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-
 if [ "$selection_simulation" = TRUE ]; then
-
     # Extracting the unique identifiers of the different selection model simulations and their corresponding technical replicate number
     # simulation_prefixes_selection_model=$(find "$selection_model_indv_bed_files_dir" -name "*_ROH_IID_*.bed" -exec basename {} \; | sed 's/_ROH_IID_[0-9]*.bed//' | sort -Vu)
     simulation_prefixes_selection_model=$(find $selection_model_pop_hom_file_dir -name "*_ROH.hom" -exec basename {} \; | sed 's/_ROH\.hom//' | sort -Vu)
-
     for prefix in $simulation_prefixes_selection_model; do
         for indv_roh_file in $selection_model_indv_bed_files_dir/${prefix}*.bed; do
             # Running coverage command for every individual to count to which roh-segments an individual maps.
@@ -239,12 +239,10 @@ if [ "$selection_simulation" = TRUE ]; then
             while [ $(jobs -r | wc -l) -ge $max_parallel_jobs ]; do
                 wait -n
             done
-        
         done
         wait # Waiting for all coverage for a simulation prefix to be completed before deleting the corresponding input files.
         rm $selection_model_indv_bed_files_dir/${prefix}*.bed
     done
-
     # Wait for all background jobs to finish
     wait
     echo "Coverage calculations completed for the selection models, results stored in $coverage_output_selection_model_dir"
@@ -275,12 +273,10 @@ if [ "$empirical_processing" = TRUE ]; then
     # num_individuals_empirical=$(find $coverage_output_empirical_breed_dir -maxdepth 1 -type f -name "*.bed" | wc -l)
     # Extract unique simulation prefixes
     datasets_prefixes=$(find "$coverage_output_empirical_breed_dir" -maxdepth 1 -type f -name "*_ROH_IID_*_coverage.bed" | sed 's/.*\/\([^/]*\)_ROH_IID_[0-9]*_.*\.bed/\1/' | sort -u)
-
     # Iterate over each simulation (unique simulation prefix)
     for prefix in $datasets_prefixes; do
         # Remove existing frequency file if it already exists for the simulation!
         rm -f "${roh_frequencies_empirical_breed_dir}/${prefix}_ROH_freq.bed"
-        
         # Filter files belonging to the current simulation prefix
         dataset_files=$(find "$coverage_output_empirical_breed_dir" -maxdepth 1 -type f -name "${prefix}_ROH_IID_*_coverage.bed")
         
@@ -301,7 +297,6 @@ if [ "$empirical_processing" = TRUE ]; then
         $dataset_files | sed '1i'"$header" | sort -k1,1n -k2,2n \
         > "${roh_frequencies_empirical_breed_dir}/${prefix}_ROH_freq.bed"
     done
-
     echo "Population level ROH-Window-frequencies computed for the empirical data"
     echo "The Output file(s) is stored in: ${roh_frequencies_empirical_breed_dir}"
 else
@@ -312,20 +307,15 @@ fi
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 # echo "coverage_output_neutral_model_dir: ${coverage_output_neutral_model_dir}"
-max_parallel_jobs_population_roh_freq=32
-
 # Function to process each simulation prefix
 process_simulation_prefix() {
     local prefix=$1
     local coverage_output_simulation_model_dir=$2
     local roh_frequencies_simulation_model_dir=$3
-    
     # Remove existing frequency file if it already exists for the simulation
     rm -f "${roh_frequencies_simulation_model_dir}/${prefix}_ROH_freq.bed"
-
     # Filter files belonging to the current simulation prefix
     local simulation_files="$coverage_output_simulation_model_dir/${prefix}_ROH*"
-
     # Using awk to calculate the sum of counts for each window and store the counts in a dictionairy with 
     # Genomic coordinate as the key (window_counts[$1"\t"$2"\t"$3]) and count as value
     # The output files includes a ROH-frequency column for each genomic window 
@@ -344,7 +334,6 @@ process_simulation_prefix() {
       
     echo "Population level ROH-Window-frequencies computed for simulation $prefix"
 }
-
 # Loop over each simulation prefix and process it in parallel
 for prefix in $simulation_prefixes_neutral_model; do
     process_simulation_prefix $prefix $coverage_output_neutral_model_dir $roh_frequencies_neutral_model_dir &
@@ -354,7 +343,6 @@ for prefix in $simulation_prefixes_neutral_model; do
         wait -n
     done
 done
-
 # Wait for all background jobs to finish
 wait
 echo "Population level ROH-Window-frequencies computed for the neutral model simulations"
@@ -362,18 +350,15 @@ echo "Output files stored in: ${roh_frequencies_neutral_model_dir}"
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Selection Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
-
 if [ "$selection_simulation" = TRUE ]; then
     echo "coverage_output_selection_model_dir: ${coverage_output_selection_model_dir}"
     # Iterate over each simulation (unique simulation prefix)
     for prefix in $simulation_prefixes_selection_model; do
         process_simulation_prefix $prefix $coverage_output_selection_model_dir $roh_frequencies_selection_model_dir &
-
         # Control the number of parallel jobs
         while [ $(jobs -r | wc -l) -ge $max_parallel_jobs_population_roh_freq ]; do
             wait -n
         done
-    
     done
     # Wait for all background jobs to finish
     wait
@@ -382,13 +367,8 @@ if [ "$selection_simulation" = TRUE ]; then
 else
     echo ""
 fi
-
 # Ending the timer 
 script_end=$(date +%s)
 # Calculating the script_runtime of the script
 script_runtime=$((script_end-script_start))
-
-
-
-
 echo "Runtime: $script_runtime seconds"
