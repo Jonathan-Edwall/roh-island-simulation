@@ -1,0 +1,12 @@
+CHR,POS1,POS2,PHENE,PHENE_CATEGORY,SINGLE_GENE_TRAIT_OR_DISORDER,DISEASE_RELATED,GENE_SYMBOL,GENE_DESCRIPTION,PHENE_URL,GENE_DETAILS_URL,BREEDS
+,,,Haemangiosarcoma,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001813/9612/,,
+,,,"Difference of sexual development, generic",Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000564/9612/,,
+-,-,-,"Coat colour, dominant black",Pigmentation phene,yes,no,CBD103,,https://www.omia.org/OMIA001416/9612/,https://www.omia.org/gene200685851/,
+,,,Stereotypical hypersociability,Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA002115/9612/,,
+,,,Williams-Beuren syndrome (redundant),,unknown,unknown,,,https://www.omia.org/OMIA002192/9612/,,
+,,,"Height, IGF1-AS-associated body-size variation",Growth / size / body region phene,unknown,no,,,https://www.omia.org/OMIA002524/9612/,,
+,,,"Coat colour, generic",Pigmentation phene,unknown,no,,,https://www.omia.org/OMIA000200/9612/,,
+,,,Immunoglobulin A deficiency,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA000552/9612/,,
+,,,"Coat colour, agouti",Pigmentation phene,yes,no,,,https://www.omia.org/OMIA000201/9612/,,
+,,,Blindness,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000114/9612/,,
+,,,Patent ductus venosus,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001173/9612/,,

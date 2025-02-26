@@ -44,7 +44,7 @@ do
     export Ne_burn_in="$Ne_burn_in" #Variable defined in run_pipeline.sh
     export nInd_founder_population="$nInd_founder_population" #Variable defined in run_pipeline.sh
     export Inbred_ancestral_population="$Inbred_ancestral_population" #Variable defined in run_pipeline.sh
-    export N_e_bottleneck="$N_e_bottleneck" #Variable defined in run_pipeline.sh
+    export N_bottleneck="$N_bottleneck" #Variable defined in run_pipeline.sh
     export n_simulated_generations_breed_formation="$n_simulated_generations_breed_formation" #Variable defined in run_pipeline.sh
     export n_individuals_breed_formation="$n_individuals_breed_formation" #Variable defined in run_pipeline.sh
     export reference_population_for_snp_chip="$reference_population_for_snp_chip" #Variable defined in run_pipeline.sh   

@@ -5,10 +5,12 @@
 script_start=$(date +%s)
 
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-# conda activate bedtools
+# # Defining the path to the Conda initialization script
+# conda_setup_script_path="/home/jonteehh/pipeline/anaconda3/etc/profile.d/conda.sh"
+# # conda_setup_script_path=""
+# source $conda_setup_script_path  # Source Conda initialization script
+# # Activate the conda environment
+# conda activate roh_island_sim_env
 # /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
 
 # bedtools intersect -h  # Documentation about the merge function
@@ -39,12 +41,12 @@ ROH_hotspots_results_dir=$results_dir/ROH-Hotspots
 #�������������
 #� Empirical �
 #�������������
-# empirical_dog_breed="empirical_breed" # Defined in run_pipeline.sh
+# empirical_breed="empirical_breed" # Defined in run_pipeline.sh
 ###### Allele frequency file ###### 
-empirical_breed_allele_freq_plink_output_dir=$PLINK_allele_freq_dir/empirical/$empirical_dog_breed
-empirical_allele_freq_w_positions_file="$empirical_breed_allele_freq_plink_output_dir/${empirical_dog_breed}_filtered_allele_freq.bed"
+empirical_breed_allele_freq_plink_output_dir=$PLINK_allele_freq_dir/empirical/$empirical_breed
+empirical_allele_freq_w_positions_file="$empirical_breed_allele_freq_plink_output_dir/${empirical_breed}_filtered_allele_freq.bed"
 ###### ROH-hotspot window-files ######
-empirical_breed_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/$empirical_dog_breed
+empirical_breed_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/$empirical_breed
 
 #�������������
 #� Simulated � 

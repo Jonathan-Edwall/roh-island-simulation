@@ -4,8 +4,8 @@ output:
     toc: true
 ---
 
-# 0: Preparation
-Defining the input and output directories
+<!-- # 0: Preparation -->
+<!-- Defining the input and output directories -->
 ```{r setup, echo = FALSE}
 # Clean the working environment
 rm(list = ls())
@@ -14,16 +14,68 @@ knitr::opts_chunk$set(echo = TRUE)
 #################################### 
 # Defining Input parameters
 #################################### 
-empirical_dog_breed <- Sys.getenv("empirical_dog_breed")
-empirical_species <- paste(toupper(substring(unlist(strsplit(empirical_dog_breed, "_")), 1, 1)),
-                             substring(unlist(strsplit(empirical_dog_breed, "_")), 2),
+### Defining the Title ###
+empirical_breed <- Sys.getenv("empirical_breed")
+empirical_species <- paste(toupper(substring(unlist(strsplit(empirical_breed, "_")), 1, 1)),
+                             substring(unlist(strsplit(empirical_breed, "_")), 2),
                              sep = "", collapse = " ")
 
-N_e_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
-n_simulated_generations_breed_formation <- as.numeric(Sys.getenv("n_simulated_generations_breed_formation"))
+document_title <- paste0("ROH Island Simulation Results for the ",empirical_species," Dataset")
+
+### Defining the Subtitle ###
+
+MAF_pruning_used <- Sys.getenv("MAF_pruning_used")
+
+min_MAF_selection_testing <- Sys.getenv("min_MAF_selection_testing")
+
+if (MAF_pruning_used == FALSE) {
+  MAF_settings_text <- paste0("No MAF-based pruning of markers were performed") 
+} else {
+  MAF_settings_text <- paste0("Markers with MAF < ",min_MAF_selection_testing," were pruned before computing Expected Heterozygosity ($H_{e}$) ") 
+}
+
+document_sub <- MAF_settings_text
+
+
+### Defining General Simulation Settings ###
+n_simulation_replicates <- as.numeric(Sys.getenv("n_simulation_replicates"))
+Introduce_mutations <- Sys.getenv("Introduce_mutations")
 reference_population_for_snp_chip <- Sys.getenv("reference_population_for_snp_chip")
-document_title <- paste0(empirical_species," ",n_simulated_generations_breed_formation," Gen Breed Formation - SNP chip: ",reference_population_for_snp_chip," - ",N_e_bottleneck," N_e bottleneck scenario")
-document_sub <- Sys.getenv("document_sub_title") 
+
+### Defining the Population History parameters for the simulations ###
+Inbred_ancestral_population <- Sys.getenv("Inbred_ancestral_population")
+Ne_burn_in <- as.numeric(Sys.getenv("Ne_burn_in"))
+N_bottleneck <- as.numeric(Sys.getenv("N_bottleneck"))
+n_generations_bottleneck <- as.numeric(Sys.getenv("n_generations_bottleneck"))
+n_simulated_generations_breed_formation <- as.numeric(Sys.getenv("n_simulated_generations_breed_formation"))
+n_individuals_breed_formation <- as.numeric(Sys.getenv("n_individuals_breed_formation"))
+
+### Defining the Selection Model Simulation Settings ###
+Simulate_Hard_Sweep <- Sys.getenv("Simulate_Hard_Sweep")
+allele_copies_threshold <- Sys.getenv("allele_copies_threshold")
+Variant_One_Individual_Origin <- Sys.getenv("Variant_One_Individual_Origin")
+fixation_threshold_causative_variant <- Sys.getenv("fixation_threshold_causative_variant")
+
+if (tolower(Simulate_Hard_Sweep) == "true") {
+  sweep_type_text <- paste0(
+    "**Hard Sweep Scenario** *(Simulate_Hard_Sweep = TRUE)*: ",
+    "In the simulated selection scenario, the causative variant was drawn from the set of alleles present in the post-bottleneck generation that had exactly one allele copy in the population."
+  )
+} else {
+  if (tolower(Variant_One_Individual_Origin) == "true") {
+    sweep_type_text <- paste0(
+      "**Soft Sweep Scenario (Single Individual Origin)** *(Simulate_Hard_Sweep = FALSE, Variant_One_Individual_Origin = TRUE)*: ",
+      "In the simulated selection scenario, the causative variant was drawn from the set of alleles in the post-bottleneck generation that originated from a single homozygous individual. ",
+      "These alleles had exactly ", allele_copies_threshold, " copies in the population (*allele_copies_threshold*)."
+    )
+  } else {
+    sweep_type_text <- paste0(
+      "**Soft Sweep Scenario (Multiple Individual Origin)** *(Simulate_Hard_Sweep = FALSE, Variant_One_Individual_Origin = FALSE)*: ",
+      "In the simulated selection scenario, the causative variant was drawn from the set of alleles in the post-bottleneck generation that originated from heterozygous individuals. ",
+      "These alleles also had exactly ", allele_copies_threshold, " copies in the population (*allele_copies_threshold*)."
+    )
+  }
+}
 
 # Parameters used for displaying the result
 ROH_frequency_decimals <- 1
@@ -35,6 +87,7 @@ histogram_line_sizes <- 3
 empirical_data_color <- "darkgreen"
 neutral_model_color <- "blue" 
 selection_model_color <- "purple"
+kable_table_digits <- 2
 ####################################  
 # Defining the Input Directories
 #################################### 
@@ -50,6 +103,17 @@ Empirical_data_autosome_ROH_freq_dir <- Sys.getenv("Empirical_data_autosome_ROH_
 Empirical_data_F_ROH_dir  <- Sys.getenv("Empirical_data_F_ROH_dir")
 ### Expected Heterozygosity distribution ###
 Empirical_data_H_e_dir <- Sys.getenv("Empirical_data_H_e_dir")
+
+### OMIA phenotype data ###
+omia_phenotypes_filepath <- Sys.getenv("omia_phenotypes_filepath")
+
+omia_scraped_phenotypes_data_filepath <- Sys.getenv("omia_scraped_phenotypes_data_filepath") 
+
+vertebrate_breed_ontology_ids <- Sys.getenv("vertebrate_breed_ontology_ids") # Identifying phenotypes labeled as either related to "Labrador retriever dog" or "unidentified breed"
+
+### Gene Detection ###
+Empirical_data_hotspot_gene_mapping_dir <- Sys.getenv("Empirical_data_hotspot_gene_mapping_dir")
+gene_annotations_filepath <- Sys.getenv("gene_annotations_filepath")
 ############### 
 ## Simulated ###
 ###############
@@ -77,7 +141,7 @@ Selection_model_H_e_dir <- Sys.getenv("Selection_model_H_e_dir")
 ## Defining the Output Directory
 #####################################
 output_dir <- Sys.getenv("Pipeline_results_output_dir") 
-# Sys.getenv()  
+# Sys.getenv()
 # # Set the working directory for notebook chunks
 # knitr::opts_knit$set(root.dir = output_dir_sweep_test)
 
@@ -94,22 +158,50 @@ date: "`r Sys.Date()`"
 editor_options: 
   markdown: 
     wrap: 72
+    
 ---
 
-## Loading libraries
-```{r Loading Libraries ,echo = FALSE}
+## Simulation Settings
+
+### General Simulation Settings:
+- **Number of Simulated Technical Replicates**: `r n_simulation_replicates` 
+- **New Random Mutations Added to Offspring**: `r Introduce_mutations` 
+- **Reference Population for SNP-chip**: `r reference_population_for_snp_chip`  
+
+### Population History Parameters:
+- **Inbred Ancestral Population**: `r Inbred_ancestral_population` 
+- **$N_{e}$ Burn-in Population**: `r Ne_burn_in` Individuals
+- **Bottleneck Scenario**: 
+  - **Population Size  ($N$)**: `r N_bottleneck` Individuals
+  - **Duration of Bottleneck Scenario**: `r n_generations_bottleneck` Generation(s)
+- **Breed Formation**: 
+  - **Population Size  ($N$)**: `r n_individuals_breed_formation` Individuals
+  - **Duration of Breed Formation Scenario**: `r n_simulated_generations_breed_formation` Generation(s)
+
+
+### Selection Model Settings:
+- `r sweep_type_text`
+- **Frequency Threshold for Fixation of the Allele of the Causative Variant:** `r fixation_threshold_causative_variant`
+
+
+
+<!-- ## Loading Libraries --> 
+
+```{r Loading Libraries, echo = FALSE, results= 'hide', warning = FALSE}
 if (!require(knitr)) install.packages("knitr", dependencies = TRUE)
 library(knitr)
+if (!require(kableExtra)) install.packages("kableExtra", dependencies = TRUE)
+library(kableExtra) 
 if (!require(ggplot2)) install.packages("ggplot2", dependencies = TRUE)
 library(ggplot2)
 if (!require(scatterplot3d)) install.packages("scatterplot3d", dependencies = TRUE)
 library(scatterplot3d) # For generating the 3d plots 
 if (!require(RColorBrewer)) install.packages("RColorBrewer", dependencies = TRUE)
 library(RColorBrewer) # For generating a color palette
-
 ```
-# Latex formatting function
-```{r ,echo = FALSE}
+<!-- # Latex Formatting Function --> 
+
+```{r Latex formatting function,echo = FALSE, results= 'hide', warning = FALSE}
 # Function to format and write a data frame to a LaTeX-compatible text file
 write_latex_table <- function(data_frame, sort_column, output_dir, output_filename) {
   # Sort the data frame based on the specified column
@@ -133,8 +225,10 @@ write_latex_table <- function(data_frame, sort_column, output_dir, output_filena
   return(file_path)
 }
 ```
-# Standard Error Confidence interval function
-```{r ,echo = FALSE}
+
+<!-- # Standard Error Confidence Interval Function --> 
+
+```{r Standard Error Confidence interval function,echo = FALSE}
 # Function to calculate standard error and its confidence interval
 standard_error_confidence_interval_fun <- function(observed_data, confidence_level = 0.95) {
   if ( length(observed_data) > 1 ) {
@@ -156,11 +250,15 @@ standard_error_confidence_interval_fun <- function(observed_data, confidence_lev
     }
 } 
 ```
-# 1: Causative variant (Selection Models)
-## 1.1: Variant fixation
-### 1.1.1: Fixation probability
-```{r ,echo = FALSE,results= 'hide',warning = FALSE}
-setwd(pruned_replicates_count_dir)
+
+# 1: Causative Variant (Selection Models)
+This section presents the simulation results for the simulated selection models.
+The models simulate selection on a causative variant under varying selection pressures (selection coefficient values). These results serve as a reference for estimating the selection coefficient of an identified candidate region for selection in the empirical dataset.
+
+## 1.1: Variant Fixation 
+<!-- ### 1.1.1: Fixation probability -->
+```{r 1.1.1: Fixation probability,echo = FALSE,results= 'hide',warning = FALSE}
+# setwd(pruned_replicates_count_dir)
 # Pattern for finding files containing "pruned_replicates_count" and ending with ".tsv"
 pattern <- ".*pruned_replicates_count.*\\.tsv$"
 pruned_replicates_count_files <- list.files(path = pruned_replicates_count_dir, pattern = pattern)
@@ -178,9 +276,10 @@ non_fixated_causative_variant_count_tables <- list()
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(pruned_replicates_count_dir,file)
   column_names <- c("Sim_name","Non_fixated_variant_count")
   # Read the .tsv frequency file into a data frame
-  causative_variant_not_fixated_count <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
+  causative_variant_not_fixated_count <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
   # Add simulation_number as an attribute to the data frame
   sim_num <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(file)))
   attr(causative_variant_not_fixated_count, "Simulation_number") <- sim_num
@@ -199,8 +298,10 @@ for (i in 1:length(sim_info$sim_name)) {
 
 #View(non_fixated_causative_variant_count_tables)
 ```
-### 1.1.2: Fixation time
-```{r ,echo = FALSE}
+
+
+<!-- ### 1.1.2: Fixation time  -->
+```{r 1.1.2: Fixation time,echo = FALSE}
 # Function to determine the number of rows until fixation is reached
 time_to_fixation <- function(data, threshold = 0.9) {
   # Find the index of the first row where the allele frequency is 0.9 or higher
@@ -209,8 +310,9 @@ time_to_fixation <- function(data, threshold = 0.9) {
   return(fixation_index - 1)
 }
 ```
+
 ```{r Causative Variant fixation time,echo = FALSE,warning = FALSE}
-setwd(variant_freq_plots_dir)
+# setwd(variant_freq_plots_dir)
 # Pattern for finding files containing "causative_variant_window_lengths" and ending with ".tsv"
 pattern <- ".*\\.txt$"
 causative_variant_fixation_files <- list.files(path = variant_freq_plots_dir, pattern = pattern)
@@ -229,11 +331,12 @@ fixation_data_causative_variant_tables <- list()
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(variant_freq_plots_dir,file)
   simname_from_file <- sim_info$sim_name[i]
   # Split the cleaned header into column names
   column_names <- c("allele_frequency")
   # Read the .tsv file into a data frame, using the cleaned column names
-  allele_freq_data <- read.table(file, header = FALSE, comment.char = "", stringsAsFactors = FALSE, col.names = column_names, sep = " ")
+  allele_freq_data <- read.table(file_path, header = FALSE, comment.char = "", stringsAsFactors = FALSE, col.names = column_names, sep = " ")
   # Adding a "generation" column
   allele_freq_data$generation <- seq_len(nrow(allele_freq_data))
   # Calculate the fixation time of the causative variant
@@ -286,8 +389,20 @@ for (selection_scenario in names(fixation_data_causative_variant_tables)) {
 }
 #View(fixation_data_causative_variant_tables)
 ```
-### 1.1.3: Summary - Variant fixation 
-```{r Variant fixation Summary, echo = FALSE,warning = FALSE}
+
+### 1.1.3: Variant Fixation Summary 
+Summary of the (near) complete sweeps of the causative variant for the different selection models. 
+The summarizing table below presents the following:
+
+- **Column 1** shows the selection coefficient of the selection model.
+
+- **Column 2** shows the fixation probability, i.e., the likelihood of a randomly selected causative variant to reach fixation at the predefined fixation threshold (`r fixation_threshold_causative_variant`) during a simulation run.
+
+- **Columns 3-5** display fixation time statistics for these conditional simulations regarding the average, minimum and maximum number of generations required for fixation in the forward-in-time simulations. 
+
+The table is sorted in ascending order by selection coefficient.
+
+```{r 1.1.3: Variant Fixation Summary, echo = FALSE,warning = FALSE, results='asis'}
 # Initialize an empty data frame to store the results
 result_df <- data.frame()
 
@@ -326,10 +441,15 @@ write_latex_table(
 # Print the table using kable
 kable(result_df_sorted)
 ```
-## 1.2: Causative variant windows
-### 1.2.1: Variant position
-```{r ,echo = FALSE,results= 'hide',warning = FALSE}
-setwd(variant_position_dir)
+
+## 1.2: Causative Variant Windows
+This section presents the *causative variant window* for each selection model. This window is initially defined by a subwindow consisting of a 100 kbp region centered around the causative variant (referred to as the *Original 100 kbp Causative Variant Subwindow*), where the average ROH frequency of this subwindow is referred to as the *initial threshold*.
+The window then expands upstream and downstream until the ROH frequency in both directions drops more than 10 percentage points below the *initial threshold*. In other words, this window captures the region impacted by the causative variant under selection and is designed to mimic the characteristics of ROH hotspot regions.
+
+<!-- ### 1.2.1: Variant position  --> 
+
+```{r 1.2.1: Variant position, echo = FALSE,results= 'hide',warning = FALSE}
+# setwd(variant_position_dir)
 # Pattern for finding files containing "causative_variant_window_lengths" and ending with ".tsv"
 pattern <- ".*variant_position.*\\.tsv$"
 causative_variant_position_files <- list.files(path = variant_position_dir, pattern = pattern)
@@ -347,9 +467,10 @@ position_causative_variant_tables <- list()
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(variant_position_dir,file)
   column_names <- c("Sim_name","Variant_Position")
   # Read the .tsv frequency file into a data frame
-  causative_variant_position_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
+  causative_variant_position_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
   # Add simulation_number as an attribute to the data frame
   sim_num <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(file)))
   attr(causative_variant_position_data, "Simulation_number") <- sim_num
@@ -366,9 +487,11 @@ for (i in 1:length(sim_info$sim_name)) {
 
 #View(position_causative_variant_tables)
 ```
-### 1.2.2: Window lengths
-```{r ,echo = FALSE,results= 'hide',warning = FALSE}
-setwd(Selection_causative_variant_windows_dir)
+
+<!-- ### 1.2.2: Window lengths  -->
+
+```{r 1.2.2: Window lengths, echo = FALSE,results= 'hide',warning = FALSE}
+# setwd(Selection_causative_variant_windows_dir)
 # Pattern for finding files containing "causative_variant_window_lengths" and ending with ".tsv"
 pattern <- ".*causative_variant_window_lengths.*\\.tsv$"
 causative_variant_window_lengths_files <- list.files(path = Selection_causative_variant_windows_dir, pattern = pattern)
@@ -385,8 +508,9 @@ window_lengths_causative_variant_tables <- list()
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(Selection_causative_variant_windows_dir,file)
   # Read the header line
-  con <- file(file, "r")
+  con <- file(file_path, "r")
   header <- readLines(con, n = 1)
   close(con)
   # Remove "#" from the header
@@ -394,7 +518,7 @@ for (i in 1:length(sim_info$sim_name)) {
   # Split the cleaned header into column names
   column_names <- strsplit(sub("#", "", header), "\t")[[1]]
   # Read the .tsv file into a data frame, using the cleaned column names
-  causative_variant_window_lengths_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
+  causative_variant_window_lengths_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE,col.names = column_names, sep = "\t")
   # Alter the column names manually
   colnames(causative_variant_window_lengths_data) <- c("Simulation_name", "Length_bp")
   # Add simulation_number as an attribute to the data frame
@@ -414,10 +538,13 @@ for (i in 1:length(sim_info$sim_name)) {
 
 #View(window_lengths_causative_variant_tables)
 ```
-### 1.2.3: Causative variant windows
-To see ROH-frequency plots of the created Causative Variant Windows, uncomment the block of code between "Start plot code" and "End plot code"
-```{r echo = FALSE,warning = FALSE}
-setwd(Selection_causative_variant_windows_dir)
+
+### 1.2.3: ROH Frequency
+
+To see ROH-frequency plots of the created Causative Variant Windows, uncomment the block of code between "Start plot code" and "End plot code" and then rerun the script.
+
+```{r 1.2.3: ROH Frequency, echo = FALSE,warning = FALSE, results='asis'}
+# setwd(Selection_causative_variant_windows_dir)
 # Pattern for finding files containing "causative_variant_window" and ending with ".bed"
 pattern <- ".*causative_variant_window.*\\.bed$"
 selection_model_causative_variant_window_files <- list.files(path = Selection_causative_variant_windows_dir, pattern = pattern)
@@ -437,6 +564,7 @@ causative_variant_window_tables_Selection_Model <- list()
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(Selection_causative_variant_windows_dir,file)
   # Extract simname from the file name
   simname_from_file <- sub(tolower("^(.*?)_causative_variant_window.*"), "\\1", tolower(file))
   # Check if the simname from the file matches with the simname from the dataframe
@@ -446,7 +574,7 @@ for (i in 1:length(sim_info$sim_name)) {
     stop("Error: Simname from file does not match with simname from dataframe.")
   }
   # Read the header line
-  con <- file(file, "r")
+  con <- file(file_path, "r")
   header <- readLines(con, n = 1)
   close(con)
   # Remove "#" from the header
@@ -455,7 +583,7 @@ for (i in 1:length(sim_info$sim_name)) {
   # Split the cleaned header into column names
   column_names <- strsplit(clean_header, separator_causative_variant_window_file)[[1]]
   # Read the .tsv frequency file into a data frame
-  causative_variant_window_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names,sep = separator_causative_variant_window_file)
+  causative_variant_window_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names,sep = separator_causative_variant_window_file)
   min_freq <- min(causative_variant_window_data[["FREQUENCY"]])
   max_freq <- max(causative_variant_window_data[["FREQUENCY"]])
   average_freq <- mean(causative_variant_window_data[["FREQUENCY"]])
@@ -532,8 +660,10 @@ causative_variant_window_tables_Selection_Model[[selection_scenario]] <- c(causa
 }
 
 ```
-#### 1.2.3.1: Calculating Summary Statistics
-```{r , echo = FALSE, warning = FALSE}
+
+ <!-- #### 1.2.3.1: Calculating Summary Statistics  --> 
+
+```{r 1.2.3.1: Calculating Summary Statistics, echo = FALSE, warning = FALSE}
 # Calculate overall statistics for each selection coefficient
 for (selection_scenario in names(causative_variant_window_tables_Selection_Model)) {
   # Extract all tables for the current selection scenario
@@ -565,14 +695,14 @@ for (selection_scenario in names(causative_variant_window_tables_Selection_Model
 }
 ```
 
+### 1.2.4: Expected Heterozygosity ($H_{e}$) - Causative Variant Windows
 
-
-## 1.3: Expected Heterozygosity
-```{r H_e Causative Variant Windows, echo = FALSE, warning = FALSE}
-setwd(causative_variant_windows_H_e_dir)
+```{r 1.2.4: Expected Heterozygosity - Causative Variant Windows, echo = FALSE, warning = FALSE, results='asis'}
+# setwd(causative_variant_windows_H_e_dir)
 # Pattern for finding files containing "avg_H_e" and ending with ".tsv"
 pattern <- ".*avg_H_e.*\\.tsv$"
 causative_variant_window_H_e_files <- list.files(path = causative_variant_windows_H_e_dir, pattern = pattern)
+
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*"
 sim_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(causative_variant_window_H_e_files)))
@@ -584,10 +714,11 @@ window_H_e_causative_variant_tables <- list()
 
 # Loop through each .tsv file
 for (i in 1:length(sim_info$sim_name)) {
-  # Get the file name
+  # Get the file from the filename and direcotry path
   file <- sim_info$file_name[i]
+  file_path <- file.path(causative_variant_windows_H_e_dir,file)
   # Read the .tsv file into a data frame, using the cleaned column names
-  causative_variant_window_H_e_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  causative_variant_window_H_e_data <- read.table(file_path, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
   # Extract the selection coefficient from the file name
   selection_coefficient <- sub(tolower("^.*_(s\\d+_chr\\d+).*$"), "\\1",tolower(file))
   # Check if the selection coefficient already exists in the list
@@ -607,22 +738,28 @@ for (selection_coefficient in names(window_H_e_causative_variant_tables)) {
   All_Population_Causative_window_Avg_H_e <- window_H_e_causative_variant_tables[[selection_coefficient]][["data"]][["Avg_He"]]
   # Remove any non-numeric values
   All_Population_Causative_window_Avg_H_e <- All_Population_Causative_window_Avg_H_e[!is.na(All_Population_Causative_window_Avg_H_e) & is.numeric(All_Population_Causative_window_Avg_H_e)]
-  # Calculate the point estimate H_e across all 20 simulations for the current selection coefficient
+  # Calculate the point estimate H_e across all technical replicates simulations for the current selection coefficient
   window_H_e_causative_variant_tables[[selection_coefficient]]$Estimated_Mean_Population_H_e <-
   mean(All_Population_Causative_window_Avg_H_e)
-  # Calculate the standard error-based confidence interval of the point estimate H_e across all 20 simulations for the current selection coefficient
+  # Calculate the standard error-based confidence interval of the point estimate H_e across all technical replicates simulations for the current selection coefficient
   # Store the standard error-based confidence interval in the window_H_e_causative_variant_tables table
   window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e <- standard_error_confidence_interval_fun(All_Population_Causative_window_Avg_H_e)  
-  # Print the Point estimate of H_e across all 20 simulations
-  cat("Point estimate H_e across all 20 simulations for ",selection_coefficient,":", window_H_e_causative_variant_tables[[selection_coefficient]]$Estimated_Mean_Population_H_e, "//n")
-  print(paste("standard error-based 95% Confidence Interval: [", 
-  window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[1], ", ", 
-  window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[2], "]", sep = ""))
+  # # Print the Point estimate of H_e across all technical replicates simulations
+  # cat("Point estimate H_e across all technical replicates simulations for ",selection_coefficient,":", window_H_e_causative_variant_tables[[selection_coefficient]]$Estimated_Mean_Population_H_e, "//n")
+  # print(paste("standard error-based 95% Confidence Interval: [", 
+  # window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[1], ", ", 
+  # window_H_e_causative_variant_tables[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_H_e[2], "]", sep = ""))
 }
 # View(window_H_e_causative_variant_tables)
 ```
-## 1.4: Summary - Causative variant windows 
-```{r Causative variant windows Summary, echo = FALSE,warning = FALSE}
+
+### 1.2.5: Causative Variant Windows - Summary
+Summary of causative variant windows from the simulated selection scenarios, presenting
+averages and confidence intervals (CI) for window length, ROH frequency and expected
+heterozygosity $H_{e}$. The table also includes minimum and maximum ranges of ROH frequency values
+and shows the average ROH frequency and its CI for the *Original 100 kbp Causative Variant Subwindow*. The table is sorted in ascending order by selection coefficient.
+
+```{r 1.2.5: Causative Variant Windows - Summary, echo = FALSE,warning = FALSE, results='asis'}
 setwd(output_dir)
 # Initialize an empty data frame to store the results
 causative_variant_window_results_df <- data.frame()
@@ -679,14 +816,20 @@ write_latex_table(
 # Print the table using kable
 kable(causative_variant_window_results_df_sorted,row.names = FALSE)
 ```
-# 2: ROH-Frequency
-## 2.1: Autosome ROH-frequencies
-### 2.1.1: Empirical - ROH frequency
-```{r Empirical - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
-setwd(Empirical_data_autosome_ROH_freq_dir)
+
+# 2: ROH Frequency
+
+## 2.1: Autosomal Genomewide ROH Frequencies
+
+
+<!-- ### 2.1.1: Empirical - ROH frequency  --> 
+
+```{r 2.1.1: Empirical - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
+# setwd(Empirical_data_autosome_ROH_freq_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- ".*ROH_freq.*\\.tsv$"
 population_ROH_freq_files <- list.files(path = Empirical_data_autosome_ROH_freq_dir, pattern = pattern)
+
 #population_ROH_freq_files
 # Extracting the ROH-hotspot threshold value from the suffix of the filename
 parts <- unlist(strsplit(population_ROH_freq_files[1], "threshold_")) # Split the string by "threshold_"
@@ -703,7 +846,8 @@ ROH_freq_table_Empirical_Data <- list()
 # Loop through each sorted .tsv file
 for (file in sorted_population_ROH_freq_files) {
   file_name <- file
-  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  file_path <- file.path(Empirical_data_autosome_ROH_freq_dir,file) 
+  ROH_freq_data <- read.table(file_path, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
   ROH_freq_data <- ROH_freq_data[1:(nrow(ROH_freq_data)/2), ]
   # Renaming POS to POS1 and add POS2 = POS1 + 1e5
   ROH_freq_data <- transform(ROH_freq_data, POS1 = POS, POS2 = POS + 1e5 -1)
@@ -718,11 +862,13 @@ for (file in sorted_population_ROH_freq_files) {
   ROH_freq_table_Empirical_Data <- c(ROH_freq_table_Empirical_Data, list(table_info))
 }
 ROH_freq_table_Empirical_Data$ROH_hotspot_threshold <- Empirical_data_ROH_hotspot_threshold
-#View(ROH_freq_table_Empirical_Data)
+# View(ROH_freq_table_Empirical_Data)
 ```
-### 2.1.2: Neutral Model - ROH frequency
-```{r Neutral Model - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
-setwd(Neutral_model_autosome_ROH_freq_dir)
+
+<!-- ### 2.1.2: Neutral Model - ROH frequency  --> 
+
+```{r 2.1.2: Neutral Model - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
+# setwd(Neutral_model_autosome_ROH_freq_dir)
 # Pattern for finding files containing "F_ROH" and ending with """.tsv"""
 pattern <- ".*ROH_freq.*\\.tsv$"
 neutral_model_ROH_freq_files <- list.files(path = Neutral_model_autosome_ROH_freq_dir, pattern = pattern)
@@ -735,13 +881,16 @@ sorted_neutral_model_ROH_freq_files <- neutral_model_ROH_freq_files[order(sim_nu
 # Initialize an empty list to store the ROH-frequency data
 ROH_freq_tables_Neutral_Model <- list()
 
+
+
 # Loop through each sorted .tsv file
 for (file in sorted_neutral_model_ROH_freq_files) {
   # Extracting the ROH-hotspot threshold value from the suffix of the filename
   parts <- unlist(strsplit(file, "threshold_")) # Split the string by "threshold_"
+  file_path <- file.path(Neutral_model_autosome_ROH_freq_dir,file)
   # Extract the decimal number using regular expressions
   simulation_ROH_hotspot_threshold <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
-  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  ROH_freq_data <- read.table(file_path, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
   ROH_freq_data <- ROH_freq_data[1:(nrow(ROH_freq_data)/2), ]
   # Renaming POS to POS1 and add POS2 = POS1 + 1e5
   ROH_freq_data <- transform(ROH_freq_data, POS1 = POS, POS2 = POS + 1e5 -1)
@@ -760,17 +909,21 @@ all_ROH_hotspot_thresholds <- unlist(lapply(ROH_freq_tables_Neutral_Model, funct
 # Calculate the overall average F_ROH
 Avg_ROH_hotspot_threshold <- mean(all_ROH_hotspot_thresholds)
 ROH_freq_tables_Neutral_Model$Avg_ROH_hotspot_threshold <- Avg_ROH_hotspot_threshold
-# Calculate the confidence interval of the point estimate ROH-hotspot threshold across all 20 simulations
+# Calculate the confidence interval of the point estimate ROH-hotspot threshold across all technical replicates simulations
 ROH_freq_tables_Neutral_Model$SE_CI_ROH_hotspot_threshold <- standard_error_confidence_interval_fun(all_ROH_hotspot_thresholds)
 #View(ROH_freq_tables_Neutral_Model)
 ```
-### 2.1.3: Selection Models
-```{r Selection Model - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
+
+<!-- ### 2.1.3: Selection Models - ROH frequency  --> 
+
+```{r 2.1.3: Selection Models - ROH frequency,echo = FALSE,results= 'hide',warning = FALSE}
 # Set the working directory to the directory containing the selection model ROH frequency files
-setwd(Selection_model_autosome_ROH_freq_dir)
+# setwd(Selection_model_autosome_ROH_freq_dir)
 # Pattern for finding files containing "ROH_freq" and ending with ".tsv"
 pattern <- ".*ROH_freq.*\\.tsv$"
 selection_model_ROH_freq_files <- list.files(path = Selection_model_autosome_ROH_freq_dir, pattern = pattern)
+
+
 # Extract simulation numbers from the filename
 sim_number_pattern <- ".*sim_(\\d+)_.*" 
 sim_numbers <- as.numeric(gsub(tolower(sim_number_pattern), "\\1", tolower(selection_model_ROH_freq_files)))
@@ -787,6 +940,7 @@ ROH_freq_tables_Selection_Model <- list()
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(Selection_model_autosome_ROH_freq_dir,file)
   # Extract simname from the file name
   simname_from_file <- sub(tolower("^(.*?)_ROH_freq.*"), "\\1", tolower(file))
   # Check if the simname from the file matches with the simname from the dataframe
@@ -799,7 +953,7 @@ for (i in 1:length(sim_info$sim_name)) {
   parts <- unlist(strsplit(file, "threshold_")) # Split the string by "threshold_"
   # Extract the decimal number using regular expressions
   simulation_ROH_hotspot_threshold <- as.numeric(gsub("\\.tsv", "", unlist(strsplit(parts[length(parts)], "_"))[1]))
-  ROH_freq_data <- read.table(file, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  ROH_freq_data <- read.table(file_path, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
   ROH_freq_data <- ROH_freq_data[1:(nrow(ROH_freq_data)/2), ]
   # Renaming POS to POS1 and add POS2 = POS1 + 1e5
   ROH_freq_data <- transform(ROH_freq_data, POS1 = POS, POS2 = POS + 1e5 -1)
@@ -827,15 +981,18 @@ for (selection_coefficient in names(ROH_freq_tables_Selection_Model)) {
   all_thresholds <- unlist(lapply(ROH_freq_tables_Selection_Model[[selection_coefficient]], function(table) table$ROH_Hotspot_threshold))
   overall_avg_threshold <- mean(all_thresholds)
   ROH_freq_tables_Selection_Model[[selection_coefficient]]$Avg_ROH_hotspot_threshold <- overall_avg_threshold
-  # Calculate the confidence interval of the point estimate ROH-hotspot threshold across all 20 simulations
+  # Calculate the confidence interval of the point estimate ROH-hotspot threshold across all technical replicates simulations
   ROH_freq_tables_Selection_Model[[selection_coefficient]]$SE_CI_ROH_hotspot_threshold <- standard_error_confidence_interval_fun(all_thresholds)
 }
 # View the resulting nested structure
 #View(ROH_freq_tables_Selection_Model)
 ```
-### 2.1.4: Summary - ROH-hotspot threshold 
-```{r echo = FALSE,warning = FALSE}
-cat("ROH-hotspot selection testing results://n")
+
+## 2.2: ROH Hotspot Threshold Summary
+The following table shows a comparison between the empirical ROH hotspot-threshold and each simulation model type.
+Lower CI and Upper CI correspond to the standard-error based confidence intervals of the ROH hotspot threshold with a confidence level of 95%.
+```{r 2.2: ROH hotspot threshold Summary, echo = FALSE,warning = FALSE, results='asis'}
+# cat("ROH-hotspot selection testing results://n")
 # Initialize an empty vector to store F_ROH values for the different selection coefficients
 selection_model_values_list <- c()
 selection_model_names_list <- c()
@@ -894,14 +1051,16 @@ write_latex_table(
 # Print the table using knitr::kable()
 knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 ```
-## 2.2: ROH-hotspots - ROH Frequency and Length
-```{r ,echo = FALSE,warning = FALSE}
-setwd(Empirical_data_ROH_hotspots_dir)
+
+<!-- ## 2.3: ROH-hotspots - ROH Frequency and Length --> 
+
+```{r 2.3: ROH-hotspots - ROH Frequency and Length, echo = FALSE,warning = FALSE}
+# setwd(Empirical_data_ROH_hotspots_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- "^.*ROH_Hotspot_windows*.bed$"
 empirical_roh_hotspot_bed_files <- list.files(path = Empirical_data_ROH_hotspots_dir, pattern = pattern)
 # chromosome_number_pattern <- "^german_shepherd_CHR(\\d+)_.*"
-chromosome_number_pattern <- paste0("^",empirical_dog_breed,"_chr(\\d+)_.*")
+chromosome_number_pattern <- paste0("^",empirical_breed,"_chr(\\d+)_.*")
 # Extract chromosome numbers
 chr_numbers <- sub(tolower(chromosome_number_pattern), "\\1", tolower(empirical_roh_hotspot_bed_files))
 # Sort the files based on chromosome numbers
@@ -911,11 +1070,12 @@ empirical_hotspot_tables <- list()
 
 # Loop through each .bed file (ROH-hotspot allele frequency window-file)
 for (file in empirical_roh_hotspot_bed_files) {
+  file_path <- file.path(Empirical_data_ROH_hotspots_dir,file) 
   # Extract chromosome number and window number from file name
   chromosome <- as.numeric(sub(tolower(chromosome_number_pattern), "\\1", tolower(file)))
   column_names <- c("CHR","POS1","POS2")
   # Read the .bed file into a data frame, skipping commented lines
-  chromosome_bed_file_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  chromosome_bed_file_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   
   # Loop through each hotspot for the current chromosome
   for (i in 1:nrow(chromosome_bed_file_data)) {
@@ -939,14 +1099,19 @@ for (file in empirical_roh_hotspot_bed_files) {
 }
 # View(empirical_hotspot_tables)
 ```
-# 3: Inbreeding coefficient
-## 3.1: Empirical data
-```{r echo = FALSE,warning = FALSE}
+
+# 3: Inbreeding Coefficient ($F_{ROH}$)
+In this section, the distribution of the inbreeding coefficient ($F_{ROH}$) is plotted for both the empirical dataset and the simulated models (neutral and selection models). For the simulation models, the distribution reflects the variation in the population average $F_{ROH}$ across all technical replicates.
+
+<!-- ## 3.1: Empirical data  -->
+
+```{r 3.1: Empirical data, echo = FALSE,warning = FALSE, results='asis'}
 # Set the working directory to the directory containing the F_ROH files for the empirical data
-setwd(Empirical_data_F_ROH_dir)
+# setwd(Empirical_data_F_ROH_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- "^.*F_ROH.*.tsv$"
 population_F_ROH_file <- list.files(path = Empirical_data_F_ROH_dir, pattern = pattern)
+
 # Extract the population name from the file names
 empirical_population_name <- sub(tolower("^(.*?)_F_ROH.*"), "\\1", tolower(population_F_ROH_file))
 # Combine population name, number, and file name
@@ -959,15 +1124,16 @@ F_ROH_table_Empirical_Data <- list()
 for (i in 1:length(population_info$empirical_population_name)) {
   # Get the file name
   file <- population_info$file_name[i]
+  file_path <- file.path(Empirical_data_F_ROH_dir,file)
   # Read the header line
-  con <- file(file, "r")
+  con <- file(file_path, "r")
   header <- readLines(con, n = 1)
   close(con)
   # Remove "#" from the header and split it into column names
   column_names <- sub("#", "", header)
   column_names <- strsplit(column_names, "\t")[[1]]
   # Read the .tsv frequency file into a data frame
-  F_ROH_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  F_ROH_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   # Add empirical_population_name as an attribute to the data frame
   attr(F_ROH_data, "empirical_population_name") <- population_info$empirical_population_name[i]
   # Add filename as an attribute to the data frame
@@ -989,14 +1155,16 @@ abline(v = F_ROH_table_Empirical_Data[["Avg_F_ROH"]], col = empirical_data_color
 legend("topright", legend = empirical_avg_F_ROH_legend_text,
        col = empirical_data_color, lty = 1, cex = 0.8, text.col = "black")
 # Print the overall average Avg_F_ROH
-cat("Overall Average Avg_F_ROH for ",empirical_population_name,":",F_ROH_table_Empirical_Data[["Avg_F_ROH"]], "//n")
+cat("\n\n**Overall Average $F_{ROH}$ for ",empirical_population_name,":**\n\n",F_ROH_table_Empirical_Data[["Avg_F_ROH"]], "\n\n")
 # View the modified data structure
 #View(F_ROH_table_Empirical_Data)
 ```
-## 3.2: Neutral Model
-```{r echo = FALSE,warning = FALSE}
+
+<!-- ## 3.2: Neutral Model  -->
+
+```{r 3.2: Neutral Model, echo = FALSE,warning = FALSE, results='asis'}
 # Set the working directory to the directory containing the F_ROH files for the empirical data
-setwd(Neutral_model_F_ROH_dir)
+# setwd(Neutral_model_F_ROH_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- "^.*F_ROH.*.tsv$"
 simulation_F_ROH_files <- list.files(path = Neutral_model_F_ROH_dir, pattern = pattern)
@@ -1009,22 +1177,22 @@ sim_info <- data.frame(sim_name = sim_name, simulation_number = simulation_numbe
 sim_info <- sim_info[order(sim_info$simulation_number), ]
 # Initialize an empty list to store Simulated model tables
 F_ROH_tables_Neutral_Model <- list()
-
 # Loop through each .tsv file
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(Neutral_model_F_ROH_dir,file)
   # Extract the table name from the file name
   file_name <- gsub("////.tsv$", "", file)
   # Read the header line
-  con <- file(file, "r")
+  con <- file(file_path, "r")
   header <- readLines(con, n = 1)
   close(con)
   # Remove "#" from the header and split it into column names
   column_names <- sub("#", "", header)
   column_names <- strsplit(column_names, "\t")[[1]]
   # Read the .tsv frequency file into a data frame
-  F_ROH_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  F_ROH_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   # Add sim_name as an attribute to the data frame
   attr(F_ROH_data, "sim_name") <- sim_info$sim_name[i]
   # Create a list with table name and corresponding data frame
@@ -1044,7 +1212,7 @@ All_Population_F_ROH <- unlist(lapply(F_ROH_tables_Neutral_Model, function(table
 
 # Remove any non-numeric values
 All_Population_F_ROH <- All_Population_F_ROH[!is.na(All_Population_F_ROH) & is.numeric(All_Population_F_ROH)]
-# Calculate the point estimate F_ROH across all 20 simulations
+# Calculate the point estimate F_ROH across all technical replicates
 F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH <- mean(All_Population_F_ROH)
 
 # Calculate the Standard Error Confidence Interval
@@ -1061,7 +1229,7 @@ if (F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH > F_ROH_table_Emp
   simulated_line_location <- "topleft"
   empirical_line_location <- "topright"
 }
-# Add a red vertical line for the point estimate F_ROH across all 20 simulations
+# Add a red vertical line for the point estimate F_ROH across all technical replicates simulations
 abline(v = F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH, col = neutral_model_color, lwd = histogram_line_sizes)
 # Add legend for the red line
 legend(simulated_line_location, legend = paste("Neutral - F_ROH Point estimate: ", round(F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH, 4)),
@@ -1073,16 +1241,18 @@ legend(empirical_line_location, legend = empirical_avg_F_ROH_legend_text,
        col = empirical_data_color, lty = 1, cex = 0.8, text.col = "black", xjust = 1, yjust = 1)
 # Reset par settings to default after plotting
 par(mfrow = c(1, 1))
-# Print the Point estimate of F_ROH across all 20 simulations
-cat("Point estimate F_ROH across all 20 simulations:", F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH, "//n")
-print(paste("Standard Error 95% Confidence Interval: [", 
-            F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
-            F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[2], "]", sep = ""))
+# Print the Point estimate of F_ROH across all technical replicates 
+cat("\n\n**The point estimate of $F_{ROH}$ across all",n_simulation_replicates,"simulations for the Neutral Model:**\n\n", F_ROH_tables_Neutral_Model$Estimated_Mean_Population_F_ROH, "\n\n")
+cat("\n\n**Standard Error 95% Confidence Interval:**\n\n [", 
+    F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
+    F_ROH_tables_Neutral_Model$SE_CI_Estimated_Mean_Population_F_ROH[2], "]")
 ```
-## 3.3: Selection Models
-```{r echo = FALSE,warning = FALSE}
+
+ <!-- ## 3.3: Selection Models --> 
+
+```{r 3.3: Selection Models, echo = FALSE,warning = FALSE, results='asis'}
 # Set the working directory to the directory containing the F_ROH files for the empirical data
-setwd(Selection_model_F_ROH_dir)
+# setwd(Selection_model_F_ROH_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- "^.*F_ROH.*.tsv$"
 simulation_F_ROH_files <- list.files(path = Selection_model_F_ROH_dir, pattern = pattern)
@@ -1099,6 +1269,7 @@ F_ROH_tables_Selection_Model <- list()
 for (i in 1:length(sim_info$sim_name)) {
   # Get the file name
   file <- sim_info$file_name[i]
+  file_path <- file.path(Selection_model_F_ROH_dir,file)
   # Extract the selection_model_type from the file name
   selection_model_type <- sub(tolower("^sim_[0-9]+_(.*?)_F_ROH.*"), "\\1", tolower(file))
   # Check if the selection_model_type already exists in the list
@@ -1113,14 +1284,14 @@ for (i in 1:length(sim_info$sim_name)) {
     stop("Error: Simname from file does not match with simname from dataframe.")
   }
   # Read the header line
-  con <- file(file, "r")
+  con <- file(file_path, "r")
   header <- readLines(con, n = 1)
   close(con)
   # Remove "#" from the header and split it into column names
   column_names <- sub("#", "", header)
   column_names <- strsplit(column_names, "\\t")[[1]]
   # Read the .tsv frequency file into a data frame
-  F_ROH_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  F_ROH_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
   # Add sim_name as an attribute to the data frame
   attr(F_ROH_data, "sim_name") <- sim_info$sim_name[i]
   # Assign the file name to file_name
@@ -1145,10 +1316,10 @@ for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
   # Remove any non-numeric values
   All_Population_F_ROH <- All_Population_F_ROH[!is.na(All_Population_F_ROH) & is.numeric(All_Population_F_ROH)]
   # print(All_Population_F_ROH)
-  # Calculate the point estimate F_ROH across all 20 simulations for the current selection coefficient
+  # Calculate the point estimate F_ROH across all technical replicates simulations for the current selection coefficient
   F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH <- mean(All_Population_F_ROH)
 
-  # Calculate the Standard Error confidence interval of the point estimate F_ROH across all 20 simulations for the current selection coefficient
+  # Calculate the Standard Error confidence interval of the point estimate F_ROH across all technical replicates simulations for the current selection coefficient
   # Store the Standard Error confidence interval in the F_ROH_tables_Selection_Model table
   F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH <- standard_error_confidence_interval_fun(All_Population_F_ROH)
   # Set the plot size
@@ -1177,16 +1348,21 @@ for (selection_coefficient in names(F_ROH_tables_Selection_Model)) {
          col = empirical_data_color, lty = 1, cex = 0.8, text.col = "black", xjust = 1, yjust = 1)
   # Reset par settings to default after plotting
   par(mfrow = c(1, 1))
-  # Print the Point estimate of F_ROH across all 20 simulations
-  cat("Point estimate F_ROH across all 20 simulations for ",selection_coefficient,":", F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH, "//n")
-  print(paste("standard error-based 95% Confidence Interval: [", 
+  # Print the Point estimate of F_ROH across all technical replicates simulations
+  cat("\n\n**The point estimate of $F_{ROH}$ across all",n_simulation_replicates,"simulations for ",selection_coefficient,":**\n\n", F_ROH_tables_Selection_Model[[selection_coefficient]]$Estimated_Mean_Population_F_ROH, "\n\n")
+  
+  cat("\n\n**Standard Error-based 95% Confidence Interval:**\n\n [", 
   F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH[1], ", ", 
-  F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH[2], "]", sep = ""))
+  F_ROH_tables_Selection_Model[[selection_coefficient]]$SE_CI_Estimated_Mean_Population_F_ROH[2], "]\n\n")
 }
 #View(F_ROH_tables_Selection_Model)
 ```
-## 3.4: F_ROH summary
-```{r echo = FALSE,warning = FALSE}
+
+## 3.4: $F_{ROH}$ Summary
+This section presents a comparison of the population average inbreeding coefficient ($F_{ROH}$) between each simulation type and the empirical data. The displayed inbreeding coefficients for the different simulation types represents the point estimate of $F_{ROH}$ across all technical replicates. 
+The Lower CI and Upper CI represent the boundaries of the sample standard-error-based confidence intervals for the population $F_{ROH}$, with a confidence level of 95%.
+ 
+```{r 3.4: F_ROH summary, echo = FALSE,warning = FALSE, results='asis'}
 # Initialize vectors to store F_ROH values and CI bounds for the different selection coefficients
 selection_model_avg_values <- c()
 selection_model_lower_ci <- c()
@@ -1245,10 +1421,12 @@ write_latex_table(
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
 ```
 
-# 4: Expected Heterozygosity
-## 4.1: Empirical data
-```{r Expected Heterozygosity - Empirical data, echo = FALSE,warning = FALSE}
-setwd(Empirical_data_H_e_dir)
+# 4: Expected Heterozygosity ($H_{e}$)
+
+<!-- ## 4.1: Empirical - Expected Heterozygosity  --> 
+
+```{r 4.1: Empirical - Expected Heterozygosity, echo = FALSE,warning = FALSE, results='asis'}
+# setwd(Empirical_data_H_e_dir)
 # Pattern for finding the specific file containing "5th_percentiles_of_H_e_distribution.tsv"
 pattern <- "^.*H_e_distribution_.*.tsv$"
 empirical_H_e_distribution_file <- list.files(path = Empirical_data_H_e_dir, pattern = pattern)
@@ -1259,8 +1437,9 @@ if (length(empirical_H_e_distribution_file) != 1) {
 }
 # Read the file
 file <- empirical_H_e_distribution_file[1]
+file_path <- file.path(Empirical_data_H_e_dir,file) 
 # Read the .tsv file into a data frame
-empirical_H_e_distribution_table <- read.table(file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+empirical_H_e_distribution_table <- read.table(file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 # View(empirical_H_e_distribution_table)
 # # Set the working directory to the directory containing the H_e files for the empirical data
 # setwd(Empirical_data_H_e_dir)
@@ -1284,9 +1463,11 @@ empirical_H_e_distribution_table <- read.table(file, header = TRUE, sep = "\t", 
 # }
 # 
 ```
-## 4.2: Neutral Model
-```{r Expected Heterozygosity - Neutral Model, echo = FALSE,warning = FALSE }
-setwd(Neutral_model_H_e_dir)
+
+<!-- ## 4.2: Neutral Model - Expected Heterozygosity  --> 
+
+```{r 4.2: Neutral Model - Expected Heterozygosity, echo = FALSE,warning = FALSE }
+# setwd(Neutral_model_H_e_dir)
 # Pattern for finding the specific file containing "5th_percentiles_of_H_e_distribution.tsv"
 pattern <- "^.*5th_percentiles_of_H_e_distribution.tsv$"
 neutral_model_5th_percentiles_of_H_e_files <- list.files(path = Neutral_model_H_e_dir, pattern = pattern)
@@ -1296,16 +1477,18 @@ if (length(neutral_model_5th_percentiles_of_H_e_files) != 1) {
 }
 # Read the file
 file <- neutral_model_5th_percentiles_of_H_e_files[1]
+file_path <- file.path(Neutral_model_H_e_dir,file)
 # Read the .tsv file into a data frame
-data <- read.table(file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+data <- read.table(file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 # Store the data frame in a list as a subtable called "data"
 H_e_5th_percentiles_Neutral_model <- list(results = data)
 H_e_5th_percentiles_Neutral_model$Estimated_Mean_H_e_5th_percentile <- mean(H_e_5th_percentiles_Neutral_model[["results"]][["Fifth_Percentile"]])
-# Calculate the Standard Error confidence interval of the point estimate F_ROH across all 20 simulations
+# Calculate the Standard Error confidence interval of the point estimate F_ROH across all technical replicates simulations
 # Store the Standard Error confidence interval in the F_ROH_tables_Neutral_Model
 H_e_5th_percentiles_Neutral_model$SE_CI_Estimated_Mean_H_e_5th_percentile <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Neutral_model[["results"]][["Fifth_Percentile"]])
 #View(H_e_5th_percentiles_Neutral_model)
 ```
+
 ```{r H_E disitrubtion plot - Neutral Model, echo = FALSE,warning = FALSE }
 # setwd(Neutral_model_H_e_dir)
 # # Set the working directory to the directory containing the H_e files for the Neutral Model
@@ -1345,9 +1528,11 @@ H_e_5th_percentiles_Neutral_model$SE_CI_Estimated_Mean_H_e_5th_percentile <- sta
 #   dev.off()
 # }
 ```
-## 4.3: Selection Models
-```{r echo = FALSE,warning = FALSE}
-setwd(Selection_model_H_e_dir)
+
+<!-- ## 4.3: Selection Models - Expected Heterozygosity --> 
+
+```{r 4.3: Selection Models - Expected Heterozygosity ,echo = FALSE,warning = FALSE}
+# setwd(Selection_model_H_e_dir)
 # Pattern for finding the specific file containing "5th_percentiles_of_H_e_distribution.tsv"
 pattern <- "^.*5th_percentiles_of_H_e_distribution.tsv$"
 selection_model_5th_percentiles_of_H_e_files <- list.files(path = Selection_model_H_e_dir, pattern = pattern)
@@ -1356,27 +1541,31 @@ H_e_5th_percentiles_Selection_models <- list()
 
 # Loop through each selection coefficient and its associated file
 for (i in seq_along(selection_model_5th_percentiles_of_H_e_files)) {
+  file_path <- file.path(Selection_model_H_e_dir,selection_model_5th_percentiles_of_H_e_files[i])
   # Extract the selection coefficient from the file name
   selection_coefficient <- sub(tolower(".*(selection_model_s\\d+_chr\\d+).*"), "\\1", tolower(selection_model_5th_percentiles_of_H_e_files[i]))
   # Read the .tsv file into a data frame
-  subtable <- read.table(selection_model_5th_percentiles_of_H_e_files[i], header = TRUE,sep = "\t", stringsAsFactors = FALSE)
+  subtable <- read.table(file_path, header = TRUE,sep = "\t", stringsAsFactors = FALSE)
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$file_name <- selection_model_5th_percentiles_of_H_e_files[i]
   # Add the subtable to the list with the selection coefficient as its name
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$results <- subtable
 }
 # Loop through each selection_coefficient
 for (selection_coefficient in names(H_e_5th_percentiles_Selection_models)) {
-  # Calculate the point estimate F_ROH across all 20 simulations for the current selection coefficient
+  # Calculate the point estimate F_ROH across all technical replicates simulations for the current selection coefficient
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$Estimated_Mean_H_e_5th_percentile <- mean(H_e_5th_percentiles_Selection_models[[selection_coefficient]][["results"]][["Fifth_Percentile"]])
-  # Calculate the Standard Error confidence interval of the point estimate F_ROH across all 20 simulations for the current selection coefficient
+  # Calculate the Standard Error confidence interval of the point estimate F_ROH across all technical replicates simulations for the current selection coefficient
   # Store the Standard Error confidence interval in the H_e_5th_percentiles_Selection_models table
   H_e_5th_percentiles_Selection_models[[selection_coefficient]]$SE_CI_Estimated_Mean_H_e_5th_percentile <- standard_error_confidence_interval_fun(H_e_5th_percentiles_Selection_models[[selection_coefficient]][["results"]][["Fifth_Percentile"]])
 }
  # View the dataframe
 # View(H_e_5th_percentiles_Selection_models)
 ```
-## 4.4: Genomewide Average H_e
-```{r Expected Heterozygosity Avg H_e Summary, echo = FALSE,warning = FALSE}
+
+## 4.4: Genomewide Average $H_{e}$ Summary
+This section presents a summary of the mean point estimation of the genome-wide average expected heterozygosity ($H_{e}$), calculated across all 100 kbp binned genomic regions.  The Lower CI and Upper CI represent the boundaries of the sample standard-error based confidence intervals for the average $H_{e}$, with a confidence level of 95%.
+
+```{r 4.4: Genomewide Average H_e Summary, echo = FALSE,warning = FALSE, results='asis'}
 # Initialize vectors to store F_ROH values and CI bounds for the different selection coefficients
 selection_model_avg_values <- c()
 selection_model_lower_ci <- c()
@@ -1436,8 +1625,10 @@ write.table(H_e_values_sorted, file = filename, sep = ",", row.names = FALSE, qu
 # Print the table using knitr::kable()
 knitr::kable(H_e_values_sorted, row.names = FALSE)
 ```
-## 4.5: Genomewide 5th percentile comparison - Expected Heterozygosity Summary
-```{r Expected Heterozygosity 5th percentile Summary, echo = FALSE,warning = FALSE}
+
+## 4.5: Genomewide 5th Percentile of Expected Heterozygosity Summary
+Summary of the mean point estimation of expected heterozygosity ($H_{e}$) 5th percentile values with standard error-based confidence intervals. \n\n
+```{r 4.5: Genomewide 5th percentile of Expected Heterozygosity Summary, echo = FALSE,warning = FALSE, results='asis'}
 # Initialize vectors to store F_ROH values and CI bounds for the different selection coefficients
 selection_model_avg_values <- c()
 selection_model_lower_ci <- c()
@@ -1497,19 +1688,338 @@ write_latex_table(
 # Print the table using knitr::kable()
 knitr::kable(H_e_5th_percentile_values_sorted, row.names = FALSE)
 ```
-# 5: Summary
-## 5.1: General comparison
-### 5.1.1: ROH-hotspot threshold comparison
-```{r echo = FALSE,warning = FALSE}
+
+# 5. OMIA Phenotypes
+<!-- Extracting all phenotypes -->
+```{r OMIA Phenotypes, echo=FALSE,results= 'hide',warning = FALSE}
+
+generate_vbo_links <- function(vbo_string) {
+  vbo_list <- trimws(unlist(strsplit(vbo_string, ",")))  # Split by comma and trim spaces
+  # base_url <- "https://www.ebi.ac.uk/ols4/search?lang=en&q=VBO%3A"
+  base_url <- "http://purl.obolibrary.org/obo/VBO_" # http://purl.obolibrary.org/obo/VBO_0200800
+  
+  vbo_list <- sapply(vbo_list, function(id) {
+    if (grepl("^VBO_", id)) {  # Check if it starts with "VBO_"
+      vbo_number <- sub("VBO_", "", id)  # Extract number
+    } else if (grepl("^VBO:", id)) {  # Check if it starts with "VBO:"
+      vbo_number <- sub("VBO:", "", id)  # Extract number
+    } else {
+      return(id)  # Return unchanged if not a VBO ID
+    }
+    
+    url <- paste0(base_url, vbo_number)
+    return(paste0('<a href="', url, '" target="_blank">', id, '</a>'))  # Create hyperlink
+  }, USE.NAMES = FALSE)
+  
+  return(paste(vbo_list, collapse = ", "))  # Join back into a string
+}
+
+generate_ensembl_gene_links <- function(gene_name) {
+  # base_url <- "https://www.ensembl.org/Multi/Search/Results?q=" #https://www.ensembl.org/Multi/Search/Results?q=DCC  
+  base_url <- "https://www.ncbi.nlm.nih.gov/gene/?term=" #https://www.ncbi.nlm.nih.gov/gene/?term=DCC  
+  url <- paste0(base_url, gene_name)
+  return(paste0('<a href="', url, '" target="_blank">', gene_name, '</a>'))  # Use gene_name instead of id
+}
+
+vertebrate_breed_ontology_ids_vector <- unlist(strsplit(vertebrate_breed_ontology_ids, ","))
+
+file <- file.path(omia_phenotypes_filepath)
+#  # Read the header (the line starting with #)
+header_line <- readLines(file, n = 1)  # Read the first line
+header <- unlist(strsplit(sub("^#", "", header_line), "\t"))  # Remove the "#" and split by tab
+
+# Read the data (skip the first line since it's the header)
+omia_phenotype_data <- read.table(file, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t", skip = 1)
+
+# Assign the extracted header as column names
+colnames(omia_phenotype_data) <- header
+
+# ---- Rename Columns for POS1 and POS2 ----
+colnames(omia_phenotype_data)[1] <- "CHR"  # V5 as POS1 (start position)
+colnames(omia_phenotype_data)[2] <- "POS1"  # V5 as POS1 (start position)
+colnames(omia_phenotype_data)[3] <- "POS2"  # V6 as POS2 (end position)
+colnames(omia_phenotype_data)[4] <- "PHENE"  
+colnames(omia_phenotype_data)[5] <- "PHENE_CATEGORY" 
+colnames(omia_phenotype_data)[6] <- "SINGLE_GENE_TRAIT_OR_DISORDER"  
+colnames(omia_phenotype_data)[7] <- "DISEASE_RELATED" 
+colnames(omia_phenotype_data)[8] <- "GENE_SYMBOL"  
+colnames(omia_phenotype_data)[9] <- "GENE_DESCRIPTION" 
+colnames(omia_phenotype_data)[10] <- "PHENE_URL"  
+colnames(omia_phenotype_data)[11] <- "GENE_DETAILS_URL" 
+colnames(omia_phenotype_data)[12] <- "BREEDS" 
+
+# ---- Ensure POS1 and POS2 are Numeric ----
+omia_phenotype_data$POS1 <- as.numeric(omia_phenotype_data$POS1)
+omia_phenotype_data$POS2 <- as.numeric(omia_phenotype_data$POS2)
+# omia_phenotype_data$BREEDS <- generate_vbo_links(omia_phenotype_data$BREEDS)
+omia_phenotype_data$BREEDS <- sapply(omia_phenotype_data$BREEDS, generate_vbo_links)
+omia_phenotype_data$GENE_SYMBOL <- sapply(omia_phenotype_data$GENE_SYMBOL, generate_ensembl_gene_links)
+
+
+# View(omia_phenotype_data)
+```
+
+## 5.1 All Breed-Specific Non-Defect (Non-Disease-Related) Phenotypes 
+```{r 5.1 All Breed-Specific Non-Defect Phenotypes, echo=FALSE, warning=FALSE, results='asis'}
+
+# Read header and data
+header_line <- readLines(omia_scraped_phenotypes_data_filepath, n = 1)
+header <- unlist(strsplit(sub("^#", "", header_line), ","))
+omia_raw_phenotype_data <- read.table(omia_scraped_phenotypes_data_filepath, 
+                                      header = FALSE, 
+                                      comment.char = "#", 
+                                      stringsAsFactors = FALSE, 
+                                      sep = ",", 
+                                      skip = 1)
+colnames(omia_raw_phenotype_data) <- header
+
+omia_raw_phenotype_data[[12]] <- sapply(omia_raw_phenotype_data[[12]], generate_vbo_links)
+omia_raw_phenotype_data[[8]] <- sapply(omia_raw_phenotype_data[[8]], generate_ensembl_gene_links)
+# Print VBO IDs used
+cat("\n\n **The following Vertebrate Breed Ontology (VBO) ID(s) were used for associating, or could potentially be associated with the empirical dataset:**\n\n", 
+    generate_vbo_links(vertebrate_breed_ontology_ids), "\n\n")
+
+cat("\n\n**Below are the non-defect phenotypes discovered on OMIA, associated with these VBO IDs.**\n\n",
+    "These phenotypes include cases where no known links to a specific genomic region or breed have been reported on OMIA so far.",
+    
+    "Additionally, some phenotypes may have genomic coordinates mapped to a different reference assembly, which could result in misalignment relative to the identified ROH hotspot regions, and thus, may be misclassified as 'not overlapping with any ROH hotspot region'. ",
+    "\n\nTherefore, these table(s) could serve as a valuable resource for identifying phenotypes that   otherwise may have been overlooked due to incomplete genomic mappings or lack of direct breed associations.\n They offer an opportunity for further investigation, particularly (if applicable) through re-mapping coordinates using a LiftOver process to potentially align them with the discovered ROH hotspot regions.")
+
+# Create list to hold phenotype tables
+Breed_phenotypes_tables <- list()
+
+for (i in seq_along(vertebrate_breed_ontology_ids_vector)) {
+  current_id <- vertebrate_breed_ontology_ids_vector[i]
+  
+  if (tolower(current_id) == "unspecified") {
+    matching_OMIA_phenotypes <- omia_raw_phenotype_data[
+      omia_raw_phenotype_data[, 12] == "" & 
+      tolower(omia_raw_phenotype_data$DISEASE_RELATED) == "no", ]
+    
+    matching_OMIA_phenotypes[, 12] <- "Unspecified"
+    matching_OMIA_phenotypes <- matching_OMIA_phenotypes[!grepl("disease", matching_OMIA_phenotypes[, 5], ignore.case = TRUE), ]
+    matching_OMIA_phenotypes <- matching_OMIA_phenotypes[order(as.numeric(matching_OMIA_phenotypes$CHR)), ]
+  } else {
+    matching_OMIA_phenotypes <- omia_raw_phenotype_data[
+      grepl(current_id, omia_raw_phenotype_data[, 12]) & 
+      tolower(omia_raw_phenotype_data$DISEASE_RELATED) != "yes", ]
+  }
+  
+  Breed_phenotypes_tables[[current_id]] <- matching_OMIA_phenotypes
+}
+
+# Loop through each table and render with kableExtra for improved styling
+for(tbl in Breed_phenotypes_tables) {
+  if (nrow(tbl) > 0) {
+    # Create a styled HTML table
+    table_html <- knitr::kable(tbl, format = "html", 
+                               row.names = FALSE, 
+                               digits = kable_table_digits,
+                               escape = FALSE,
+                               table.attr = "class='table table-bordered table-striped'") %>%
+      kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed")) %>%
+      # Adjust column width; change "3cm" to a width that suits your data
+      column_spec(1:ncol(tbl), width = "3cm")
+    
+    # Output the table and add spacing
+    cat(table_html)
+    cat("<br><br>\n")
+  }
+}
+```
+
+## 5.2 Species-Specific Phenotypes Overlapping With The Detected Empirical ROH Hotspot(s)
+```{r 5.2 Species-Specific Phenotypes Overlapping With The Detected Empirical ROH Hotspot(s), echo=FALSE,warning = FALSE, results='asis'}
+
+# View(empirical_hotspot_tables)
+for (i in seq_along(empirical_hotspot_tables)) {
+  # Extract chromosome and hotspot region boundaries
+  CHR <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["CHR"]]
+  POS1 <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["POS1"]]
+  POS2 <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["POS2"]]
+  # cat("Hotspot Window -> POS1:", POS1, " POS2:", POS2, "\n")
+  
+  # Find phenotypes that partially or fully overlap the hotspot region
+  overlapping_phenotypes <- omia_phenotype_data[
+    omia_phenotype_data$CHR == CHR &
+    omia_phenotype_data$POS2 >= POS1 &  # Phenotype end is after or at the region start
+    omia_phenotype_data$POS1 <= POS2,   # Phenotype start is before or at the region end
+  ]
+
+  # Compute Overlap_Percentage for each phenotype
+  if (nrow(overlapping_phenotypes) > 0) {
+    overlapping_phenotypes$Overlap_Percentage <- apply(overlapping_phenotypes, 1, function(phenotype) {
+      phenotype_start <- as.numeric(phenotype["POS1"])
+      phenotype_end <- as.numeric(phenotype["POS2"])
+      phenotype_length <- phenotype_end - phenotype_start + 1  # Total phenotype length
+
+      # Compute upstream and downstream outside portions
+      upstream_outside <- max(0, POS1 - phenotype_start)  # If phenotype starts before hotspot
+      downstream_outside <- max(0, phenotype_end - POS2)  # If phenotype ends after hotspot
+      outside_portion <- upstream_outside + downstream_outside
+
+      # Compute Overlap Percentage
+      Overlap_Percentage <- 100 * (1 - (outside_portion / phenotype_length))
+      return(Overlap_Percentage)
+    })
+  } else {
+    overlapping_phenotypes$Hotspot_Overlap_Perc <- numeric(0)  # Empty case
+  }
+
+  # Store results
+  empirical_hotspot_tables[[i]][["Hotspot_species_phenotypes"]] <- overlapping_phenotypes
+}
+
+# Initialize the empty list
+All_phenotypes_for_all_hotspots <- list()
+
+hotspots_with_overlapping_phenotypes <- ""
+
+# Loop through each hotspot and filter under selection
+for (hotspot in names(empirical_hotspot_tables)) {
+      # Extract the phenotypes for the selected hotspot
+      phenotypes_data <- empirical_hotspot_tables[[hotspot]][["Hotspot_species_phenotypes"]]
+      
+      if (!is.null(phenotypes_data) && nrow(phenotypes_data) > 0) {
+        All_phenotypes_for_all_hotspots[[hotspot]] <- phenotypes_data
+        hotspots_with_overlapping_phenotypes <- paste0(hotspots_with_overlapping_phenotypes,", ", hotspot)
+      }
+    
+}
+
+# All_phenotypes_for_all_hotspots[[hotspot]] <- Breed_phenotypes_tables[[1]] # Debugging purposes
+# hotspots_with_overlapping_phenotypes <- "" # Debugging purposes
+
+
+# Check if there are any phenotypes under selection and display a message with the tables
+if (length(All_phenotypes_for_all_hotspots) > 0) {
+  # Print a phenotyperal message before displaying tables
+  cat("\n\nThe following table(s) shows all defect and non-defect phenotypes (for the studied species) overlapping with the empirical ROH hotspots. \n\n**The hotspots are displayed in the following order:**\n\n",hotspots_with_overlapping_phenotypes,"")
+  
+  # # Display the entire table for all hotspots
+  # knitr::kable(All_phenotypes_for_all_hotspots, row.names = FALSE,
+  #              caption = "All defect and non-defect phenotypes (for the studied species) overlapping with the empirical ROH hotspots")
+  
+  # Loop through each table and render with kableExtra for improved styling
+  for(tbl in All_phenotypes_for_all_hotspots) {
+    if (nrow(tbl) > 0) {
+      # Create a styled HTML table
+      table_html <- knitr::kable(tbl, format = "html", 
+                                 row.names = FALSE, 
+                                 digits = kable_table_digits,
+                                 escape = FALSE,
+                                 table.attr = "class='table table-bordered table-striped'") %>%
+        kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed")) %>%
+        # Adjust column width; change "3cm" to a width that suits your data
+        column_spec(1:ncol(tbl), width = "3cm")
+      
+      # Output the table and add spacing
+      cat(table_html)
+      cat("<br><br>\n")
+    }
+  }
+
+  
+} else {
+        cat("\n\n**Result:**\n\nNo non-defect (non-disease) species-specific phenotypes were found to overlap with the empirical ROH hotspot regions.\n")
+
+}
+
+```
+
+# 6: Summary
+## 6.0: Detected Empirical ROH Hotspots
+Summary of the detected ROH hotspot windows in the empirical dataset.
+```{r 6.0: Detected Empirical ROH hotspots, echo = FALSE,warning = FALSE, results='asis'}
+Hotspot <- c()
+Chr <- c()
+Start <- c()
+End <- c()
+Length_Mb <- c()
+
+# Loop through each selection_coefficient in H_e_5th_percentiles_Selection_models
+for (hotspot in names(empirical_hotspot_tables)) {
+  # Append values to the lists
+  Hotspot <- c(Hotspot, hotspot)
+  Chr <- c(Chr, empirical_hotspot_tables[[hotspot]][["Hotspot_region_data"]][["CHR"]])
+  Start <- c(Start ,empirical_hotspot_tables[[hotspot]][["Hotspot_region_data"]][["POS1"]])
+  End <- c(End , empirical_hotspot_tables[[hotspot]][["Hotspot_region_data"]][["POS2"]])
+  Length_Mb <- c(Length_Mb, empirical_hotspot_tables[[hotspot]][["Hotspot_length_Mb"]])
+}
+
+
+# Combine all values into a data frame
+Detected_ROH_hotspots <- data.frame(
+  Name = Hotspot,
+  Chr = Chr,
+  Start = Start,
+  End = End,
+  Length_Mb = Length_Mb
+)
+
+# Display the entire table for all hotspots
+knitr::kable(Detected_ROH_hotspots, row.names = FALSE )
+
+
+
+```
+## 6.1: General Comparison
+### 6.1.1: ROH Hotspot Threshold Comparison
+
+```{r 6.1.1: ROH-hotspot threshold comparison ,echo = FALSE,warning = FALSE, results='asis'}
 cat("\n ROH-hotspot threshold comparison between the different datasets")
 # Print the table using knitr::kable()
 knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 ```
-### 5.1.2: F_ROH comparison
-```{r echo = FALSE,warning = FALSE}
+
+### 6.1.2: $F_{ROH}$ Comparison
+This section shows a plot comparing the population $F_{ROH}$ (y-axis) between each simulation type (x-axis) and the empirical data.
+
+The dashed horizontal red line represents the population $F_{ROH}$ for Labrador
+Retriever. The circle for each simulation type represents the point estimate $F_{ROH}$ across all 
+simulations. The upper and lower error margins of these point estimates represents the lower
+and upper standard error-based confidence intervals with a confidence level of 95%. 
+```{r 6.1.2: F_ROH comparison, echo = FALSE,warning = FALSE, results='asis'}
 setwd(output_dir)
+
+cat("\n\n")
+##############################################
+#### Saving the Inbreeding coefficient Plot
+##############################################
+
 # Creating an image of the F_ROH plot
 png(filename = "Population_F_ROH_comparison_with_CI.png",width = 1920, height = 1080, res = 300)
+# Remove the empirical model from the plotting data
+plotting_data <- F_ROH_values[F_ROH_values$Model != "Empirical", ]
+# Add a column indicating whether the empirical F_ROH is within the CI of each model
+empirical_F_ROH <- empirical_avg_F_ROH
+plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_F_ROH) & (plotting_data$Upper_CI >= empirical_F_ROH)
+
+# Create the plot
+p <- ggplot(plotting_data, aes(x = Model, y = F_ROH, color = Empirical_Within_CI)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
+  # Force the empirical F_ROH line to always be shown
+  geom_hline(aes(yintercept = empirical_F_ROH), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
+  labs(title = "F_ROH Values and Confidence Intervals by Model",
+       x = "Model",
+       y = "F_ROH",
+       color = "Empirical F_ROH\nwithin CI",
+       linetype = "Empirical F_ROH") +
+  scale_linetype_manual(name = "Empirical F_ROH", values = c("dashed")) +
+  scale_color_manual(values = c("TRUE" = "blue", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Print the plot
+print(p)
+# Close the graphics device
+dev.off()
+
+##############################################
+#### Displaying Inbreeding coefficient Plot
+##############################################
+
 # Remove the empirical model from the plotting data
 plotting_data <- F_ROH_values[F_ROH_values$Model != "Empirical", ]
 # Add a column indicating whether the empirical F_ROH is within the CI of each model
@@ -1537,22 +2047,31 @@ print(p)
 # Print which models the empirical F_ROH is inside of
 inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
 outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
-cat("Models where empirical F_ROH is within CI:\n")
+cat("\n\n**Models the empirical $F_{ROH}$ is within the CI of:**\n\n")
 print(inside_models)
-cat("\nModels where empirical F_ROH is outside CI:\n")
+cat("\n**Models the empirical $F_{ROH}$ is outside the CI of:**\n\n")
 print(outside_models)
-# Close the graphics device
-dev.off()
+
+
 # Print the table using knitr::kable()
 knitr::kable(F_ROH_values_sorted, row.names = FALSE)
 ```
-## 5.2: Selection Testing of Empirical ROH-Hotspots
-### 5.2.1: Selection test (Sweep test)
-```{r Sweep test, echo = FALSE,warning = FALSE}
-setwd(Sweep_test_dir)
+
+## 6.2: Selection Testing of Empirical ROH Hotspots
+
+### 6.2.1: Selection Test (Sweep Test)
+This section shows the selection testing results of the different ROH hotspots based on the window average expected heterozygosity ($H_{e}$).
+The Table is sorted by expected heterozygosity in ascending order. 
+
+The threshold value for selection used in this selection test, comes from the lower boundary of the standard-error-based confidence interval for the 5th percentile extreme value of the neutral model simulations.
+
+```{r 6.2.1: Selection test (Sweep test), echo = FALSE,warning = FALSE, results='asis'}
+# setwd(Sweep_test_dir)
 # Pattern for finding files containing "F_ROH" and ending with ".tsv"
 pattern <- "^.*neutral_model.*.tsv$"
 selection_testing_files <- list.files(path = Sweep_test_dir, pattern = pattern)
+
+
 # Extracting the ROH-hotspot threshold value from the suffix of the filename
 parts <- unlist(strsplit(selection_testing_files[1], "thr_")) # Split the string by "threshold_"
 # Extract the decimal number using regular expressions
@@ -1560,23 +2079,28 @@ fifth_percentile_H_e_neutral_model <- as.numeric(gsub("\\.tsv", "", unlist(strsp
 
 for (file in selection_testing_files) {
   file_name <- file
+  file_path <- file.path(Sweep_test_dir,file)
   # Read the header line
-  con <- file(file, "r")
+  con <- file(file_path, "r")
   header <- readLines(con, n = 1)
   close(con)
   # Remove "#" from the header and split it into column names
   column_names <- sub("#", "", header)
   column_names <- strsplit(column_names, "\t")[[1]]
   # Read the .tsv frequency file into a data frame
-  Selection_testing_results <- read.table(selection_testing_files, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+  # Debug
+    Selection_testing_results <- read.table(file_path, header = TRUE, comment.char = "#", stringsAsFactors = FALSE, col.names = column_names)
+
   Selection_testing_results[3] <- round(Selection_testing_results[3],H_e_values_decimals)
   # Remove "_allele_freq" from the names
   Selection_testing_results$Name <- gsub(tolower("_allele_freq$"), "", tolower(Selection_testing_results$Name))
 
 }
-paste0("Selection test results")
-paste0("ROH-hotspot windows with an mean H_e Value lower or equal to the lower confidence interval of the fifth percentile of the neutral model are classified as being under selection")
-paste0("5th percentile of the neutral model is: ",fifth_percentile_H_e_neutral_model)
+
+# cat("Selection Testing Results. \n\n")
+cat("ROH-hotspot windows with a mean $H_{e}$ Value lower than or equal to the lower boundary of the confidence interval for the fifth percentile of the neutral model are classified as being under selection.\n\n")
+cat("**The lower boundary of the standard-error-based confidence interval for the 5th percentile of the $H_{e}$-distribution for the neutral model is:**\n\n",fifth_percentile_H_e_neutral_model)
+
 # Print the table using knitr::kable()
 knitr::kable(Selection_testing_results, row.names = FALSE) 
 formatted_selection_H_e_threshold <- round(fifth_percentile_H_e_neutral_model,H_e_values_decimals)
@@ -1598,13 +2122,16 @@ write_latex_table(
 )
 # Subset the dataframe to extract rows where Under_selection is "Yes"
 under_selection_rows <- subset(Selection_testing_results, Under_selection == "Yes")
-paste0("ROH-hotspots under selection:")
+cat("\n\n**ROH hotspots marked as candidate regions for selection:**\n\n")
 knitr::kable(under_selection_rows, row.names = FALSE) 
 #View(Selection_testing_results)
 ```
-### (Optional) 5.2.2: Sweep Test of Causative Variant Windows
-This Optional quality control step verifies whether the Causative Variant Windows in the simulated selection models are accurately identified as regions under selection based on the results of the sweep test.
-```{r ,echo = FALSE,warning = FALSE}
+
+### (Optional) 6.2.2: Sweep Test of Causative Variant Windows
+
+This optional "quality control" step verifies whether the Causative Variant Windows in the simulated selection models are accurately identified as candidate regions for selection based on the results of the sweep test.
+
+```{r (Optional) 6.2.2: Sweep Test of Causative Variant Windows, echo = FALSE,warning = FALSE, results='asis'}
 # Initialize vectors to store H_e values and CI bounds for the different selection coefficients
 selection_model_avg_values <- c()
 selection_model_lower_ci <- c()
@@ -1663,8 +2190,10 @@ write_latex_table(
 # Print the table using knitr::kable()
 knitr::kable(H_e_values_sorted, row.names = FALSE)
 ```
-### 5.2.3: Extracting Hotspots under selection
-```{r echo = FALSE,warning = FALSE}
+
+<!-- ### 6.2.3: Extracting Hotspot candidate regions for selection --> 
+
+```{r 6.2.3: Extracting Hotspot candidate regions for selection,echo = FALSE,warning = FALSE}
 # Initialize an empty list to store the new table
 hotspot_under_selection_H_e_table <- list()
 
@@ -1690,19 +2219,380 @@ for (i in 1:nrow(under_selection_rows)) {
 # View the new table
 # View(hotspot_under_selection_H_e_table)
 ```
-## 5.3: Selection Strength Estimation of Empirical ROH-Hotspots
+
+## 6.3 Functional Assessment of Candidate Regions for Selection
+### 6.3.1 Genes Identified in Candidate Regions
+This section presents the results of the mapping of genes to the empirical ROH hotspot candidate region(s) for selection.
+
+```{r 6.3.1 Genes Identified in Candidate Regions, echo=FALSE,warning = FALSE, results='asis'}
+# setwd(Empirical_data_hotspot_gene_mapping_dir)
+
+#################################################################################### 
+### Step 1: Mapping genes to the empirical ROH hotspots
+####################################################################################
+
+# Pattern for finding the gene mapping files
+pattern <- ".*gene_mapping*\\.txt$"
+hotspot_gene_mapping_files <- list.files(path = Empirical_data_hotspot_gene_mapping_dir, pattern = pattern)
+
+# Extract chromosome numbers from the filenames
+chr_number_pattern <- ".*_chr(\\d+)_.*\\.txt$"
+chr_numbers <- as.numeric(gsub(tolower(chr_number_pattern), "\\1", tolower(hotspot_gene_mapping_files)))
+
+# Create a data frame with file and chromosome information
+chr_info <- data.frame(
+  chr_number = chr_numbers, 
+  file_name = hotspot_gene_mapping_files, 
+  stringsAsFactors = FALSE
+)
+
+# Sort the dataframe by chromosome number
+chr_info <- chr_info[order(chr_info$chr_number), ]
+
+# Initialize an empty list to store the gene mapping tables by chromosome
+gene_mapping_tables <- list()
+gene_location_tables <- list()   # Simplified table with Gene, POS1, and POS2
+
+# Loop through each file and store data by chromosome
+for (i in 1:nrow(chr_info)) {
+  file <- chr_info$file_name[i]
+  file_path <- file.path(Empirical_data_hotspot_gene_mapping_dir,file)
+  chr <- chr_info$chr_number[i]
+  
+  # Read the file into a data frame
+  gene_mapping_data <- read.table(file_path, header = FALSE, comment.char = "#", stringsAsFactors = FALSE, sep = "\t")
+  
+  # Add chromosome number as an attribute
+  attr(gene_mapping_data, "Chromosome_number") <- chr
+  
+  # Store full gene mapping data
+  gene_mapping_tables[[paste0("chr", chr)]] <- gene_mapping_data
+  
+  # ---- Rename Columns for POS1 and POS2 ----
+  colnames(gene_mapping_data)[4] <- "POS1"  # V5 as POS1 (start position)
+  colnames(gene_mapping_data)[5] <- "POS2"  # V6 as POS2 (end position)
+  
+  # ---- Extract Gene Name and Clean It ----
+  gene_mapping_data$Gene <- gsub(".*gene_name ([^;]+);.*", "\\1", gene_mapping_data$V13)  # Extract gene name
+  gene_mapping_data$Gene <- gsub(";", "", gene_mapping_data$Gene)  # Remove trailing semicolon if any
+  
+  # ---- Ensure POS1 and POS2 are Numeric ----
+  gene_mapping_data$POS1 <- as.numeric(gene_mapping_data$POS1)
+  gene_mapping_data$POS2 <- as.numeric(gene_mapping_data$POS2)
+  
+  # ---- Remove Rows with Missing POS1 or POS2 ----
+  gene_mapping_data <- gene_mapping_data[!is.na(gene_mapping_data$POS1) & !is.na(gene_mapping_data$POS2), ]
+  
+  # ---- Find Unique Genes ----
+  unique_genes <- unique(gene_mapping_data$Gene)
+  
+  # ---- Initialize an Empty Data Frame for Aggregated Data ----
+  aggregated_gene_data <- data.frame(Gene = character(), POS1 = numeric(), POS2 = numeric(), stringsAsFactors = FALSE)
+  
+  # ---- Inner Loop: Aggregate Data for Each Unique Gene ----
+  for (gene in unique_genes) {
+    gene_rows <- gene_mapping_data[gene_mapping_data$Gene == gene, ]  # Filter rows for the gene
+    
+    min_pos1 <- min(gene_rows$POS1)  # Find minimum POS1 for this gene
+    max_pos2 <- max(gene_rows$POS2)  # Find maximum POS2 for this gene
+    
+    # Append the result to aggregated_gene_data
+    aggregated_gene_data <- rbind(aggregated_gene_data, data.frame(Gene = gene, POS1 = min_pos1, POS2 = max_pos2))
+  }
+  
+  # Store the result in gene_location_tables
+  gene_location_tables[[paste0("chr", chr)]] <- aggregated_gene_data
+}
+
+# Output the results
+# View(gene_mapping_tables)     # Full tables
+# View(gene_location_tables)    # Only Gene, POS1, and POS2
+
+#################################################################################### 
+### Step 2: Detect genes overlapping with ROH-hotspots
+####################################################################################
+# Convert gene location list to a single dataframe
+gene_location_tables_flat <- do.call(rbind, lapply(names(gene_location_tables), function(chr) {
+  df <- gene_location_tables[[chr]]
+  df$CHR <- gsub("chr", "", chr)  # Remove "chr" prefix
+  df[c("CHR", "POS1", "POS2", "Gene")]  # Reorder columns
+}))
+
+# Convert CHR column to numeric if needed
+gene_location_tables_flat$CHR <- as.numeric(gene_location_tables_flat$CHR)
+
+gene_location_tables_flat$Gene <- sapply(gene_location_tables_flat$Gene, generate_ensembl_gene_links)
+
+# # Print the final merged table
+# print(gene_location_tables_flat)
+
+# View(gene_location_tables)
+# View(empirical_hotspot_tables)
+for (i in seq_along(empirical_hotspot_tables)) {
+  # Extract chromosome and hotspot region boundaries
+  CHR <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["CHR"]]
+  POS1 <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["POS1"]]
+  POS2 <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["POS2"]]
+  # cat("Hotspot Window -> POS1:", POS1, " POS2:", POS2, "\n")
+  
+  # Find genes that partially or fully overlap the hotspot region
+  overlapping_genes <- gene_location_tables_flat[
+    gene_location_tables_flat$CHR == CHR & 
+    gene_location_tables_flat$POS2 >= POS1 &  # Gene end is after or at the region start
+    gene_location_tables_flat$POS1 <= POS2,   # Gene start is before or at the region end
+  ]
+
+  # Compute Overlap_Percentage for each gene
+  if (nrow(overlapping_genes) > 0) {
+    overlapping_genes$Overlap_Percentage <- apply(overlapping_genes, 1, function(gene) {
+      gene_start <- as.numeric(gene["POS1"])
+      gene_end <- as.numeric(gene["POS2"])
+      gene_length <- gene_end - gene_start + 1  # Total gene length
+
+      # Compute upstream and downstream outside portions
+      upstream_outside <- max(0, POS1 - gene_start)  # If gene starts before hotspot
+      downstream_outside <- max(0, gene_end - POS2)  # If gene ends after hotspot
+      outside_portion <- upstream_outside + downstream_outside
+
+      # Compute Overlap Percentage
+      Overlap_Percentage <- 100 * (1 - (outside_portion / gene_length))
+      return(Overlap_Percentage)
+    })
+  } else {
+    overlapping_genes$Hotspot_Overlap_Perc <- numeric(0)  # Empty case
+  }
+
+  # Store results
+  empirical_hotspot_tables[[i]][["Hotspot_genes"]] <- overlapping_genes
+}
+
+#################################################################################### 
+### Step 3: Show genes for Hotspots under selection
+####################################################################################
+#echo = FALSE,warning = FALSE
+# Initialize the empty list
+Genes_hotspots_under_selection <- list()
+
+# Sorting in alphanumerical order
+hotspots_under_selection <- under_selection_rows[order(under_selection_rows$Name), ]
+
+# Loop through each hotspot and filter under selection
+for (hotspot in names(empirical_hotspot_tables)) {
+  for (selection_hotspot_index in 1:nrow(hotspots_under_selection)) {
+    if (tolower(hotspot) == tolower(hotspots_under_selection$Name[selection_hotspot_index])) {
+      
+      # Extract the genes for the selected hotspot
+      genes_data <- empirical_hotspot_tables[[hotspot]][["Hotspot_genes"]]
+      
+      # Append to the list if genes are found
+      if (!is.null(genes_data) && nrow(genes_data) > 0) {
+        Genes_hotspots_under_selection[[hotspot]] <- genes_data
+      }
+      else {
+        # Create an empty table for this hotspot and append
+        Genes_hotspots_under_selection[[hotspot]] <- data.frame(CHR = character(0),
+                                                                POS1 = numeric(0),
+                                                                POS2 = numeric(0),
+                                                                Gene = character(0),
+                                                                Overlap_Percentage = numeric(0))
+    }}
+  }
+}
+
+
+cat("\n\n**The following gene annotation file was used to map genes to the empirical candidate region(s) for selection:**\n\n", gene_annotations_filepath)
+
+# Check if there are any genes under selection and display a message with the tables
+if (length(Genes_hotspots_under_selection) > 0) {
+  
+  # Print message before displaying tables
+  if (length(Genes_hotspots_under_selection) == 1) {
+      cat("\n\n**The table below displays the gene(s) that overlap with the ROH hotspot candidate region for selection: ", names(Genes_hotspots_under_selection), ".**\n\n")
+  } else {
+      cat("\n\n**The tables below show the gene(s) overlapping with the following ROH hotspot candidate regions for selection, listed in order:**", 
+          paste(names(Genes_hotspots_under_selection), collapse=", "), ".\n\n")
+  }
+
+  cat("**Note:** The column 'Overlap_Percentage' represents the percentage of the gene that overlaps with the candidate region.\n\n")
+  
+  
+  # Loop through each table and render with kableExtra for improved styling
+  for(tbl in Genes_hotspots_under_selection) {
+    if (nrow(tbl) > 0) {
+      # Create a styled HTML table
+      table_html <- knitr::kable(tbl, format = "html", 
+                                 row.names = FALSE, 
+                                 digits = kable_table_digits,
+                                 escape = FALSE,
+                                 table.attr = "class='table table-bordered table-striped'") %>%
+        kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed")) %>%
+        # Adjust column width; change "3cm" to a width that suits your data
+        column_spec(1:ncol(tbl), width = "3cm")
+      
+      # Output the table and add spacing
+      cat(table_html)
+      cat("<br><br>\n")
+    }
+  }
+  
+  
+} else {
+  cat("\n\nNo matching hotspots found under selection.\n\n")  # If no hotspots found
+}
+
+```
+
+### 6.3.2 Non-Defect (Non-Disease-Related) Phenotypes Identified in Candidate Regions
+This section presents the results of the search for known favorable/non-defect (non-disease-related) phenotypes from OMIA that overlap with the ROH hotspot candidate region(s) for selection.
+
+The search was breed-specific and the Vertebrate Breed Ontology (VBO) IDs used were defined in the 'vertebrate_breed_ontology_ids' parameter of the main pipeline script.
+
+```{r 6.3.2 Non-Defect (Non-Disease-Related) Phenotypes Identified in Candidate Regions, echo=FALSE,warning = FALSE, results='asis'}
+
+#############################################################################################
+### Step 1: Detect All Breed-specific Non-Defect (Non-Disease-Related) phenotypes overlapping with the ROH-hotspots
+#############################################################################################
+
+# Convert phenotype location list to a single dataframe
+Breed_phenotypes_tables_flat <- do.call(rbind, lapply(names(Breed_phenotypes_tables), function(VBO_ID) {
+  df <- Breed_phenotypes_tables[[VBO_ID]]
+}))
+
+# Convert CHR column to numeric if needed
+Breed_phenotypes_tables_flat$CHR <- as.numeric(Breed_phenotypes_tables_flat$CHR)
+
+
+# View(Breed_phenotypes_tables)
+# View(empirical_hotspot_tables)
+for (i in seq_along(empirical_hotspot_tables)) {
+  # Extract chromosome and hotspot region boundaries
+  CHR <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["CHR"]]
+  POS1 <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["POS1"]]
+  POS2 <- empirical_hotspot_tables[[i]][["Hotspot_region_data"]][["POS2"]]
+  # cat("Hotspot Window -> POS1:", POS1, " POS2:", POS2, "\n")
+  
+  # Find phenotypes that partially or fully overlap the hotspot region
+  overlapping_phenotypes <- Breed_phenotypes_tables_flat[
+    Breed_phenotypes_tables_flat$CHR == CHR & 
+    Breed_phenotypes_tables_flat$POS2 >= POS1 &  # Phenotype end is after or at the region start
+    Breed_phenotypes_tables_flat$POS1 <= POS2,   # Phenotype start is before or at the region end
+  ]
+
+  # Compute Overlap_Percentage for each phenotype
+  if (nrow(overlapping_phenotypes) > 0) {
+    overlapping_phenotypes$Overlap_Percentage <- apply(overlapping_phenotypes, 1, function(phenotype) {
+      phenotype_start <- as.numeric(phenotype["POS1"])
+      phenotype_end <- as.numeric(phenotype["POS2"])
+      phenotype_length <- phenotype_end - phenotype_start + 1  # Total phenotype length
+
+      # Compute upstream and downstream outside portions
+      upstream_outside <- max(0, POS1 - phenotype_start)  # If phenotype starts before hotspot
+      downstream_outside <- max(0, phenotype_end - POS2)  # If phenotype ends after hotspot
+      outside_portion <- upstream_outside + downstream_outside
+
+      # Compute Overlap Percentage
+      Overlap_Percentage <- 100 * (1 - (outside_portion / phenotype_length))
+      return(Overlap_Percentage)
+    })
+  } else {
+    overlapping_phenotypes$Hotspot_Overlap_Perc <- numeric(0)  # Empty case
+  }
+
+  # Store results
+  empirical_hotspot_tables[[i]][["Hotspot_phenotypes"]] <- overlapping_phenotypes
+}
+
+
+##################################################################################################
+### Step 2: Show all non-defect (non-disease-related) phenotypes overlapping with the candidate regions for selection
+##################################################################################################
+
+All_phenotypes_hotspots_under_selection <- list()
+
+# Sorting in alphanumerical order
+hotspots_under_selection <- under_selection_rows[order(under_selection_rows$Name), ]
+
+# Loop through each hotspot and filter under selection
+for (hotspot in names(empirical_hotspot_tables)) {
+  for (selection_hotspot_index in 1:nrow(hotspots_under_selection)) {
+    if (tolower(hotspot) == tolower(hotspots_under_selection$Name[selection_hotspot_index])) {
+      
+      # Extract the phenotypes for the selected hotspot
+      phenotypes_data <- empirical_hotspot_tables[[hotspot]][["Hotspot_species_phenotypes"]]
+      
+      # Append to the list if phenotypes are found
+      if (!is.null(phenotypes_data) && nrow(phenotypes_data) > 0) {
+        All_phenotypes_hotspots_under_selection[[hotspot]] <- phenotypes_data
+      }
+
+      }
+  }
+}
+
+cat("**The following Vertebrate Breed Ontology (VBO) ID(s) were used to map phenotypes from OMIA with each candidate region for selection:** ", generate_vbo_links(vertebrate_breed_ontology_ids))
+
+
+cat("\n\n**The following OMIA phenotype file was used to map phenotypes to the empirical candidate region(s) for selection:**\n\n", omia_phenotypes_filepath)
+
+# Debugging purposes
+# All_phenotypes_hotspots_under_selection[["hotspot_1"]] <- Breed_phenotypes_tables[[1]][1, ] 
+# All_phenotypes_hotspots_under_selection[["hotspot_2"]] <- Breed_phenotypes_tables[[1]][2, ] 
+
+
+# Check if there are any phenotypes under selection and display a message with the tables
+if (length(All_phenotypes_hotspots_under_selection) > 0) {
+  
+  # Print a phenotyperal message before displaying tables
+  if (length(All_phenotypes_hotspots_under_selection) == 1) {
+      cat("\n\n**The table below displays the phenotype(s) that overlap with the ROH hotspot candidate region for selection,",names(All_phenotypes_hotspots_under_selection),".**\n\n")
+
+  } else {
+    cat("\n\n**The tables below displays the phenotypes that overlap with the following ROH hotspot candidate regions for selection, listed in order: ", paste(names(All_phenotypes_hotspots_under_selection), collapse=", "), ".**\n\n")
+  }
+
+  # Loop through each table and render with kableExtra for improved styling
+  for(tbl in All_phenotypes_hotspots_under_selection) {
+    if (nrow(tbl) > 0) {
+      # Create a styled HTML table
+      table_html <- knitr::kable(tbl, format = "html", 
+                                 row.names = FALSE, 
+                                 digits = kable_table_digits,
+                                 escape = FALSE,
+                                 table.attr = "class='table table-bordered table-striped'") %>%
+        kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed")) %>%
+        # Adjust column width; change "3cm" to a width that suits your data
+        column_spec(1:ncol(tbl), width = "3cm")
+      
+      # Output the table and add spacing
+      cat(table_html)
+      cat("<br><br>\n")
+    }
+  }
+  
+  
+} else {
+  cat("\n\n**Result:**\n\nNo Non-Defect (Non-Disease-Related) phenotypes were discovered for the ROH hotspot candidate region(s) for selection \n") 
+}
+
+```
+
+## 6.4: Selection Strength Estimation of Empirical ROH Hotspot Candidate Region(s) For Selection
 In this section, the selection coefficients of empirical ROH-Hotspots, identified as candidate regions for selection, are estimated by comparing these regions with the Causative Variant Windows of the simulated selection models.
 
 By identifying the selection model that produces Causative Variant Windows most similar to the empirical region in terms of:
 
-* ROH frequency
-* Expected heterozygosity
-* Window length
+--   **ROH frequency**
 
-One can infer that the selection coefficient of the empirical candidate region likely corresponds to the selection coefficient of the matched selection model.
+--   **Expected heterozygosity ($H_{e}$)**
 
-### 5.3.1: Comparison of ROH-Hotspots and Causative Variant Windows
-```{r ,echo = FALSE,warning = FALSE}
+--   **Window length**
+
+one can infer that the selection coefficient of the empirical candidate region likely corresponds to the selection coefficient of the matched selection model.
+
+### 6.4.1: Comparison of ROH Hotspots and Causative Variant Windows
+The following section compares the empirical ROH hotspot candidate region(s) for selection with the causative variant windows from the different selection models. The table is sorted by the selection strength of the models in descending alphanumerical order.
+
+```{r 6.4.1: Comparison of ROH-Hotspots and Causative Variant Windows, echo = FALSE,warning = FALSE, results='asis'}
 # Initialize an empty data frame to store the results
 results_df <- data.frame()
 hotspot_avg_H_e <- c()
@@ -1786,17 +2676,33 @@ filename_tuples <- file.path(output_dir, paste("ROH_Hotspots_and_Causative_Windo
 write.table(Hotspots_and_Causative_windows_CI_tuples_sorted, file = filename_tuples, sep = ",", row.names = FALSE, quote = FALSE)
 kable(Hotspots_and_Causative_windows_comparison_sorted, row.names = FALSE)
 # View(causative_variant_window_results_df)
+
+
+# # Comparison Sorted after the different metrics
+#  kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$Lengths_Mb), ])
+#  kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$ROH_Freq), ])
+#  kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$H_e), ])
+
 ```
-#### 5.3.1.1: Comparison Sorted after the different metrics
-```{r }
-# Sort the data frame based on average fixation time, in descending order
- kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$Lengths_Mb), ])
- kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$ROH_Freq), ])
- kable(Hotspots_and_Causative_windows_comparison[order(-Hotspots_and_Causative_windows_comparison$H_e), ])
-```
-### 5.3.2: 3D Plot Comparison of Mean Values  
-```{r ,echo = FALSE}
+
+### 6.4.2: 3D Plot Comparison of Mean Values
+This section presents a 3D-scatterplot comparing the ROH hotspot candidate region(s) for selection in the empirical dataset with the causative variant windows from different selection models (displayed in monochromatic color).
+The axes are defined as follows:
+
+- **x-axis:** Represents the average ROH frequency of 100 kbp windows in the respective regions (percentage).
+
+- **y-axis:** Represents the average $H_{e}$ of 100 kbp windows in the respective regions.
+
+- **z-axis:** Represents the average length of the respective regions (in megabases).
+
+To enhance the readability of the plots have vertical lines been added for each data point, projecting the regions onto the x-y plane.
+
+```{r 6.4.2: 3D Plot Comparison of Mean Values, echo = FALSE,warning = FALSE, results='asis'}
 setwd(output_dir)
+
+add_2d_shadows_to_3d_plot <- TRUE
+# add_2d_shadows_to_3d_plot <- FALSE
+
 plot_title <- paste("ROH Hotspot(s) & Causative Windows comparison")
 # Modify the labels by removing "Hotspot_" prefix and "_window" suffix from hotspot models
 Hotspots_and_Causative_windows_comparison_sorted$Label <- ifelse(
@@ -1836,12 +2742,6 @@ y_axis_label <- "Length (Mb)"
 z_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
 z_axis_label <- "Avg H_e"
 
-# x_value <- Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
-# x_axis_label <- "Length (Mb)"
-# y_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
-# y_axis_label <- "Avg H_e"
-# z_value <- Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq
-# z_axis_label <- "Avg ROH-frequency (%)"
 x_value <- Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq
 x_axis_label <- "Avg ROH-frequency (%)"
 y_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
@@ -1849,12 +2749,6 @@ y_axis_label <- "Avg H_e"
 z_value <- Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
 z_axis_label <- "Length (Mb)"
 
-# x_value <- Hotspots_and_Causative_windows_comparison_sorted$H_e
-# x_axis_label <- "Avg H_e"
-# y_value <- Hotspots_and_Causative_windows_comparison_sorted$ROH_Freq
-# y_axis_label <- "Avg ROH-frequency (%)"
-# z_value <- Hotspots_and_Causative_windows_comparison_sorted$Lengths_Mb
-# z_axis_label <- "Length (Mb)"
 
 # # Create and save the 3D scatter plot as a PNG file
 # png(filename = "3dplot_Hotspot_Causative_Window_Comparison.png", width = 1920, height = 1080, res = 300)
@@ -1863,24 +2757,24 @@ z_axis_label <- "Length (Mb)"
 
 # Create the 3D scatter plot
 s3d <- scatterplot3d(
-  x_value  ,
+  x_value,
   y_value,
   z_value,
   color = Hotspots_and_Causative_windows_comparison_sorted$Color,
   pch = 19, # Solid circle
+  # pch = 20, # Solid circle
   xlab = x_axis_label,
   ylab = y_axis_label,
   zlab = z_axis_label,
-  main = plot_title
-)
-
-# Add shadows on the x-y plane (z = 0)
-s3d$points3d(
-  x_value,
-  y_value,
-  rep(0, nrow(Hotspots_and_Causative_windows_comparison_sorted)),  # Set z to 0 for shadow
-  col = adjustcolor(Hotspots_and_Causative_windows_comparison_sorted$Color, alpha.f = 0.3), # Semi-transparent shadows
-  pch = 19
+  main = plot_title,
+  angle=65,
+  type = "h",
+  scale.y = 1,
+  axis = TRUE,
+  grid = TRUE,
+  box = TRUE,
+  # highlight.3d = TRUE
+  
 )
 
 # Convert coordinates for adding labels
@@ -1893,19 +2787,25 @@ s3d.coords <- s3d$xyz.convert(
 # Add labels to the original points
 text(s3d.coords$x, s3d.coords$y, 
      labels = Hotspots_and_Causative_windows_comparison_sorted$Label, 
-     pos = 3, cex = 0.5) # pos=3 means above
+     pos = 2.5, cex = 0.5, font = 2) # pos=3 means above
+
 
 # # Close the graphics device
 # dev.off()
 
 ```
 
-### 5.3.3: Visualization of Confidence Intervals and Means
-In this section, plots of the standard error-based confidence intervals, alongside mean values, are created to account for the distribution of values, rather than relying solely on the mean (As in the 3D-plot).
-These plots are generated individually for each empirical candidate region for selection, allowing a more detailed comparison between each empirical ROH-Hotspot and the Causative Variant Windows of the simulated selection models.
+### 6.4.3: Visualization of Confidence Intervals and Means
 
-#### 5.3.3.1: Standard Error CI for H_e  
-```{r echo = FALSE,warning = FALSE}
+In this section, plots of the standard error-based confidence intervals, alongside mean values, are created to account for the distribution of values, rather than relying solely on the mean (as is the case in the 3D-plot).
+
+These plots are generated individually for each empirical candidate region for selection, allowing a more detailed comparison between each empirical ROH Hotspot and the Causative Variant Windows of the simulated selection models.
+
+#### 6.4.3.1: Standard Error CI for $H_{e}$
+The following section displays plot(s) comparing the average expected heterozygosity of the empirical ROH Hotspot(s) with the corresponding standard error-based confidence intervals for
+the different causative variant windows.
+
+```{r 6.4.3.1: Standard Error CI for H_e, echo = FALSE,warning = FALSE, results='asis'}
 setwd(output_dir)
 generate_H_e_plot <- function(hotspot_name, empirical_value) {
   image_name <- paste0("Selection_strength_H_e_plot_", hotspot_name)
@@ -1945,24 +2845,81 @@ generate_H_e_plot <- function(hotspot_name, empirical_value) {
   # Print which models the empirical H_e is inside of
   inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
   outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
-  cat("Models where empirical H_e is within CI for", hotspot_name, ":\n")
-  print(inside_models)
-  cat("\nModels where empirical H_e is outside CI for", hotspot_name, ":\n")
-  print(outside_models)
   # Close the graphics device
   dev.off()
 }
+
+display_H_e_plot <- function(hotspot_name, empirical_value) {
+  # Initialize plotting_data by directly selecting relevant columns from causative_variant_window_results_df
+  plotting_data <- data.frame(
+    sim_mean_value = causative_variant_window_results_df$Avg_H_e,
+    Lower_CI = causative_variant_window_results_df$H_e_lower_CI,
+    Upper_CI = causative_variant_window_results_df$H_e_upper_CI,
+    Model = causative_variant_window_results_df$Sel.coeff
+  )
+  # Add a column indicating whether the empirical H_e is within the CI of each model
+  plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_value) & (plotting_data$Upper_CI >= empirical_value)
+  # Determine the y-axis limits
+  min_y <- min(c(plotting_data$Lower_CI, empirical_value))
+  max_y <- max(c(plotting_data$Upper_CI, empirical_value))
+  # Create the plot
+  p <- ggplot(plotting_data, aes(x = Model, y = sim_mean_value, color = Empirical_Within_CI)) +
+    geom_point(size = H_e_values_decimals) +
+    geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
+    geom_hline(aes(yintercept = empirical_value), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
+    labs(title = paste("H_e Comparison with CI:s - ", hotspot_name),
+         x = "Model",
+         y = "H_e",
+         color = "Hotspot Average H_e (Red) \nin relation to CI") +
+    scale_color_manual(values = c("TRUE" = "darkgreen", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(
+      limits = c(min_y, max_y),
+      breaks = round(seq(min_y, max_y, length.out = 10), 5),
+      labels = scales::number_format(accuracy = 0.001)  # Format y-axis to 3 decimal places
+    )
+  # Print the plot
+  print(p)
+  # Print which models the empirical H_e is inside of
+  inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
+  outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
+  
+  cat("\n\n**Models whose confidence intervals contain the empirical $H_{e}$ for", hotspot_name, ":**\n\n")
+
+  if (length(inside_models) == 0) {
+    cat("No models had confidence intervals containing the empirical $H_{e}$.")
+  } else {
+    print(inside_models)
+  }
+  
+  cat("\n\n**Models in which the empirical $H_{e}$, for",hotspot_name, ", falls outside the confidence interval:**\n\n")
+  if (length(outside_models) == 0) {
+    cat("None – the empirical $H_{e}$ is within all confidence intervals of the simulated models.")
+  } else {
+    print(outside_models)
+  }
+
+  
+}
+
 # Loop through each hotspot and generate plots
 for (i in 1:nrow(under_selection_rows)) {
   hotspot_name <- tools::toTitleCase(Selection_testing_results$Name[i])
   empirical_value <- Selection_testing_results$Window_based_Average_H_e[i]
   generate_H_e_plot(hotspot_name, empirical_value)
+  display_H_e_plot(hotspot_name, empirical_value)
+  cat("\n\n")
 }
 ```
-#### 5.3.3.2: Standard Error CI for Window Length
-```{r echo = FALSE,warning = FALSE}
+
+#### 6.4.3.2: Standard Error CI for Window Length
+The following section displays plot(s) comparing the average Window length of the empirical ROH hotspot(s) with the corresponding standard error-based confidence intervals for
+the different causative variant windows.
+
+```{r 6.4.3.2: Standard Error CI for Window Length,echo = FALSE,warning = FALSE, results='asis'}
 setwd(output_dir)
-generate_H_e_plot <- function(hotspot_name, empirical_value) {
+generate_window_length_plot <- function(hotspot_name, empirical_value) {
   image_name <- paste0("Selection_strength_window_lengths_plot_", hotspot_name)
   # Create and save the 3D scatter plot as a PNG file
   png(filename = paste0(image_name, ".png"), width = 1920, height = 1080, res = 300)
@@ -1976,7 +2933,44 @@ generate_H_e_plot <- function(hotspot_name, empirical_value) {
   )
   # Add a column indicating whether the empirical Window Length is within the CI of each model
   plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_value) & (plotting_data$Upper_CI >= empirical_value)
-  cat(plotting_data$Empirical_Within_CI)
+  # print(plotting_data)
+  # Determine the y-axis limits
+  min_y <- min(c(plotting_data$Lower_CI, empirical_value))
+  max_y <- max(c(plotting_data$Upper_CI, empirical_value))
+  # Create the plot
+  p <- ggplot(plotting_data, aes(x = Model, y = sim_mean_value, color = Empirical_Within_CI)) +
+    geom_point(size = Window_lengths_decimals) +
+    geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
+    geom_hline(aes(yintercept = empirical_value), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
+    labs(title = paste("Length (Mb) Comparison with CI:s - ", hotspot_name),
+         x = "Model",
+         y = "Length (Mb)",
+         color = "Hotspot Window Length (Red) \nin relation to CI") +
+    scale_color_manual(values = c("TRUE" = "darkgreen", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(limits = c(min_y, max_y), 
+                       breaks = round(seq(min_y, max_y, length.out = 10), 5),
+                       labels = scales::number_format(accuracy = 1/(10^Window_lengths_decimals)))  # Format y-axis to 3 decimal places
+
+       
+  # Print the plot
+  print(p)
+  # Close the graphics device
+  dev.off()
+}
+
+display_window_length_plot <- function(hotspot_name, empirical_value) {
+  plotting_data <- data.frame()
+  # Initialize plotting_data by directly selecting relevant columns from causative_variant_window_results_df
+  plotting_data <- data.frame(
+    sim_mean_value = causative_variant_window_results_df$Length_Mb,
+    Lower_CI = causative_variant_window_results_df$Length_lower_CI,
+    Upper_CI = causative_variant_window_results_df$Length_Upper_CI,
+    Model = causative_variant_window_results_df$Sel.coeff
+  )
+  # Add a column indicating whether the empirical Window Length is within the CI of each model
+  plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_value) & (plotting_data$Upper_CI >= empirical_value)
   # print(plotting_data)
   # Determine the y-axis limits
   min_y <- min(c(plotting_data$Lower_CI, empirical_value))
@@ -2003,29 +2997,94 @@ generate_H_e_plot <- function(hotspot_name, empirical_value) {
   # Print which models the empirical Window Length is inside of
   inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
   outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
-  cat("Models where empirical Length is within CI for", hotspot_name, ":\n")
-  print(inside_models)
-  cat("\nModels where empirical Length is outside CI for", hotspot_name, ":\n")
-  print(outside_models)
-  # Close the graphics device
-  dev.off()
+  
+  cat("\n\n**Models whose confidence intervals contain the empirical window length for", hotspot_name, ":**\n\n")
+
+  if (length(inside_models) == 0) {
+    cat("No models had confidence intervals containing the empirical window length.")
+  } else {
+    print(inside_models)
+  }
+  
+  cat("\n\n**Models in which the empirical window length, for",hotspot_name, ", falls outside the confidence interval:**\n\n")
+  if (length(outside_models) == 0) {
+    cat("None – the empirical window length is within all confidence intervals of the simulated models.")
+  } else {
+    print(outside_models)
+  }
+  
+  
+  
 }
+
+
 Hotspot_windows_sel_strength_test <- Hotspots_and_Causative_windows_comparison[grepl("Hotspot", Hotspots_and_Causative_windows_comparison$Model), ]
+
+# Sort the data frame by the lowest H_e value (increasing order)
+Hotspot_windows_sel_strength_test <- Hotspot_windows_sel_strength_test[order(Hotspot_windows_sel_strength_test$H_e), ]
+
 
 # Loop through each hotspot and generate plots
 for (i in 1:nrow(Hotspot_windows_sel_strength_test)) {
   hotspot_name <- tools::toTitleCase(Hotspot_windows_sel_strength_test$Model[i])
   empirical_value <- Hotspot_windows_sel_strength_test$Lengths_Mb[i]
-  generate_H_e_plot(hotspot_name, empirical_value)
+  generate_window_length_plot(hotspot_name, empirical_value)
+  display_window_length_plot(hotspot_name, empirical_value)
 }
 ```
-#### 5.3.3.3: Standard Error CI for ROH Freq
-```{r echo = FALSE,warning = FALSE}
+
+#### 6.4.3.3: Standard Error CI for ROH Frequency
+The following section displays plot(s) comparing the average ROH-frequency of the empirical ROH hotspot(s) with the corresponding standard error-based confidence intervals for the different causative variant windows.
+```{r 6.4.3.3: Standard Error CI for ROH Frequency,echo = FALSE,warning = FALSE, results='asis'}
 setwd(output_dir)
-generate_H_e_plot <- function(hotspot_name, empirical_value) {
+generate_roh_freq_plot <- function(hotspot_name, empirical_value) {
   image_name <- paste0("Selection_strength_ROH_frequency_plot_", hotspot_name)
   # Create and save the 3D scatter plot as a PNG file
   png(filename = paste0(image_name, ".png"), width = 1920, height = 1080, res = 300)
+  plotting_data <- data.frame()
+  # Initialize plotting_data by directly selecting relevant columns from causative_variant_window_results_df
+  plotting_data <- data.frame(
+    sim_mean_value = causative_variant_window_results_df$ROH_freq,
+    Lower_CI = causative_variant_window_results_df$ROH_freq_lower_CI,
+    Upper_CI = causative_variant_window_results_df$ROH_freq_upper_CI,
+    Model = causative_variant_window_results_df$Sel.coeff
+  )
+  # Add a column indicating whether the empirical ROH-frequency is within the CI of each model
+  plotting_data$Empirical_Within_CI <- (plotting_data$Lower_CI <= empirical_value) & (plotting_data$Upper_CI >= empirical_value)
+  # cat(plotting_data$Empirical_Within_CI)
+  # print(plotting_data)
+
+  # Determine the y-axis limits
+  min_y <- min(c(plotting_data$Lower_CI, empirical_value))
+  max_y <- max(c(plotting_data$Upper_CI, empirical_value))
+  # Create the plot
+  p <- ggplot(plotting_data, aes(x = Model, y = sim_mean_value, color = Empirical_Within_CI)) +
+    geom_point(size = ROH_frequency_decimals) +
+    geom_errorbar(aes(ymin = Lower_CI, ymax = Upper_CI), width = 0.2) +
+    geom_hline(aes(yintercept = empirical_value), linetype = "dashed", color = "red", linewidth = 1, show.legend = TRUE) +
+    labs(title = paste("ROH-Frequency Comparison with CI:s - ", hotspot_name),
+         x = "Model",
+         y = "ROH Freq (%)",
+         color = "Hotspot ROH Freq (%) (Red) \nin relation to CI") +
+    scale_color_manual(values = c("TRUE" = "darkgreen", "FALSE" = "black"), labels = c("TRUE" = "Inside CI", "FALSE" = "Outside CI")) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(
+      limits = c(min_y, max_y),
+
+      breaks = round(seq(min_y, max_y, length.out = 10), 5),
+
+      labels = scales::number_format(accuracy = 1/(10^ROH_frequency_decimals)))  # Format y-axis to 3 decimal places
+    # scale_y_continuous(limits = c(min_y, max_y), 
+    #                    breaks = round(seq(min_y, max_y, length.out = 10), 5))
+
+  # Print the plot
+  print(p)
+  # Close the graphics device
+  dev.off()
+}
+
+display_roh_freq_plot <- function(hotspot_name, empirical_value) {
   plotting_data <- data.frame()
   # Initialize plotting_data by directly selecting relevant columns from causative_variant_window_results_df
   plotting_data <- data.frame(
@@ -2069,18 +3128,38 @@ generate_H_e_plot <- function(hotspot_name, empirical_value) {
   # Print which models the empirical ROH-frequency is inside of
   inside_models <- plotting_data$Model[plotting_data$Empirical_Within_CI]
   outside_models <- plotting_data$Model[!plotting_data$Empirical_Within_CI]
-  cat("Models where empirical ROH-freq is within CI for", hotspot_name, ":\n")
-  print(inside_models)
-  cat("\nModels where empirical ROH-freq is outside CI for", hotspot_name, ":\n")
-  print(outside_models)
-  # Close the graphics device
-  dev.off()
+  
+
+  cat("\n\n**Models whose confidence intervals contain the empirical ROH frequency for", hotspot_name, ":**\n\n")
+
+  if (length(inside_models) == 0) {
+    cat("No models had confidence intervals containing the empirical ROH frequency.")
+  } else {
+    print(inside_models)
+  }
+  
+  cat("\n\n**Models in which the empirical ROH frequency, for",hotspot_name, ", falls outside the confidence interval:**\n\n")
+  if (length(outside_models) == 0) {
+    cat("None – the empirical ROH frequency is within all confidence intervals of the simulated models.")
+  } else {
+    print(outside_models)
+  }
+  
+  
+  
 }
+
+
 Hotspot_windows_sel_strength_test <- Hotspots_and_Causative_windows_comparison[grepl("Hotspot", Hotspots_and_Causative_windows_comparison$Model), ]
+
+# Sort the data frame by the lowest H_e value (increasing order)
+Hotspot_windows_sel_strength_test <- Hotspot_windows_sel_strength_test[order(Hotspot_windows_sel_strength_test$H_e), ]
+
 # Loop through each hotspot and generate plots
 for (i in 1:nrow(Hotspot_windows_sel_strength_test)) {
   hotspot_name <- tools::toTitleCase(Hotspot_windows_sel_strength_test$Model[i])
   empirical_value <- Hotspot_windows_sel_strength_test$ROH_Freq[i]
-  generate_H_e_plot(hotspot_name, empirical_value)
+  generate_roh_freq_plot(hotspot_name, empirical_value)
+  display_roh_freq_plot(hotspot_name, empirical_value)
 }
 ```

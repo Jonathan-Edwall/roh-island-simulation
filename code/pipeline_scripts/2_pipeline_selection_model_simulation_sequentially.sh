@@ -72,7 +72,7 @@ run_simulation_sel_coefficients_sequentially() {
     export Ne_burn_in="$Ne_burn_in"
     export nInd_founder_population="$nInd_founder_population"
     export Inbred_ancestral_population="$Inbred_ancestral_population"
-    export N_e_bottleneck="$N_e_bottleneck"
+    export N_bottleneck="$N_bottleneck"
     export n_simulated_generations_breed_formation="$n_simulated_generations_breed_formation"
     export n_individuals_breed_formation="$n_individuals_breed_formation"
     export reference_population_for_snp_chip="$reference_population_for_snp_chip"

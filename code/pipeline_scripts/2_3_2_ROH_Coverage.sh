@@ -4,10 +4,12 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-# source $conda_env_full_path  # Source Conda initialization script
-# conda activate bedtools
+# # Defining the path to the Conda initialization script
+# conda_setup_script_path="/home/jonteehh/pipeline/anaconda3/etc/profile.d/conda.sh"
+# # conda_setup_script_path=""
+# source $conda_setup_script_path  # Source Conda initialization script
+# # Activate the conda environment
+# conda activate roh_island_sim_env
 # /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
 # bedtools coverage -h  # Documentation about the merge function
 
@@ -64,8 +66,8 @@ window_files_dir=$preprocessed_data_dir/empirical/genomic_window_files
 #���������������
 #� Empirical ROH-data �
 #���������������
-# empirical_dog_breed="empirical_breed" # Defined in run_pipeline.sh
-empirical_breed_pop_hom_file_dir=$plink_results_dir/empirical/$empirical_dog_breed
+# empirical_breed="empirical_breed" # Defined in run_pipeline.sh
+empirical_breed_pop_hom_file_dir=$plink_results_dir/empirical/$empirical_breed
 # Defining path to input directory of Individual ROH-files (bed format)
 empirical_breed_indv_bed_files_dir=$empirical_breed_pop_hom_file_dir/individual_ROH/bed_format
 
@@ -88,7 +90,7 @@ bedtools_results_dir=$results_dir/Bedtools/coverage
 #�������������
 #� Empirical �
 #�������������
-coverage_output_empirical_breed_dir=$bedtools_results_dir/empirical/$empirical_dog_breed
+coverage_output_empirical_breed_dir=$bedtools_results_dir/empirical/$empirical_breed
 # Creating a directory to store the output files in, if it does not already exist.
 mkdir -p $coverage_output_empirical_breed_dir
 
@@ -131,8 +133,10 @@ mkdir -p $roh_frequencies_selection_model_dir
 ############################################################################################### 
 
 # To enhance the performance and reduce memory, a temporary window file is created only containing windows for the simulated chromosome.
-temp_window_file="$window_files_dir/temp_canine_reference_assembly_simulated_chr_100kB_window_sizes.bed"
-awk -v chr="$simulated_chr_number" 'NR == 1 || $1 == chr' "$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed" > $temp_window_file
+temp_window_file="$window_files_dir/temp_${empirical_species}_reference_assembly_simulated_chr_100kB_window_sizes.bed"
+species_reference_assembly_output_window_file=$window_files_dir/${empirical_species}_reference_assembly_autosome_windows_100kB_window_sizes.bed
+
+awk -v chr="$simulated_chr_number" 'NR == 1 || $1 == chr' "$species_reference_assembly_output_window_file" > $temp_window_file
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 # Function: bedtools coverage
@@ -183,7 +187,7 @@ if [ "$empirical_processing" = TRUE ]; then
         # Run bedtools coverage-function 
         # Process substitution is used on the individual ROH-files to remove their headers and to make only columns 1 to 3 be processed (chr,pos1,pos2)   
         bedtools coverage \
-        -a "$window_files_dir/${empirical_dog_breed}_autosome_windows_100kB_window_sizes.bed" \
+        -a "$window_files_dir/${empirical_breed}_autosome_windows_100kB_window_sizes.bed" \
         -b <(tail -n +2 "$indv_roh_file") \
         -counts \
         -f $overlap_fraction \
@@ -259,10 +263,10 @@ rm $temp_window_file
 # Calculating population ROH frequency
 # 
 ###Input:
-# Individual ROH-window-count:  /home/jonathan/results/PLINK/empirical/$empirical_dog_breed/individual_roh/bed_format 
+# Individual ROH-window-count:  /home/jonathan/results/PLINK/empirical/$empirical_breed/individual_roh/bed_format 
 # 
 ###Output:
-# /home/jonathan/results/Bedtools/empirical/$empirical_dog_breed/coverage/all_autosomes_100kb_window_size/sorted_population_coverage.bed
+# /home/jonathan/results/Bedtools/empirical/$empirical_breed/coverage/all_autosomes_100kb_window_size/sorted_population_coverage.bed
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤

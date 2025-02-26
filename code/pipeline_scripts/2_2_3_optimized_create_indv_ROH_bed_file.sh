@@ -32,8 +32,8 @@ simulated_plink_dir=$plink_results_dir/simulated
 #�������������
 #� Empirical �
 #�������������
-# empirical_dog_breed="german_shepherd" # Defined in run_pipeline.sh
-empirical_breed_pop_hom_file_dir=$plink_results_dir/empirical/$empirical_dog_breed
+# empirical_breed="german_shepherd" # Defined in run_pipeline.sh
+empirical_breed_pop_hom_file_dir=$plink_results_dir/empirical/$empirical_breed
 
 #�������������
 #� Simulated � 

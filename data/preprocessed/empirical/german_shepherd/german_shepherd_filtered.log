@@ -1,0 +1,42 @@
+PLINK v1.90b6.21 64-bit (19 Oct 2020)
+Options in effect:
+  --bfile /home/jonathan/data/raw/empirical/german_shepherd/GSD_fs
+  --chr 1-38
+  --dog
+  --geno 0.05
+  --make-bed
+  --mind 0.1
+  --out /home/jonathan/data/preprocessed/empirical/german_shepherd/german_shepherd_filtered
+  --pca 2
+
+Hostname: axelina
+Working directory: /home/jonathan
+Start time: Tue Oct 29 22:09:10 2024
+
+Random number seed: 1730239750
+385423 MB RAM detected; reserving 192711 MB for main workspace.
+127480 out of 131488 variants loaded from .bim file.
+124 dogs (59 males, 65 females) loaded from .fam.
+0 dogs removed due to missing genotype data (--mind).
+Using up to 31 threads (change this with --threads).
+Before main variant filters, 124 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.994182.
+2805 variants removed due to missing genotype data (--geno).
+124675 variants and 124 dogs pass filters and QC.
+Note: No phenotypes present.
+Relationship matrix calculation complete.
+--pca: Results saved to
+/home/jonathan/data/preprocessed/empirical/german_shepherd/german_shepherd_filtered.eigenval
+and
+/home/jonathan/data/preprocessed/empirical/german_shepherd/german_shepherd_filtered.eigenvec
+.
+--make-bed to
+/home/jonathan/data/preprocessed/empirical/german_shepherd/german_shepherd_filtered.bed
++
+/home/jonathan/data/preprocessed/empirical/german_shepherd/german_shepherd_filtered.bim
++
+/home/jonathan/data/preprocessed/empirical/german_shepherd/german_shepherd_filtered.fam
+... done.
+
+End time: Tue Oct 29 22:09:11 2024

@@ -1,17 +1,35 @@
 #!/bin/bash -l
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate plink
+# Defining the path to the Conda initialization script
+# conda_setup_script_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
+# source $conda_setup_script_path  # Source Conda initialization script
+# Activate the conda environment
+# conda activate roh_island_sim_env
 
 ######################################  
 ####### Defining parameter values #######
 ######################################
-empirical_preprocessed_data_basename="${empirical_dog_breed}_filtered"
+empirical_preprocessed_data_basename="${empirical_breed}_filtered"
 # empirical_raw_data_basename=LR_fs
-autosomal_chromosomes_species="1-38"
+# empirical_autosomal_chromosomes="1-38" # Variable Defined in run_pipeline.sh
 empirical_geneticmap_filetype_raw_data=.bim
+
+
+# Extract the start and end of the chromosome range (e.g., "1-19")
+start_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f1)
+end_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f2)
+
+# Calculate the number of chromosomes in the range
+num_chromosomes=$((end_chromosome - start_chromosome + 1))
+
+# empirical_species="dog" # Variable Defined in run_pipeline.sh
+# Define species-specific options
+if [[ "$empirical_species" == "dog" ]]; then
+    species_flag="--dog"
+else
+    species_flag="--chr-set $num_chromosomes"
+fi
+
 
 ####################################  
 # Defining the working directory
@@ -25,12 +43,12 @@ cd $HOME
 
 # Defining input directory
 raw_data_dir="$data_dir/raw"
-raw_empirical_breed_dir=$raw_data_dir/empirical/$empirical_dog_breed
+raw_empirical_breed_dir=$raw_data_dir/empirical/$empirical_breed
 # raw_empirical_breed_dir=$raw_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
 
 preprocessed_data_dir=$HOME/data/preprocessed
-# preprocessed_empirical_dog_breed_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
-preprocessed_empirical_dog_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
+# preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/doi_10_5061_dryad_h44j0zpkf__v20210813
+preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_breed
 
 ####################################  
 # Defining the output files
@@ -51,8 +69,8 @@ GONE_dir=$HOME/GONE
 plink \
 --bfile $raw_empirical_breed_dir/$empirical_raw_data_basename \
 --recode \
---dog \
---chr $autosomal_chromosomes_species \
+$species_flag \
+--chr $empirical_autosomal_chromosomes \
 --out $GONE_dir/$empirical_raw_data_basename 
 
 empirical_data_basename=$empirical_raw_data_basename
@@ -63,9 +81,9 @@ empirical_data_basename=$empirical_raw_data_basename
 
 # # Convert .bed, .bim, .fam to .ped and .map
 # plink \
-# --bfile $preprocessed_empirical_dog_breed_dir/$empirical_preprocessed_data_basename \
+# --bfile $preprocessed_empirical_breed_dir/$empirical_preprocessed_data_basename \
 # --recode \
-# --dog \
+# $species_flag \
 # --out $GONE_dir/$empirical_preprocessed_data_basename
 
 

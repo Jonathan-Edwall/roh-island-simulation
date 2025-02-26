@@ -3,11 +3,6 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-# source $conda_env_full_path  # Source Conda initialization script
-# conda activate plink
-
 ######################################  
 ####### Defining parameter values #######
 ######################################
@@ -17,6 +12,22 @@ max_parallel_jobs=$(nproc)
 
 # # Boolean value to determine whether to run the selection simulation code
 # selection_simulation=TRUE # Defined in run_pipeline.sh
+
+# Extract the start and end of the chromosome range (e.g., "1-19")
+start_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f1)
+end_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f2)
+
+# Calculate the number of chromosomes in the range
+num_chromosomes=$((end_chromosome - start_chromosome + 1))
+
+# empirical_species="dog" # Variable Defined in run_pipeline.sh
+# Define species-specific options
+if [[ "$empirical_species" == "dog" ]]; then
+    species_flag="--dog"
+else
+    species_flag="--chr-set $num_chromosomes"
+    # species_flag="--chr-set $num_chromosomes"
+fi
 
 
 ####################################  
@@ -85,7 +96,7 @@ run_plink_preprocessing() {
     #     --file "${raw_simulated_model_dir}/${simulation_name}" \
     #     --out "${raw_simulated_model_dir}/PCA/${simulation_name}_PCA" \
     #     --nonfounders --allow-no-sex \
-    #     --dog \
+    #     $species_flag \
     #     --pca 2
     
     # Converting the files to binary format
@@ -93,7 +104,7 @@ run_plink_preprocessing() {
     --file "${raw_simulated_model_dir}/${simulation_name}" \
     --out "${raw_simulated_model_dir}/${simulation_name}" \
     --make-bed \
-    --dog 
+    $species_flag 
 
     # Remove the .ped and .map files
     rm -f "${raw_simulated_model_dir}/${simulation_name}.ped"
@@ -105,7 +116,7 @@ run_plink_preprocessing() {
         --bfile "${raw_simulated_model_dir}/${simulation_name}" \
         --out "${preprocessed_simulated_model_dir}/${simulation_name}" \
         --make-bed \
-        --dog \
+        $species_flag \
         --geno 0.05 --mind 0.1 \
         --nonfounders --allow-no-sex \
         --pca 2 
@@ -115,7 +126,7 @@ run_plink_preprocessing() {
         --bfile "${raw_simulated_model_dir}/${simulation_name}" \
         --out "${preprocessed_simulated_model_dir}/${simulation_name}" \
         --make-bed \
-        --dog \
+        $species_flag \
         --geno 0.05 --mind 0.1 \
         --nonfounders --allow-no-sex
     fi

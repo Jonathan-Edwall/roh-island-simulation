@@ -9,7 +9,7 @@ import signal
 import sys
 
 HO_id = "" # Name the Hyperparameter Optimization run
-number_of_trials=2000
+number_of_trials=100 # Define the number of trials to run
 HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
 # Dynamically determine the root directory one level up from the current script's directory
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

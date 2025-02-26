@@ -52,7 +52,7 @@ nInd_founder_population <- as.numeric(Sys.getenv("nInd_founder_population")) # F
 Inbred_ancestral_population <- as.logical(Sys.getenv("Inbred_ancestral_population"))
 Inbred_ancestral_population
 
-n_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
+n_bottleneck <- as.numeric(Sys.getenv("N_bottleneck"))
 n_bottleneck
 
 n_generations_bottleneck <- as.numeric(Sys.getenv("n_generations_bottleneck")) # 5 default

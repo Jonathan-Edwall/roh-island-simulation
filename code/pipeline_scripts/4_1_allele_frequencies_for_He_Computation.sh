@@ -13,10 +13,27 @@ cd $HOME
 ####### Defining parameter values #######
 ######################################
 header="#CHR\tPOS1\tPOS2\tSNP\tA1\tA2\tMAF\tNCHROBS"
-# empirical_dog_breed="empirical_breed" # Defined in run_pipeline.sh
+# empirical_breed="empirical_breed" # Defined in run_pipeline.sh
 
 # # Boolean value to determine whether to run the selection simulation code
 # selection_simulation=TRUE # Defined in run_pipeline.sh
+
+# Extract the start and end of the chromosome range (e.g., "1-19")
+start_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f1)
+end_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f2)
+
+# Calculate the number of chromosomes in the range
+num_chromosomes=$((end_chromosome - start_chromosome + 1))
+
+# empirical_species="dog" # Variable Defined in run_pipeline.sh
+# Define species-specific options
+if [[ "$empirical_species" == "dog" ]]; then
+    species_flag="--dog" # Specifies dog chromosome set.
+else
+    species_flag="--chr-set $num_chromosomes" # Specifies a nonhuman chromosome set
+fi
+
+
 ####################################  
 # Defining the input files
 #################################### 
@@ -27,7 +44,7 @@ preprocessed_data_dir=$data_dir/preprocessed
 #�������������
 #� Empirical �
 #�������������
-preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
+preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_breed
 
 #�������������
 #� Simulated � 
@@ -45,7 +62,7 @@ simulated_plink_dir=$plink_results_dir/simulated
 #�������������
 #� Empirical � 
 #�������������
-empirical_breed_allele_freq_plink_output_dir="$plink_results_dir/empirical/$empirical_dog_breed"
+empirical_breed_allele_freq_plink_output_dir="$plink_results_dir/empirical/$empirical_breed"
 mkdir -p $empirical_breed_allele_freq_plink_output_dir
 
 #�������������
@@ -89,7 +106,7 @@ if [ "$empirical_processing" = TRUE ]; then
         
         # Run plink command for the current population
         plink --bfile "${preprocessed_empirical_breed_dir}/${population_name}" \
-            --freq --dog --nonfounders --allow-no-sex \
+            --freq $species_flag --nonfounders --allow-no-sex \
             --out "${empirical_breed_allele_freq_plink_output_dir}/${population_name}_allele_freq"
             
         ##############################
@@ -140,7 +157,7 @@ for simulation_file in $preprocessed_neutral_model_dir/*.bim; do
     
     # Run plink command for the current simulation
     plink --bfile "${preprocessed_neutral_model_dir}/${simulation_name}" \
-          --freq --dog --nonfounders --allow-no-sex \
+          --freq $species_flag --nonfounders --allow-no-sex \
           --out "${simulated_neutral_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq"
           
     ##############################
@@ -180,7 +197,7 @@ if [ "$selection_simulation" = TRUE ]; then
         
         # Run plink command for the current simulation
         plink --bfile "${preprocessed_selection_model_dir}/${simulation_name}" \
-            --freq --dog --nonfounders --allow-no-sex \
+            --freq $species_flag --nonfounders --allow-no-sex \
             --out "${simulated_selection_model_allele_freq_plink_output_dir}/${simulation_name}_allele_freq"
             
         ##############################

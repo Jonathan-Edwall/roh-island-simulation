@@ -3,10 +3,11 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-source $conda_env_full_path  # Source Conda initialization script
-conda activate plink
+# Defining the path to the Conda initialization script
+# conda_setup_script_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
+# source $conda_setup_script_path  # Source Conda initialization script
+# Activate the conda environment
+# conda activate roh_island_sim_env
 
 ######################################  
 ####### Defining parameter values #######
@@ -14,6 +15,23 @@ conda activate plink
 # chr_simulated="chr1" # Imported from run_pipeline.sh
 # selection_models_list=("s0075" "s01" "s0125" "s015" "s02" "s03" "s04" "s05" "s06" "s07" "s08")
 selection_models_list=("s04" "s06" "s08")
+
+# Extract the start and end of the chromosome range (e.g., "1-19")
+start_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f1)
+end_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f2)
+
+# Calculate the number of chromosomes in the range
+num_chromosomes=$((end_chromosome - start_chromosome + 1))
+
+# empirical_species="dog" # Variable Defined in run_pipeline.sh
+# Define species-specific options
+if [[ "$empirical_species" == "dog" ]]; then
+    species_flag="--dog"
+else
+    species_flag="--chr-set $num_chromosomes"
+fi
+
+
 
 ####################################  
 # Defining the working directory
@@ -60,7 +78,7 @@ GONE_dir=$HOME/GONE
 plink \
 --bfile $raw_simulated_neutral_model_dir/$neutral_model_simulation_name \
 --recode \
---dog \
+$species_flag \
 --out $GONE_dir/$neutral_model_simulation_name 
 
 ###########  
@@ -110,7 +128,7 @@ if [ "$selection_simulation" = TRUE ]; then
     plink \
     --bfile $raw_simulated_selection_model_dir/$selection_model_simulation_name \
     --recode \
-    --dog \
+    $species_flag \
     --out $GONE_dir/$selection_model_simulation_name
 
     # GONE section

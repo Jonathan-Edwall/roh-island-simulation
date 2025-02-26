@@ -11,6 +11,9 @@ start=$(date +%s)
 
 # Define the window sizes in base pairs
 window_size_bp=100000  # 100kB as window size
+
+# To create window files for the studied species, one has to manually input the correct chromosomes and chromosomes sizes 
+# in basepairs into the variable: "chromosome_lengths_bp"
 #���������������������
 #� 100kbp window files based on�
 #� the canine reference assembly�
@@ -43,9 +46,9 @@ preprocessed_data_dir=$data_dir/preprocessed
 #�������������
 #� Empirical �
 #�������������
-# empirical_dog_breed="german_shepherd" # Defined in run_pipeline.sh
-preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
-empirical_breed_autosome_lengths_file=$preprocessed_empirical_breed_dir/"${empirical_dog_breed}_filtered_autosome_lengths_and_marker_density.tsv"
+# empirical_breed="german_shepherd" # Defined in run_pipeline.sh
+preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_breed
+empirical_breed_autosome_lengths_file=$preprocessed_empirical_breed_dir/"${empirical_breed}_filtered_autosome_lengths_and_marker_density.tsv"
 ######################################  
 ####### Defining the output files #######
 ######################################  
@@ -54,7 +57,7 @@ mkdir -p $window_files_dir
 #�������������
 #� Empirical �
 #�������������
-empirical_breed_output_window_file=$window_files_dir/"${empirical_dog_breed}_autosome_windows_100kB_window_sizes.bed"
+empirical_breed_output_window_file=$window_files_dir/"${empirical_breed}_autosome_windows_100kB_window_sizes.bed"
 
 if [ "$empirical_processing" = TRUE ]; then
     # Remove the existing output file if it exists
@@ -69,10 +72,10 @@ fi
 #� the canine reference assembly�
 #� UU_Cfam_GSD_1.0          �
 #���������������������
-canine_reference_assembly_output_window_file=$window_files_dir/canine_reference_assembly_autosome_windows_100kB_window_sizes.bed
+species_reference_assembly_output_window_file=$window_files_dir/${empirical_species}_reference_assembly_autosome_windows_100kB_window_sizes.bed
 # Remove the existing output file if it exists
-if [ -e "$canine_reference_assembly_output_window_file" ]; then
-    rm "$canine_reference_assembly_output_window_file"
+if [ -e "$species_reference_assembly_output_window_file" ]; then
+    rm "$species_reference_assembly_output_window_file"
 fi
 ###############################################################################################  
 # RESULTS
@@ -107,13 +110,14 @@ fi
 # Sort the output file by genomic coordinates
 sort -k1,1n -k2,2n -o "$empirical_breed_output_window_file" "$empirical_breed_output_window_file"
 echo "Window file written to $empirical_breed_output_window_file"
-#���������������������
-#� 100kbp window files based on�
-#� the canine reference assembly�
-#� UU_Cfam_GSD_1.0          �
-#���������������������
+
+#����������������������������������
+#� Creation of the 100kbp window files based on    �
+#� the chromosomes and chromosome lengths in the  �
+#� chromosome_lengths_bp variable, defined above    �
+#����������������������������������
 # Write the header to the output file
-echo -e "#Chromosome\tStart\tEnd" > "$canine_reference_assembly_output_window_file"
+echo -e "#Chromosome\tStart\tEnd" > "$species_reference_assembly_output_window_file"
 # Iterate over chromosome lengths and generate windows
 for chrom in "${!chromosome_lengths_bp[@]}"; do
     length_bp=${chromosome_lengths_bp[$chrom]}
@@ -125,14 +129,14 @@ for chrom in "${!chromosome_lengths_bp[@]}"; do
             window_end=$length_bp
         fi
         # Append the window to the output file
-        echo -e "$chrom\t$window_start\t$window_end" >> "$canine_reference_assembly_output_window_file"
+        echo -e "$chrom\t$window_start\t$window_end" >> "$species_reference_assembly_output_window_file"
         # Move to the next window position
         ((window_start += window_size_bp))
     done
 done
 # Sort the output file by genomic coordinates
-sort -k1,1n -k2,2n -o "$canine_reference_assembly_output_window_file" "$canine_reference_assembly_output_window_file"
-echo "Window file written to $canine_reference_assembly_output_window_file"
+sort -k1,1n -k2,2n -o "$species_reference_assembly_output_window_file" "$species_reference_assembly_output_window_file"
+echo "Window file written to $species_reference_assembly_output_window_file"
 # Ending the timer 
 end=$(date +%s)
 # Calculating the runtime of the script

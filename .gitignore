@@ -1,4 +1,4 @@
-
+/results_chr1_3185_Ne_50TC
 dog_simulation_example.Rmd
 Empirical Data/doi_10_5061_dryad_h44j0zpkf__v20210813/Wang_HDGenetDogs_Genotypes_100621_UK.ped
 Empirical Data/doi_10_5061_dryad_078nc__v20151111/FBD_UK_database.ped
@@ -56,6 +56,8 @@ code/.RData
 /data/preprocessed/simulated - HO5
 /data/preprocessed/simulated - HO6
 /data/raw/simulated - HO5
+/data/raw/simulated-chr1_3185_Ne_50TC
+/data/preprocessed/simulated-chr1_3185_Ne_50TC
 /Old
 /res_H10_v1
 /res_HO5

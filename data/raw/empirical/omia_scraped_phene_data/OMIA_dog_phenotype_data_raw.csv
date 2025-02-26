@@ -1,0 +1,985 @@
+CHR,POS1,POS2,PHENE,PHENE_CATEGORY,SINGLE_GENE_TRAIT_OR_DISORDER,DISEASE_RELATED,GENE_SYMBOL,GENE_DESCRIPTION,PHENE_URL,GENE_DETAILS_URL,BREEDS
+,,,"Eyelid gland, third, prolapse of",Vision / eye phene,no,yes,,,https://www.omia.org/OMIA000359/9615/,,"VBO_0200038, VBO_0200204, VBO_0200485, VBO_0201455, VBO_0200623, VBO_0200712, VBO_0200824, VBO_0200930"
+,,,Deficiency of cytosolic arylamine N-acetylation,Normal phene,yes,no,,,https://www.omia.org/OMIA001587/9615/,,
+,,,Hydrops foetalis,Embryo phene,unknown,yes,,,https://www.omia.org/OMIA000493/9615/,,VBO_0201455
+29,13302075,13283050,Ataxia with isolated vitamin E deficiency,Vision / eye phene,yes,yes,TTPA,alpha tocopherol transfer protein,https://www.omia.org/OMIA002922/9615/,https://www.omia.org/gene398298980/,VBO_0200486
+,,,Hip dysplasia,Skeleton phene (incl. short stature & teeth),no,yes,,,https://www.omia.org/OMIA000473/9615/,,
+18,6549500,6469626,Hyperbiliverdinaemia,Homeostasis / metabolism phene,yes,unknown,BLVRA,biliverdin reductase A,https://www.omia.org/OMIA002917/9615/,https://www.omia.org/gene398298978/,VBO_0200902
+,,,"Height, IGF2BP2-associated body-size variation",Growth / size / body region phene,no,no,,,https://www.omia.org/OMIA002921/9615/,,
+,,,"Carcinoma, gastric, susceptibility to",Neoplasm,no,yes,,,https://www.omia.org/OMIA002919/9615/,,"VBO_0200145, VBO_0200148, VBO_0200361"
+,,,"Endometritis, susceptibility to",Reproductive system phene,no,yes,,,https://www.omia.org/OMIA002568/9615/,,
+27,10688121,10851084,"Cleft lip with or without cleft palate, ADAMTS20-related",Craniofacial phene,yes,yes,ADAMTS20,"ADAM metallopeptidase with thrombospondin type 1 motif, 20",https://www.omia.org/OMIA001140/9615/,https://www.omia.org/gene388252259/,VBO_0200964
+12,3313122,3382514,"Charcot-Marie-Tooth disease, ITPR3-related",Skeleton phene (incl. short stature & teeth),yes,yes,ITPR3,"inositol 1,4,5-trisphosphate receptor type 3",https://www.omia.org/OMIA002916/9615/,https://www.omia.org/gene398298977/,VBO_0200808
+-,-,-,"Chondrodysplasia, FGF4 retrogene-related",Skeleton phene (incl. short stature & teeth),yes,no,FGF4 retrogene CFA18,,https://www.omia.org/OMIA002542/9615/,https://www.omia.org/gene398298785/,"VBO_0200126, VBO_0200267, VBO_0200290, VBO_0200406, VBO_0200429, VBO_0200808, VBO_0200962, VBO_0200994, VBO_0200995, VBO_0201009, VBO_0201223, VBO_0201240, VBO_0201316, VBO_0201352, VBO_0201415"
+,,,Polymyositis,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA001874/9615/,,"VBO_0200932, VBO_0201389"
+33,25348614,25282284,Retinal atrophy - Cone-rod dystrophy 2,Vision / eye phene,yes,yes,IQCB1,IQ motif containing B1,https://www.omia.org/OMIA001675/9615/,https://www.omia.org/gene388246541/,VBO_0200054
+25,48506862,48555710,"Coat colour, dilution, MLPH-related",Pigmentation phene,yes,yes,MLPH,melanophilin,https://www.omia.org/OMIA000031/9615/,https://www.omia.org/gene3539089/,"VBO_0200055, VBO_0200131, VBO_0200147, VBO_0200338, VBO_0200361, VBO_0200406, VBO_0200442, VBO_0201454, VBO_0200577, VBO_0200613, VBO_0200683, VBO_0200713, VBO_0200724, VBO_0200816, VBO_0200893, VBO_0200921, VBO_0200994, VBO_0201102, VBO_0201135, VBO_0201217, VBO_0201223, VBO_0201242, VBO_0201348, VBO_0201351, VBO_0201448"
+,,,Haemochromatosis,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000428/9615/,,
+,,,Cystic microphthalmia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000253/9615/,,
+,,,Ocular squamous cell carcinoma,Neoplasm,no,yes,,,https://www.omia.org/OMIA000735/9615/,,
+,,,"Dermatitis, atopic",Integument (skin) phene,no,yes,,,https://www.omia.org/OMIA000269/9615/,,"VBO_0200210, VBO_0200258, VBO_0200577, VBO_0200800, VBO_0201089, VBO_0201415"
+,,,"Ataxia, episodic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002909/9615/,,"VBO_0200163, VBO_0200372"
+21,11074816,10980195,"Coat/skin colour, oculocutaneous albinism type I (OCA1), TYR-related",Pigmentation phene,yes,yes,TYR,tyrosinase,https://www.omia.org/OMIA000202/9615/,https://www.omia.org/gene388198949/,"VBO_0200406, VBO_0200902"
+1,115181223,115063307,Malignant hyperthermia,Homeostasis / metabolism phene,yes,yes,RYR1,ryanodine receptor 1 (skeletal),https://www.omia.org/OMIA000621/9615/,https://www.omia.org/gene3538631/,"VBO_0200062, VBO_0200163, VBO_0200372, VBO_0200375, VBO_0200442, VBO_0200497, VBO_0200577, VBO_0200610, VBO_0200638, VBO_0200800, VBO_0200902, VBO_0201029, VBO_0201160"
+,,,Sjogren syndrome,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA002910/9615/,,
+16,6227304,6196701,Myotonia,Muscle phene,yes,yes,CLCN1,"chloride channel, voltage-sensitive 1",https://www.omia.org/OMIA000698/9615/,https://www.omia.org/gene403723/,"VBO_0200034, VBO_0200088, VBO_0200193, VBO_0200210, VBO_0200361, VBO_0200372, VBO_0201455, VBO_0200623, VBO_0200724, VBO_0200800, VBO_0200896, VBO_0200902, VBO_0201296"
+15,18575495,18646528,Retinal atrophy - Cone-rod dystrophy 4,Vision / eye phene,yes,yes,RPGRIP1,retinitis pigmentosa GTPase regulator interacting protein 1,https://www.omia.org/OMIA001432/9615/,https://www.omia.org/gene388244116/,"VBO_0200409, VBO_0200497"
+15,53638052,53583032,Retinal atrophy - Cone-rod dystrophy 4,Vision / eye phene,yes,yes,MAP9,microtubule-associated protein 9,https://www.omia.org/OMIA001432/9615/,https://www.omia.org/gene388249508/,"VBO_0200409, VBO_0200497"
+19,12995177,13120933,"Neuronal ceroid lipofuscinosis, 7",Lysosomal storage disease,yes,yes,MFSD8,major facilitator superfamily domain containing 8,https://www.omia.org/OMIA001962/9615/,https://www.omia.org/gene388244653/,"VBO_0200338, VBO_0200345, VBO_0201251"
+,,,Meningoencephalitis,Nervous system phene,no,yes,,,https://www.omia.org/OMIA001470/9615/,,"VBO_0200241, VBO_0200338, VBO_0200389, VBO_0201455, VBO_0200856, VBO_0200985, VBO_0200994, VBO_0201089, VBO_0201223, VBO_0201448"
+,,,Epilepsy,Nervous system phene,no,yes,,,https://www.omia.org/OMIA000344/9615/,,"VBO_0200144, VBO_0200193, VBO_0200375, VBO_0200453, VBO_0200526, VBO_0200577, VBO_0201009"
+3,38430387,38394079,"Fanconi syndrome, FAN1-related",Renal / urinary system phene,yes,yes,FAN1,FANCD2/FANCI-associated nuclease 1,https://www.omia.org/OMIA002683/9615/,https://www.omia.org/gene388246875/,VBO_0200120
+,,,"Cardiomyopathy, dilated",Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA000162/9615/,,"VBO_0200197, VBO_0200210, VBO_0200372, VBO_0200442, VBO_0200486, VBO_0200623, VBO_0200706, VBO_0200938, VBO_0200964, VBO_0201077, VBO_0201401"
+,,,Ocular melanosis,Pigmentation phene,yes,yes,,,https://www.omia.org/OMIA001804/9615/,,"VBO_0200267, VBO_0201223"
+27,39191850,39329540,Von Willebrand disease III,Haematopoietic system phene,yes,yes,VWF,von Willebrand factor,https://www.omia.org/OMIA001058/9615/,https://www.omia.org/gene399544/,"VBO_0200406, VBO_0200932, VBO_0201198, VBO_0201217"
+5,32678721,32665395,"Cancer, TP53-related",Neoplasm,unknown,yes,TP53,tumor protein p53,https://www.omia.org/OMIA001990/9615/,https://www.omia.org/gene403869/,
+,,,"Dyskinesia, paroxysmal",Behaviour / neurological phene,no,yes,,,https://www.omia.org/OMIA001543/9615/,,VBO_0200962
+18,16579791,17064382,"Lissencephaly and cerebellar hypoplasia, RELN-related",Nervous system phene,yes,yes,RELN,reelin,https://www.omia.org/OMIA001867/9615/,https://www.omia.org/gene388249897/,VBO_0201423
+4,87442470,87564197,"Neuropathy, sensory, RETREG1-related",Nervous system phene,yes,yes,FAM134B,"family with sequence similarity 134, member B",https://www.omia.org/OMIA002032/9615/,https://www.omia.org/gene388247158/,"VBO_0200193, VBO_0200585, VBO_0200902"
+,,,"Steroid-responsive meningitis-arteritis, susceptibility to",Nervous system phene,no,yes,,,https://www.omia.org/OMIA002842/9615/,,"VBO_0200090, VBO_0200161, VBO_0200193, VBO_0200210, VBO_0200316, VBO_0200610, VBO_0200713, VBO_0200964, VBO_0200995, VBO_0201427"
+,,,"Alopecia, generic",Integument (skin) phene,yes,yes,,,https://www.omia.org/OMIA000030/9615/,,VBO_0201043
+31,26654922,26662986,Degenerative myelopathy,Nervous system phene,yes,yes,SOD1,"superoxide dismutase 1, soluble",https://www.omia.org/OMIA000263/9615/,https://www.omia.org/gene403559/,"VBO_0200015, VBO_0200017, VBO_0200046, VBO_0200059, VBO_0200088, VBO_0200095, VBO_0200131, VBO_0200144, VBO_0200147, VBO_0200161, VBO_0200175, VBO_0200193, VBO_0200197, VBO_0200210, VBO_0200234, VBO_0200274, VBO_0200290, VBO_0200309, VBO_0200326, VBO_0200345, VBO_0200375, VBO_0200376, VBO_0200389, VBO_0200402, VBO_0200427, VBO_0200442, VBO_0200492, VBO_0200497, VBO_0201455, VBO_0200577, VBO_0200610, VBO_0200629, VBO_0200674, VBO_0200702, VBO_0200724, VBO_0200764, VBO_0200779, VBO_0200793, VBO_0200800, VBO_0200938, VBO_0200962, VBO_0200964, VBO_0200995, VBO_0201051, VBO_0201056, VBO_0201089, VBO_0201102, VBO_0201125, VBO_0201135, VBO_0201141, VBO_0201143, VBO_0201160, VBO_0201174, VBO_0201217, VBO_0201226, VBO_0201233, VBO_0201260, VBO_0201296, VBO_0201334, VBO_0201342, VBO_0201353, VBO_0201401, VBO_0201412, VBO_0201423, VBO_0201424"
+25,42715740,42674227,Degenerative myelopathy,Nervous system phene,yes,yes,SP110,SP110 nuclear body protein,https://www.omia.org/OMIA000263/9615/,https://www.omia.org/gene389416327/,"VBO_0200015, VBO_0200017, VBO_0200046, VBO_0200059, VBO_0200088, VBO_0200095, VBO_0200131, VBO_0200144, VBO_0200147, VBO_0200161, VBO_0200175, VBO_0200193, VBO_0200197, VBO_0200210, VBO_0200234, VBO_0200274, VBO_0200290, VBO_0200309, VBO_0200326, VBO_0200345, VBO_0200375, VBO_0200376, VBO_0200389, VBO_0200402, VBO_0200427, VBO_0200442, VBO_0200492, VBO_0200497, VBO_0201455, VBO_0200577, VBO_0200610, VBO_0200629, VBO_0200674, VBO_0200702, VBO_0200724, VBO_0200764, VBO_0200779, VBO_0200793, VBO_0200800, VBO_0200938, VBO_0200962, VBO_0200964, VBO_0200995, VBO_0201051, VBO_0201056, VBO_0201089, VBO_0201102, VBO_0201125, VBO_0201135, VBO_0201141, VBO_0201143, VBO_0201160, VBO_0201174, VBO_0201217, VBO_0201226, VBO_0201233, VBO_0201260, VBO_0201296, VBO_0201334, VBO_0201342, VBO_0201353, VBO_0201401, VBO_0201412, VBO_0201423, VBO_0201424"
+1,91786552,91821587,"Cerebellar hypoplasia, VLDLR-associated",Nervous system phene,yes,yes,VLDLR,very low density lipoprotein receptor,https://www.omia.org/OMIA001947/9615/,https://www.omia.org/gene388244833/,VBO_0200512
+9,13499392,13493565,"Dwarfism, growth-hormone deficiency",Skeleton phene (incl. short stature & teeth),yes,yes,GH1,growth hormone,https://www.omia.org/OMIA001473/9615/,https://www.omia.org/gene388199274/,"VBO_0200241, VBO_0200338, VBO_0201011, VBO_0201147"
+35,7562265,7607463,"Ichthyosis, DSP-related",Integument (skin) phene,yes,yes,DSP,desmoplakin,https://www.omia.org/OMIA002243/9615/,https://www.omia.org/gene398298916/,VBO_0201051
+,,,"Retinal atrophy, progressive, Whippet",Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA002085/9615/,,VBO_0201421
+X,28487633,26319830,"Muscular dystrophy, Duchenne type",Muscle phene,yes,yes,DMD,dystrophin,https://www.omia.org/OMIA001081/9615/,https://www.omia.org/gene606758/,"VBO_0200092, VBO_0200193, VBO_0200239, VBO_0200309, VBO_0200503, VBO_0200583, VBO_0200610, VBO_0200615, VBO_0200704, VBO_0200724, VBO_0200740, VBO_0200800, VBO_0200896, VBO_0200995, VBO_0201125, VBO_0201143, VBO_0201174, VBO_0201353, VBO_0201401"
+14,13507439,13410127,"Multidrug resistance 1, ABCB1-related",Homeostasis / metabolism phene,yes,yes,ABCB1,"ATP-binding cassette, sub-family B (MDR/TAP), member 1",https://www.omia.org/OMIA001402/9615/,https://www.omia.org/gene26536055/,"VBO_0200095, VBO_0200193, VBO_0200375, VBO_0200376, VBO_0200577, VBO_0200683, VBO_0200833, VBO_0200872, VBO_0200881, VBO_0200902, VBO_0200969, VBO_0201217, VBO_0201235, VBO_0201394, VBO_0201423"
+,,,Myopathy,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000693/9615/,,"VBO_0200577, VBO_0200800"
+4,67462747,67473870,"Ataxia, cerebellar, SELENOP-related",Nervous system phene,yes,yes,SEPP1,"selenoprotein P, plasma, 1",https://www.omia.org/OMIA002367/9615/,https://www.omia.org/gene388247132/,VBO_0200144
+8,26937999,26899306,L-2-hydroxyglutaricacidemia,Nervous system phene,yes,yes,L2HGDH,L-2-hydroxyglutarate dehydrogenase,https://www.omia.org/OMIA001371/9615/,https://www.omia.org/gene26585840/,"VBO_0201296, VBO_0201415, VBO_0201448"
+6,7068561,7137106,"Drug metabolism, altered",Homeostasis / metabolism phene,unknown,unknown,POR,cytochrome p450 oxidoreductase,https://www.omia.org/OMIA002421/9615/,https://www.omia.org/gene398298941/,VBO_0200638
+1,113415892,113431675,"Drug metabolism, altered",Homeostasis / metabolism phene,unknown,unknown,CYP2B6,cytochrome P450 2B11,https://www.omia.org/OMIA002421/9615/,https://www.omia.org/gene398298942/,VBO_0200638
+17,59709253,59692674,"Chondrodysplasia, disproportionate short-limbed, ITGA10-related'",Skeleton phene (incl. short stature & teeth),yes,yes,ITGA10,"integrin, alpha 10",https://www.omia.org/OMIA001886/9615/,https://www.omia.org/gene388303744/,"VBO_0200353, VBO_0200754, VBO_0200955"
+9,51583512,51733920,"classical Ehlers-Danlos syndrome (cEDS), COL5A1-related",Integument (skin) phene,yes,yes,COL5A1,"collagen, type V, alpha 1",https://www.omia.org/OMIA002165/9615/,https://www.omia.org/gene388248174/,"VBO_0200131, VBO_0200408, VBO_0200577, VBO_0200610, VBO_0200800, VBO_0200902, VBO_0201198"
+22,61197920,61208435,Factor VII deficiency,Haematopoietic system phene,yes,yes,F7,coagulation factor VII (serum prothrombin conversion accelerator),https://www.omia.org/OMIA000361/9615/,https://www.omia.org/gene3539631/,"VBO_0200008, VBO_0200015, VBO_0200016, VBO_0200017, VBO_0200047, VBO_0200126, VBO_0200131, VBO_0200298, VBO_0200410, VBO_0200490, VBO_0200522, VBO_0200583, VBO_0200602, VBO_0200604, VBO_0200660, VBO_0200705, VBO_0200740, VBO_0200896, VBO_0200902, VBO_0200985, VBO_0201132, VBO_0201195, VBO_0201200, VBO_0201411, VBO_0201421"
+10,69610843,69607664,"Ichthyosis, ASPRV1-related",Integument (skin) phene,yes,yes,ASPRV1,"aspartic peptidase, retroviral-like 1",https://www.omia.org/OMIA002099/9615/,https://www.omia.org/gene388248660/,"VBO_0200577, VBO_0200995"
+5,31801741,31815685,"Myasthenic syndrome, congenital, CHRNE-related",Nervous system phene,yes,yes,CHRNE,"cholinergic receptor, nicotinic, epsilon (muscle)",https://www.omia.org/OMIA000685/9615/,https://www.omia.org/gene388247226/,"VBO_0200497, VBO_0200666, VBO_0200724, VBO_0201258"
+10,64995951,64966161,"Retinal atrophy, progressive, FAM161A-related",Vision / eye phene,yes,yes,FAM161A,"family with sequence similarity 161, member A",https://www.omia.org/OMIA001918/9615/,https://www.omia.org/gene388248644/,"VBO_0200496, VBO_0201352, VBO_0201353"
+,,,"Pituitary hormone deficiency, generic",Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000307/9615/,,"VBO_0200402, VBO_0200577, VBO_0200754, VBO_0201158"
+9,50125225,50131690,"Pituitary hormone deficiency, LHX3-related",Skeleton phene (incl. short stature & teeth),yes,yes,LHX3,LIM homeobox 3,https://www.omia.org/OMIA002314/9615/,https://www.omia.org/gene388303261/,"VBO_0200402, VBO_0200577, VBO_0201158, VBO_0201353"
+31,752910,771826,"Pituitary hormone deficiency, POU1F1-related",Skeleton phene (incl. short stature & teeth),yes,yes,POU1F1,POU class 1 homeobox 1,https://www.omia.org/OMIA002315/9615/,https://www.omia.org/gene403753/,VBO_0200754
+21,5366974,5491223,"Polyneuropathy, hypomyelinating, MTMR2-related",Nervous system phene,yes,yes,MTMR2,myotubularin related protein 2,https://www.omia.org/OMIA002727/9615/,https://www.omia.org/gene388302814/,VBO_0200610
+16,24652836,24681609,"Neuroaxonal dystrophy, RNF170-related",Nervous system phene,yes,yes,RNF170,ring finger protein 170,https://www.omia.org/OMIA002876/9615/,https://www.omia.org/gene398298925/,VBO_0200880
+,,,Dog allergen,Normal phene,unknown,no,,,https://www.omia.org/OMIA002799/9615/,,
+,,,"Pseudomyotonia, congenital",Muscle phene,unknown,unknown,,,https://www.omia.org/OMIA001464/9615/,,
+,,,Pulmonary hypertension,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000841/9615/,,
+16,8065738,8237942,Transitional cell carcinoma,Neoplasm,no,yes,BRAF,"B-Raf proto-oncogene, serine/threonine kinase",https://www.omia.org/OMIA001512/9615/,https://www.omia.org/gene388244214/,"VBO_0200131, VBO_0201198, VBO_0201217, VBO_0201415"
+30,30879701,30957083,Transitional cell carcinoma,Neoplasm,no,yes,MAP2K1,mitogen-activated protein kinase kinase 1,https://www.omia.org/OMIA001512/9615/,https://www.omia.org/gene388246362/,"VBO_0200131, VBO_0201198, VBO_0201217, VBO_0201415"
+13,44477241,44500597,Transitional cell carcinoma,Neoplasm,no,yes,NIPAL1,NIPA like domain containing 1,https://www.omia.org/OMIA001512/9615/,https://www.omia.org/gene398298928/,"VBO_0200131, VBO_0201198, VBO_0201217, VBO_0201415"
+3,70150039,70345339,Urolithiasis,Renal / urinary system phene,yes,yes,SLC2A9,"solute carrier family 2 (facilitated glucose transporter), member 9",https://www.omia.org/OMIA001033/9615/,https://www.omia.org/gene27949574/,"VBO_0200055, VBO_0200095, VBO_0200163, VBO_0200174, VBO_0200185, VBO_0200427, VBO_0200485, VBO_0200568, VBO_0200577, VBO_0200604, VBO_0200800, VBO_0200816, VBO_0200824, VBO_0200845, VBO_0200896, VBO_0200987, VBO_0200994, VBO_0201043, VBO_0201056, VBO_0201198, VBO_0201280, VBO_0201401"
+,,,Myelodysplastic syndrome,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA002870/9615/,,"VBO_0200408, VBO_0201089"
+8,4209738,4219816,"Dyskinesia, paroxysmal, PCK2-related",Homeostasis / metabolism phene,unknown,yes,PCK2,"phosphoenolpyruvate carboxykinase 2, mitochondrial",https://www.omia.org/OMIA002868/9615/,https://www.omia.org/gene398298918/,VBO_0201217
+,,,"Muscular dystrophy, Becker type",Muscle phene,unknown,yes,,,https://www.omia.org/OMIA001888/9615/,,
+,,,Osteosarcoma,Neoplasm,yes,yes,,,https://www.omia.org/OMIA001441/9615/,,"VBO_0200442, VBO_0200577, VBO_0200623, VBO_0200638, VBO_0200702, VBO_0200706, VBO_0200819, VBO_0201143, VBO_0201160, VBO_0201195"
+,,,"Encephalopathy, generic",Nervous system phene,unknown,unknown,,,https://www.omia.org/OMIA002867/9615/,,VBO_0200131
+,,,"Myopathy, mitochondrial",Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000695/9615/,,"VBO_0200724, VBO_0200969, VBO_0201056"
+,,,Pheochromocytoma,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA001268/9615/,,
+22,144381,208578,Wilson disease,Liver/biliary system phene,yes,yes,ATP7B,"ATPase, Cu++ transporting, beta polypeptide",https://www.omia.org/OMIA001071/9615/,https://www.omia.org/gene388245279/,"VBO_0200137, VBO_0200309, VBO_0200427, VBO_0200442, VBO_0200800"
+X,55046702,55482183,"Hypohidrotic ectodermal dysplasia, X-linked, EDA-related",Integument (skin) phene,yes,yes,EDA,ectodysplasin A,https://www.omia.org/OMIA000543/9615/,https://www.omia.org/gene491935/,"VBO_0200126, VBO_0200144, VBO_0200163, VBO_0200372, VBO_0200577, VBO_0200800, VBO_0200893, VBO_0200902, VBO_0200994, VBO_0201051, VBO_0201421, VBO_0201448"
+,,,Wolff-Parkinson-White syndrome,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001194/9615/,,
+,,,Behaviour,Behaviour / neurological phene,no,unknown,,,https://www.omia.org/OMIA002328/9615/,,"VBO_0200147, VBO_0200486, VBO_0200546, VBO_0200577, VBO_0200800"
+30,32459741,32442020,"Neuronal ceroid lipofuscinosis, 6",Lysosomal storage disease,yes,yes,CLN6,"ceroid-lipofuscinosis, neuronal 6, late infantile, variant",https://www.omia.org/OMIA001443/9615/,https://www.omia.org/gene26598540/,"VBO_0200095, VBO_0201181"
+32,4533042,4556071,"Hair, long",Integument (skin) phene,yes,no,FGF5,fibroblast growth factor 5,https://www.omia.org/OMIA000439/9615/,https://www.omia.org/gene99327621/,"VBO_0200004, VBO_0200193, VBO_0200372, VBO_0200375, VBO_0200406, VBO_0200577, VBO_0200610, VBO_0200995, VBO_0201043, VBO_0201174"
+12,1648746,1595038,"classic-like Ehlers-Danlos syndrome (clEDS), TNXB-related",Integument (skin) phene,unknown,yes,TNXB,tenascin XB,https://www.omia.org/OMIA002203/9615/,https://www.omia.org/gene389413072/,VBO_0200902
+,,,Nodular dermatofibrosis and kidney disease (redundant),,unknown,unknown,,,https://www.omia.org/OMIA001195/9615/,,
+5,42284487,42304049,Renal cystadenocarcinoma and nodular dermatofibrosis,Neoplasm,yes,yes,FLCN,folliculin,https://www.omia.org/OMIA001335/9615/,https://www.omia.org/gene26585227/,"VBO_0200131, VBO_0200577, VBO_0200902"
+,,,"Gangliosidosis, GM2, (AB variant), GM2A-related",Lysosomal storage disease,unknown,unknown,,,https://www.omia.org/OMIA001427/9615/,,
+27,2535235,2543509,Curly coat,Integument (skin) phene,yes,no,KRT71,"keratin 71, type II",https://www.omia.org/OMIA000245/9615/,https://www.omia.org/gene23860798/,"VBO_0200163, VBO_0200326, VBO_0200397, VBO_0200704, VBO_0200804, VBO_0201077, VBO_0201280"
+15,23131808,23378520,"Deafness, unilateral and vestibular dysfunction, PTPRQ-related'",Hearing / vestibular / ear phene,yes,yes,PTPRQ,"protein tyrosine phosphatase, receptor type, Q",https://www.omia.org/OMIA002196/9615/,https://www.omia.org/gene388249459/,VBO_0200442
+8,39523986,39377314,"Elliptocytosis, SPTB-related",Haematopoietic system phene,yes,yes,SPTB,"spectrin, beta, erythrocytic",https://www.omia.org/OMIA001318/9615/,https://www.omia.org/gene23863703/,VBO_0200902
+15,56573299,56706386,Hypomyelination of the central nervous system,Nervous system phene,yes,yes,FNIP2,folliculin interacting protein 2,https://www.omia.org/OMIA000526/9615/,https://www.omia.org/gene388244185/,VBO_0201401
+13,9022401,8873544,Improper coat,Integument (skin) phene,yes,yes,RSPO2,R-spondin 2,https://www.omia.org/OMIA001498/9615/,https://www.omia.org/gene23857650/,VBO_0201077
+20,58179361,58173790,"Leigh syndrome, NDUFS7-related",Nervous system phene,yes,yes,NDUFS7,NADH:ubiquinone oxidoreductase core subunit S7,https://www.omia.org/OMIA002840/9615/,https://www.omia.org/gene398298884/,VBO_0200902
+28,23970117,24011237,"Lipid malabsorption, ACSL5-related",Digestive / alimentary phene,yes,yes,ACSL5,acyl-CoA synthetase long-chain family member 5,https://www.omia.org/OMIA002226/9615/,https://www.omia.org/gene388245967/,VBO_0200090
+5,75580429,75594782,Macular corneal dystrophy,Vision / eye phene,yes,yes,LOC489707,carbohydrate sulfotransferase 6,https://www.omia.org/OMIA002071/9615/,https://www.omia.org/gene388254349/,VBO_0200800
+30,38023809,38029593,Metabolizer of a cognitive enhancer,Homeostasis / metabolism phene,yes,no,CYP1A2,"cytochrome P450, family 1, subfamily A, polypeptide 2",https://www.omia.org/OMIA001405/9615/,https://www.omia.org/gene26595581/,VBO_0200131
+1,93940875,93989640,Polycythemia,Haematopoietic system phene,yes,yes,JAK2,Janus kinase 2,https://www.omia.org/OMIA000809/9615/,https://www.omia.org/gene26588522/,"VBO_0200856, VBO_0200902, VBO_0201048, VBO_0201415, VBO_0201448"
+29,33163070,32900394,"Achromatopsia-3, CNGB3-related",Vision / eye phene,yes,yes,CNGB3,cyclic nucleotide gated channel beta 3,https://www.omia.org/OMIA001365/9615/,https://www.omia.org/gene403554/,"VBO_0200015, VBO_0200017, VBO_0200881, VBO_0201233"
+,,,Calvarial hyperostotic syndrome,Craniofacial phene,unknown,yes,,,https://www.omia.org/OMIA002245/9615/,,"VBO_0200054, VBO_0200055, VBO_0200253, VBO_0200497, VBO_0201401"
+,,,Cerebellar abiotrophy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000175/9615/,,"VBO_0200090, VBO_0200131, VBO_0200193, VBO_0200210, VBO_0200239, VBO_0200485, VBO_0200764, VBO_0200800, VBO_0200804, VBO_0201434"
+37,25735139,25652649,"Choroidal hypoplasia, NHEJ1-related",Vision / eye phene,yes,yes,NHEJ1,nonhomologous end-joining factor 1,https://www.omia.org/OMIA000218/9615/,https://www.omia.org/gene3542381/,"VBO_0200015, VBO_0200090, VBO_0200095, VBO_0200193, VBO_0200214, VBO_0200353, VBO_0200376, VBO_0200377, VBO_0200671, VBO_0200724, VBO_0200782, VBO_0200808, VBO_0200814, VBO_0200833, VBO_0200964, VBO_0200969, VBO_0200987, VBO_0201217, VBO_0201233, VBO_0201235, VBO_0201256, VBO_0201334"
+,,,"Craniomandibular osteopathy, generic",Craniofacial phene,no,yes,,,https://www.omia.org/OMIA000236/9615/,,"VBO_0200008, VBO_0200010, VBO_0200054, VBO_0200098, VBO_0200126, VBO_0200210, VBO_0200253, VBO_0200267, VBO_0200397, VBO_0200442, VBO_0200485, VBO_0200602, VBO_0200623, VBO_0200800, VBO_0200969, VBO_0201113, VBO_0201198, VBO_0201217, VBO_0201401, VBO_0201415"
+11,2257166,2480747,"Dermatosparaxis Ehlers-Danlos syndrome (dEDS), ADAMTS2-related",Integument (skin) phene,yes,yes,ADAMTS2,"ADAM metallopeptidase with thrombospondin type 1 motif, 2",https://www.omia.org/OMIA000328/9615/,https://www.omia.org/gene388248681/,"VBO_0200014, VBO_0200054, VBO_0200298, VBO_0200442"
+23,3992209,4074051,"Gangliosidosis, GM1",Lysosomal storage disease,yes,yes,GLB1,"galactosidase, beta 1",https://www.omia.org/OMIA000402/9615/,https://www.omia.org/gene403873/,"VBO_0200015, VBO_0200131, VBO_0200497, VBO_0201077, VBO_0201220"
+X,111487863,111520319,Haemophilia B,Haematopoietic system phene,yes,yes,F9,coagulation factor IX,https://www.omia.org/OMIA000438/9615/,https://www.omia.org/gene404015/,"VBO_0200008, VBO_0200017, VBO_0200038, VBO_0200054, VBO_0200131, VBO_0200163, VBO_0200168, VBO_0200267, VBO_0200361, VBO_0200442, VBO_0201455, VBO_0200577, VBO_0200602, VBO_0200610, VBO_0200674, VBO_0200724, VBO_0200800, VBO_0200824, VBO_0200859, VBO_0200902, VBO_0200938, VBO_0200969, VBO_0201135, VBO_0201143, VBO_0201160, VBO_0201198, VBO_0201200, VBO_0201223, VBO_0201401, VBO_0201424"
+,,,"Laryngeal paralysis, generic",Respiratory system phene,unknown,yes,,,https://www.omia.org/OMIA001206/9615/,,"VBO_0200015, VBO_0200427, VBO_0200800, VBO_0201113, VBO_0201143"
+12,23015406,23120685,Narcolepsy,Behaviour / neurological phene,yes,yes,HCRTR2,hypocretin (orexin) receptor 2,https://www.omia.org/OMIA000703/9615/,https://www.omia.org/gene399545/,"VBO_0200004, VBO_0200008, VBO_0200017, VBO_0200131, VBO_0200370, VBO_0200372, VBO_0200406, VBO_0200442, VBO_0200604, VBO_0200702, VBO_0200800, VBO_0200902, VBO_0200995, VBO_0201051, VBO_0201056, VBO_0201143, VBO_0201160, VBO_0201287, VBO_0201427"
+,,,Necrosis of digits,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001665/9615/,,"VBO_0201029, VBO_0201211"
+25,40695609,40657948,"Necrotising encephalopathy, subacute, of Leigh",Nervous system phene,yes,yes,SLC19A3,"solute carrier family 19 (thiamine transporter), member 3",https://www.omia.org/OMIA001097/9615/,https://www.omia.org/gene388251937/,"VBO_0200015, VBO_0201448"
+16,20392367,20382879,Polydactyly,Skeleton phene (incl. short stature & teeth),yes,yes,SHH,sonic hedgehog,https://www.omia.org/OMIA000810/9615/,https://www.omia.org/gene388304145/,"VBO_0200131, VBO_0200147, VBO_0200372, VBO_0200629, VBO_0200838, VBO_0201056, VBO_0201143, VBO_0201160, VBO_0201177, VBO_0201189, VBO_0201217, VBO_0201223, VBO_0201357, VBO_0201448"
+18,45583479,45629082,Polydactyly,Skeleton phene (incl. short stature & teeth),yes,yes,ALX4,ALX homeobox 4,https://www.omia.org/OMIA000810/9615/,https://www.omia.org/gene388304937/,"VBO_0200131, VBO_0200147, VBO_0200372, VBO_0200629, VBO_0200838, VBO_0201056, VBO_0201143, VBO_0201160, VBO_0201177, VBO_0201189, VBO_0201217, VBO_0201223, VBO_0201357, VBO_0201448"
+X,33156658,33082215,"Retinal atrophy, progressive, X-linked, type 2",Vision / eye phene,yes,yes,RPGR,retinitis pigmentosa GTPase regulator,https://www.omia.org/OMIA001518/9615/,https://www.omia.org/gene403726/,VBO_0200902
+18,53453534,53467923,"Thrombopathia, RASGRP2-related",Haematopoietic system phene,yes,yes,RASGRP2,RAS guanyl releasing protein 2 (calcium and DAG-regulated),https://www.omia.org/OMIA002433/9615/,https://www.omia.org/gene388306487/,"VBO_0200046, VBO_0200126, VBO_0200809"
+,,,"XX difference of sexual development, generic",Reproductive system phene,no,yes,,,https://www.omia.org/OMIA000901/9615/,,"VBO_0200004, VBO_0200038, VBO_0200054, VBO_0200055, VBO_0200095, VBO_0200126, VBO_0200131, VBO_0200161, VBO_0200193, VBO_0200241, VBO_0200255, VBO_0200258, VBO_0200442, VBO_0200486, VBO_0201455, VBO_0201454, VBO_0200577, VBO_0200583, VBO_0200610, VBO_0200724, VBO_0200764, VBO_0200955, VBO_0201026, VBO_0201089, VBO_0201260, VBO_0201353, VBO_0201374, VBO_0201389, VBO_0201401, VBO_0201420"
+10,334246,299404,"Coat colour, merle",Pigmentation phene,yes,yes,PMEL,premelanosome protein,https://www.omia.org/OMIA000211/9615/,https://www.omia.org/gene23857013/,"VBO_0200091, VBO_0200095, VBO_0200193, VBO_0200290, VBO_0200298, VBO_0200338, VBO_0200376, VBO_0200406, VBO_0201455, VBO_0200623, VBO_0200798, VBO_0200880, VBO_0200881, VBO_0200921, VBO_0201117, VBO_0201217, VBO_0201410"
+30,18328524,18136193,Dilute coat color with neurological defects,Pigmentation phene,yes,yes,MYO5A,myosin VA,https://www.omia.org/OMIA001501/9615/,https://www.omia.org/gene388246333/,"VBO_0200408, VBO_0201135"
+5,41162218,41192723,"Hyperkeratosis, palmoplantar, FAM83G-related",Integument (skin) phene,yes,yes,FAM83G,"family with sequence similarity 83, member G",https://www.omia.org/OMIA001327/9615/,https://www.omia.org/gene389413015/,"VBO_0200137, VBO_0200704, VBO_0200786"
+3,41014731,41340884,Lens luxation,Vision / eye phene,yes,yes,ADAMTS17,"ADAM metallopeptidase with thrombospondin type 1 motif, 17",https://www.omia.org/OMIA000588/9615/,https://www.omia.org/gene26591637/,"VBO_0200057, VBO_0200088, VBO_0200193, VBO_0200239, VBO_0200345, VBO_0200351, VBO_0200568, VBO_0201454, VBO_0200585, VBO_0200724, VBO_0200808, VBO_0200882, VBO_0200987, VBO_0200990, VBO_0201067, VBO_0201125, VBO_0201200, VBO_0201342, VBO_0201353, VBO_0201361, VBO_0201390, VBO_0201412, VBO_0201424, VBO_0201448"
+3,28405848,28672345,"Neutropenia, cyclic",Haematopoietic system phene,yes,yes,AP3B1,"adaptor-related protein complex 3, beta 1 subunit",https://www.omia.org/OMIA000248/9615/,https://www.omia.org/gene403459/,"VBO_0200126, VBO_0200375, VBO_0200902"
+,,,"Osteochondromatosis, generic",Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA002555/9615/,,VBO_0200902
+,,,"Persistent Mullerian duct syndrome, generic",Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000791/9615/,,"VBO_0200126, VBO_0200147, VBO_0200372, VBO_0200577, VBO_0200856, VBO_0201448"
+-,-,-,Pyruvate kinase deficiency of erythrocyte,Homeostasis / metabolism phene,yes,yes,PKLR,"pyruvate kinase, liver and RBC",https://www.omia.org/OMIA000844/9615/,https://www.omia.org/gene406183/,"VBO_0200120, VBO_0200131, VBO_0200267, VBO_0200338, VBO_0200406, VBO_0200800, VBO_0201051, VBO_0201089, VBO_0201358, VBO_0201415"
+27,9257318,9072368,Scott Syndrome,Haematopoietic system phene,yes,yes,ANO6,anoctamin 6,https://www.omia.org/OMIA001353/9615/,https://www.omia.org/gene388252255/,VBO_0200577
+1,54369833,54360266,"Tail, short",Skeleton phene (incl. short stature & teeth),yes,yes,TBXT,T-box transcription factor T,https://www.omia.org/OMIA000975/9615/,https://www.omia.org/gene403653/,"VBO_0200095, VBO_0200097, VBO_0200103, VBO_0200156, VBO_0200221, VBO_0200231, VBO_0200239, VBO_0200392, VBO_0000663, VBO_0200442, VBO_0008063, VBO_0200724, VBO_0200754, VBO_0200921, VBO_0200995, VBO_0201035, VBO_0201117, VBO_0201184, VBO_0201280, VBO_0201316"
+X,78808649,78825317,"Tremor, X-linked",Nervous system phene,yes,yes,PLP1,proteolipid protein 1,https://www.omia.org/OMIA000770/9615/,https://www.omia.org/gene4773602/,VBO_0201287
+27,39191850,39329540,Von Willebrand disease I,Haematopoietic system phene,yes,yes,VWF,von Willebrand factor,https://www.omia.org/OMIA001057/9615/,https://www.omia.org/gene399544/,"VBO_0200442, VBO_0200577, VBO_0200610, VBO_0200786, VBO_0200995, VBO_0201051, VBO_0201217, VBO_0201448"
+27,39191850,39329540,Von Willebrand disease II,Haematopoietic system phene,yes,yes,VWF,von Willebrand factor,https://www.omia.org/OMIA001339/9615/,https://www.omia.org/gene399544/,"VBO_0200214, VBO_0200345, VBO_0200583, VBO_0200585, VBO_0200602"
+,,,"Von Willebrand disease, generic",Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA001056/9615/,,
+17,38764819,38768812,Ectodermal dysplasia,Integument (skin) phene,yes,yes,FOXI3,forkhead box I3,https://www.omia.org/OMIA000323/9615/,https://www.omia.org/gene3481910/,"VBO_0200345, VBO_0201004, VBO_0201436"
+5,32294698,32299874,Exercise induced metabolic myopathy,Muscle phene,yes,yes,ACADVL,"acyl-CoA dehydrogenase, very long chain",https://www.omia.org/OMIA002140/9615/,https://www.omia.org/gene388254161/,VBO_0200568
+18,50746392,50756504,Exfoliative cutaneous lupus erythematosus,Integument (skin) phene,yes,yes,UNC93B1,unc-93 homolog B1 (C. elegans),https://www.omia.org/OMIA001609/9615/,https://www.omia.org/gene388250234/,"VBO_0200221, VBO_0200583, VBO_0201389"
+,,,Fanconi syndrome,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000366/9615/,,"VBO_0200194, VBO_0200706, VBO_0200955, VBO_0201421, VBO_0201448"
+20,53638525,53618496,"Glaucoma, primary open angle, ADAMTS10-related",Vision / eye phene,yes,yes,ADAMTS10,"ADAM metallopeptidase with thrombospondin type 1 motif, 10",https://www.omia.org/OMIA001870/9615/,https://www.omia.org/gene388305873/,"VBO_0200131, VBO_0200955"
+29,16355030,16498290,"Hypotrichosis, recessive",Integument (skin) phene,yes,yes,SGK3,"serum/glucocorticoid regulated kinase family, member 3",https://www.omia.org/OMIA001279/9615/,https://www.omia.org/gene388252519/,"VBO_0200049, VBO_0201125, VBO_0201195"
+35,17028403,17027204,Myoclonus epilepsy of Lafora,Behaviour / neurological phene,yes,yes,NHLRC1,NHL repeat containing E3 ubiquitin protein ligase 1,https://www.omia.org/OMIA000690/9615/,https://www.omia.org/gene26581065/,"VBO_0200126, VBO_0200131, VBO_0200241, VBO_0200338, VBO_0200411, VBO_0201455, VBO_0200938, VBO_0200995, VBO_0201029, VBO_0201051, VBO_0201056"
+X,83631540,83897969,"Nephritis, X-linked",Renal / urinary system phene,yes,yes,COL4A5,"collagen, type IV, alpha 5",https://www.omia.org/OMIA001112/9615/,https://www.omia.org/gene403466/,"VBO_0200372, VBO_0200929, VBO_0201174"
+18,32244956,32241825,"Severe combined immunodeficiency disease, autosomal, T cell-negative, B cell-negative, NK cell-positive",Immune system phene,yes,yes,RAG1,recombination activating gene 1,https://www.omia.org/OMIA001574/9615/,https://www.omia.org/gene3482170/,VBO_0200555
+8,15263403,15261532,Spinal dysraphism,Skeleton phene (incl. short stature & teeth),yes,yes,NKX2-8,NK2 homeobox 8,https://www.omia.org/OMIA000938/9615/,https://www.omia.org/gene388304790/,"VBO_0200017, VBO_0200338, VBO_0200375, VBO_0200427, VBO_0200485, VBO_0200577, VBO_0200610, VBO_0200702, VBO_0200994, VBO_0201061, VBO_0201143, VBO_0201174, VBO_0201401, VBO_0201415"
+7,64714403,64463775,"Epidermolysis bullosa, junctionalis, LAMA3-related",Integument (skin) phene,yes,yes,LAMA3,"laminin, alpha 3",https://www.omia.org/OMIA001677/9615/,https://www.omia.org/gene3479814/,VBO_0200574
+9,22656504,22661353,"Hyperkeratosis, epidermolytic",Integument (skin) phene,yes,yes,KRT10,"keratin 10, type I",https://www.omia.org/OMIA001415/9615/,https://www.omia.org/gene26593276/,"VBO_0200338, VBO_0200800, VBO_0200945, VBO_0201135"
+20,45514972,45502644,"Hypothyroidism, congenital dyshormonogenic, with goiter, SLC5A5-related",Endocrine / exocrine gland phene (incl mammary gland),yes,yes,SLC5A5,"solute carrier family 5 (sodium/iodide cotransporter), member 5",https://www.omia.org/OMIA002174/9615/,https://www.omia.org/gene388250977/,"VBO_0200994, VBO_0201223"
+9,4868644,4855717,"Progressive rod-cone degeneration, PRCD-related",Vision / eye phene,yes,yes,PRCD,progressive rod-cone degeneration,https://www.omia.org/OMIA001298/9615/,https://www.omia.org/gene28634284/,"VBO_0200038, VBO_0200046, VBO_0200088, VBO_0200095, VBO_0200097, VBO_0200119, VBO_0200326, VBO_0200338, VBO_0200345, VBO_0200370, VBO_0200486, VBO_0200503, VBO_0200523, VBO_0200610, VBO_0200611, VBO_0200754, VBO_0200793, VBO_0200798, VBO_0200800, VBO_0200814, VBO_0200955, VBO_0200964, VBO_0201048, VBO_0201051, VBO_0201061, VBO_0201067, VBO_0201077, VBO_0201184, VBO_0201237, VBO_0201280, VBO_0201315, VBO_0201317, VBO_0201448"
+21,21823670,21739388,"Deafness, bilateral, and vestibular dysfunction, MYO7A-related",Hearing / vestibular / ear phene,yes,yes,MYO7A,myosin VIIA,https://www.omia.org/OMIA002148/9615/,https://www.omia.org/gene388251254/,VBO_0200442
+31,38152274,38125566,"Leukocyte adhesion deficiency, type I",Immune system phene,yes,yes,ITGB2,"integrin, beta 2 (complement component 3 receptor 3 and 4 subunit)",https://www.omia.org/OMIA000595/9615/,https://www.omia.org/gene403770/,"VBO_0200700, VBO_0200702, VBO_0200902"
+10,1840136,1834457,"Vitamin D-deficiency rickets, type IA",Skeleton phene (incl. short stature & teeth),yes,yes,CYP27B1,"cytochrome P450, family 27, subfamily B, polypeptide 1",https://www.omia.org/OMIA000837/9615/,https://www.omia.org/gene388248469/,"VBO_0201089, VBO_0201160"
+18,49090454,49093840,Dermoid sinus,Integument (skin) phene,yes,yes,FGF4 retrogene on CFA12,fibroblast growth factor 4,https://www.omia.org/OMIA000272/9615/,https://www.omia.org/gene3482387/,"VBO_0200361, VBO_0200406, VBO_0201455, VBO_0200712, VBO_0201135, VBO_0201233, VBO_0201348, VBO_0201448"
+18,49142011,49147073,Dermoid sinus,Integument (skin) phene,yes,yes,FGF19,fibroblast growth factor 19,https://www.omia.org/OMIA000272/9615/,https://www.omia.org/gene23858819/,"VBO_0200361, VBO_0200406, VBO_0201455, VBO_0200712, VBO_0201135, VBO_0201233, VBO_0201348, VBO_0201448"
+18,49057796,49065400,Dermoid sinus,Integument (skin) phene,yes,yes,FGF3,fibroblast growth factor 3,https://www.omia.org/OMIA000272/9615/,https://www.omia.org/gene388306198/,"VBO_0200361, VBO_0200406, VBO_0201455, VBO_0200712, VBO_0201135, VBO_0201233, VBO_0201348, VBO_0201448"
+18,49159378,49167844,Dermoid sinus,Integument (skin) phene,yes,yes,ORAOV1,oral cancer overexpressed 1,https://www.omia.org/OMIA000272/9615/,https://www.omia.org/gene388306207/,"VBO_0200361, VBO_0200406, VBO_0201455, VBO_0200712, VBO_0201135, VBO_0201233, VBO_0201348, VBO_0201448"
+4,70966694,70991860,Acral mutilation syndrome,Nervous system phene,yes,yes,GDNF,glial cell derived neurotrophic factor,https://www.omia.org/OMIA001514/9615/,https://www.omia.org/gene388253976/,"VBO_0200494, VBO_0200497, VBO_0200548, VBO_0200583, VBO_0200893"
+9,19243310,19252910,Alexander disease,Nervous system phene,yes,yes,GFAP,glial fibrillary acidic protein,https://www.omia.org/OMIA001208/9615/,https://www.omia.org/gene388248020/,"VBO_0200131, VBO_0200161, VBO_0200338, VBO_0201455, VBO_0200800, VBO_0201051, VBO_0201061, VBO_0201198"
+7,41586514,41569142,"Cardiomyopathy, dilated, LMNA-related",Cardiovascular system phene,yes,yes,LMNA,lamin A/C,https://www.omia.org/OMIA002796/9615/,https://www.omia.org/gene388247742/,VBO_0200964
+,,,"Lissencephaly, generic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002771/9615/,,"VBO_0200090, VBO_0200702, VBO_0200824, VBO_0200902, VBO_0200994, VBO_0201223, VBO_0201424"
+13,20697736,20646614,Periodic Fever Syndrome,Immune system phene,no,yes,HAS2,hyaluronan synthase 2,https://www.omia.org/OMIA001561/9615/,https://www.omia.org/gene3481181/,VBO_0200351
+13,19644280,19710517,Periodic Fever Syndrome,Immune system phene,no,yes,MTBP,MDM2 binding protein,https://www.omia.org/OMIA001561/9615/,https://www.omia.org/gene388304307/,VBO_0200351
+20,3050338,3048622,"Bernard-Soulier syndrome, type C",Haematopoietic system phene,yes,yes,GP9,glycoprotein IX (platelet),https://www.omia.org/OMIA002207/9615/,https://www.omia.org/gene388304690/,VBO_0200372
+9,56220232,56174435,Exercise-induced collapse,Nervous system phene,yes,yes,DNM1,dynamin 1,https://www.omia.org/OMIA001466/9615/,https://www.omia.org/gene3487940/,"VBO_0200193, VBO_0200214, VBO_0200326, VBO_0200397, VBO_0200800, VBO_0200995"
+,,,Glucose-6-phosphate dehydrogenase deficiency,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000416/9615/,,
+1,4873155,4918572,"Methaemoglobinaemia, CYB5A-related",Haematopoietic system phene,yes,yes,CYB5A,cytochrome b5 type A,https://www.omia.org/OMIA002858/9615/,https://www.omia.org/gene398298900/,VBO_0200902
+10,23565239,23592996,"Methaemoglobinaemia, CYB5R3-related",Haematopoietic system phene,yes,yes,CYB5R3,cytochrome b5 reductase 3,https://www.omia.org/OMIA002131/9615/,https://www.omia.org/gene388243402/,"VBO_0200046, VBO_0200054, VBO_0200197, VBO_0200338, VBO_0200370, VBO_0200495, VBO_0200902, VBO_0201043, VBO_0201051, VBO_0201125, VBO_0201406"
+,,,"Megaoesophagus, generic",Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000631/9615/,,"VBO_0200351, VBO_0200406, VBO_0200530, VBO_0200611, VBO_0200623, VBO_0200702, VBO_0200800, VBO_0200896, VBO_0200938, VBO_0200987, VBO_0201185, VBO_0201287"
+12,58932320,58907909,"Megaoesophagus, MCHR2-related",Digestive / alimentary phene,yes,yes,MCHR2,melanin-concentrating hormone receptor 2,https://www.omia.org/OMIA002716/9615/,https://www.omia.org/gene388199077/,VBO_0200577
+,,,"Myelopathy, hereditary",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002857/9615/,,VBO_0200004
+,,,Ocular-skeletal dysplasia (redundant),,unknown,unknown,,,https://www.omia.org/OMIA000301/9615/,,
+24,47526060,47541889,Oculoskeletal dysplasia 1,Skeleton phene (incl. short stature & teeth),yes,yes,COL9A3,"collagen, type IX, alpha 3",https://www.omia.org/OMIA001522/9615/,https://www.omia.org/gene26648406/,"VBO_0200800, VBO_0200952"
+15,2733779,2748412,Oculoskeletal dysplasia 2,Skeleton phene (incl. short stature & teeth),yes,yes,COL9A2,"collagen, type IX, alpha 2",https://www.omia.org/OMIA001523/9615/,https://www.omia.org/gene3539588/,VBO_0201174
+,,,"Osteogenesis imperfecta, generic",Skeleton phene (incl. short stature & teeth),yes,yes,,,https://www.omia.org/OMIA000754/9615/,,"VBO_0200492, VBO_0200523, VBO_0200577"
+9,26994434,26978359,"Osteogenesis imperfecta, type III, COL1A1-related",Skeleton phene (incl. short stature & teeth),yes,yes,COL1A1,"collagen, type I, alpha 1",https://www.omia.org/OMIA002126/9615/,https://www.omia.org/gene388199150/,VBO_0200610
+33,29648017,29596717,"Skeletal dysplasia 3, PCYT1A-related",Skeleton phene (incl. short stature & teeth),yes,yes,PCYT1A,"phosphate cytidylyltransferase 1, choline, alpha",https://www.omia.org/OMIA002606/9615/,https://www.omia.org/gene388246555/,VBO_0201389
+23,46581332,46535240,"Bleeding disorder, P2RY12-related",Haematopoietic system phene,yes,yes,P2RY12,"purinergic receptor P2Y, G-protein coupled, 12",https://www.omia.org/OMIA001564/9615/,https://www.omia.org/gene442958/,VBO_0200631
+5,82635528,82626129,"Cataract, early onset, HSF4-related",Vision / eye phene,yes,yes,HSF4,heat shock transcription factor 4,https://www.omia.org/OMIA001758/9615/,https://www.omia.org/gene23863019/,"VBO_0200095, VBO_0200204, VBO_0201455, VBO_0200893, VBO_0201296"
+20,43002992,43076845,"Cataract, FYCO1-related",Vision / eye phene,yes,yes,FYCO1,FYVE and coiled-coil domain containing 1,https://www.omia.org/OMIA002536/9615/,https://www.omia.org/gene388245073/,VBO_0201427
+,,,"Cataract, generic",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000168/9615/,,
+1,67721690,68305337,"Congenital muscular dystrophy, LAMA2-related",Muscle phene,yes,yes,LAMA2,laminin subunit alpha 2,https://www.omia.org/OMIA002459/9615/,https://www.omia.org/gene388250508/,"VBO_0200713, VBO_0201296"
+5,32307523,32299943,Screw tail,Limbs / fins / digit / tail phene,yes,yes,DVL2,dishevelled segment polarity protein 2,https://www.omia.org/OMIA002186/9615/,https://www.omia.org/gene388254162/,"VBO_0200034, VBO_0200054, VBO_0200055, VBO_0200204, VBO_0200450, VBO_0200485, VBO_0201455, VBO_0201089, VBO_0201223, VBO_0201296"
+9,19744435,19758300,Thrombasthenia,Haematopoietic system phene,yes,yes,ITGA2B,"integrin, alpha 2b (platelet glycoprotein IIb of IIb/IIIa complex, antigen CD41)",https://www.omia.org/OMIA001000/9615/,https://www.omia.org/gene403789/,"VBO_0200610, VBO_0200629, VBO_0200902, VBO_0200980"
+27,2565565,2571930,"Epidermolysis bullosa simplex, KRT5-related",Integument (skin) phene,yes,yes,KRT5,"keratin 5, type II",https://www.omia.org/OMIA002081/9615/,https://www.omia.org/gene389417605/,"VBO_0200290, VBO_0200577"
+,,,Syringomyelia,Nervous system phene,no,yes,,,https://www.omia.org/OMIA000965/9615/,,"VBO_0200241, VBO_0200309, VBO_0201455, VBO_0201043, VBO_0201174"
+9,49987891,49997435,"Immunodeficiency, CARD9-related",Immune system phene,yes,yes,CARD9,caspase recruitment domain family member 9,https://www.omia.org/OMIA002854/9615/,https://www.omia.org/gene398298895/,VBO_0200896
+25,40359046,40389383,Mitochondrial fission encephalopathy,Nervous system phene,yes,yes,MFF,mitochondrial fission factor,https://www.omia.org/OMIA002551/9615/,https://www.omia.org/gene388245644/,VBO_0200253
+14,525721,520581,"Necrotising myelopathy, IBA57-related",Nervous system phene,yes,yes,IBA57,"IBA57 homolog, iron-sulfur cluster assembly",https://www.omia.org/OMIA000706/9615/,https://www.omia.org/gene388249199/,VBO_0200932
+,,,Multiple ocular defects,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000733/9615/,,"VBO_0200010, VBO_0200309, VBO_0200442, VBO_0200724, VBO_0200969, VBO_0201077, VBO_0201160"
+,,,Nasolacrimal duct obstruction,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002852/9615/,,
+,,,Renal dysplasia,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001135/9615/,,"VBO_0200131, VBO_0200161, VBO_0200210, VBO_0200267, VBO_0200309, VBO_0200372, VBO_0200522, VBO_0200610, VBO_0200819, VBO_0200932, VBO_0201135, VBO_0201223"
+4,73877695,73833571,"Microphthalmia with haematopoietic defects, DNAJC21-related",Vision / eye phene,yes,yes,DNAJC21,DnaJ heat shock protein family (Hsp40) member C21,https://www.omia.org/OMIA002847/9615/,https://www.omia.org/gene398298888/,VBO_0201077
+X,122944801,122978966,Verrucous epidermal keratinocytic nevi,Integument (skin) phene,yes,yes,NSDHL,NAD(P) dependent steroid dehydrogenase-like,https://www.omia.org/OMIA002117/9615/,https://www.omia.org/gene388248422/,"VBO_0200068, VBO_0200338, VBO_0200800, VBO_0200902"
+,,,"Vaccine-induced immune response, variation in",Immune system phene,no,no,,,https://www.omia.org/OMIA002844/9615/,,
+,,,"Tuberculosis, susceptibility/resistance to",Immune system phene,no,yes,,,https://www.omia.org/OMIA001856/9615/,,
+1,56009740,56168234,Brachycephaly,Craniofacial phene,no,yes,SMOC2,SPARC related modular calcium binding 2,https://www.omia.org/OMIA001551/9615/,https://www.omia.org/gene388244786/,
+32,8172037,8196170,Brachycephaly,Craniofacial phene,no,yes,BMP3,bone morphogenetic protein 3,https://www.omia.org/OMIA001551/9615/,https://www.omia.org/gene388253077/,
+5,32307523,32299943,Brachycephaly,Craniofacial phene,no,yes,DVL2,dishevelled segment polarity protein 2,https://www.omia.org/OMIA001551/9615/,https://www.omia.org/gene388254162/,
+,,,Vertebral anomalies,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA001046/9615/,,
+,,,Atresia ani,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000083/9615/,,
+5,63923224,63922271,"Coat colour, extension",Pigmentation phene,yes,no,MC1R,melanocortin 1 receptor (alpha melanocyte stimulating hormone receptor),https://www.omia.org/OMIA001199/9615/,https://www.omia.org/gene489652/,
+5,63923224,63922271,"Coat colour, grizzle",Pigmentation phene,yes,no,MC1R,melanocortin 1 receptor (alpha melanocyte stimulating hormone receptor),https://www.omia.org/OMIA001495/9615/,https://www.omia.org/gene489652/,
+5,63923224,63922271,"Coat colour, melanistic mask",Pigmentation phene,yes,no,MC1R,melanocortin 1 receptor (alpha melanocyte stimulating hormone receptor),https://www.omia.org/OMIA001590/9615/,https://www.omia.org/gene489652/,
+9,21614689,21606902,"Lysosomal storage disease, CNP-related",Lysosomal storage disease,yes,yes,CNP,"2',3'-cyclic nucleotide 3' phosphodiesterase",https://www.omia.org/OMIA002591/9615/,https://www.omia.org/gene388303336/,"VBO_0200427, VBO_0201401"
+,,,"Muscle hypertrophy, dysphagia, and gait abnormalities",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002839/9615/,,VBO_0201455
+,,,Omphalocele,Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA000741/9615/,,
+6,42582738,42570893,"Pontocerebellar hypoplasia, AMPD2-related",Nervous system phene,yes,yes,AMPD2,adenosine monophosphate deaminase 2,https://www.omia.org/OMIA002838/9615/,https://www.omia.org/gene398298883/,VBO_0200365
+5,82240296,82227854,"Immunodeficiency, CARMIL2-related",Respiratory system phene,yes,yes,CARMIL2,capping protein regulator and myosin 1 linker 2,https://www.omia.org/OMIA002835/9615/,https://www.omia.org/gene398298878/,VBO_0200309
+,,,Spinal intradural arachnoid cyst,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001923/9615/,,"VBO_0201455, VBO_0201089, VBO_0201143"
+,,,"Papillomatosis, cutaneous",Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001147/9615/,,
+,,,Hyperlipoproteinaemia,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA001210/9615/,,
+,,,"Polyneuropathy, generic",Nervous system phene,yes,yes,,,https://www.omia.org/OMIA001292/9615/,,"VBO_0200017, VBO_0200055, VBO_0200193, VBO_0200427, VBO_0200610, VBO_0200638, VBO_0200819, VBO_0200896, VBO_0201113, VBO_0201143"
+,,,Afibrinogenaemia or hypofibrinogenaemia,Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA000018/9615/,,
+,,,"Aortic stenosis, subvalvular",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000052/9615/,,
+,,,Black hair follicular dysplasia,Integument (skin) phene,unknown,unknown,,,https://www.omia.org/OMIA000110/9615/,,
+,,,Central core myopathy,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000172/9615/,,VBO_0200623
+,,,"Chondrodysplasia, generic",Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000187/9615/,,VBO_0200629
+,,,Cryptorchidism,Reproductive system phene,no,yes,,,https://www.omia.org/OMIA000243/9615/,,VBO_0201233
+,,,"Deafness, generic",Hearing / vestibular / ear phene,no,yes,,,https://www.omia.org/OMIA000259/9615/,,"VBO_0200088, VBO_0200193, VBO_0200255, VBO_0200298, VBO_0200427, VBO_0200445, VBO_0200486, VBO_0200495, VBO_0200724, VBO_0201421"
+,,,Dental abnormalities,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA002583/9615/,,
+27,1796819,1791762,"Persistent Mullerian duct syndrome, AMHR2-related",Reproductive system phene,yes,yes,AMHR2,"anti-Mullerian hormone receptor, type II",https://www.omia.org/OMIA002775/9615/,https://www.omia.org/gene3484440/,VBO_0200896
+,,,Respiratory distress syndrome,Respiratory system phene,unknown,unknown,,,https://www.omia.org/OMIA000101/9615/,,
+29,241975,20665,"Severe combined immunodeficiency disease, autosomal, PRKDC-related",Immune system phene,yes,yes,PRKDC,"protein kinase, DNA-activated, catalytic polypeptide",https://www.omia.org/OMIA000220/9615/,https://www.omia.org/gene474176/,VBO_0200724
+9,977032,983475,PCYT2 deficiency,Vision / eye phene,yes,yes,PCYT2,"phosphate cytidylyltransferase 2, ethanolamine",https://www.omia.org/OMIA002728/9615/,https://www.omia.org/gene398298867/,VBO_0201158
+,,,Uterine aplasia,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA002822/9615/,,
+,,,"Mastocytosis, cutaneous",Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA002816/9615/,,
+31,21669000,21405966,"Alzheimer disease, APP-related",Nervous system phene,yes,yes,APP,amyloid beta precursor protein,https://www.omia.org/OMIA002538/9615/,https://www.omia.org/gene398298859/,
+2,71930048,71960986,"Polioencephalopathy, MECR-related",Nervous system phene,yes,yes,MECR,mitochondrial trans-2-enoyl-CoA reductase,https://www.omia.org/OMIA002814/9615/,https://www.omia.org/gene398298860/,VBO_0200512
+,,,Woolly hair,Integument (skin) phene,unknown,no,,,https://www.omia.org/OMIA001256/9615/,,
+6,47763689,47960683,"Multiple ocular defects, COL11A1-related",Vision / eye phene,yes,yes,COL11A1,collagen type XI alpha 1 chain,https://www.omia.org/OMIA002811/9615/,https://www.omia.org/gene398298857/,VBO_0200969
+,,,Amelia,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000587/9615/,,
+,,,Anencephaly/Exencephaly,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000044/9615/,,
+,,,Entropion,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000337/9615/,,"VBO_0200062, VBO_0200351, VBO_0201089, VBO_0201223"
+,,,Keratoconjunctivitis sicca,Vision / eye phene,no,yes,,,https://www.omia.org/OMIA002393/9615/,,
+20,5667219,5661948,"Retinal atrophy, progressive, autosomal dominant, RHO-related",Vision / eye phene,yes,yes,RHO,rhodopsin,https://www.omia.org/OMIA001346/9615/,https://www.omia.org/gene493763/,"VBO_0200253, VBO_0200492"
+,,,"Trichiasis, caruncular",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002809/9615/,,VBO_0201223
+13,1253509,1988060,Trapped Neutrophil Syndrome,Haematopoietic system phene,yes,yes,VPS13B,vacuolar protein sorting 13 homolog B (yeast),https://www.omia.org/OMIA001428/9615/,https://www.omia.org/gene27951711/,VBO_0200193
+,,,Complex vertebral malformation,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA001340/9615/,,VBO_0201455
+X,126170925,126024520,Haemophilia A,Haematopoietic system phene,yes,yes,F8,"coagulation factor VIII, procoagulant component",https://www.omia.org/OMIA000437/9615/,https://www.omia.org/gene403875/,"VBO_0200147, VBO_0200193, VBO_0200210, VBO_0200372, VBO_0200577, VBO_0200583, VBO_0200610, VBO_0200702, VBO_0200800, VBO_0200896, VBO_0200969, VBO_0201048, VBO_0201135, VBO_0201233, VBO_0201401"
+1,111058288,111055483,"Hyperlipidaemia/atherosclerosis, APOE-related",Homeostasis / metabolism phene,yes,no,APOE,apolipoprotein E,https://www.omia.org/OMIA002063/9615/,https://www.omia.org/gene388244913/,
+5,61791984,61808701,"Parkinson disease, PARK7-related",Nervous system phene,yes,yes,PARK7,parkinson protein 7,https://www.omia.org/OMIA002488/9615/,https://www.omia.org/gene388247328/,
+10,17395273,17348145,Phelan-McDermid syndrome,Behaviour / neurological phene,yes,yes,SHANK3,SH3 and multiple ankyrin repeat domains 3,https://www.omia.org/OMIA002402/9615/,https://www.omia.org/gene388243383/,
+,,,Polyarthritis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000805/9615/,,VBO_0200406
+37,628235,623197,Muscular hypertrophy (double muscling),Muscle phene,yes,no,MSTN,myostatin,https://www.omia.org/OMIA000683/9615/,https://www.omia.org/gene26535682/,VBO_0201421
+,,,Polyendocrine syndrome,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA002797/9615/,,
+22,30880658,30887978,"Neuronal ceroid lipofuscinosis, 5",Lysosomal storage disease,yes,yes,CLN5,"ceroid-lipofuscinosis, neuronal 5",https://www.omia.org/OMIA001482/9615/,https://www.omia.org/gene485498/,"VBO_0200088, VBO_0200193, VBO_0200610"
+,,,Retinoschisis,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA001185/9615/,,VBO_0200800
+38,22234321,22263231,"Ataxia, cerebellar, KCNJ10-related",Nervous system phene,yes,yes,KCNJ10,"potassium channel, inwardly rectifying subfamily J, member 10",https://www.omia.org/OMIA002089/9615/,https://www.omia.org/gene388253587/,"VBO_0200144, VBO_0200147, VBO_0200406, VBO_0200724, VBO_0200987, VBO_0201145, VBO_0201258"
+,,,"Myelopathy, fibrocartilaginous embolic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001120/9615/,,"VBO_0200161, VBO_0200210, VBO_0200442, VBO_0200577, VBO_0200610, VBO_0200623, VBO_0200706, VBO_0200800, VBO_0200896, VBO_0201143, VBO_0201217, VBO_0201296, VBO_0201448"
+,,,"Rupture of the cranial cruciate ligament, susceptibility to",Skeleton phene (incl. short stature & teeth),no,yes,,,https://www.omia.org/OMIA001474/9615/,,"VBO_0200163, VBO_0200800, VBO_0200938, VBO_0201143, VBO_0201296"
+20,54997233,54999275,Ventricular arrhythmias and sudden death,Cardiovascular system phene,unknown,yes,MICOS13,mitochondrial contact site and cristae organizing system subunit 13,https://www.omia.org/OMIA001040/9615/,https://www.omia.org/gene388245149/,"VBO_0200210, VBO_0200577, VBO_0200819, VBO_0201135"
+,,,Dentinogenesis imperfecta,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA002792/9615/,,VBO_0200800
+,,,"Vena cava defect, generic",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA002791/9615/,,
+,,,Uveodermatological syndrome,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002787/9615/,,
+,,,Acrodermatitis enteropathica,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA000593/9615/,,
+,,,Body weight,Growth / size / body region phene,unknown,no,,,https://www.omia.org/OMIA002077/9615/,,
+,,,"Cardiomyopathy, arrhythmogenic left ventricular",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA002588/9615/,,VBO_0200520
+,,,"Chromosomal abnormality, generic",Chromosomal disorder,unknown,yes,,,https://www.omia.org/OMIA002657/9615/,,
+,,,Infertility,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000562/9615/,,
+,,,Macrothrombocytopenia,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA002143/9615/,,VBO_0200010
+,,,"Melanoma, congenital",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA000634/9615/,,
+,,,Menkes disease,Liver/biliary system phene,unknown,unknown,,,https://www.omia.org/OMIA000640/9615/,,
+,,,"Neurofibromatosis, generic",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA000716/9615/,,
+,,,"Retinal atrophy - Rod-cone dysplasia, CRX related",Vision / eye phene,unknown,unknown,,,https://www.omia.org/OMIA000881/9615/,,
+,,,Sacral agenesis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA002420/9615/,,
+,,,"Cyclic guanosine monophosphate (cGMP) concentration, reduced",Homeostasis / metabolism phene,unknown,no,,,https://www.omia.org/OMIA002774/9615/,,
+,,,"Lymphoma, B-cell, susceptibility to",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002586/9615/,,
+,,,"Cholelithiasis, susceptibility to",Liver/biliary system phene,unknown,yes,,,https://www.omia.org/OMIA002782/9615/,,
+,,,"Adaptation, environment, generic",Normal phene,unknown,no,,,https://www.omia.org/OMIA002637/9615/,,
+,,,"Colonic agenesis, congenital partial",Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA002781/9615/,,
+25,15344721,15434496,"Ataxia, spastic, SACS-related",Nervous system phene,yes,yes,SACS,sacsin molecular chaperone,https://www.omia.org/OMIA002780/9615/,https://www.omia.org/gene388245606/,VBO_0200629
+,,,"Lymphoma, generic",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001733/9615/,,"VBO_0200193, VBO_0200408, VBO_0200442"
+20,49964867,49980270,"Mannosidosis, alpha",Lysosomal storage disease,yes,yes,MAN2B1,"mannosidase, alpha, class 2B, member 1",https://www.omia.org/OMIA000625/9615/,https://www.omia.org/gene388251065/,VBO_0200442
+9,6719394,6725404,"Lethality, BTBD17-related",Mortality / aging (incl. embryonic lethal),yes,yes,BTBD17,BTB (POZ) domain containing 17,https://www.omia.org/OMIA002132/9615/,https://www.omia.org/gene388249908/,VBO_0200583
+,,,"Sex chromosome difference of sexual development, generic",Reproductive system phene,no,yes,,,https://www.omia.org/OMIA002776/9615/,,
+,,,"XY difference of sexual development, generic",Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA001601/9615/,,VBO_0201448
+1,73607891,73642437,"XY difference of sexual development, HSD17B3-related",Reproductive system phene,yes,yes,HSD17B3,hydroxysteroid (17-beta) dehydrogenase 3,https://www.omia.org/OMIA002777/9615/,https://www.omia.org/gene388302837/,VBO_0200406
+9,59379513,59404555,"XY sex reversal, NR5A1-related",Reproductive system phene,yes,yes,NR5A1,,https://www.omia.org/OMIA002296/9615/,https://www.omia.org/gene398298769/,VBO_0201448
+,,,Inflammatory bowel disease,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA001687/9615/,,"VBO_0200193, VBO_0200210, VBO_0200408, VBO_0201455, VBO_0200577, VBO_0201143, VBO_0201401"
+26,39359420,39447205,Colorectal hamartomatous polyposis and ganglioneuromatosis,Neoplasm,yes,yes,PTEN,phosphatase and tensin homolog,https://www.omia.org/OMIA001515/9615/,https://www.omia.org/gene403832/,"VBO_0200611, VBO_0200623"
+25,48438226,48356794,"Muscular dystrophy, Ullrich type, COL6A3-related",Muscle phene,yes,yes,COL6A3,"collagen, type VI, alpha 3",https://www.omia.org/OMIA002274/9615/,https://www.omia.org/gene388199093/,"VBO_0200055, VBO_0200800"
+,,,Cleft lip and palate,Craniofacial phene,yes,yes,,,https://www.omia.org/OMIA001714/9615/,,"VBO_0200210, VBO_0201113, VBO_0201296"
+,,,Leg weakness,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000585/9615/,,"VBO_0200206, VBO_0200485, VBO_0200800, VBO_0200896, VBO_0201233"
+8,14570610,14327816,"Ataxia, cerebellar, RALGAPA1-related",Nervous system phene,yes,yes,RALGAPA1,"Ral GTPase activating protein, alpha subunit 1 (catalytic)",https://www.omia.org/OMIA002757/9615/,https://www.omia.org/gene388307002/,VBO_0200144
+4,54612269,53696389,"Muscular dystrophy, limb-girdle, type R6 (LGMDR6)",Muscle phene,yes,yes,SGCD,"sarcoglycan, delta (35kDa dystrophin-associated glycoprotein)",https://www.omia.org/OMIA002122/9615/,https://www.omia.org/gene388306478/,"VBO_0200204, VBO_0200804"
+,,,"Ehlers-Danlos syndrome, generic",Integument (skin) phene,yes,yes,,,https://www.omia.org/OMIA000327/9615/,,"VBO_0200408, VBO_0008023"
+1,24331495,24326030,"Reduced hair shedding, MC5R-related",Integument (skin) phene,yes,no,MC5R,melanocortin 5 receptor,https://www.omia.org/OMIA002750/9615/,https://www.omia.org/gene388250420/,
+,,,Gingival hypertrophy,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000409/9615/,,VBO_0200210
+8,59589663,59531522,Krabbe disease,Lysosomal storage disease,yes,yes,GALC,galactosylceramidase,https://www.omia.org/OMIA000578/9615/,https://www.omia.org/gene403916/,"VBO_0200090, VBO_0200126, VBO_0200131, VBO_0200183, VBO_0200267, VBO_0200427, VBO_0200702, VBO_0200902, VBO_0201051, VBO_0201143, VBO_0201415"
+,,,External auditory canal atresia,Hearing / vestibular / ear phene,unknown,yes,,,https://www.omia.org/OMIA002751/9615/,,VBO_0200800
+9,21026834,21012211,"Laryngeal paralysis and polyneuropathy, CNTNAP1-related",Nervous system phene,yes,yes,CNTNAP1,contactin associated protein 1,https://www.omia.org/OMIA002301/9615/,https://www.omia.org/gene388255222/,"VBO_0200800, VBO_0200819, VBO_0201117, VBO_0201160"
+,,,"Cardiomyopathy, arrhythmogenic right ventricular",Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA000878/9615/,,VBO_0200210
+18,47186461,47510762,"Long QT syndrome, KCNQ1-related",Cardiovascular system phene,yes,yes,KCNQ1,"potassium channel, voltage gated KQT-like subfamily Q, member 1",https://www.omia.org/OMIA002332/9615/,https://www.omia.org/gene388250219/,VBO_0200497
+,,,"Pelvic organ prolapse, susceptibility to",Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA002581/9615/,,
+,,,Brachycephalic obstructive airway syndrome,Respiratory system phene,no,yes,,,https://www.omia.org/OMIA000145/9615/,,
+38,21323207,21328277,"Polyneuropathy, hypomyelinating, MPZ-related",Nervous system phene,yes,yes,MPZ,myelin protein zero,https://www.omia.org/OMIA002739/9615/,https://www.omia.org/gene388253604/,VBO_0200610
+4,60283914,60388188,"Polyneuropathy, hypomyelinating, SH3TC2-related",Nervous system phene,yes,yes,SH3TC2,SH3 domain and tetratricopeptide repeats 2,https://www.omia.org/OMIA002740/9615/,https://www.omia.org/gene388253960/,VBO_0200610
+,,,"Neoplasm, generic",Neoplasm,no,yes,,,https://www.omia.org/OMIA002587/9615/,,
+,,,Pulmonary valve dysplasia,Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA002730/9615/,,"VBO_0200131, VBO_0200258, VBO_0201455"
+,,,Thoracoabdominal syndrome,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA002729/9615/,,VBO_0200985
+17,19713398,19706608,Obesity,Adipose tissue phene,no,yes,POMC,proopiomelanocortin,https://www.omia.org/OMIA001258/9615/,https://www.omia.org/gene388199157/,"VBO_0200528, VBO_0200800"
+17,19505567,19426953,Obesity,Adipose tissue phene,no,yes,ADCY3,adenylate cyclase 3,https://www.omia.org/OMIA001258/9615/,https://www.omia.org/gene388249697/,"VBO_0200528, VBO_0200800"
+,,,Pelger-Huet anomaly,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000783/9615/,,
+6,39132038,39173761,Polycystic kidney disease,Renal / urinary system phene,yes,yes,PKD1,polycystic kidney disease 1 (autosomal dominant),https://www.omia.org/OMIA000807/9615/,https://www.omia.org/gene26644260/,"VBO_0200255, VBO_0200267, VBO_0200804, VBO_0201415"
+27,5526748,5539570,Hyposegmentation of granulocytes,Haematopoietic system phene,yes,unknown,LMBR1L,limb development membrane protein 1-like,https://www.omia.org/OMIA002700/9615/,https://www.omia.org/gene388306979/,VBO_0200095
+9,35007411,35151837,"Cerebellar abiotrophy, VMP1-related",Nervous system phene,yes,yes,VMP1,vacuole membrane protein 1,https://www.omia.org/OMIA002602/9615/,https://www.omia.org/gene388255333/,VBO_0201434
+,,,Cerebellar cortical atrophy,Nervous system phene,yes,yes,,,https://www.omia.org/OMIA000177/9615/,,
+,,,Cerebellar degeneration,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001221/9615/,,
+,,,Cerebellar Purkinje cell degeneration,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000174/9615/,,
+1,47837738,47786357,"Multiple system degeneration, SERAC1-related",Nervous system phene,yes,yes,SERAC1,serine active site containing 1,https://www.omia.org/OMIA001468/9615/,https://www.omia.org/gene388244778/,"VBO_0200345, VBO_0200688, VBO_0200764"
+18,12406088,12453716,"Myeloencephalopathy, progressive degenerative, PNPLA8-related",Nervous system phene,yes,yes,PNPLA8,patatin-like phospholipase domain containing 8,https://www.omia.org/OMIA000827/9615/,https://www.omia.org/gene388244480/,VBO_0200095
+20,51146788,51141597,Neurodegenerative vacuolar storage disease,Nervous system phene,yes,yes,ATG4D,"autophagy related 4D, cysteine peptidase",https://www.omia.org/OMIA001954/9615/,https://www.omia.org/gene388251083/,VBO_0200804
+,,,Coloboma,Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA000219/9615/,,
+,,,Corneal dystrophy,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000230/9615/,,"VBO_0200131, VBO_0200583, VBO_0200602"
+,,,Distichiasis,Vision / eye phene,no,yes,,,https://www.omia.org/OMIA001841/9615/,,"VBO_0200479, VBO_0200486, VBO_0200662, VBO_0201296, VBO_0201353"
+27,20704954,20624441,Early retinal degeneration,Vision / eye phene,yes,yes,STK38L,serine/threonine kinase 38 like,https://www.omia.org/OMIA001297/9615/,https://www.omia.org/gene26583787/,VBO_0200955
+,,,Ectropion,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000325/9615/,,
+8,35799002,35801808,"Eye malformation, SIX6-related",Vision / eye phene,yes,yes,SIX6,SIX homeobox 6,https://www.omia.org/OMIA002208/9615/,https://www.omia.org/gene388255052/,VBO_0200610
+,,,"Glaucoma, generic",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000411/9615/,,
+-,-,-,"Glaucoma, primary closed-angle",Vision / eye phene,yes,yes,NEB,nebulin,https://www.omia.org/OMIA001871/9615/,https://www.omia.org/gene388244698/,"VBO_0200038, VBO_0200126, VBO_0200429"
+17,52663276,52666350,Goniodysgenesis,Vision / eye phene,yes,yes,OLFML3,olfactomedin-like 3,https://www.omia.org/OMIA001223/9615/,https://www.omia.org/gene388249798/,"VBO_0200193, VBO_0201233"
+,,,Iris sphincter dysplasia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002599/9615/,,VBO_0200427
+,,,Keratitis,Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA001287/9615/,,VBO_0200638
+6,77481101,77504927,Leber congenital amaurosis,Vision / eye phene,yes,yes,RPE65,retinal pigment epithelium-specific protein 65kDa,https://www.omia.org/OMIA001222/9615/,https://www.omia.org/gene403803/,VBO_0200234
+1,49720525,49682496,Ligneous membranitis,Vision / eye phene,yes,yes,PLG,plasminogen,https://www.omia.org/OMIA002020/9615/,https://www.omia.org/gene388199107/,"VBO_0200442, VBO_0200610, VBO_0200856, VBO_0201198, VBO_0201448"
+,,,Microphthalmia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000649/9615/,,
+28,8090965,8083216,"Microphthalmia, isolated, with coloboma",Vision / eye phene,yes,yes,RBP4,"retinol binding protein 4, plasma",https://www.omia.org/OMIA002151/9615/,https://www.omia.org/gene388245927/,VBO_0200703
+,,,"Nystagmus, congenital",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000731/9615/,,
+,,,"Optic nerve hypoplasia, bilateral",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000743/9615/,,"VBO_0200375, VBO_0201051"
+,,,Persistent hyaloid remnants,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA001519/9615/,,VBO_0200095
+7,9875980,9875369,"Retinal atrophy - Rod-cone dysplasia 2, RD3-related",Vision / eye phene,yes,yes,RD3,retinal degeneration 3,https://www.omia.org/OMIA001260/9615/,https://www.omia.org/gene3541705/,VBO_0200375
+4,59584148,59644927,"Retinal atrophy - Rod-cone dysplasia 3, PDE6A-related",Vision / eye phene,yes,yes,PDE6A,"phosphodiesterase 6A, cGMP-specific, rod, alpha",https://www.omia.org/OMIA001314/9615/,https://www.omia.org/gene403620/,"VBO_0200290, VBO_0200345, VBO_0201043"
+,,,"Retinal atrophy, progressive, X-linked, type 3",Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA001517/9615/,,VBO_0200193
+,,,Retinal detachment,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000275/9615/,,
+,,,Vitreous degeneration,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002409/9615/,,"VBO_0200241, VBO_0200713, VBO_0201223"
+10,45150463,45105862,"Achromatopsia-2, CNGA3-related",Vision / eye phene,yes,yes,CNGA3,cyclic nucleotide gated channel alpha 3,https://www.omia.org/OMIA001481/9615/,https://www.omia.org/gene388248616/,"VBO_0200577, VBO_0200800"
+,,,"Glaucoma, primary open angle",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002046/9615/,,"VBO_0200038, VBO_0200131, VBO_0201220, VBO_0201223"
+18,55534952,55522441,Multifocal retinopathy 1,Vision / eye phene,yes,yes,BEST1,bestrophin 1,https://www.omia.org/OMIA001444/9615/,https://www.omia.org/gene26588296/,"VBO_0200034, VBO_0200095, VBO_0200185, VBO_0200253, VBO_0200450, VBO_0200485, VBO_0200492, VBO_0200629, VBO_0200712, VBO_0201000"
+18,55534952,55522441,Multifocal retinopathy 2,Vision / eye phene,yes,yes,BEST1,bestrophin 1,https://www.omia.org/OMIA001553/9615/,https://www.omia.org/gene26588296/,VBO_0200389
+18,55534952,55522441,Multifocal retinopathy 3,Vision / eye phene,yes,yes,BEST1,bestrophin 1,https://www.omia.org/OMIA001554/9615/,https://www.omia.org/gene26588296/,"VBO_0200523, VBO_0200814"
+32,30245558,30265027,"Night blindness, congenital stationary, LRIT3-related",Vision / eye phene,yes,yes,LRIT3,"leucine-rich repeat, immunoglobulin-like and transmembrane domains 3",https://www.omia.org/OMIA001486/9615/,https://www.omia.org/gene388305346/,VBO_0200131
+17,23473219,23461566,Retinal atrophy - Rod-cone dysplasia 4,Vision / eye phene,yes,yes,PCARE,photoreceptor cilium actin regulator,https://www.omia.org/OMIA001575/9615/,https://www.omia.org/gene287044800/,"VBO_0200613, VBO_0200702, VBO_0000668, VBO_0201035, VBO_0201037, VBO_0201051, VBO_0201056, VBO_0201353"
+2,61454518,61519006,"Retinal atrophy, progressive, CNGB1-related",Vision / eye phene,yes,yes,CNGB1,cyclic nucleotide gated channel beta 1,https://www.omia.org/OMIA002723/9615/,https://www.omia.org/gene388305794/,"VBO_0200985, VBO_0201015"
+,,,"Retinal atrophy, progressive, generic",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000830/9615/,,
+17,37111333,37223997,"Retinal atrophy, progressive, MERTK-related",Vision / eye phene,yes,yes,MERTK,"MER proto-oncogene, tyrosine kinase",https://www.omia.org/OMIA001932/9615/,https://www.omia.org/gene388249751/,VBO_0201316
+6,55434279,55561973,Stargardt disease 1,Vision / eye phene,yes,yes,ABCA4,"ATP-binding cassette, sub-family A (ABC1), member 4",https://www.omia.org/OMIA002179/9615/,https://www.omia.org/gene44463606/,VBO_0200800
+18,53896895,53879047,"Leukocyte adhesion deficiency, type III",Immune system phene,yes,yes,FERMT3,fermitin family member 3,https://www.omia.org/OMIA001525/9615/,https://www.omia.org/gene23858892/,"VBO_0200577, VBO_0201143"
+10,27290620,27351106,"Neuroaxonal dystrophy, PLA2G6-related",Nervous system phene,yes,yes,PLA2G6,"phospholipase A2, group VI (cytosolic, calcium-independent)",https://www.omia.org/OMIA002105/9615/,https://www.omia.org/gene388248558/,VBO_0200985
+25,45060350,45103430,"Retinal atrophy, progressive, SAG-related",Vision / eye phene,yes,yes,SAG,S-antigen; retina and pineal gland (arrestin),https://www.omia.org/OMIA001876/9615/,https://www.omia.org/gene403906/,VBO_0200120
+16,46700923,46683089,Factor XI deficiency,Haematopoietic system phene,yes,yes,F11,coagulation factor XI,https://www.omia.org/OMIA000363/9615/,https://www.omia.org/gene3476214/,"VBO_0200497, VBO_0200629, VBO_0200764"
+,,,"Nephritis, autosomal dominant",Renal / urinary system phene,yes,yes,,,https://www.omia.org/OMIA001114/9615/,,"VBO_0200255, VBO_0200427"
+25,40223035,40097773,"Nephropathy, COL4A4 related",Renal / urinary system phene,yes,yes,COL4A4,"collagen, type IV, alpha 4",https://www.omia.org/OMIA002618/9615/,https://www.omia.org/gene403841/,"VBO_0200486, VBO_0200497"
+37,30888770,30912784,"Neuronal ceroid lipofuscinosis, 8",Lysosomal storage disease,yes,yes,CLN8,"ceroid-lipofuscinosis, neuronal 8 (epilepsy, progressive with mental retardation)",https://www.omia.org/OMIA001506/9615/,https://www.omia.org/gene488558/,"VBO_0200023, VBO_0200095, VBO_0200495, VBO_0200583, VBO_0201171"
+13,44464133,44430864,"Retinal atrophy, progressive, CNGA1-related",Vision / eye phene,yes,yes,CNGA1,cyclic nucleotide gated channel alpha 1,https://www.omia.org/OMIA001977/9615/,https://www.omia.org/gene403891/,VBO_0201217
+2,19652419,19672996,"Centronuclear myopathy, HACD1-related",Muscle phene,yes,yes,HACD1,"protein tyrosine phosphatase-like (proline instead of catalytic arginine), member A",https://www.omia.org/OMIA001374/9615/,https://www.omia.org/gene574011/,VBO_0200800
+5,9346109,9323545,"Craniomandibular osteopathy, SLC37A2-related",Craniofacial phene,yes,yes,SLC37A2,"solute carrier family 37 (glucose-6-phosphate transporter), member 2",https://www.omia.org/OMIA002244/9615/,https://www.omia.org/gene388254025/,"VBO_0200126, VBO_0200267, VBO_0201198, VBO_0201415"
+,,,Hyperparathyroidism,Endocrine / exocrine gland phene (incl mammary gland),yes,yes,,,https://www.omia.org/OMIA000508/9615/,,"VBO_0200577, VBO_0200759"
+18,34033703,33993703,Hypocatalasia,Homeostasis / metabolism phene,yes,yes,CAT,catalase,https://www.omia.org/OMIA001138/9615/,https://www.omia.org/gene403474/,"VBO_0200047, VBO_0200131, VBO_0200490, VBO_0200660, VBO_0201051, VBO_0201374"
+18,17253389,17307355,"Leukoencephalomyelopathy, NAPEPLD-related",Nervous system phene,yes,yes,NAPEPLD,N-acyl phosphatidylethanolamine phospholipase D,https://www.omia.org/OMIA001788/9615/,https://www.omia.org/gene389415332/,"VBO_0200623, VBO_0200819, VBO_0201143"
+7,53971999,53918314,"Xanthinuria, type II",Renal / urinary system phene,yes,yes,MOCOS,molybdenum cofactor sulfurase,https://www.omia.org/OMIA001819/9615/,https://www.omia.org/gene388254904/,"VBO_0200309, VBO_0200406, VBO_0200486, VBO_0200862"
+5,60152631,60022493,"Retinal atrophy - Cone-rod dystrophy, NPHP4-related",Vision / eye phene,yes,yes,NPHP4,nephronophthisis 4,https://www.omia.org/OMIA001455/9615/,https://www.omia.org/gene23862912/,"VBO_0200411, VBO_0200421"
+,,,Cervical vertebral compressive myelopathy,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA001894/9615/,,"VBO_0200197, VBO_0200442, VBO_0200623, VBO_0200867"
+,,,Cone degeneration,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002715/9615/,,
+,,,Haemangiosarcoma,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001813/9615/,,"VBO_0200442, VBO_0200577, VBO_0200610"
+16,46736876,46683089,Prekallikrein deficiency,Haematopoietic system phene,yes,yes,KLKB1,"kallikrein B, plasma (Fletcher factor) 1",https://www.omia.org/OMIA000819/9615/,https://www.omia.org/gene26582224/,"VBO_0200351, VBO_0201223"
+3,88754615,89880267,"Ataxia, cerebellar, KCNIP4-related",Nervous system phene,yes,yes,KCNIP4,Kv channel interacting protein 4,https://www.omia.org/OMIA002240/9615/,https://www.omia.org/gene388246955/,VBO_0200953
+14,19699099,19734901,"Osteogenesis imperfecta, COL1A2-related",Skeleton phene (incl. short stature & teeth),yes,yes,COL1A2,"collagen, type I, alpha 2",https://www.omia.org/OMIA002112/9615/,https://www.omia.org/gene26536015/,"VBO_0200131, VBO_0200361, VBO_0200804"
+4,74344944,74373772,"Coat colour, albinism, oculocutaneous type IV",Pigmentation phene,yes,yes,SLC45A2,"solute carrier family 45, member 2",https://www.omia.org/OMIA001821/9615/,https://www.omia.org/gene388253987/,"VBO_0200253, VBO_0200442, VBO_0200824, VBO_0200994, VBO_0201043"
+13,47717855,47799689,Gastrointestinal stromal tumour,Neoplasm,yes,yes,KIT,v-kit Hardy-Zuckerman 4 feline sarcoma viral oncogene homolog,https://www.omia.org/OMIA001516/9615/,https://www.omia.org/gene403811/,
+13,62348334,62087170,Upper airway syndrome,Respiratory system phene,unknown,yes,ADAMTS3,"ADAM metallopeptidase with thrombospondin type 1 motif, 3",https://www.omia.org/OMIA001893/9615/,https://www.omia.org/gene388249186/,VBO_0200962
+24,44469667,44524884,"ACTH-independent adrenal Cushing syndrome, somatic",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,GNAS,GNAS complex locus,https://www.omia.org/OMIA001937/9615/,https://www.omia.org/gene388199395/,
+,,,"Adrenal hyperplasia, congenital, due to 11-beta hydroxylase deficiency",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA001661/9615/,,
+,,,Chiari malformation Type I with syringomyelia,Nervous system phene,no,yes,,,https://www.omia.org/OMIA001861/9615/,,"VBO_0200003, VBO_0200241, VBO_0200309, VBO_0200338, VBO_0200765"
+27,25419340,25572249,"Cardiomyopathy, dilated, ABCC9-related",Cardiovascular system phene,yes,yes,ABCC9,"ATP-binding cassette, sub-family C (CFTR/MRP), member 9",https://www.omia.org/OMIA002710/9615/,https://www.omia.org/gene388252285/,VBO_0200862
+,,,"Dermal arteritis, nasal",Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA002707/9615/,,
+20,57202556,57210586,"Epilepsy, generalized myoclonic, with photosensitivity",Behaviour / neurological phene,yes,yes,DIRAS1,"DIRAS family, GTP-binding RAS-like 1",https://www.omia.org/OMIA002095/9615/,https://www.omia.org/gene388251186/,VBO_0201135
+,,,"Macroglobulinaemia, Waldenström",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002706/9615/,,
+4,57919593,57971180,"Hyperekplexia, GLRA1-related",Nervous system phene,yes,yes,GLRA1,"glycine receptor, alpha 1",https://www.omia.org/OMIA000689/9615/,https://www.omia.org/gene388253940/,VBO_0200881
+25,51163250,51171015,"Hyperoxaluria, primary, type I (Oxalosis I)",Renal / urinary system phene,yes,yes,AGXT,alanine-glyoxylate aminotransferase,https://www.omia.org/OMIA001672/9615/,https://www.omia.org/gene389508874/,"VBO_0200389, VBO_0201352"
+,,,Autoimmune thrombocytopenia,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000095/9615/,,
+12,46368369,46295243,"Cerebellar cortical degeneration, SNX14-related",Nervous system phene,yes,yes,SNX14,sorting nexin 14,https://www.omia.org/OMIA002034/9615/,https://www.omia.org/gene388243793/,VBO_0201389
+2,38692463,38573084,Glucocorticoid resistance,Homeostasis / metabolism phene,yes,yes,NR3C1,"nuclear receptor subfamily 3, group C, member 1 (glucocorticoid receptor)",https://www.omia.org/OMIA002254/9615/,https://www.omia.org/gene388246130/,VBO_0200902
+X,121040671,121137182,Myotubular myopathy 1,Muscle phene,yes,yes,MTM1,myotubularin 1,https://www.omia.org/OMIA001508/9615/,https://www.omia.org/gene26648378/,"VBO_0200214, VBO_0200800, VBO_0201143"
+1,119506650,119521536,"Pseudomyotonia, paradoxical, SLC7A10-related",Muscle phene,yes,yes,SLC7A10,"solute carrier family 7 (neutral amino acid transporter light chain, asc system), member 10",https://www.omia.org/OMIA002645/9615/,https://www.omia.org/gene388250809/,"VBO_0200486, VBO_0200497"
+37,15543812,15452165,"Deafness, KLF7-related",Hearing / vestibular / ear phene,unknown,yes,KLF7,Kruppel-like factor 7 (ubiquitous),https://www.omia.org/OMIA002326/9615/,https://www.omia.org/gene388246772/,VBO_0200097
+16,28382674,28245576,Retinal atrophy - Cone-rod dystrophy 3,Vision / eye phene,yes,yes,ADAM9,ADAM metallopeptidase domain 9,https://www.omia.org/OMIA001520/9615/,https://www.omia.org/gene23852799/,VBO_0200609
+20,22101930,21883312,"Coat colour, white spotting",Pigmentation phene,yes,no,MITF,microphthalmia-associated transcription factor,https://www.omia.org/OMIA000214/9615/,https://www.omia.org/gene415126/,
+8,4355545,4340192,"Ichthyosis, TGM1-related",Integument (skin) phene,yes,yes,TGM1,transglutaminase 1,https://www.omia.org/OMIA000546/9615/,https://www.omia.org/gene403630/,VBO_0200724
+3,41014731,41340884,"Glaucoma, primary open angle, ADAMTS17-related",Vision / eye phene,yes,yes,ADAMTS17,"ADAM metallopeptidase with thrombospondin type 1 motif, 17",https://www.omia.org/OMIA001976/9615/,https://www.omia.org/gene26591637/,"VBO_0200125, VBO_0200126, VBO_0200351, VBO_0201009"
+21,43704400,43760475,"Hyperekplexia (Startle disease), SLC6A5-related",Nervous system phene,yes,yes,SLC6A5,"solute carrier family 6 (neurotransmitter transporter), member 5",https://www.omia.org/OMIA001594/9615/,https://www.omia.org/gene3543883/,"VBO_0200706, VBO_0201274"
+,,,Cleft lip,Craniofacial phene,unknown,yes,,,https://www.omia.org/OMIA000444/9615/,,
+,,,Cleft palate,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000197/9615/,,"VBO_0200239, VBO_0200800, VBO_0201113"
+14,21882338,21903013,"Cleft palate 1, DLX6-related",Digestive / alimentary phene,yes,yes,DLX6,distal-less homeobox 6,https://www.omia.org/OMIA001919/9615/,https://www.omia.org/gene388249276/,VBO_0200964
+9,26959303,26972755,"Muscular dystrophy, limb-girdle, type R3 (LGMDR3)",Muscle phene,yes,yes,SGCA,"sarcoglycan, alpha (50kDa dystrophin-associated glycoprotein)",https://www.omia.org/OMIA002305/9615/,https://www.omia.org/gene388304440/,VBO_0200408
+10,62894268,63067243,"Copper toxicosis, COMMD1-related",Liver/biliary system phene,yes,yes,COMMD1,copper metabolism (Murr1) domain containing 1,https://www.omia.org/OMIA001988/9615/,https://www.omia.org/gene403590/,VBO_0200137
+3,86155381,86187875,"Epilepsy, benign familial juvenile, LGI2-related",Behaviour / neurological phene,yes,yes,LGI2,"leucine-rich repeat LGI family, member 2",https://www.omia.org/OMIA001596/9615/,https://www.omia.org/gene3486092/,VBO_0200804
+MT,14183,15322,"Leukodystrophy, CYTB-related",Nervous system phene,yes,yes,CYTB,cytochrome b,https://www.omia.org/OMIA002684/9615/,https://www.omia.org/gene26753425/,"VBO_0200088, VBO_0201217"
+,,,"Leukodystrophy, generic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001130/9615/,,"VBO_0200427, VBO_0201051, VBO_0201198"
+11,34222689,34240515,"Coat colour, brown, TYRP1-related",Pigmentation phene,yes,no,TYRP1,tyrosinase-related protein 1,https://www.omia.org/OMIA001249/9615/,https://www.omia.org/gene403479/,"VBO_0200095, VBO_0200577, VBO_0200808, VBO_0200819, VBO_0200880, VBO_0201233"
+2,72232624,72034545,"Elliptocytosis, EPB41-related",Haematopoietic system phene,yes,yes,EPB41,erythrocyte membrane protein band 4.1,https://www.omia.org/OMIA002682/9615/,https://www.omia.org/gene388221479/,
+,,,Spherocytosis,Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA001228/9615/,,VBO_0200610
+,,,Hyperhomocysteinaemia,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA002079/9615/,,VBO_0200638
+,,,Hypoadrenocorticism,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000519/9615/,,
+X,61442067,61595242,"Modifier of copper toxicosis, ATP7A-related",Homeostasis / metabolism phene,yes,no,ATP7A,"ATPase, Cu++ transporting, alpha polypeptide",https://www.omia.org/OMIA002608/9615/,https://www.omia.org/gene406185/,VBO_0200800
+,,,"Alzheimer-like disease, generic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000033/9615/,,
+7,23467664,23871975,"Dystonia-ataxia syndrome, paroxysmal, TNR-related",Nervous system phene,yes,yes,TNR,tenascin R,https://www.omia.org/OMIA002663/9615/,https://www.omia.org/gene388254795/,VBO_0201401
+9,20862184,20851596,Glycogen storage disease Ia,Homeostasis / metabolism phene,yes,yes,G6PC,"glucose-6-phosphatase, catalytic subunit",https://www.omia.org/OMIA000418/9615/,https://www.omia.org/gene3429665/,"VBO_0201454, VBO_0200859"
+,,,Ureter abnormality,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA002662/9615/,,
+10,47580243,47618780,"Cystinuria, type I - A",Renal / urinary system phene,yes,yes,SLC3A1,"solute carrier family 3 (amino acid transporter heavy chain), member 1",https://www.omia.org/OMIA000256/9615/,https://www.omia.org/gene403700/,"VBO_0200485, VBO_0201455, VBO_0200800, VBO_0200809, VBO_0200938"
+1,119806922,119830085,"Cystinuria, type II - B",Renal / urinary system phene,yes,yes,SLC7A9,"solute carrier family 7 (amino acid transporter light chain, bo,+ system), member 9",https://www.omia.org/OMIA001880/9615/,https://www.omia.org/gene388250811/,VBO_0200893
+,,,"Haemolytic anaemia, autoimmune",Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000432/9615/,,
+10,1131692,1123804,"Ichthyosis, non-epidermolytic, SDR9C7-related",Integument (skin) phene,yes,yes,SDR9C7,"short chain dehydrogenase/reductase family 9C, member 7",https://www.omia.org/OMIA002659/9615/,https://www.omia.org/gene388248456/,VBO_0200338
+,,,Cardiomyopathy,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000160/9615/,,
+,,,Nephropathy,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000710/9615/,,"VBO_0200161, VBO_0200210, VBO_0200427, VBO_0200995, VBO_0201143, VBO_0201223, VBO_0201401"
+,,,Caudal articular process dysplasia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA002647/9615/,,
+26,8406466,8467508,Darier disease,Integument (skin) phene,yes,yes,ATP2A2,"ATPase, Ca++ transporting, cardiac muscle, slow twitch 2",https://www.omia.org/OMIA002265/9615/,https://www.omia.org/gene388199337/,"VBO_0200495, VBO_0200704, VBO_0201223"
+5,32946524,32962026,"Retinal atrophy, progressive, GUCY2D-related",Vision / eye phene,yes,yes,GUCY2D,"guanylate cyclase 2D, membrane (retina-specific)",https://www.omia.org/OMIA002646/9615/,https://www.omia.org/gene388199326/,VBO_0200585
+,,,Corneal ulceration,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002644/9615/,,
+15,30311189,30230533,Squamous cell carcinoma of the digit,Neoplasm,no,yes,KITLG,KIT ligand,https://www.omia.org/OMIA001787/9615/,https://www.omia.org/gene388199034/,"VBO_0200604, VBO_0201056"
+,,,Thoracolumbar myelopathy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002641/9615/,,VBO_0201089
+,,,Anterior segment dysgenesis,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002636/9615/,,
+9,46703271,46710872,Delayed postoperative hemorrhage,Haematopoietic system phene,yes,yes,SERPINF2,"serpin peptidase inhibitor, clade F (alpha-2 antiplasmin, pigment epithelium derived factor), member 2",https://www.omia.org/OMIA002631/9615/,https://www.omia.org/gene388305872/,"VBO_0200638, VBO_0201195"
+,,,"Pneumonia, aspiration",Respiratory system phene,unknown,yes,,,https://www.omia.org/OMIA001930/9615/,,
+,,,Testicular agenesis,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA002615/9615/,,
+,,,Meningioma,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002634/9615/,,
+37,25288815,25313775,"Ciliary dyskinesia, primary, STK36-related",Respiratory system phene,yes,yes,STK36,serine/threonine kinase 36,https://www.omia.org/OMIA002623/9615/,https://www.omia.org/gene388246795/,VBO_0200095
+,,,Myxomatous valvular degeneration,Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA000654/9615/,,"VBO_0200197, VBO_0200309, VBO_0200406, VBO_0200896, VBO_0201051, VBO_0201448"
+,,,Tricuspid valve dysplasia,Cardiovascular system phene,yes,yes,,,https://www.omia.org/OMIA001345/9615/,,"VBO_0200197, VBO_0200450, VBO_0200800"
+,,,Eye defects,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000358/9615/,,
+34,12496918,12576076,Mammary tumour,Neoplasm,unknown,yes,PIK3CA,"phosphatidylinositol-4,5-bisphosphate 3-kinase, catalytic subunit alpha",https://www.omia.org/OMIA001777/9615/,https://www.omia.org/gene388253233/,
+,,,Gastric dilatation volvulus syndrome,Digestive / alimentary phene,no,yes,,,https://www.omia.org/OMIA000404/9615/,,
+-,-,-,Intervertebral disc disease,Skeleton phene (incl. short stature & teeth),yes,yes,FGF4 retrogene in CFA12,,https://www.omia.org/OMIA000157/9615/,https://www.omia.org/gene398298717/,"VBO_0200038, VBO_0200126, VBO_0200131, VBO_0200290, VBO_0200309, VBO_0200326, VBO_0200338, VBO_0200389, VBO_0200406, VBO_0200497, VBO_0201455, VBO_0200964, VBO_0200994, VBO_0201051, VBO_0201061, VBO_0201223"
+,,,Portosystemic shunt,Haematopoietic system phene,no,yes,,,https://www.omia.org/OMIA000817/9615/,,
+,,,Osteoarthritis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000747/9615/,,
+,,,"Hyperadrenocorticism, generic",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000494/9615/,,
+3,92532617,92515340,Mucopolysaccharidosis I,Lysosomal storage disease,yes,yes,IDUA,"iduronidase, alpha-L-",https://www.omia.org/OMIA000664/9615/,https://www.omia.org/gene4479646/,"VBO_0200204, VBO_0200442, VBO_0200610, VBO_0201023"
+,,,"Melanoma, malignant",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001724/9615/,,
+36,14395064,14302838,"Neuropathy, hereditary sensory and autonomic, SCN9A-related",Nervous system phene,yes,yes,SCN9A,"sodium channel, voltage-gated, type IX, alpha subunit",https://www.omia.org/OMIA002616/9615/,https://www.omia.org/gene388253412/,VBO_0200902
+23,27572135,27700471,"Myasthenic syndrome, congenital, COLQ-related",Muscle phene,yes,yes,LOC608697,2-hydroxyacyl-CoA lyase 1,https://www.omia.org/OMIA001928/9615/,https://www.omia.org/gene388304030/,"VBO_0200610, VBO_0200800"
+21,30753157,30747948,"Neuronal ceroid lipofuscinosis, 2",Lysosomal storage disease,yes,yes,TPP1,tripeptidyl peptidase I,https://www.omia.org/OMIA001472/9615/,https://www.omia.org/gene485337/,VBO_0200406
+,,,"Progressive retinal atrophy, Miniature Schnauzer, type 1 (redundant)",,unknown,unknown,,,https://www.omia.org/OMIA002252/9615/,,
+-,-,-,"Neuropathy, sensory ataxic",Nervous system phene,yes,yes,MTTY,"TRANSFER RNA, MITOCHONDRIAL, TYROSINE",https://www.omia.org/OMIA001467/9615/,https://www.omia.org/gene398298798/,VBO_0200610
+,,,"Hypercalciuria, idiopathic",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA002384/9615/,,
+,,,Pemphigus,Integument (skin) phene,yes,yes,,,https://www.omia.org/OMIA001188/9615/,,
+24,24041356,24084629,"Coat colour, agouti",Pigmentation phene,yes,no,ASIP,agouti signaling protein,https://www.omia.org/OMIA000201/9615/,https://www.omia.org/gene492296/,
+16,57081626,57083181,"Coat colour, dominant black",Pigmentation phene,yes,no,CBD103,beta-defensin 103,https://www.omia.org/OMIA001416/9615/,https://www.omia.org/gene4236237/,
+24,24041356,24084629,"Coat colour, saddle tan vs black-and-tan",Pigmentation phene,yes,no,ASIP,agouti signaling protein,https://www.omia.org/OMIA001806/9615/,https://www.omia.org/gene492296/,"VBO_0200126, VBO_0200995"
+,,,"Dystonia, generic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002069/9615/,,
+,,,"Hepatitis, copper-associated chronic (redundant)",,unknown,unknown,,,https://www.omia.org/OMIA001475/9615/,,
+20,52963476,52964967,"Modifier of copper toxicosis, RETN-related",Homeostasis / metabolism phene,yes,no,RETN,resistin,https://www.omia.org/OMIA002609/9615/,https://www.omia.org/gene388306078/,VBO_0200800
+27,2422007,2427021,"Ichthyosis, KRT1-related",Integument (skin) phene,yes,yes,KRT1,"keratin 1, type II",https://www.omia.org/OMIA002425/9615/,https://www.omia.org/gene388223343/,VBO_0200351
+37,26151769,26167414,"Retinal atrophy, progressive, SLC4A3-related",Vision / eye phene,yes,yes,SLC4A3,"solute carrier family 4 (anion exchanger), member 3",https://www.omia.org/OMIA001572/9615/,https://www.omia.org/gene26591522/,VBO_0200610
+8,60332658,60386187,"Retinal atrophy, progressive, TTC8-related",Vision / eye phene,yes,yes,TTC8,tetratricopeptide repeat domain 8,https://www.omia.org/OMIA001984/9615/,https://www.omia.org/gene388247952/,VBO_0200610
+4,22485192,22847328,"Deafness, CDH23-related",Hearing / vestibular / ear phene,yes,yes,CDH23,cadherin-related 23,https://www.omia.org/OMIA002584/9615/,https://www.omia.org/gene389415032/,VBO_0200136
+6,71475297,71444858,"Acyl-CoA dehydrogenase, medium chain, deficiency of",Nervous system phene,yes,yes,ACADM,"acyl-CoA dehydrogenase, C-4 to C-12 straight chain",https://www.omia.org/OMIA002585/9615/,https://www.omia.org/gene388254719/,VBO_0200309
+,,,Swimmer puppy syndrome (redundant),,unknown,unknown,,,https://www.omia.org/OMIA002546/9615/,,
+,,,Calcinosis circumscripta,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000158/9615/,,VBO_0200577
+6,50468323,50395404,Glycogen storage disease IIIa,Homeostasis / metabolism phene,yes,yes,AGL,"amylo-alpha-1, 6-glucosidase, 4-alpha-glucanotransferase",https://www.omia.org/OMIA001577/9615/,https://www.omia.org/gene3479617/,VBO_0200397
+,,,Hyperinsulinemic hypoglycemia,Endocrine / exocrine gland phene (incl mammary gland),unknown,unknown,,,https://www.omia.org/OMIA002327/9615/,,VBO_0201220
+,,,Maxillary canine-tooth mesioversion,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA002291/9615/,,VBO_0201217
+,,,"Achromatopsia (cone degeneration, hemeralopia), GSPT (redundant)",,unknown,unknown,,,https://www.omia.org/OMIA001676/9615/,,
+,,,Hypolipoproteinaemia (redundant),,unknown,unknown,,,https://www.omia.org/OMIA000524/9615/,,
+,,,Multiple autoimmune diseases syndrome,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA001808/9615/,,"VBO_0200713, VBO_0201048"
+,,,"Nephritis, autosomal recessive (redundant)",Homeostasis / metabolism phene,unknown,unknown,,,https://www.omia.org/OMIA001359/9615/,,
+,,,Osteochondrosis dissecans (redundant),,unknown,unknown,,,https://www.omia.org/OMIA000751/9615/,,
+,,,Pentalogy of Fallot,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001857/9615/,,VBO_0201177
+,,,"Polyglandular autoimmune syndrome, type II",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA001179/9615/,,"VBO_0200442, VBO_0200819"
+,,,Rupture of the anterior cruciate ligament (redundant),,unknown,unknown,,,https://www.omia.org/OMIA002527/9615/,,
+,,,Swimming pup syndrome (redundant),,unknown,unknown,,,https://www.omia.org/OMIA000962/9615/,,
+,,,"Tail, curl (redundant)",,unknown,unknown,,,https://www.omia.org/OMIA001811/9615/,,
+,,,Acrochordonous plaque,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001370/9615/,,"VBO_0200258, VBO_0201089"
+,,,Anal furunculosis,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA001589/9615/,,VBO_0200577
+,,,Budd-chiari syndrome,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001203/9615/,,"VBO_0200309, VBO_0200765"
+,,,Comedo syndrome,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001272/9615/,,"VBO_0201185, VBO_0201436"
+,,,Cricopharyngeal dysfunction,Digestive / alimentary phene,yes,yes,,,https://www.omia.org/OMIA001418/9615/,,VBO_0200610
+,,,Follicular dysplasia and interface dermatitis,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001369/9615/,,VBO_0200210
+,,,Fragmented coronoid process,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001167/9615/,,
+,,,Hyperphosphatasaemia,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001240/9615/,,VBO_0201233
+,,,Lymphoproliferative disease,Neoplasm,no,yes,,,https://www.omia.org/OMIA001409/9615/,,
+,,,Medial coronoid disease,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001863/9615/,,VBO_0200800
+,,,Myelin defect (redundant),,unknown,unknown,,,https://www.omia.org/OMIA001204/9615/,,
+,,,Myelopathy (redundant),,unknown,unknown,,,https://www.omia.org/OMIA001162/9615/,,
+,,,Neuronal abiotrophy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001164/9615/,,VBO_0200764
+,,,Neuronal vacuolar disorder,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001303/9615/,,VBO_0201143
+,,,"Neuronopathy, progressive",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001282/9615/,,VBO_0200267
+,,,Retinal and skeletal dysplasia,Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA001182/9615/,,"VBO_0200054, VBO_0200800"
+,,,Retinal dysplasia and persistent primary vitreous,Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA001420/9615/,,VBO_0200896
+,,,Stomatocytosis and gastritis,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001178/9615/,,
+,,,"Vasculopathy, cutaneous and renal",Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001220/9615/,,VBO_0200638
+,,,"Optic chiasm, absence of",Nervous system phene,yes,yes,,,https://www.omia.org/OMIA001116/9615/,,VBO_0200144
+,,,Tapetal degeneration,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000980/9615/,,VBO_0200131
+,,,"Axonopathy, progressive",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000825/9615/,,VBO_0200210
+,,,Day blindness,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000726/9615/,,VBO_0200234
+,,,Nervous,Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA000713/9615/,,VBO_0201029
+,,,Neurogenic muscular atrophy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000719/9615/,,VBO_0200494
+,,,Night blindness,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002580/9615/,,VBO_0200234
+,,,Oesophageal motility disorder,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000738/9615/,,
+,,,Orchitis,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000745/9615/,,VBO_0200131
+,,,Granule cell type cerebellar hypoplasia,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000427/9615/,,VBO_0200131
+,,,"Haemolytic anaemia, nonspherocytic",Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000433/9615/,,"VBO_0200120, VBO_0200131"
+,,,Hodgkin disease,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA000476/9615/,,
+,,,Hyperkinesis,Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA000503/9615/,,"VBO_0200427, VBO_0201198"
+,,,Iris atrophy,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000566/9615/,,VBO_0200406
+,,,Mitochondrial myopathy (redundant),,unknown,unknown,,,https://www.omia.org/OMIA001285/9615/,,
+,,,Multiple anomalies,Skeleton phene (incl. short stature & teeth),yes,yes,,,https://www.omia.org/OMIA000669/9615/,,VBO_0200095
+,,,"Muscular dystrophy, dysphagia-associated",Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000681/9615/,,
+,,,"Myopathy, congenital",Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000694/9615/,,VBO_0201174
+,,,"Myopathy, progressive, subacute",Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000696/9615/,,VBO_0201237
+,,,"Myopathy, sex-linked",Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000692/9615/,,VBO_0200704
+,,,"Neuropathy, hypertrophic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000518/9615/,,VBO_0201351
+,,,Focal metatarsal fistula,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA000389/9615/,,"VBO_0200577, VBO_0200638"
+17,830903,866744,"Thyroid follicular cell carcinoma, susceptibility to",Neoplasm,unknown,yes,TPO,thyroid peroxidase,https://www.omia.org/OMIA002380/9615/,https://www.omia.org/gene403521/,VBO_0200570
+23,2871778,2837297,"Ichthyosis, ABHD5-related",Integument (skin) phene,yes,yes,ABHD5,abhydrolase domain containing 5,https://www.omia.org/OMIA002368/9615/,https://www.omia.org/gene388251536/,VBO_0200610
+20,51009858,50920493,"Centronuclear myopathy 1, DNM2-related",Muscle phene,yes,yes,DNM2,dynamin 2,https://www.omia.org/OMIA002534/9615/,https://www.omia.org/gene388251079/,VBO_0200193
+,,,Glioma susceptibility,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002012/9615/,,
+18,13402315,13395100,"Coat colour, dark red",Pigmentation phene,unknown,no,GPR22,G protein-coupled receptor 22,https://www.omia.org/OMIA002569/9615/,https://www.omia.org/gene388303175/,VBO_0201048
+,,,"Gallbladder, agenesis of",Liver/biliary system phene,unknown,yes,,,https://www.omia.org/OMIA002567/9615/,,
+,,,"Leishmaniasis, susceptibility/resistance to",Immune system phene,unknown,yes,,,https://www.omia.org/OMIA001807/9615/,,
+18,52667675,52649609,Dyserythropoietic anemia and myopathy syndrome,Haematopoietic system phene,yes,yes,EHBP1L1,EH domain binding protein 1-like 1,https://www.omia.org/OMIA002564/9615/,https://www.omia.org/gene388250269/,"VBO_0200497, VBO_0200800"
+3,92774237,92746064,Retinal atrophy - Rod-cone dysplasia 1,Vision / eye phene,yes,yes,PDE6B,"phosphodiesterase 6B, cGMP-specific, rod, beta",https://www.omia.org/OMIA000882/9615/,https://www.omia.org/gene399653/,VBO_0200702
+36,16511922,16305983,"Cerebellar degeneration-myositis complex, SLC25A12-related",Nervous system phene,yes,yes,SLC25A12,"solute carrier family 25 (aspartate/glutamate carrier), member 12",https://www.omia.org/OMIA002294/9615/,https://www.omia.org/gene388246702/,"VBO_0200463, VBO_0200964"
+3,224101,93843,Familial adenomatous polyposis,Neoplasm,yes,yes,APC,adenomatous polyposis coli,https://www.omia.org/OMIA001916/9615/,https://www.omia.org/gene388246964/,VBO_0200724
+34,13860663,13816636,"Ciliary dyskinesia, primary, CCDC39-related",Respiratory system phene,yes,yes,CCDC39,coiled-coil domain containing 39,https://www.omia.org/OMIA001540/9615/,https://www.omia.org/gene3485550/,VBO_0200969
+18,34303932,34265986,"Ciliary dyskinesia, primary, generic",Respiratory system phene,yes,yes,NAT10,N-acetyltransferase 10 (GCN5-related),https://www.omia.org/OMIA000573/9615/,https://www.omia.org/gene388250021/,"VBO_0200163, VBO_0200351, VBO_0200361, VBO_0200406, VBO_0200427, VBO_0200442, VBO_0200495, VBO_0200497, VBO_0200610, VBO_0200938, VBO_0201143, VBO_0201185, VBO_0201296"
+11,26645447,26624451,"Ciliary dyskinesia, primary, NME5-related",Respiratory system phene,yes,yes,NME5,NME/NM23 family member 5,https://www.omia.org/OMIA002206/9615/,https://www.omia.org/gene388305257/,VBO_0200017
+,,,Ectopic ureter,Renal / urinary system phene,no,yes,,,https://www.omia.org/OMIA001891/9615/,,VBO_0200503
+9,50799767,50833236,"Geleophysic dysplasia, ADMATSL2-related",Skeleton phene (incl. short stature & teeth),yes,yes,ADAMTSL2,ADAMTS-like 2,https://www.omia.org/OMIA001509/9615/,https://www.omia.org/gene26593484/,VBO_0200131
+9,2247757,2233266,Glycogen storage disease II,Lysosomal storage disease,yes,yes,GAA,"glucosidase, alpha; acid",https://www.omia.org/OMIA000419/9615/,https://www.omia.org/gene388249964/,"VBO_0200523, VBO_0200814, VBO_0201315"
+36,30921527,30769002,"classical Ehlers-Danlos syndrome (cEDS), COL5A2-related",Integument (skin) phene,yes,yes,COL5A2,"collagen, type V, alpha 2",https://www.omia.org/OMIA002295/9615/,https://www.omia.org/gene388246732/,VBO_0200338
+,,,Osteochondritis dissecans,Skeleton phene (incl. short stature & teeth),no,yes,,,https://www.omia.org/OMIA000748/9615/,,"VBO_0200088, VBO_0200161, VBO_0200193, VBO_0200255, VBO_0200372, VBO_0200450, VBO_0200583, VBO_0200610, VBO_0200623, VBO_0200629, VBO_0200702, VBO_0200706, VBO_0200793, VBO_0200800, VBO_0200938, VBO_0200969, VBO_0201143, VBO_0201160, VBO_0201351, VBO_0201389"
+,,,Masticatory muscle myositis,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA001134/9615/,,
+7,41193313,41176717,"Episodic falling, BCAN-related",Nervous system phene,yes,yes,BCAN,brevican,https://www.omia.org/OMIA001592/9615/,https://www.omia.org/gene13003115/,VBO_0200309
+2,57746022,57775171,"Gangliosidosis, GM2, type II (Sandhoff or variant 0)",Lysosomal storage disease,yes,yes,HEXB,hexosaminidase B (beta polypeptide),https://www.omia.org/OMIA001462/9615/,https://www.omia.org/gene296413295/,"VBO_0200610, VBO_0200902, VBO_0201061, VBO_0201220"
+18,45796802,45647570,"Osteochondromatosis, EXT2-related",Skeleton phene (incl. short stature & teeth),yes,yes,EXT2,exostosin glycosyltransferase 2,https://www.omia.org/OMIA001214/9615/,https://www.omia.org/gene388244566/,VBO_0200055
+13,30105421,30048859,"Polyneuropathy,  NDRG1-related",Nervous system phene,yes,yes,NDRG1,N-myc downstream regulated 1,https://www.omia.org/OMIA002120/9615/,https://www.omia.org/gene26587068/,"VBO_0200017, VBO_0200638"
+13,37804968,37796064,Congenital keratoconjunctivitis sicca and ichthyosiform dermatosis,Vision / eye phene,yes,yes,FAM83H,"family with sequence similarity 83, member H",https://www.omia.org/OMIA001683/9615/,https://www.omia.org/gene180373696/,VBO_0200309
+14,13379530,13307604,Gallbladder mucoceles,Liver/biliary system phene,unknown,yes,ABCB4,"ATP-binding cassette, sub-family B (MDR/TAP), member 4",https://www.omia.org/OMIA001524/9615/,https://www.omia.org/gene23857841/,"VBO_0200267, VBO_0200372, VBO_0200896, VBO_0201043, VBO_0201217"
+17,830903,866744,"Hypothyroidism, congenital",Endocrine / exocrine gland phene (incl mammary gland),yes,yes,TPO,thyroid peroxidase,https://www.omia.org/OMIA000536/9615/,https://www.omia.org/gene403521/,"VBO_0201455, VBO_0200604, VBO_0201125, VBO_0201195, VBO_0201280, VBO_0201342, VBO_0201361"
+36,19255411,19170174,"Neonatal encephalopathy with seizures, ATF2-related",Nervous system phene,yes,yes,ATF2,activating transcription factor 2,https://www.omia.org/OMIA001471/9615/,https://www.omia.org/gene26584660/,VBO_0201056
+5,14730034,14720316,"Neuroaxonal dystrophy, VPS11-related",Nervous system phene,yes,yes,VPS11,vacuolar protein sorting 11 homolog (S. cerevisiae),https://www.omia.org/OMIA002152/9615/,https://www.omia.org/gene388254089/,VBO_0201143
+21,23244497,23235602,"Osteogenesis imperfecta, SERPINH1-related",Skeleton phene (incl. short stature & teeth),yes,yes,SERPINH1,"serpin peptidase inhibitor, clade H (heat shock protein 47), member 1, (collagen binding protein 1)",https://www.omia.org/OMIA001483/9615/,https://www.omia.org/gene3483476/,VBO_0200406
+33,7924899,7842019,"Retinal atrophy, progressive, IMPG2-related",Vision / eye phene,yes,yes,IMPG2,interphotoreceptor matrix proteoglycan 2,https://www.omia.org/OMIA002289/9615/,https://www.omia.org/gene388303885/,VBO_0200824
+28,22616330,22687337,"Cardiomyopathy, dilated, RBM20-related",Cardiovascular system phene,yes,yes,RBM20,RNA binding motif protein 20,https://www.omia.org/OMIA002365/9615/,https://www.omia.org/gene388252456/,"VBO_0200604, VBO_0201189"
+,,,Facial dysmorphia,Craniofacial phene,yes,yes,,,https://www.omia.org/OMIA002239/9615/,,VBO_0200800
+,,,Pyoderma,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001877/9615/,,VBO_0200577
+15,2902313,2973313,"Photoreceptor dysplasia, PPT1-related",Vision / eye phene,yes,yes,PPT1,palmitoyl-protein thioesterase 1,https://www.omia.org/OMIA001311/9615/,https://www.omia.org/gene475316/,VBO_0200896
+31,38938729,38956907,"Muscular dystrophy, Ullrich type, COL6A1-related",Muscle phene,yes,yes,COL6A1,"collagen, type VI, alpha 1",https://www.omia.org/OMIA001967/9615/,https://www.omia.org/gene388199166/,VBO_0200809
+27,6732671,6687848,Glycogen storage disease VII,Homeostasis / metabolism phene,yes,yes,PFKM,"phosphofructokinase, muscle",https://www.omia.org/OMIA000421/9615/,https://www.omia.org/gene403849/,"VBO_0200038, VBO_0200440, VBO_0200486, VBO_0201421"
+18,26347768,26364453,"Deafness, EPS8L2-related",Hearing / vestibular / ear phene,yes,yes,EPS8L2,EPS8-like 2,https://www.omia.org/OMIA002550/9615/,https://www.omia.org/gene389509222/,VBO_0201135
+,,,Repetitive behaviour,Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA002545/9615/,,
+,,,Alloxan-diabetes,Homeostasis / metabolism phene,no,yes,,,https://www.omia.org/OMIA000029/9615/,,
+14,47746501,47796142,"Respiratory distress syndrome, ANLN-related",Respiratory system phene,yes,yes,ANLN,anillin actin binding protein,https://www.omia.org/OMIA002539/9615/,https://www.omia.org/gene388249339/,VBO_0200427
+-,-,-,"Skeletal dysplasia, FGF4-retrogene-related",Skeleton phene (incl. short stature & teeth),yes,yes,FGF4 retrogene on CFA12,,https://www.omia.org/OMIA002133/9615/,https://www.omia.org/gene398298783/,VBO_0200964
+,,,"Onychomadesis, symmetrical",Integument (skin) phene,no,yes,,,https://www.omia.org/OMIA001989/9615/,,"VBO_0200193, VBO_0200613"
+1,106568222,106563986,"Amelogenesis imperfecta, ACP4-related",Skeleton phene (incl. short stature & teeth),yes,yes,ACPT,"acid phosphatase, testicular",https://www.omia.org/OMIA002177/9615/,https://www.omia.org/gene388250633/,"VBO_0200010, VBO_0200027"
+2,81842888,81861861,"Neuronal ceroid lipofuscinosis, 12",Lysosomal storage disease,yes,yes,ATP13A2,ATPase type 13A2,https://www.omia.org/OMIA001552/9615/,https://www.omia.org/gene389416873/,"VBO_0200088, VBO_0201353"
+18,26230043,26227144,Ameloblastoma,Neoplasm,unknown,yes,HRAS,Harvey rat sarcoma viral oncogene homolog,https://www.omia.org/OMIA002171/9615/,https://www.omia.org/gene388199224/,
+-,-,-,"Height, IGF1-AS-associated body-size variation",Growth / size / body region phene,no,no,IGF1-AS (LOC111090066),,https://www.omia.org/OMIA002524/9615/,https://www.omia.org/gene398298776/,
+,,,Anal gland disease,Endocrine / exocrine gland phene (incl mammary gland),no,yes,,,https://www.omia.org/OMIA002523/9615/,,
+,,,Diabetes,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000277/9615/,,
+12,63187531,63079955,"Ataxia, HACE1-related",Nervous system phene,yes,yes,HACE1,HECT domain and ankyrin repeat containing E3 ubiquitin protein ligase 1,https://www.omia.org/OMIA002522/9615/,https://www.omia.org/gene388243815/,VBO_0200955
+,,,Valvular pulmonic stenosis,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001038/9615/,,
+2,42575135,42566457,"Pancreatitis, hereditary",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,SPINK1,"serine peptidase inhibitor, Kazal type 1",https://www.omia.org/OMIA001403/9615/,https://www.omia.org/gene26645438/,
+34,22119559,21969192,Lundehund syndrome,Digestive / alimentary phene,yes,yes,P3H2,prolyl 3-hydroxylase 2,https://www.omia.org/OMIA002031/9615/,https://www.omia.org/gene388246610/,VBO_0200838
+,,,Thrombopathia,Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA001003/9615/,,
+,,,Brachygnathia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000147/9615/,,
+,,,Patent ductus arteriosus,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000779/9615/,,
+31,26654922,26662986,"Dyskinesia, paroxysmal, SOD1-related",Nervous system phene,yes,yes,SOD1,"superoxide dismutase 1, soluble",https://www.omia.org/OMIA002322/9615/,https://www.omia.org/gene403559/,VBO_0200469
+2,60219421,60250791,Bardet-Biedl syndrome 2,Vision / eye phene,yes,yes,BBS2,Bardet-Biedl syndrome 2,https://www.omia.org/OMIA002484/9615/,https://www.omia.org/gene388246182/,VBO_0201217
+,,,Lymphangiosarcoma,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002476/9615/,,
+38,16925143,16982995,"Dental-skeletal-retinal anomaly, MIA3-related",Skeleton phene (incl. short stature & teeth),yes,yes,MIA3,MIA SH3 domain ER export factor 3,https://www.omia.org/OMIA002465/9615/,https://www.omia.org/gene388246862/,VBO_0200712
+32,5395076,5294681,"Dwarfism, PRKG2-related",Skeleton phene (incl. short stature & teeth),yes,yes,PRKG2,protein kinase cGMP-dependent 2,https://www.omia.org/OMIA001485/9615/,https://www.omia.org/gene388253078/,VBO_0200445
+10,30671995,31198842,"Muscular dystrophy-dystroglycanopathy, LARGE1-related",Muscle phene,yes,yes,LARGE,like-glycosyltransferase,https://www.omia.org/OMIA002460/9615/,https://www.omia.org/gene388243435/,VBO_0200800
+,,,Atrial fibrillation,Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA001181/9615/,,
+,,,Caudal cruciate ligament disease,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA002463/9615/,,VBO_0200126
+,,,"Pancreatic insufficiency, exocrine",Endocrine / exocrine gland phene (incl mammary gland),no,yes,,,https://www.omia.org/OMIA000765/9615/,,
+,,,"Epidermolysis bullosa, junctionalis",Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA000342/9615/,,VBO_0200583
+,,,"Alanine aminotransferase, reduced activty",Homeostasis / metabolism phene,unknown,unknown,,,https://www.omia.org/OMIA002446/9615/,,
+,,,"Xanthinuria, generic",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001283/9615/,,
+17,25524534,25464496,"Xanthinuria, type I",Renal / urinary system phene,yes,yes,XDH,xanthine dehydrogenase,https://www.omia.org/OMIA002445/9615/,https://www.omia.org/gene388249725/,VBO_0200902
+14,60802007,60697897,"Chondrodysplasia, SLC13A1-related",Skeleton phene (incl. short stature & teeth),yes,yes,SLC13A1,"solute carrier family 13 (sodium/sulfate symporter), member 1",https://www.omia.org/OMIA001400/9615/,https://www.omia.org/gene388249353/,VBO_0201051
+,,,Osteochondrodysplasia,Skeleton phene (incl. short stature & teeth),no,yes,,,https://www.omia.org/OMIA001315/9615/,,VBO_0201195
+,,,Chronic valvular disease,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001246/9615/,,
+,,,Thrombocytopenia,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001001/9615/,,
+,,,"Thrombocytopenia, TUBB1-related",Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA002434/9615/,,"VBO_0200267, VBO_0200309, VBO_0200945"
+,,,Diabetes mellitus,Endocrine / exocrine gland phene (incl mammary gland),no,yes,,,https://www.omia.org/OMIA000279/9615/,,
+5,32678721,32665395,"Histiocytosis, malignant",Neoplasm,no,yes,TP53,tumor protein p53,https://www.omia.org/OMIA000620/9615/,https://www.omia.org/gene403869/,"VBO_0200161, VBO_0200528, VBO_0200610, VBO_0200896, VBO_0201143"
+,,,Hypertension,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000509/9615/,,
+,,,Mast cell tumour,Neoplasm,no,yes,,,https://www.omia.org/OMIA001797/9615/,,
+,,,Osteodystrophy,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000753/9615/,,
+,,,"Otitis externa, susceptibility to",Hearing / vestibular / ear phene,unknown,yes,,,https://www.omia.org/OMIA001110/9615/,,
+10,28817559,28909010,May-Hegglin anomaly,Haematopoietic system phene,yes,yes,MYH9,"myosin, heavy chain 9, non-muscle",https://www.omia.org/OMIA001608/9615/,https://www.omia.org/gene23857153/,VBO_0201089
+,,,"Agenesis, renal",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA002007/9615/,,
+,,,Elbow dysplasia,Skeleton phene (incl. short stature & teeth),no,yes,,,https://www.omia.org/OMIA000330/9615/,,
+,,,Systemic lupus erythematosus,Immune system phene,no,yes,,,https://www.omia.org/OMIA000968/9615/,,
+6,548724,535764,Mucopolysaccharidosis VII,Lysosomal storage disease,yes,yes,GUSB,"glucuronidase, beta",https://www.omia.org/OMIA000667/9615/,https://www.omia.org/gene403831/,"VBO_0200231, VBO_0200577"
+,,,"Blood group systems, generic",Haematopoietic system phene,unknown,no,,,https://www.omia.org/OMIA000116/9615/,,
+10,7971606,8151219,"Ears, folded (drop vs prick)",Hearing / vestibular / ear phene,unknown,no,MSRB3,methionine sulfoxide reductase B3,https://www.omia.org/OMIA000319/9615/,https://www.omia.org/gene388303816/,
+,,,"Hepatic encephalopathy, portosystemic",Liver/biliary system phene,unknown,yes,,,https://www.omia.org/OMIA000816/9615/,,
+,,,Vitiligo,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001055/9615/,,
+,,,Choroid plexus tumour,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002403/9615/,,
+,,,Androgen insensitivity syndrome (AIS),Reproductive system phene,yes,yes,,,https://www.omia.org/OMIA000991/9615/,,
+,,,"Coat colour, generic",Pigmentation phene,yes,no,,,https://www.omia.org/OMIA000200/9615/,,
+,,,"Liver fibrosis, congential, generic",Liver/biliary system phene,unknown,yes,,,https://www.omia.org/OMIA002392/9615/,,VBO_0200210
+,,,Pyometra,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA002391/9615/,,
+X,33156658,33082215,"Retinal atrophy, progressive X-linked, type 1",Vision / eye phene,yes,yes,RPGR,retinitis pigmentosa GTPase regulator,https://www.omia.org/OMIA000831/9615/,https://www.omia.org/gene403726/,"VBO_0201174, VBO_0201233, VBO_0201401"
+15,52933990,52924743,"Afibrinogenaemia, FGA-related",Haematopoietic system phene,yes,yes,FGA,fibrinogen alpha chain,https://www.omia.org/OMIA002382/9615/,https://www.omia.org/gene388244177/,VBO_0200411
+23,44566353,44606057,"Coat colour, HPS3-related",Pigmentation phene,yes,unknown,HPS3,Hermansky-Pudlak syndrome 3,https://www.omia.org/OMIA002275/9615/,https://www.omia.org/gene388251625/,VBO_0201455
+27,6920266,6976964,"Vitamin D-deficiency rickets, type II",Skeleton phene (incl. short stature & teeth),yes,yes,VDR,"vitamin D (1,25- dihydroxyvitamin D3) receptor",https://www.omia.org/OMIA001431/9615/,https://www.omia.org/gene27954922/,VBO_0201043
+15,3983099,3985924,"Polyneuropathy, GJA9-related",Nervous system phene,yes,yes,GJA9,"gap junction protein, alpha 9, 59kDa",https://www.omia.org/OMIA002119/9615/,https://www.omia.org/gene389414795/,VBO_0200819
+11,21936235,21931257,"Fecundity, GDF9-related",Reproductive system phene,no,no,GDF9,growth differentiation factor 9,https://www.omia.org/OMIA002362/9615/,https://www.omia.org/gene389090111/,VBO_0200503
+,,,"Fecundity, generic",Reproductive system phene,no,no,,,https://www.omia.org/OMIA001943/9615/,,
+,,,Transitional lumbosacral vertebrae,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA001014/9615/,,"VBO_0200338, VBO_0200577, VBO_0200800"
+,,,"Prostatic hyperplasia, benign",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002355/9615/,,VBO_0201135
+,,,"Coat colour, phaeomelanin dilution, generic",Pigmentation phene,unknown,no,,,https://www.omia.org/OMIA002350/9615/,,
+20,56514447,56522856,"Coat colour, phaeomelanin dilution, MFSD12-related",Pigmentation phene,yes,no,MFSD12,major facilitator superfamily domain containing 12,https://www.omia.org/OMIA002197/9615/,https://www.omia.org/gene388251177/,
+X,38063932,38037857,"Retinal dysplasia, NDP-related",Vision / eye phene,yes,yes,NDP,Norrie disease (pseudoglioma),https://www.omia.org/OMIA002348/9615/,https://www.omia.org/gene388306737/,VBO_0200486
+7,44615788,44781462,"Deafness, LOXHD1-related",Hearing / vestibular / ear phene,yes,yes,LOXHD1,lipoxygenase homology domains 1,https://www.omia.org/OMIA002336/9615/,https://www.omia.org/gene388254896/,VBO_0201143
+,,,"Amyloidosis, AA",Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000038/9615/,,
+,,,Prostate cancer,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA002335/9615/,,
+15,30311189,30230533,"Coat colour, phaeomelanin dilution, KITLG-related",Pigmentation phene,yes,no,KITLG,KIT ligand,https://www.omia.org/OMIA002228/9615/,https://www.omia.org/gene388199034/,
+2,32565906,32602813,"Epilepsy, mitochondrial dysfunction and neurodegeneration, PITRM1-related",Behaviour / neurological phene,yes,yes,PITRM1,pitrilysin metallopeptidase 1,https://www.omia.org/OMIA002324/9615/,https://www.omia.org/gene388246109/,VBO_0200987
+38,11776697,11089431,"Coat colour, roan",Pigmentation phene,yes,no,USH2A,"Usher syndrome 2A (autosomal recessive, mild)",https://www.omia.org/OMIA001216/9615/,https://www.omia.org/gene388253552/,"VBO_0200088, VBO_0200486, VBO_0200583, VBO_0201427"
+,,,"Leukodystrophy, hypomyelinating",Nervous system phene,yes,yes,,,https://www.omia.org/OMIA002321/9615/,,VBO_0200577
+20,5745833,5673817,"Retinal atrophy, progressive, IFT122-related",Vision / eye phene,yes,yes,IFT122,intraflagellar transport 122,https://www.omia.org/OMIA002320/9615/,https://www.omia.org/gene388244977/,"VBO_0200523, VBO_0200814"
+38,11776697,11089431,"Coat colour, ticked",Pigmentation phene,yes,no,USH2A,"Usher syndrome 2A (autosomal recessive, mild)",https://www.omia.org/OMIA002264/9615/,https://www.omia.org/gene388253552/,"VBO_0200486, VBO_0200497"
+9,16669828,16777722,"Lysosomal storage disease, ARSG related",Lysosomal storage disease,yes,yes,ARSG,arylsulfatase G,https://www.omia.org/OMIA001503/9615/,https://www.omia.org/gene12940887/,VBO_0200055
+,,,Protein-losing enteropathy,Digestive / alimentary phene,no,yes,,,https://www.omia.org/OMIA001325/9615/,,VBO_0201260
+20,41004719,41035678,"Epidermolysis bullosa, dystrophic",Integument (skin) phene,yes,yes,COL7A1,"collagen, type VII, alpha 1",https://www.omia.org/OMIA000341/9615/,https://www.omia.org/gene403467/,"VBO_0200126, VBO_0200321, VBO_0200610"
+11,20751119,20553837,"Laryngeal paralysis, RAPGEF6-related",Respiratory system phene,no,yes,RAPGEF6,Rap guanine nucleotide exchange factor (GEF) 6,https://www.omia.org/OMIA002222/9615/,https://www.omia.org/gene388304610/,VBO_0200882
+9,21133008,21126245,Mucopolysaccharidosis IIIB,Lysosomal storage disease,yes,yes,NAGLU,"N-acetylglucosaminidase, alpha",https://www.omia.org/OMIA001342/9615/,https://www.omia.org/gene26593249/,VBO_0201184
+16,61970321,61881132,"Polyneuropathy, ARHGEF10-related",Nervous system phene,yes,yes,ARHGEF10,Rho guanine nucleotide exchange factor (GEF) 10,https://www.omia.org/OMIA001917/9615/,https://www.omia.org/gene388304604/,"VBO_0200819, VBO_0201160"
+19,39307155,39452060,"Polyneuropathy, RAB3GAP1-related",Nervous system phene,yes,yes,RAB3GAP1,RAB3 GTPase activating protein subunit 1 (catalytic),https://www.omia.org/OMIA001970/9615/,https://www.omia.org/gene388244679/,"VBO_0200015, VBO_0200174, VBO_0201143"
+21,34339237,33884844,"Polyneuropathy, SBF2-related",Nervous system phene,yes,yes,SBF2,SET binding factor 2,https://www.omia.org/OMIA002284/9615/,https://www.omia.org/gene388245237/,VBO_0200896
+20,34030861,33985924,"Retinal atrophy, progressive, CCDC66-related",Vision / eye phene,yes,yes,CCDC66,coiled-coil domain containing 66,https://www.omia.org/OMIA001521/9615/,https://www.omia.org/gene26582962/,"VBO_0201077, VBO_0201181"
+26,29260365,29385328,"Leukaemia, chronic monocytic",Neoplasm,no,yes,BCR,breakpoint cluster region,https://www.omia.org/OMIA001573/9615/,https://www.omia.org/gene26644765/,
+9,54162127,54019016,"Leukaemia, chronic monocytic",Neoplasm,no,yes,ABL1,"ABL proto-oncogene 1, non-receptor tyrosine kinase",https://www.omia.org/OMIA001573/9615/,https://www.omia.org/gene388255470/,
+26,29260365,29385328,"Leukaemia, chronic myelogenous",Neoplasm,no,yes,BCR,breakpoint cluster region,https://www.omia.org/OMIA001513/9615/,https://www.omia.org/gene26644765/,
+9,54162127,54019016,"Leukaemia, chronic myelogenous",Neoplasm,no,yes,ABL1,"ABL proto-oncogene 1, non-receptor tyrosine kinase",https://www.omia.org/OMIA001513/9615/,https://www.omia.org/gene388255470/,
+26,29260365,29385328,"Leukaemia, chronic myelomonocytic",Neoplasm,no,yes,BCR,breakpoint cluster region,https://www.omia.org/OMIA002299/9615/,https://www.omia.org/gene26644765/,
+9,54162127,54019016,"Leukaemia, chronic myelomonocytic",Neoplasm,no,yes,ABL1,"ABL proto-oncogene 1, non-receptor tyrosine kinase",https://www.omia.org/OMIA002299/9615/,https://www.omia.org/gene388255470/,
+,,,"Cushing disease, pituitary-dependent hyperadrenocorticism",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000247/9615/,,
+,,,Hypertriglyceridaemia,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000514/9615/,,VBO_0200896
+2,20075720,20333544,"Intestinal cobalamin (vitamin B12) malabsorption, CUBN-related",Homeostasis / metabolism phene,yes,yes,CUBN,cubilin (intrinsic factor-cobalamin receptor),https://www.omia.org/OMIA001786/9615/,https://www.omia.org/gene388199252/,"VBO_0200131, VBO_0200193, VBO_0200779"
+3,27790052,27973468,Mucopolysaccharidosis VI,Lysosomal storage disease,yes,yes,ARSB,arylsulfatase B,https://www.omia.org/OMIA000666/9615/,https://www.omia.org/gene26646828/,"VBO_0200326, VBO_0200623, VBO_0200893, VBO_0200896, VBO_0201051, VBO_0201061, VBO_0201406"
+,,,"Intersex: XX, SRY-negative (redundant)",,unknown,yes,,,https://www.omia.org/OMIA002290/9615/,,
+,,,Glycogen storage disease IV,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000420/9615/,,VBO_0200902
+35,22678366,22704116,Succinic semialdehyde dehydrogenase deficiency,Nervous system phene,yes,yes,ALDH5A1,"aldehyde dehydrogenase 5 family, member A1",https://www.omia.org/OMIA002250/9615/,https://www.omia.org/gene388253333/,VBO_0201171
+7,8099489,7973087,"Epidermolysis bullosa, junctionalis, LAMB3-related",Integument (skin) phene,yes,yes,LAMB3,"laminin, beta 3",https://www.omia.org/OMIA002269/9615/,https://www.omia.org/gene388221477/,VBO_0200095
+,,,Vestibular disease,Hearing / vestibular / ear phene,unknown,yes,,,https://www.omia.org/OMIA002263/9615/,,
+,,,"Coat colour, dominant white",Pigmentation phene,unknown,no,,,https://www.omia.org/OMIA000209/9615/,,
+3,92774237,92746064,"Retinal atrophy, progressive, PDE6B-related",Vision / eye phene,yes,yes,PDE6B,"phosphodiesterase 6B, cGMP-specific, rod, beta",https://www.omia.org/OMIA002282/9615/,https://www.omia.org/gene399653/,VBO_0201280
+,,,"Coat colour, albinism, generic",Pigmentation phene,unknown,yes,,,https://www.omia.org/OMIA002280/9615/,,
+30,868821,957072,"Ataxia, spinocerebellar, SLC12A6-related",Nervous system phene,yes,yes,SLC12A6,"solute carrier family 12 (potassium/chloride transporter), member 6",https://www.omia.org/OMIA002279/9615/,https://www.omia.org/gene388246272/,VBO_0200147
+1,58763549,58775010,"Cardiomyopathy, dilated, PLN-related",Cardiovascular system phene,yes,yes,PLN,phospholamban,https://www.omia.org/OMIA002195/9615/,https://www.omia.org/gene388207564/,VBO_0201411
+,,,"Eye colour, blue",Pigmentation phene,unknown,no,,,https://www.omia.org/OMIA001868/9615/,,
+,,,"Pulmonary fibrosis, idiopathic",Respiratory system phene,unknown,yes,,,https://www.omia.org/OMIA001417/9615/,,VBO_0201415
+18,51662893,51701379,"Ataxia, spinocerebellar, SPTBN2-related",Nervous system phene,yes,yes,SPTBN2,"spectrin, beta, non-erythrocytic 2",https://www.omia.org/OMIA002092/9615/,https://www.omia.org/gene303950144/,VBO_0200131
+28,1656110,1708901,"Myasthenic syndrome, congenital, CHAT-related",Nervous system phene,yes,yes,CHAT,choline O-acetyltransferase,https://www.omia.org/OMIA002072/9615/,https://www.omia.org/gene3484643/,VBO_0000668
+,,,Spinal muscular atrophy,Nervous system phene,yes,yes,,,https://www.omia.org/OMIA000939/9615/,,VBO_0200239
+,,,"Spongiform encephalopathy, susceptibility/resistance to",Nervous system phene,unknown,unknown,,,https://www.omia.org/OMIA000944/9615/,,
+26,31652659,31641745,Van den Ende-Gupta syndrome,Skeleton phene (incl. short stature & teeth),yes,yes,SCARF2,"scavenger receptor class F, member 2",https://www.omia.org/OMIA002016/9615/,https://www.omia.org/gene389414972/,VBO_0201424
+7,58179775,58144506,"Hyperkeratosis, palmoplantar, DSG1-related",Integument (skin) phene,yes,yes,DSG1,desmoglein 1,https://www.omia.org/OMIA002266/9615/,https://www.omia.org/gene388198946/,VBO_0201143
+,,,Tetragametic chimerism (including Freemartin),Reproductive system phene,no,yes,,,https://www.omia.org/OMIA000393/9615/,,VBO_0201455
+27,16320190,16347401,Cardiomyopathy and juvenile mortality,Cardiovascular system phene,yes,yes,YARS2,"tyrosyl-tRNA synthetase 2, mitochondrial",https://www.omia.org/OMIA002256/9615/,https://www.omia.org/gene388252268/,VBO_0200144
+,,,"Retinal atrophy, progressive, Miniature Schnauzer, type 2",Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA002253/9615/,,VBO_0200896
+34,16033717,15998428,"Surfactant metabolism dysfunction, pulmonary",Respiratory system phene,yes,yes,LAMP3,lysosomal-associated membrane protein 3,https://www.omia.org/OMIA002251/9615/,https://www.omia.org/gene388302982/,VBO_0200008
+3,92125265,92275341,"Height, LCORL-associated body-size variation",Growth / size / body region phene,no,no,LCORL,ligand dependent nuclear receptor corepressor-like,https://www.omia.org/OMIA002246/9615/,https://www.omia.org/gene388307121/,
+9,5686738,5679689,"Leukodystrophy, TSEN54-related",Nervous system phene,yes,yes,TSEN54,TSEN54 tRNA splicing endonuclease subunit,https://www.omia.org/OMIA002215/9615/,https://www.omia.org/gene388249930/,VBO_0201189
+,,,"Leukodystrophy, cavitating",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002214/9615/,,VBO_0200427
+32,24386916,24271881,"Mannosidosis, beta",Lysosomal storage disease,yes,yes,MANBA,"mannosidase, beta A, lysosomal",https://www.omia.org/OMIA000626/9615/,https://www.omia.org/gene388253111/,"VBO_0200577, VBO_0200902"
+11,69735745,69685075,Recurrent inflammatory pulmonary disease,Respiratory system phene,yes,yes,AKNA,AT-hook transcription factor,https://www.omia.org/OMIA002205/9615/,https://www.omia.org/gene388248850/,VBO_0200376
+,,,"Coat, double vs single",Integument (skin) phene,unknown,no,,,https://www.omia.org/OMIA002199/9615/,,
+27,37814521,37826493,"Retinal atrophy, progressive, NECAP1-related",Vision / eye phene,yes,yes,NECAP1,NECAP endocytosis associated 1,https://www.omia.org/OMIA002198/9615/,https://www.omia.org/gene388252325/,VBO_0200604
+27,3346792,3170259,"Ataxia, spinocerebellar, SCN8A-related",Nervous system phene,yes,yes,SCN8A,"sodium channel, voltage gated, type VIII alpha subunit",https://www.omia.org/OMIA002194/9615/,https://www.omia.org/gene388245796/,VBO_0200023
+13,60739886,60753519,"Amelogenesis imperfecta, ENAM-related",Skeleton phene (incl. short stature & teeth),yes,yes,ENAM,enamelin,https://www.omia.org/OMIA001805/9615/,https://www.omia.org/gene388249183/,"VBO_0200638, VBO_0200987, VBO_0201056"
+9,49937770,49948230,Diffuse cystic renal dysplasia and hepatic fibrosis,Renal / urinary system phene,yes,yes,INPP5E,inositol polyphosphate-5-phosphatase E,https://www.omia.org/OMIA002173/9615/,https://www.omia.org/gene388303165/,VBO_0200962
+,,,Bald thigh syndrome,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA002168/9615/,,"VBO_0200557, VBO_0200638, VBO_0200842, VBO_0201421"
+,,,"Sudden acquired retinal degeneration syndrome, SARDS",Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002169/9615/,,VBO_0200406
+4,53184445,53171446,"Ichthyosis, NIPAL4-related",Integument (skin) phene,yes,yes,NIPAL4,NIPA-like domain containing 4,https://www.omia.org/OMIA001980/9615/,https://www.omia.org/gene388253928/,"VBO_0200034, VBO_0200036"
+,,,Patellar luxation,Limbs / fins / digit / tail phene,no,yes,,,https://www.omia.org/OMIA000778/9615/,,VBO_0200498
+2,78182495,78128381,Hypophosphatasia,Skeleton phene (incl. short stature & teeth),yes,yes,ALPL,"alkaline phosphatase, liver/bone/kidney",https://www.omia.org/OMIA002162/9615/,https://www.omia.org/gene388199066/,VBO_0200754
+18,53053236,53024769,"Ataxia, spinocerebellar, CAPN1-related",Nervous system phene,yes,yes,CAPN1,"calpain 1, (mu/I) large subunit",https://www.omia.org/OMIA001820/9615/,https://www.omia.org/gene388250277/,"VBO_0200724, VBO_0200987"
+15,2902313,2973313,"Neuronal ceroid lipofuscinosis, 1",Lysosomal storage disease,yes,yes,PPT1,palmitoyl-protein thioesterase 1,https://www.omia.org/OMIA001504/9615/,https://www.omia.org/gene475316/,"VBO_0200406, VBO_0200712"
+,,,"Neuroaxonal dystrophy, generic",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000715/9615/,,
+2,84971271,84945233,"Neuroaxonal dystrophy, MFN2-related",Nervous system phene,yes,yes,MFN2,mitofusin 2,https://www.omia.org/OMIA002153/9615/,https://www.omia.org/gene3485115/,VBO_0201186
+14,5699541,5374406,"Acrodermatitis, lethal, MKLN1-related",Integument (skin) phene,yes,yes,MKLN1,"muskelin 1, intracellular mediator containing kelch motifs",https://www.omia.org/OMIA002146/9615/,https://www.omia.org/gene388303299/,"VBO_0200255, VBO_0200882"
+2,22051385,22017081,Nasal parakeratosis,Integument (skin) phene,yes,yes,SUV39H2,suppressor of variegation 3-9 homolog 2 (Drosophila),https://www.omia.org/OMIA001373/9615/,https://www.omia.org/gene388246091/,"VBO_0200638, VBO_0200800"
+,,,Cerebral amyloid angiopathy,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA002138/9615/,,
+-,-,-,"Nemaline myopathy, NEB-related",Muscle phene,yes,yes,NEB,nebulin,https://www.omia.org/OMIA002137/9615/,https://www.omia.org/gene388244698/,VBO_0200034
+9,2173239,2179357,Mucopolysaccharidosis IIIA,Lysosomal storage disease,yes,yes,SGSH,N-sulfoglucosamine sulfohydrolase,https://www.omia.org/OMIA001309/9615/,https://www.omia.org/gene403707/,VBO_0200423
+3,32621251,33055320,"Oculocutaneous albinism, OCA2-related",Pigmentation phene,yes,yes,OCA2,oculocutaneous albinism II,https://www.omia.org/OMIA002130/9615/,https://www.omia.org/gene388253619/,VBO_0200585
+,,,Pectinate ligament dysplasia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA002118/9615/,,VBO_0201411
+,,,Stereotypical hypersociability,Behaviour / neurological phene,unknown,no,,,https://www.omia.org/OMIA002115/9615/,,
+7,1605354,1559536,"Ectodermal dysplasia/skin fragility syndrome, PKP1-related",Integument (skin) phene,yes,yes,PKP1,plakophilin 1 (ectodermal dysplasia/skin fragility syndrome),https://www.omia.org/OMIA001864/9615/,https://www.omia.org/gene388302952/,"VBO_0200326, VBO_0200610"
+4,36421312,36427353,"Ataxia, cerebellar, juvenile to adolescent, RAB24-related",Nervous system phene,yes,yes,RAB24,"RAB24, member RAS oncogene family",https://www.omia.org/OMIA001913/9615/,https://www.omia.org/gene388247079/,"VBO_0200613, VBO_0200969"
+1,37381684,37767160,"Ataxia, cerebellar, neonatal, GRM1-related",Nervous system phene,yes,yes,GRM1,"glutamate receptor, metabotropic 1",https://www.omia.org/OMIA000078/9615/,https://www.omia.org/gene3482627/,VBO_0200389
+8,54055128,53998407,"Ataxia, cerebellar, progressive early-onset, SEL1L-related",Nervous system phene,yes,yes,SEL1L,sel-1 suppressor of lin-12-like (C. elegans),https://www.omia.org/OMIA001692/9615/,https://www.omia.org/gene274066165/,VBO_0200522
+20,13108309,12789247,"Ataxia, spinocerebellar, ITPR1-related",Nervous system phene,yes,yes,ITPR1,"inositol 1,4,5-trisphosphate receptor, type 1",https://www.omia.org/OMIA002097/9615/,https://www.omia.org/gene388244992/,VBO_0200721
+5,32653348,32659884,"Ataxia, cerebellar, ATP1B2-related",Nervous system phene,yes,yes,ATP1B2,"ATPase, Na+/K+ transporting, beta 2 polypeptide",https://www.omia.org/OMIA002110/9615/,https://www.omia.org/gene388254176/,VBO_0200144
+30,36258709,36315967,Bardet-Biedl syndrome 4,Vision / eye phene,yes,yes,BBS4,Bardet-Biedl syndrome 4,https://www.omia.org/OMIA002045/9615/,https://www.omia.org/gene388252966/,VBO_0201102
+5,33052693,33047237,"Spondylocostal dysostosis, autosomal recessive",Skeleton phene (incl. short stature & teeth),yes,yes,HES7,hes family bHLH transcription factor 7,https://www.omia.org/OMIA001944/9615/,https://www.omia.org/gene388306975/,VBO_0200896
+12,5725170,5771521,"Ichthyosis, PNPLA1-related",Integument (skin) phene,yes,yes,PNPLA1,patatin-like phospholipase domain containing 1,https://www.omia.org/OMIA001588/9615/,https://www.omia.org/gene180373481/,VBO_0200610
+,,,Lameness,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000579/9615/,,
+9,21888353,21891277,"Palmoplantar keratoderma, nonepidermolytic, focal 1",Integument (skin) phene,yes,yes,KRT16,"keratin, type I cytoskeletal 16",https://www.omia.org/OMIA002088/9615/,https://www.omia.org/gene388255238/,VBO_0200450
+1,14544736,14652948,"Dyskinesia, paroxysmal, PIGN-related",Nervous system phene,yes,yes,PIGN,"phosphatidylinositol glycan anchor biosynthesis, class N",https://www.omia.org/OMIA002084/9615/,https://www.omia.org/gene388244722/,VBO_0201260
+13,37980292,37924192,"Epidermolysis bullosa, simplex, PLEC-related",Integument (skin) phene,yes,yes,PLEC,plectin,https://www.omia.org/OMIA002080/9615/,https://www.omia.org/gene388249122/,VBO_0200512
+,,,"Epidermolysis bullosa, simplex",Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA002082/9615/,,
+,,,"Stevens-Johnson syndrome, susceptibility to",Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA002070/9615/,,
+,,,Guillain-Barr-like polyradiculoneuropathy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002062/9615/,,
+,,,Blood group system/dog erythrocyte antigen Dal,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA002057/9615/,,
+,,,Blood group system/dog erythrocyte antigen Kai,Haematopoietic system phene,unknown,no,,,https://www.omia.org/OMIA002058/9615/,,
+,,,Degenerative encephalopathy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA002055/9615/,,VBO_0200964
+,,,Recombination rate,Normal phene,yes,no,,,https://www.omia.org/OMIA001691/9615/,,
+29,38987121,38996745,Pyruvate dehydrogenase deficiency,Homeostasis / metabolism phene,yes,yes,PDP1,pyruvate dehyrogenase phosphatase catalytic subunit 1,https://www.omia.org/OMIA001406/9615/,https://www.omia.org/gene3478038/,"VBO_0200366, VBO_0201309"
+9,33744696,33734267,Myeloperoxidase deficiency,Haematopoietic system phene,yes,yes,MPO,myeloperoxidase,https://www.omia.org/OMIA002028/9615/,https://www.omia.org/gene388304943/,VBO_0200714
+,,,Stiff skin syndrome,Integument (skin) phene,yes,yes,,,https://www.omia.org/OMIA002018/9615/,,VBO_0201415
+,,,Immunoglobulin A deficiency,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA000552/9615/,,"VBO_0200351, VBO_0200577, VBO_0200610, VBO_0200800"
+6,16626815,16577996,Dental hypomineralization,Skeleton phene (incl. short stature & teeth),yes,yes,FAM20C,"family with sequence similarity 20, member C",https://www.omia.org/OMIA002015/9615/,https://www.omia.org/gene388255609/,VBO_0200193
+10,8459176,8604625,"Height, HMGA2-associated body-size variation",Growth / size / body region phene,no,no,HMGA2,high mobility group AT-hook 2,https://www.omia.org/OMIA001968/9615/,https://www.omia.org/gene389077191/,
+9,56099730,56084580,"Ichthyosis, SLC27A4-related",Integument (skin) phene,yes,yes,SLC27A4,"solute carrier family 27 (fatty acid transporter), member 4",https://www.omia.org/OMIA001973/9615/,https://www.omia.org/gene388255492/,VBO_0200623
+,,,"Deafness, adult-onset",Hearing / vestibular / ear phene,yes,yes,,,https://www.omia.org/OMIA001727/9615/,,VBO_0200193
+,,,Hemivertebrae,Skeleton phene (incl. short stature & teeth),no,yes,,,https://www.omia.org/OMIA001191/9615/,,
+8,70610039,70711934,"Neuroaxonal dystrophy, TECPR2-related",Nervous system phene,yes,yes,TECPR2,tectonin beta-propeller repeat containing 2,https://www.omia.org/OMIA001975/9615/,https://www.omia.org/gene388255150/,VBO_0201280
+,,,Ventricular septal defect,Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA001041/9615/,,
+,,,Subaortic stenosis,Cardiovascular system phene,yes,yes,,,https://www.omia.org/OMIA000952/9615/,,VBO_0200938
+,,,Cerebellar hypoplasia,Nervous system phene,yes,yes,,,https://www.omia.org/OMIA000179/9615/,,
+,,,Perosomus elumbis,Embryo phene,unknown,yes,,,https://www.omia.org/OMIA000789/9615/,,
+,,,"Hypomyelinogenesis, congenital",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000527/9615/,,
+30,36068396,36041265,"Gangliosidosis, GM2, type I (B variant)",Lysosomal storage disease,yes,yes,HEXA,hexosaminidase A (alpha polypeptide),https://www.omia.org/OMIA001461/9615/,https://www.omia.org/gene388252965/,VBO_0200735
+13,47717855,47799689,"Coat colour, white spotting, KIT-related",Pigmentation phene,yes,no,KIT,v-kit Hardy-Zuckerman 4 feline sarcoma viral oncogene homolog,https://www.omia.org/OMIA001737/9615/,https://www.omia.org/gene403811/,VBO_0200577
+,,,Myopia,Vision / eye phene,no,yes,,,https://www.omia.org/OMIA001487/9615/,,"VBO_0200497, VBO_0200800"
+20,54220548,54253547,C3 deficiency,Immune system phene,yes,yes,C3,complement component 3,https://www.omia.org/OMIA000155/9615/,https://www.omia.org/gene3477095/,VBO_0200239
+3,92774237,92746064,Retinal atrophy - Cone-rod dystrophy 1,Vision / eye phene,yes,yes,PDE6B,"phosphodiesterase 6B, cGMP-specific, rod, beta",https://www.omia.org/OMIA001674/9615/,https://www.omia.org/gene399653/,VBO_0200055
+,,,Attention deficit hyperactivity disorder,Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA001882/9615/,,
+10,47580243,47618780,"Cystinuria, type II - A",Renal / urinary system phene,yes,yes,SLC3A1,"solute carrier family 3 (amino acid transporter heavy chain), member 1",https://www.omia.org/OMIA001879/9615/,https://www.omia.org/gene403700/,VBO_0200088
+,,,"Cystinuria, type III",Renal / urinary system phene,yes,yes,,,https://www.omia.org/OMIA001881/9615/,,"VBO_0200704, VBO_0200867, VBO_0201195"
+,,,"Stenosis, spinal",Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000947/9615/,,
+,,,Beta blocker response in heart failure,Homeostasis / metabolism phene,unknown,no,,,https://www.omia.org/OMIA001810/9615/,,
+,,,"Dwarfism, hypochondroplastic",Skeleton phene (incl. short stature & teeth),yes,yes,,,https://www.omia.org/OMIA001296/9615/,,
+,,,Gluten-sensitive enteropathy,Digestive / alimentary phene,yes,yes,,,https://www.omia.org/OMIA001261/9615/,,
+,,,"Hemimelia, generic",Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000450/9615/,,
+,,,"Hypotrichosis, generic",Integument (skin) phene,yes,yes,,,https://www.omia.org/OMIA000540/9615/,,
+,,,Mucopolysaccharidosis II,Lysosomal storage disease,yes,yes,,,https://www.omia.org/OMIA001317/9615/,,
+,,,Persistent truncus arteriosus,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000795/9615/,,
+,,,Neurological syndrome,Nervous system phene,yes,yes,,,https://www.omia.org/OMIA000720/9615/,,VBO_0200613
+19,24808041,24860795,"Centronuclear myopathy 2, BIN1-related",Muscle phene,yes,yes,BIN1,bridging integrator 1,https://www.omia.org/OMIA001660/9615/,https://www.omia.org/gene388250366/,VBO_0200623
+,,,"Neuronal Ceroid Lipofuscinosis, generic",Lysosomal storage disease,yes,yes,,,https://www.omia.org/OMIA000181/9615/,,
+18,46700871,46691854,"Neuronal ceroid lipofuscinosis, 10",Lysosomal storage disease,yes,yes,CTSD,cathepsin D,https://www.omia.org/OMIA001505/9615/,https://www.omia.org/gene483662/,VBO_0200034
+,,,Atopy,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA000082/9615/,,
+13,9022401,8873544,Furnishings (moustache and eyebrows),Integument (skin) phene,yes,no,RSPO2,R-spondin 2,https://www.omia.org/OMIA001531/9615/,https://www.omia.org/gene23857650/,
+,,,Hydranencephaly,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000486/9615/,,
+,,,"Persistent right aortic arch, with subclavian artery and ligamentum arteriosum",Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA001570/9615/,,VBO_0201454
+,,,Aggression,Behaviour / neurological phene,no,yes,,,https://www.omia.org/OMIA001499/9615/,,
+,,,Compulsive disorder,Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA001530/9615/,,
+,,,Leg morphology (leg width versus leg length),Limbs / fins / digit / tail phene,unknown,no,,,https://www.omia.org/OMIA001809/9615/,,
+,,,Heat tolerance,Homeostasis / metabolism phene,unknown,no,,,https://www.omia.org/OMIA001667/9615/,,
+,,,Alopecia areata,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001702/9615/,,
+,,,Endocardial fibroelastosis,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001803/9615/,,
+,,,"Intestinal cobalamin (vitamin B12) malabsorption, generic",Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA001791/9615/,,
+,,,"Myopathy, congenital, with fibre-type disproportion",Muscle phene,unknown,yes,,,https://www.omia.org/OMIA001796/9615/,,
+,,,"Niemann-Pick disease, type A",Lysosomal storage disease,unknown,yes,,,https://www.omia.org/OMIA001795/9615/,,
+12,2986887,2957578,"Skeletal dysplasia 2, COL11A2-related",Skeleton phene (incl. short stature & teeth),yes,yes,COL11A2,"collagen, type XI, alpha 2",https://www.omia.org/OMIA001772/9615/,https://www.omia.org/gene388248885/,VBO_0200800
+,,,"Chondrodysplasia, Labrador",Skeleton phene (incl. short stature & teeth),yes,yes,,,https://www.omia.org/OMIA001790/9615/,,VBO_0200800
+8,71077067,71085111,"Intestinal cobalamin malabsorption, AMN-related",Haematopoietic system phene,yes,yes,AMN,amnion associated transmembrane protein,https://www.omia.org/OMIA000565/9615/,https://www.omia.org/gene3429615/,"VBO_0200095, VBO_0200604, VBO_0200779"
+,,,Selective ADP deficiency,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001792/9615/,,
+,,,Blood group system/dog erythrocyte antigen (DEA) 1,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001713/9615/,,
+,,,"Blood group system, rhesus",Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001785/9615/,,
+,,,Blood group system/dog erythrocyte antigen (DEA) 3,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001779/9615/,,
+,,,Blood group system/dog erythrocyte antigen (DEA) 4,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001780/9615/,,
+,,,Blood group system/dog erythrocyte antigen (DEA) 5,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001781/9615/,,
+,,,Blood group system/dog erythrocyte antigen (DEA) 6,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001782/9615/,,
+,,,Blood group system/dog erythrocyte antigen (DEA) 7,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001783/9615/,,
+,,,Blood group system/dog erythrocyte antigen (DEA) 8,Haematopoietic system phene,yes,no,,,https://www.omia.org/OMIA001784/9615/,,
+,,,"Sodium-potassium-ATPase, high activity",Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000924/9615/,,
+,,,Protein-losing nephropathy,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001326/9615/,,VBO_0201260
+,,,Choanal atresia,Respiratory system phene,unknown,yes,,,https://www.omia.org/OMIA001764/9615/,,
+,,,Telomere length,Normal phene,unknown,no,,,https://www.omia.org/OMIA001761/9615/,,
+,,,"Lumbosacral junction, skeletal morphology and morphometry",Skeleton phene (incl. short stature & teeth),unknown,no,,,https://www.omia.org/OMIA001729/9615/,,
+3,92774237,92746064,Retinal atrophy - Rod-cone dysplasia 1a,Vision / eye phene,yes,yes,PDE6B,"phosphodiesterase 6B, cGMP-specific, rod, beta",https://www.omia.org/OMIA001669/9615/,https://www.omia.org/gene399653/,VBO_0201242
+2,76224732,76236351,"Fucosidosis, alpha",Lysosomal storage disease,yes,yes,FUCA1,"fucosidase, alpha-L- 1, tissue",https://www.omia.org/OMIA000396/9615/,https://www.omia.org/gene403929/,VBO_0200497
+X,56453658,56449759,"Severe combined immunodeficiency disease, X-linked",Immune system phene,yes,yes,IL2RG,"interleukin 2 receptor, gamma",https://www.omia.org/OMIA000899/9615/,https://www.omia.org/gene403851/,"VBO_0200126, VBO_0200290"
+,,,Achondroplasia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000004/9615/,,
+,,,"Lymphoma, non-Hodgkin",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001708/9615/,,
+,,,"Gangliosidosis, GM2, generic",Lysosomal storage disease,yes,yes,,,https://www.omia.org/OMIA000403/9615/,,
+,,,"Hepatitis, chronic active",Liver/biliary system phene,yes,yes,,,https://www.omia.org/OMIA001093/9615/,,
+9,59449060,59512699,"Coat colour, harlequin",Pigmentation phene,yes,no,PSMB7,proteasome subunit beta 7,https://www.omia.org/OMIA001454/9615/,https://www.omia.org/gene25031640/,
+,,,Rod dysplasia,Vision / eye phene,yes,yes,,,https://www.omia.org/OMIA001670/9615/,,VBO_0200955
+,,,"Lipomatosis, multiple",Neoplasm,unknown,yes,,,https://www.omia.org/OMIA000606/9615/,,
+,,,Ectromelia,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001126/9615/,,
+,,,Polycystic mononephrosis,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000808/9615/,,
+,,,Short spine,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000911/9615/,,
+,,,Prognathism,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000823/9615/,,
+,,,"Otocephaly, generic",Craniofacial phene,unknown,yes,,,https://www.omia.org/OMIA001127/9615/,,
+,,,Glossopharyngeal defect,Digestive / alimentary phene,yes,yes,,,https://www.omia.org/OMIA000415/9615/,,
+,,,Cyclopia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000249/9615/,,
+,,,Cystic bone lesions,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000251/9615/,,
+,,,"Diamond-Blackfan anaemia, generic",Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000041/9615/,,
+,,,Tail chasing,Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA000971/9615/,,
+,,,Adrenal cortical atrophy,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000016/9615/,,
+,,,Hypospadias,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001187/9615/,,
+,,,Taillessness,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000977/9615/,,
+,,,Brachydactyly,Limbs / fins / digit / tail phene,yes,yes,,,https://www.omia.org/OMIA000146/9615/,,
+,,,Conotruncal heart malformations,Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA000224/9615/,,VBO_0200759
+,,,Muscular dystrophy,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000679/9615/,,"VBO_0200239, VBO_0200309, VBO_0200583, VBO_0200610, VBO_0200615, VBO_0200704, VBO_0200800, VBO_0200896, VBO_0200995, VBO_0201125, VBO_0201143, VBO_0201174, VBO_0201401"
+,,,Tetralogy of Fallot,Cardiovascular system phene,no,yes,,,https://www.omia.org/OMIA000994/9615/,,VBO_0200759
+,,,Racing performance,Homeostasis / metabolism phene,unknown,no,,,https://www.omia.org/OMIA001600/9615/,,
+,,,Sebaceous adenitis,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001563/9615/,,
+,,,"Niemann-Pick disease, type C1",Lysosomal storage disease,unknown,yes,,,https://www.omia.org/OMIA000725/9615/,,
+,,,Chylothorax,Respiratory system phene,unknown,yes,,,https://www.omia.org/OMIA001422/9615/,,
+,,,"Coat colour, cream dilution",Pigmentation phene,yes,no,,,https://www.omia.org/OMIA001344/9615/,,
+,,,Eye colour,Pigmentation phene,unknown,no,,,https://www.omia.org/OMIA000357/9615/,,
+,,,Heterochromia irides/iridis,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000468/9615/,,
+,,,Priapism,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA001166/9615/,,
+,,,Retinal dystrophy,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000869/9615/,,
+,,,Incomplete ossification of the humeral condyle,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001507/9615/,,
+,,,Anal sac gland carcinoma,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001500/9615/,,
+,,,Stereotypes,Behaviour / neurological phene,unknown,no,,,https://www.omia.org/OMIA001459/9615/,,
+,,,"Spondyloepiphyseal dysplasia, congenital type",Skeleton phene (incl. short stature & teeth),yes,yes,,,https://www.omia.org/OMIA001448/9615/,,
+,,,Knobbed acrosome,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000576/9615/,,
+,,,Patent ductus venosus,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001173/9615/,,
+,,,"Aortic aneurysm, familial thoracic",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001419/9615/,,
+,,,Pulmonary adenomatosis,Respiratory system phene,no,yes,,,https://www.omia.org/OMIA000840/9615/,,
+,,,Glomerulonephropathy,Renal / urinary system phene,yes,yes,,,https://www.omia.org/OMIA000414/9615/,,
+,,,Anodontia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000048/9615/,,
+,,,Patent urachus,Embryo phene,unknown,yes,,,https://www.omia.org/OMIA000781/9615/,,
+,,,Acetabular dystrophy,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001129/9615/,,
+,,,"Achalasia of the oesophagus, congenital",Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000003/9615/,,
+,,,Acromegaly,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000008/9615/,,
+,,,Alloimmune haemolytic anaemia of the newborn,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000028/9615/,,
+,,,Alpha-1-antitrypsin deficiency,Respiratory system phene,unknown,yes,,,https://www.omia.org/OMIA000032/9615/,,
+,,,"Amyloidosis, generic",Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000037/9615/,,
+,,,"Amyloidosis, renal",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000040/9615/,,
+,,,Ankylosing spondylitis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000046/9615/,,
+,,,Aphakia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000054/9615/,,
+,,,Aplasia segmentalis ductus wolffii,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000056/9615/,,
+,,,Arthritis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000064/9615/,,
+,,,"Arthritis, rheumatoid",Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000067/9615/,,
+,,,Ascites,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA001169/9615/,,
+,,,"Ataxia, progressive",Behaviour / neurological phene,unknown,yes,,,https://www.omia.org/OMIA001091/9615/,,
+,,,"Ataxia, progressive, with head tremor and seizures",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001363/9615/,,
+,,,Atherosclerosis,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000080/9615/,,
+,,,Atresia intestinal,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000087/9615/,,
+,,,Atrial septal defect,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000089/9615/,,
+,,,Bleeding disorder,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000113/9615/,,
+,,,Bullous pemphigoid,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001183/9615/,,
+,,,"Cardiomyopathy, hypertrophic",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000515/9615/,,
+,,,Cardiovascular malformations,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000165/9615/,,
+,,,Carpal subluxation,Skeleton phene (incl. short stature & teeth),yes,yes,,,https://www.omia.org/OMIA000166/9615/,,
+,,,Cauda equina syndrome,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000170/9615/,,
+,,,Chondrodystrophy,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000189/9615/,,
+,,,Coeliac sprue,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA001238/9615/,,
+,,,Cor triatriatum dexter,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000227/9615/,,
+,,,Corneal dermoid,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000229/9615/,,
+,,,Coxofemoral dysplasia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000233/9615/,,
+,,,Coxofemoral luxation,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000234/9615/,,
+,,,Cranioschisis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000237/9615/,,
+,,,Degenerative myopathy of obturator-externus,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000265/9615/,,
+,,,Dermatomyositis,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA000270/9615/,,
+,,,Dermatosis,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001219/9615/,,
+,,,Diabetes insipidus,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000278/9615/,,
+,,,"Difference of sexual development, generic",Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000564/9615/,,
+,,,Dwarfism with anaemia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000300/9615/,,
+,,,"Dwarfism, generic",Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000299/9615/,,
+,,,Dysautonomia,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000312/9615/,,
+,,,Dysplasia epiphysealis hememelica,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001361/9615/,,VBO_0200210
+,,,Eclampsia,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA001331/9615/,,
+,,,Ectrodactyly,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000324/9615/,,
+,,,Elbow disease,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000329/9615/,,
+,,,Elbow luxation,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000331/9615/,,
+,,,Elbow subluxation,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000332/9615/,,
+,,,Encephalomyelopathy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000335/9615/,,
+,,,Endotoxin shock,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA000336/9615/,,
+,,,Epidermolysis bullosa,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA000340/9615/,,
+,,,Epistaxis,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000346/9615/,,
+,,,Exophthalmos with strabismus,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000353/9615/,,
+,,,"Exostoses, multiple",Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000354/9615/,,
+,,,Factor X deficiency,Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA000362/9615/,,
+,,,Factor XII deficiency,Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA000364/9615/,,
+,,,Fibrodysplasia ossificans,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA000388/9615/,,
+,,,Fragile site,Chromosomal disorder,unknown,yes,,,https://www.omia.org/OMIA000392/9615/,,
+,,,Galactosialidosis,Lysosomal storage disease,unknown,yes,,,https://www.omia.org/OMIA000400/9615/,,
+,,,"Gangliosidosis, generic",Lysosomal storage disease,unknown,yes,,,https://www.omia.org/OMIA000401/9615/,,
+,,,"Gaucher disease, generic",Lysosomal storage disease,yes,yes,,,https://www.omia.org/OMIA000405/9615/,,
+,,,Genu valgum,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001172/9615/,,
+,,,Glomerulonephritis,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000413/9615/,,
+,,,"Goitre, familial",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000424/9615/,,
+,,,Haemolytic anaemia,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000430/9615/,,
+,,,"Haemolytic anaemia, primary autoimmune",Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000434/9615/,,
+,,,Haemolytic uremic syndrome,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000435/9615/,,
+,,,Haemophagocytic syndrome,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001229/9615/,,
+,,,"Heart defect, congenital",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000446/9615/,,
+,,,Hepatic encephalopathy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000453/9615/,,
+,,,"Hepatic fibrosis, idiopathic",Liver/biliary system phene,unknown,yes,,,https://www.omia.org/OMIA000454/9615/,,
+,,,"Hepatitis, neonatal",Liver/biliary system phene,unknown,yes,,,https://www.omia.org/OMIA001094/9615/,,
+,,,"Hernia, diaphragmatic",Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA000459/9615/,,
+,,,"Hernia, hiatal",Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA000461/9615/,,
+,,,"Hernia, inguinal",Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA000462/9615/,,
+,,,"Hernia, oesophageal hiatal",Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA000463/9615/,,
+,,,"Hernia, perineal",Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA001103/9615/,,
+,,,"Hernia, scrotal",Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA000464/9615/,,
+,,,"Hernia, umbilical",Growth / size / body region phene,unknown,yes,,,https://www.omia.org/OMIA000465/9615/,,
+,,,Heterochromia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000467/9615/,,
+,,,Horner syndrome,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001197/9615/,,
+,,,Hydrocephalus,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000487/9615/,,
+,,,"Hydrocephalus, internal",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000489/9615/,,
+,,,Hydromelia,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001264/9615/,,
+,,,"Hyperbilirubinaemia, generic",Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000495/9615/,,
+,,,Hypercholesterolaemia,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA000499/9615/,,
+,,,Hypereosinophilic syndrome,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000502/9615/,,
+,,,Hypergammaglobulinaemia,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA001196/9615/,,
+,,,Hyperlipidaemia,Homeostasis / metabolism phene,unknown,yes,,,https://www.omia.org/OMIA001160/9615/,,
+,,,"Hypertension, essential",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000510/9615/,,
+,,,Hypertrichosis,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA000513/9615/,,
+,,,"Hypoadrenocorticism, primary",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000520/9615/,,
+,,,Hypogonadism,Reproductive system phene,unknown,yes,,,https://www.omia.org/OMIA000522/9615/,,
+,,,Hypoparathyroidism,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000528/9615/,,
+,,,Hypothalamic dysplasia,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000535/9615/,,
+,,,"Hypothyroidism, primary",Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA000538/9615/,,
+,,,Immunodeficiency,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA000550/9615/,,
+,,,Immunoglobulin A glomerulonephropathy,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000553/9615/,,
+,,,Immunoglobulin G deficiency,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA000554/9615/,,
+,,,Imperforate anus with rectovaginal fistula,Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA000559/9615/,,
+,,,Inborn error of hepatic metabolism,Liver/biliary system phene,unknown,yes,,,https://www.omia.org/OMIA000561/9615/,,
+,,,"Intussusception, susceptibility to",Digestive / alimentary phene,unknown,yes,,,https://www.omia.org/OMIA001227/9615/,,
+,,,Iris defects,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000567/9615/,,
+,,,Legg-Calvé-Perthes disease,Skeleton phene (incl. short stature & teeth),yes,yes,,,https://www.omia.org/OMIA000586/9615/,,
+,,,Linear IgA disease,Integument (skin) phene,unknown,yes,,,https://www.omia.org/OMIA001330/9615/,,
+,,,Lymphoedema,Immune system phene,unknown,yes,,,https://www.omia.org/OMIA000613/9615/,,
+,,,Lysosomal storage disease,Lysosomal storage disease,unknown,yes,,,https://www.omia.org/OMIA000616/9615/,,
+,,,Megakaryoblastic leukaemia,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA000630/9615/,,
+,,,Mislocated polydontic maxillary incisor teeth,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000652/9615/,,
+,,,Mitral stenosis,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000653/9615/,,
+,,,Motor neuron disease,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001165/9615/,,
+,,,"Motor neuron disease, lower",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000662/9615/,,
+,,,Myasthenia,Nervous system phene,yes,yes,,,https://www.omia.org/OMIA000684/9615/,,
+,,,Mycosis fungoides,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001109/9615/,,
+,,,Nephritis,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000708/9615/,,
+,,,Nephrotic syndrome,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000712/9615/,,
+,,,"Neuropathy, giant axonal",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001207/9615/,,
+,,,"Neuropathy, peripheral",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001150/9615/,,
+,,,Occipital dysplasia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000732/9615/,,
+,,,Oligodontia,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA001241/9615/,,
+,,,Osmotic resistance of erythrocytes,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000746/9615/,,
+,,,Osteochondroma causing progressive posterior paresis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000749/9615/,,
+,,,Osteochondrosis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000750/9615/,,
+,,,"Otitis media, susceptibility to",Hearing / vestibular / ear phene,unknown,yes,,,https://www.omia.org/OMIA001266/9615/,,
+,,,"Paresis, posterior",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000011/9615/,,
+,,,Patent ductus arteriosus and pulmonary hypertension,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000780/9615/,,
+,,,Persistence of immature pyruvate kinase and hexokinase isozymes,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA000790/9615/,,
+,,,Persistent right aortic arch,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000794/9615/,,
+,,,Pneumothorax,Respiratory system phene,unknown,yes,,,https://www.omia.org/OMIA000804/9615/,,
+,,,Polioencephalomyelopathy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001280/9615/,,
+,,,Polymelia,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA001226/9615/,,
+,,,Polymicrogyria and asymmetrical ventricular dilation,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001098/9615/,,
+,,,"Polyneuropathy, distal sensorimotor",Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA000813/9615/,,
+,,,Polysaccharide storage myopathy/PSSM1/Exertional rhabdomyolysis,Muscle phene,unknown,yes,,,https://www.omia.org/OMIA001158/9615/,,
+,,,Polyuria,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001177/9615/,,
+,,,"Portal vein hypoplasia, congenital",Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA001095/9615/,,
+,,,Pulmonary stenosis,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000842/9615/,,
+,,,Quadriplegia and amblyopia,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000845/9615/,,
+,,,"Reduced glutathione deficiency, unclassified",Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001235/9615/,,
+,,,Renal disease,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000856/9615/,,
+,,,"Renal hypoplasia, bilateral",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000858/9615/,,
+,,,Renal insufficiency,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000859/9615/,,
+,,,Renal nephropathy,Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA000860/9615/,,
+27,38535384,38528834,Retinal degeneration II,Vision / eye phene,unknown,yes,GNB3,"guanine nucleotide binding protein (G protein), beta polypeptide 3",https://www.omia.org/OMIA001244/9615/,https://www.omia.org/gene403511/,
+12,11797719,11780500,Retinal degeneration II,Vision / eye phene,unknown,yes,PRPH2,"peripherin 2 (retinal degeneration, slow)",https://www.omia.org/OMIA001244/9615/,https://www.omia.org/gene403972/,
+,,,Retinal dysplasia,Vision / eye phene,unknown,yes,,,https://www.omia.org/OMIA000868/9615/,,
+,,,Scoliosis,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000891/9615/,,
+,,,"Sex reversal, generic (redundant)",,unknown,yes,,,https://www.omia.org/OMIA000900/9615/,,
+,,,Shoulder luxation,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000912/9615/,,
+,,,Spina bifida,Embryo phene,unknown,yes,,,https://www.omia.org/OMIA000933/9615/,,
+,,,Spina bifida occulta,Embryo phene,unknown,yes,,,https://www.omia.org/OMIA000934/9615/,,
+,,,Spondylosis deformans,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA001132/9615/,,VBO_0200210
+,,,Sudden death,Mortality / aging (incl. embryonic lethal),unknown,yes,,,https://www.omia.org/OMIA000955/9615/,,
+,,,Syndactyly,Skeleton phene (incl. short stature & teeth),unknown,yes,,,https://www.omia.org/OMIA000963/9615/,,
+,,,Tachycardia,Cardiovascular system phene,unknown,yes,,,https://www.omia.org/OMIA000969/9615/,,
+,,,Tail abnormalities,Limbs / fins / digit / tail phene,unknown,yes,,,https://www.omia.org/OMIA000970/9615/,,
+,,,Thrombocytopathy,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001002/9615/,,
+,,,"Thrombocytopenic purpura, autoimmune",Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001104/9615/,,
+,,,Thromboxane responsiveness of platelets,Haematopoietic system phene,yes,yes,,,https://www.omia.org/OMIA001004/9615/,,
+,,,Thyroiditis,Endocrine / exocrine gland phene (incl mammary gland),unknown,yes,,,https://www.omia.org/OMIA001005/9615/,,
+,,,Tremor,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001016/9615/,,
+,,,Tremor syndrome with central axonopathy,Nervous system phene,unknown,yes,,,https://www.omia.org/OMIA001017/9615/,,
+,,,"Urolith, cystine",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001031/9615/,,
+,,,"Urolith, KMgP",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001349/9615/,,
+,,,"Urolith, urate",Renal / urinary system phene,unknown,yes,,,https://www.omia.org/OMIA001032/9615/,,
+,,,Various disorders,,unknown,yes,,,https://www.omia.org/OMIA001039/9615/,,
+,,,Vitamin-K-dependent blood coagulation factors deficiency,Haematopoietic system phene,unknown,yes,,,https://www.omia.org/OMIA001054/9615/,,
+,,,Wilms tumour,Neoplasm,unknown,yes,,,https://www.omia.org/OMIA001142/9615/,,

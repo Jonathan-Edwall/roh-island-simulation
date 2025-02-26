@@ -47,7 +47,7 @@ Ne_burn_in <- 2500
 nInd_fo <- 50
 Inbred_fo <- TRUE
 
-N_e_bottleneck <- 50
+N_bottleneck <- 50
 n_generations_bottleneck <- 5
 n_gen_breed <- 40 
 n_breed <- 200 
@@ -1049,7 +1049,7 @@ ROH_hotspot_ci <- paste0("(", format(ROH_hotspot_ci[1], nsmall = 2), ", ", forma
 column_names <- c("Chr","NeBurnIn","nBottleneck","nGenBottleneck","nGenBreed","nBreed","SNPchipRefPop","Chr_specific_recomb_rate","Mutations","Sim_F_ROH","F_ROH_CI","Sim_ROH_hotspot_thr","ROH_hotspot_thr_CI","H_e_No_MAF","H_e_No_MAF_ci","H_e_5th_perc_No_MAF","H_e_MAF_0_05","H_e_MAF_0_05_ci","H_e_5th_perc_MAF_0_05","Sim_Cost_Result")
 
 # Create a list of the values for the current simulation
-current_simulation_values <- list(chr,Ne_burn_in,N_e_bottleneck,n_generations_bottleneck,n_gen_breed,n_breed,snp_chip,chr_specific_recomb_rate,Introduce_mutations,
+current_simulation_values <- list(chr,Ne_burn_in,N_bottleneck,n_generations_bottleneck,n_gen_breed,n_breed,snp_chip,chr_specific_recomb_rate,Introduce_mutations,
          round(neutral_model_F_ROH,decimals_output_values),
          F_ROH_ci,
          round(neutral_model_ROH_hotspot_threshold,decimals_output_values),

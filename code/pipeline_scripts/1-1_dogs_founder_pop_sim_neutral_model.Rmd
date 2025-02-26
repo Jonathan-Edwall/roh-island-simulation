@@ -39,7 +39,7 @@ nInd_founder_population <- as.numeric(Sys.getenv("nInd_founder_population")) # F
 Inbred_ancestral_population <- as.logical(Sys.getenv("Inbred_ancestral_population"))
 introduce_mutations <- as.logical(Sys.getenv("Introduce_mutations"))
 
-n_bottleneck <- as.numeric(Sys.getenv("N_e_bottleneck"))
+n_bottleneck <- as.numeric(Sys.getenv("N_bottleneck"))
 n_generations_bottleneck <- as.numeric(Sys.getenv("n_generations_bottleneck"))
 
 n_generations_random_mating <- as.numeric(Sys.getenv("n_simulated_generations_breed_formation")) # The number of generations to simulate during the random mating scenario of modern dog breeds

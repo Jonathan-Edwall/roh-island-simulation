@@ -22,7 +22,7 @@ trap 'handle_interrupt' SIGINT
 # Max number of parallel jobs to run at a time 
 # max_parallel_jobs=$(nproc)
 # max_parallel_jobs=$((nproc / 4))
-max_parallel_jobs=1
+max_parallel_jobs=4
 
 
 # # Boolean value to determine whether to run the selection simulation code

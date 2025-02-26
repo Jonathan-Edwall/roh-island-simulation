@@ -6,7 +6,7 @@ import pandas as pd
 import signal
 import sys
 
-n_results=5
+n_results=5 # Define the top n result to rerun
 HO_input_results_file = f"neutral_models_cost_function_results.tsv"
 # Dynamically determine the root directory one level up from the current script's directory
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

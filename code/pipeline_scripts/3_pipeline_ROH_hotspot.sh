@@ -29,8 +29,8 @@ bedtools_results_dir=$results_dir/Bedtools/coverage
 #�������������
 #� Empirical �
 #�������������
-# empirical_dog_breed="german_shepherd" # Defined in run_pipeline.sh
-coverage_output_empirical_breed_dir=$bedtools_results_dir/empirical/$empirical_dog_breed
+# empirical_breed="german_shepherd" # Defined in run_pipeline.sh
+coverage_output_empirical_breed_dir=$bedtools_results_dir/empirical/$empirical_breed
 
 roh_frequencies_empirical_breed_dir=$coverage_output_empirical_breed_dir/pop_roh_freq
 
@@ -55,7 +55,7 @@ all_chr_roh_freq_dir_relative_path=Gosling_plots/all_chr_roh_freq
 #�������������
 #� Empirical �
 #�������������
-roh_hotspots_output_empirical_breed_dir=$ROH_hotspots_dir/empirical/$empirical_dog_breed
+roh_hotspots_output_empirical_breed_dir=$ROH_hotspots_dir/empirical/$empirical_breed
 mkdir -p $roh_hotspots_output_empirical_breed_dir # Creating subdirectory if it doesn't already exist
 
 gapless_roh_hotspots_empirical_breed_dir=$roh_hotspots_output_empirical_breed_dir/gapless_roh_hotspots
@@ -132,7 +132,7 @@ if [ "$empirical_processing" = TRUE ]; then
         # Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd', run_pandoc=FALSE)"
     done
     wait
-    echo "ROH-Hotspots detected for $empirical_dog_breed"
+    echo "ROH-Hotspots detected for $empirical_breed"
     echo "The results are stored in: $roh_hotspots_output_empirical_breed_dir"
 else
     echo "Empirical data has been set to not be processed, since files have already been created."

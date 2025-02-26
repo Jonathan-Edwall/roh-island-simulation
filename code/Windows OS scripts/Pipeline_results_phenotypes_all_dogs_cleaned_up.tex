@@ -1,0 +1,306 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Labrador Retriever 98 Gen Breed Formation - SNP chip: last\_breed\_formation\_generation - 50 N\_e bottleneck scenario},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Labrador Retriever 98 Gen Breed Formation - SNP chip:
+last\_breed\_formation\_generation - 50 N\_e bottleneck scenario}
+\author{}
+\date{\vspace{-2.5em}2025-02-02}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\section{0: Preparation}\label{preparation}
+
+Defining the input and output directories
+
+\subsection{Loading libraries}\label{loading-libraries}
+
+\begin{verbatim}
+## Loading required package: knitr
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: ggplot2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'ggplot2' was built under R version 4.3.2
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: scatterplot3d
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'scatterplot3d' was built under R version 4.3.1
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: RColorBrewer
+\end{verbatim}
+
+\section{Latex formatting function}\label{latex-formatting-function}
+
+\section{Standard Error Confidence interval
+function}\label{standard-error-confidence-interval-function}
+
+\section{Gene mapping}\label{gene-mapping}
+
+\section{2: ROH-Frequency}\label{roh-frequency}
+
+\subsection{2.1: Autosome
+ROH-frequencies}\label{autosome-roh-frequencies}
+
+\subsubsection{2.1.1: Empirical - ROH
+frequency}\label{empirical---roh-frequency}
+
+\subsection{2.2: ROH-hotspots - ROH Frequency and
+Length}\label{roh-hotspots---roh-frequency-and-length}
+
+\section{5: Summary}\label{summary}
+
+\subsection{5.1: General comparison}\label{general-comparison}
+
+\subsection{5.2: Selection Testing of Empirical
+ROH-Hotspots}\label{selection-testing-of-empirical-roh-hotspots}
+
+\subsubsection{5.2.1: Selection test (Sweep
+test)}\label{selection-test-sweep-test}
+
+\begin{verbatim}
+## [1] "Selection test results"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "ROH-hotspot windows with an mean H_e Value lower or equal to the lower confidence interval of the fifth percentile of the neutral model are classified as being under selection"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "5th percentile of the neutral model is: 0.16359"
+\end{verbatim}
+
+\begin{longtable}[]{@{}llr@{}}
+\toprule\noalign{}
+Name & Under\_selection & Window\_based\_Average\_H\_e \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+hotspot\_chr28\_window\_1 & Yes & 0.118 \\
+hotspot\_chr1\_window\_1 & Yes & 0.144 \\
+hotspot\_chr24\_window\_1 & No & 0.186 \\
+hotspot\_chr13\_window\_1 & No & 0.190 \\
+hotspot\_chr11\_window\_2 & No & 0.205 \\
+hotspot\_chr15\_window\_1 & No & 0.223 \\
+hotspot\_chr6\_window\_1 & No & 0.232 \\
+hotspot\_chr11\_window\_1 & No & 0.233 \\
+hotspot\_chr8\_window\_1 & No & 0.307 \\
+\end{longtable}
+
+\begin{verbatim}
+## [1] "C:/Users/jonat/GitHub/roh-island-simulation/results_chr1_3185_Ne_50TC/Pipeline_results/ROH_hotspots_Selection_testing_neutral_model_H_E_threshold_0.164.csv.txt"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "ROH-hotspots under selection:"
+\end{verbatim}
+
+\begin{longtable}[]{@{}llr@{}}
+\toprule\noalign{}
+Name & Under\_selection & Window\_based\_Average\_H\_e \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+hotspot\_chr28\_window\_1 & Yes & 0.118 \\
+hotspot\_chr1\_window\_1 & Yes & 0.144 \\
+\end{longtable}
+
+\subsubsection{5.2.3: Extracting Hotspots under
+selection}\label{extracting-hotspots-under-selection}
+
+\section{OMIA Phenotypes}\label{omia-phenotypes}
+
+\subsection{Breed-specific Phenotypes from
+OMIA}\label{breed-specific-phenotypes-from-omia}
+
+\subsubsection{All Breed-specific non-defect phenotypes of the specified
+breed}\label{all-breed-specific-non-defect-phenotypes-of-the-specified-breed}
+
+\begin{table}
+\caption{\label{tab:unnamed-chunk-8}Table of the non-defect breed-related phenotypes from OMIA}
+
+\centering
+\begin{tabular}[t]{r|r|r|l|l|l|l|l|l|l|l}
+\hline
+CHR & POS1 & POS2 & Phene & Phene\_category & Considered\_defect & Gene\_symbol & Gene\_description & Phene\_url & Gene\_details\_url & Breeds\\
+\hline
+20 & 52963476 & 52964967 & Modifier of copper toxicosis, RETN-related & Homeostasis / metabolism phene & no & RETN & resistin & https://www.omia.org/OMIA002609/9615/ & https://www.omia.org/gene388306078/ & VBO\_0200800\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{r|r|r|l|l|l|l|l|l|l|l}
+\hline
+CHR & POS1 & POS2 & Phene & Phene\_category & Considered\_defect & Gene\_symbol & Gene\_description & Phene\_url & Gene\_details\_url & Breeds\\
+\hline
+1 & 24326030 & 24331495 & Reduced hair shedding, MC5R-related & Integument (skin) phene & no & MC5R & melanocortin 5 receptor & https://www.omia.org/OMIA002750/9615/ & https://www.omia.org/gene388250420/ & Unspecified\\
+\hline
+1 & 111055483 & 111058288 & Hyperlipidaemia/atherosclerosis, APOE-related & Homeostasis / metabolism phene & no & APOE & apolipoprotein E & https://www.omia.org/OMIA002063/9615/ & https://www.omia.org/gene388244913/ & Unspecified\\
+\hline
+3 & 92125265 & 92275341 & Height, LCORL-associated body-size variation & Growth / size / body region phene & no & LCORL & ligand dependent nuclear receptor corepressor-like & https://www.omia.org/OMIA002246/9615/ & https://www.omia.org/gene388307121/ & Unspecified\\
+\hline
+5 & 63922271 & 63923224 & Coat colour, extension & Pigmentation phene & no & MC1R & melanocortin 1 receptor (alpha melanocyte stimulating hormone receptor) & https://www.omia.org/OMIA001199/9615/ & https://www.omia.org/gene489652/ & Unspecified\\
+\hline
+5 & 63922271 & 63923224 & Coat colour, grizzle & Pigmentation phene & no & MC1R & melanocortin 1 receptor (alpha melanocyte stimulating hormone receptor) & https://www.omia.org/OMIA001495/9615/ & https://www.omia.org/gene489652/ & Unspecified\\
+\hline
+5 & 63922271 & 63923224 & Coat colour, melanistic mask & Pigmentation phene & no & MC1R & melanocortin 1 receptor (alpha melanocyte stimulating hormone receptor) & https://www.omia.org/OMIA001590/9615/ & https://www.omia.org/gene489652/ & Unspecified\\
+\hline
+9 & 59449060 & 59512699 & Coat colour, harlequin & Pigmentation phene & no & PSMB7 & proteasome subunit beta 7 & https://www.omia.org/OMIA001454/9615/ & https://www.omia.org/gene25031640/ & Unspecified\\
+\hline
+10 & 7971606 & 8151219 & Ears, folded (drop vs prick) & Hearing / vestibular / ear phene & no & MSRB3 & methionine sulfoxide reductase B3 & https://www.omia.org/OMIA000319/9615/ & https://www.omia.org/gene388303816/ & Unspecified\\
+\hline
+10 & 8459176 & 8604625 & Height, HMGA2-associated body-size variation & Growth / size / body region phene & no & HMGA2 & high mobility group AT-hook 2 & https://www.omia.org/OMIA001968/9615/ & https://www.omia.org/gene389077191/ & Unspecified\\
+\hline
+13 & 8873544 & 9022401 & Furnishings (moustache and eyebrows) & Integument (skin) phene & no & RSPO2 & R-spondin 2 & https://www.omia.org/OMIA001531/9615/ & https://www.omia.org/gene23857650/ & Unspecified\\
+\hline
+15 & 30230533 & 30311189 & Coat colour, phaeomelanin dilution, KITLG-related & Pigmentation phene & no & KITLG & KIT ligand & https://www.omia.org/OMIA002228/9615/ & https://www.omia.org/gene388199034/ & Unspecified\\
+\hline
+16 & 57081626 & 57083181 & Coat colour, dominant black & Pigmentation phene & no & CBD103 & beta-defensin 103 & https://www.omia.org/OMIA001416/9615/ & https://www.omia.org/gene4236237/ & Unspecified\\
+\hline
+20 & 21883312 & 22101930 & Coat colour, white spotting & Pigmentation phene & no & MITF & microphthalmia-associated transcription factor & https://www.omia.org/OMIA000214/9615/ & https://www.omia.org/gene415126/ & Unspecified\\
+\hline
+20 & 56514447 & 56522856 & Coat colour, phaeomelanin dilution, MFSD12-related & Pigmentation phene & no & MFSD12 & major facilitator superfamily domain containing 12 & https://www.omia.org/OMIA002197/9615/ & https://www.omia.org/gene388251177/ & Unspecified\\
+\hline
+24 & 24041356 & 24084629 & Coat colour, agouti & Pigmentation phene & no & ASIP & agouti signaling protein & https://www.omia.org/OMIA000201/9615/ & https://www.omia.org/gene492296/ & Unspecified\\
+\hline
+27 & 2535235 & 2543509 & Curly coat & Integument (skin) phene & no & KRT71 & keratin 71, type II & https://www.omia.org/OMIA000245/9615/ & https://www.omia.org/gene23860798/ & Unspecified\\
+\hline
+30 & 38023809 & 38029593 & Metabolizer of a cognitive enhancer & Homeostasis / metabolism phene & no & CYP1A2 & cytochrome P450, family 1, subfamily A, polypeptide 2 & https://www.omia.org/OMIA001405/9615/ & https://www.omia.org/gene26595581/ & Unspecified\\
+\hline
+32 & 4533042 & 4556071 & Hair, long & Integument (skin) phene & no & FGF5 & fibroblast growth factor 5 & https://www.omia.org/OMIA000439/9615/ & https://www.omia.org/gene99327621/ & Unspecified\\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Species-specific phenotypes overlapping with the detected
+empirical ROH
+hotspot(s)}\label{species-specific-phenotypes-overlapping-with-the-detected-empirical-roh-hotspots}
+
+\begin{verbatim}
+## The following table(s) shows the empirical ROH hotspots overlapping with species-specific phenotypes (defect/non-defect).The tables are displayed in the following order:
+##  , Hotspot_chr13_window_1, Hotspot_chr15_window_1
+\end{verbatim}
+
+\begin{table}
+\caption{\label{tab:unnamed-chunk-9}All defect/non-defect phenotypes (for the studied species) overlapping with the empirical ROH hotspots}
+
+\centering
+\begin{tabular}[t]{r|r|r|l|l|l|l|l|l|l|l|r}
+\hline
+CHR & POS1 & POS2 & Phene & Phene\_category & Considered\_defect & Gene\_symbol & Gene\_description & Phene\_url & Gene\_details\_url & Breeds & Overlap\_Percentage\\
+\hline
+13 & 37796064 & 37804968 & Congenital keratoconjunctivitis sicca and ichthyosiform dermatosis & Vision / eye phene & yes & FAM83H & family with sequence similarity 83, member H & https://www.omia.org/OMIA001683/9615/ & https://www.omia.org/gene180373696/ & VBO\_0200309 & 100\\
+\hline
+13 & 37924192 & 37980292 & Epidermolysis bullosa, simplex, PLEC-related & Integument (skin) phene & yes & PLEC & plectin & https://www.omia.org/OMIA002080/9615/ & https://www.omia.org/gene388249122/ & VBO\_0200512 & 100\\
+\hline
+\end{tabular}
+\centering
+\begin{tabular}[t]{r|r|r|l|l|l|l|l|l|l|l|r}
+\hline
+CHR & POS1 & POS2 & Phene & Phene\_category & Considered\_defect & Gene\_symbol & Gene\_description & Phene\_url & Gene\_details\_url & Breeds & Overlap\_Percentage\\
+\hline
+15 & 18575495 & 18646528 & Retinal atrophy - Cone-rod dystrophy 4 & Vision / eye phene & yes & RPGRIP1 & retinitis pigmentosa GTPase regulator interacting protein 1 & https://www.omia.org/OMIA001432/9615/ & https://www.omia.org/gene388244116/ & VBO\_0200409 & 100\\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Non-defect Phenotypes overlapping with candidate regions for
+selection}\label{non-defect-phenotypes-overlapping-with-candidate-regions-for-selection}
+
+Finding if there exists any non-defect phenotypes overlapping with ROH
+hotspot candidate regions for selection, for the specified breed
+(Defined from the list of VBO-IDs).
+
+\begin{verbatim}
+## No non-defect phenotypes discovered for the ROH hotspot candidate region(s) for selection
+\end{verbatim}
+
+\end{document}

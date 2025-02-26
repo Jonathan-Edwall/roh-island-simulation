@@ -20,7 +20,7 @@ cd $HOME
 # export use_MAF_pruning=TRUE # Imported from H_e_calc_for_multiple_MAF_HO.sh
 # export min_MAF=0.01 # Imported from H_e_calc_for_multiple_MAF_HO.sh
 
-# empirical_dog_breed="empirical_breed" # Variable Defined in run_pipeline_hyperoptimize_neutral_model.sh
+# empirical_breed="empirical_breed" # Variable Defined in run_pipeline_hyperoptimize_neutral_model.sh
 
 # MAF_status_suffix="No_MAF" # Imported from H_e_calc_for_multiple_MAF_HO.sh
 # MAF_status_suffix="MAF_0_01" # Imported from H_e_calc_for_multiple_MAF_HO.sh
@@ -36,10 +36,10 @@ PLINK_allele_freq_dir=$results_dir/PLINK/allele_freq
 #� Empirical �
 #�������������
 ##### Genomewide Allele frequencies #####
-Empirical_breed_allele_freq_dir=$PLINK_allele_freq_dir/empirical/$empirical_dog_breed
+Empirical_breed_allele_freq_dir=$PLINK_allele_freq_dir/empirical/$empirical_breed
 ##### ROH-hotspot Allele frequencies #####
 roh_hotspots_results_dir=$results_dir/ROH-Hotspots
-empirical_roh_hotspots_dir=$roh_hotspots_results_dir/empirical/$empirical_dog_breed
+empirical_roh_hotspots_dir=$roh_hotspots_results_dir/empirical/$empirical_breed
 Empirical_breed_roh_hotspots_allele_frequency_dir=$empirical_roh_hotspots_dir/hotspots_allele_freq
 
 #�������������
@@ -58,7 +58,7 @@ mkdir -p $expected_heterozygosity_dir
 #�������������
 #� Empirical �
 #�������������
-export Empirical_breed_H_e_dir="$expected_heterozygosity_dir/empirical/$empirical_dog_breed"
+export Empirical_breed_H_e_dir="$expected_heterozygosity_dir/empirical/$empirical_breed"
 mkdir -p $Empirical_breed_H_e_dir
 ##### Neutral Model #####
 neutral_model_H_e_dir="$expected_heterozygosity_dir/simulated/neutral_model"

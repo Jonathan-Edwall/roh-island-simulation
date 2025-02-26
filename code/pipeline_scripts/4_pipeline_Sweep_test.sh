@@ -21,8 +21,8 @@ max_parallel_jobs=1
 # export use_MAF_pruning=FALSE
 # export <=0.01
 
-# export empirical_dog_breed="german_shepherd"
-# empirical_dog_breed="empirical_breed" # Defined in run_pipeline.sh
+# export empirical_breed="german_shepherd"
+# empirical_breed="empirical_breed" # Defined in run_pipeline.sh
 
 ######################################  
 ####### Defining the INPUT files #######
@@ -34,10 +34,10 @@ PLINK_allele_freq_dir=$results_dir/PLINK/allele_freq
 #� Empirical �
 #�������������
 ##### Genomewide Allele frequencies #####
-Empirical_breed_allele_freq_dir=$PLINK_allele_freq_dir/empirical/$empirical_dog_breed
+Empirical_breed_allele_freq_dir=$PLINK_allele_freq_dir/empirical/$empirical_breed
 ##### ROH-hotspot Allele frequencies #####
 roh_hotspots_results_dir=$results_dir/ROH-Hotspots
-empirical_roh_hotspots_dir=$roh_hotspots_results_dir/empirical/$empirical_dog_breed
+empirical_roh_hotspots_dir=$roh_hotspots_results_dir/empirical/$empirical_breed
 Empirical_breed_roh_hotspots_allele_frequency_dir=$empirical_roh_hotspots_dir/hotspots_allele_freq
 
 #�������������
@@ -65,7 +65,7 @@ mkdir -p $expected_heterozygosity_dir
 #�������������
 #� Empirical �
 #�������������
-Empirical_breed_H_e_dir=$expected_heterozygosity_dir/empirical/$empirical_dog_breed
+Empirical_breed_H_e_dir=$expected_heterozygosity_dir/empirical/$empirical_breed
 mkdir -p $Empirical_breed_H_e_dir
 
 ##### Neutral Model #####

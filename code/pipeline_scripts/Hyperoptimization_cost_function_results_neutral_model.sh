@@ -18,8 +18,8 @@ cd $HOME
 ######################################  
 ####### Defining parameter values #######
 ######################################
-# export empirical_dog_breed="german_shepherd"
-# empirical_dog_breed="empirical_breed" # Defined in run_pipeline_hyperoptimize_neutral_model.sh
+# export empirical_breed="german_shepherd"
+# empirical_breed="empirical_breed" # Defined in run_pipeline_hyperoptimize_neutral_model.sh
 
 # chr_simulated # Imported from run_pipeline_hyperoptimize_neutral_model.sh
 
@@ -29,7 +29,7 @@ cd $HOME
 
 # Inbred_ancestral_population # Imported from run_pipeline_hyperoptimize_neutral_model.sh
 
-# N_e_bottleneck # Imported from run_pipeline_hyperoptimize_neutral_model.sh
+# N_bottleneck # Imported from run_pipeline_hyperoptimize_neutral_model.sh
 
 # n_simulated_generations_breed_formation # Imported from run_pipeline_hyperoptimize_neutral_model.sh
 
@@ -59,12 +59,12 @@ raw_simulated_data_dir=$raw_data_dir/simulated
 #� Empirical �
 #�������������
 
-Empirical_breed_ROH_hotspots_dir=$ROH_hotspots_dir/empirical/$empirical_dog_breed
+Empirical_breed_ROH_hotspots_dir=$ROH_hotspots_dir/empirical/$empirical_breed
 Empirical_breed_autosome_ROH_freq_dir=$Empirical_breed_ROH_hotspots_dir/Gosling_plots/autosome_roh_freq
 ### Inbreeding coefficient ###
-Empirical_breed_F_ROH_dir=$plink_ROH_dir/empirical/$empirical_dog_breed/F_ROH
+Empirical_breed_F_ROH_dir=$plink_ROH_dir/empirical/$empirical_breed/F_ROH
 ### Expected Heterozygosity distribution ###
-# Empirical_breed_H_e_dir=$expected_heterozygosity_dir/empirical/$empirical_dog_breed # Imported from Hyperoptimization_H_e_calculation.sh
+# Empirical_breed_H_e_dir=$expected_heterozygosity_dir/empirical/$empirical_breed # Imported from Hyperoptimization_H_e_calculation.sh
 
 #�������������
 #� Simulated � 
@@ -106,7 +106,7 @@ export Empirical_data_F_ROH_dir="$Empirical_breed_F_ROH_dir"
 ### Expected Heterozygosity distribution ###
 # MAF_status_suffix="No_MAF"
 # expected_heterozygosity_dir="$results_dir/expected_heterozygosity_$MAF_status_suffix"
-# Empirical_breed_H_e_dir=$expected_heterozygosity_dir/empirical/$empirical_dog_breed
+# Empirical_breed_H_e_dir=$expected_heterozygosity_dir/empirical/$empirical_breed
 
 # export Empirical_data_H_e_dir="$Empirical_breed_H_e_dir"
 

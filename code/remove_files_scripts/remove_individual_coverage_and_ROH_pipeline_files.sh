@@ -7,6 +7,8 @@ script_start=$(date +%s)
 ######################################
 cd $HOME # Defined in run_pipeline.sh
 
+# empirical_breed="labrador_retriever" # Defined in run_pipeline.sh
+
 #############################################  
 ####### Defining paths for the files to be removed #######
 #############################################  
@@ -23,14 +25,14 @@ simulated_bedtools_dir=$bedtools_results_dir/simulated
 #���������������
 #� Empirical Data �
 #���������������
-# export empirical_dog_breed="german_shepherd"
-# empirical_dog_breed="labrador_retriever" # Defined in run_pipeline.sh
+# export empirical_breed="german_shepherd"
+# empirical_breed="labrador_retriever" # Defined in run_pipeline.sh
 
-empirical_breed_pop_hom_file_dir=$plink_results_dir/empirical/$empirical_dog_breed
+empirical_breed_pop_hom_file_dir=$plink_results_dir/empirical/$empirical_breed
 # Defining path to input directory of Individual ROH-files (bed format)
 empirical_breed_indv_ROH_files_dir=$empirical_breed_pop_hom_file_dir/individual_ROH
 
-coverage_output_empirical_breed_dir=$bedtools_results_dir/empirical/$empirical_dog_breed
+coverage_output_empirical_breed_dir=$bedtools_results_dir/empirical/$empirical_breed
 
 
 #���������������

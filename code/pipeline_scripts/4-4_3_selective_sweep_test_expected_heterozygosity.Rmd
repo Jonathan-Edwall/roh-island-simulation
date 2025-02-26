@@ -25,8 +25,8 @@ use_MAF_pruning <- Sys.getenv("use_MAF_pruning")
 use_MAF_pruning
 min_MAF <- as.numeric(Sys.getenv("min_MAF"))
 min_MAF
-empirical_dog_breed <- Sys.getenv("empirical_dog_breed")
-empirical_dog_breed
+empirical_breed <- Sys.getenv("empirical_breed")
+empirical_breed
 
 ####################################  
 # Defining the input files
@@ -657,8 +657,8 @@ if (use_MAF_pruning == TRUE) {
 
 # Determine the number of bins you want
 num_bins <- 100  
-histogram_title <-  paste0(empirical_dog_breed," H_e Distribution (",MAF_setting_text,") - Windowsize: ",window_size,"bp ")
-image_name <- paste0("H_e_distribution_",empirical_dog_breed,".png")
+histogram_title <-  paste0(empirical_breed," H_e Distribution (",MAF_setting_text,") - Windowsize: ",window_size,"bp ")
+image_name <- paste0("H_e_distribution_",empirical_breed,".png")
 # Save the plot as a PNG file with specified path
 png(file.path(output_empirical_H_e_dir, image_name), width = 1200, height = 900, res = 120)
 # Create a histogram with custom breaks
@@ -685,7 +685,7 @@ dev.off()
 # Initialize an empty data frame to store the results
 empirical_5th_percentiles_df <- data.frame(Fifth_Percentile = empirical_dataset_percentile_5,Avg_H_e = empirical_genomewides_mean_he_window_based, stringsAsFactors = FALSE)
 # Define the filename with the output directory path
-filename <- file.path(output_empirical_H_e_dir, paste0("H_e_distribution_",empirical_dog_breed,".tsv"))
+filename <- file.path(output_empirical_H_e_dir, paste0("H_e_distribution_",empirical_breed,".tsv"))
 # Saving the results in a .tsv-file
 write.table(empirical_5th_percentiles_df, filename, sep = "\t", row.names = FALSE,quote = FALSE)
 ```

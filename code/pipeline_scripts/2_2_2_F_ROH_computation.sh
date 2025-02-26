@@ -39,10 +39,10 @@ preprocessed_data_dir=$data_dir/preprocessed
 #�������������
 #� Empirical �
 #�������������
-# empirical_dog_breed="german_shepherd" # Defined in run_pipeline.sh
-preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
+# empirical_breed="german_shepherd" # Defined in run_pipeline.sh
+preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_breed
 
-empirical_breed_pop_hom_file_dir=$plink_ROH_results_dir/empirical/$empirical_dog_breed
+empirical_breed_pop_hom_file_dir=$plink_ROH_results_dir/empirical/$empirical_breed
 
 #�������������
 #� Simulated � 

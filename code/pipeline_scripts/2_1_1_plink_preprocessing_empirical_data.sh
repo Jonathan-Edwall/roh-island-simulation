@@ -3,12 +3,6 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-# source $conda_env_full_path  # Source Conda initialization script
-# conda activate plink
-# conda activate $PLINK_environment
-
 ######################################  
 ####### Defining parameter values #######
 ######################################
@@ -16,11 +10,26 @@ script_start=$(date +%s)
 autosome_lengths_header="#Chromosome\tLength(bp)\tLength(KB)\tMarkers\tSNP_density(Mb)"
 
 # empirical_raw_data_basename=LR_fs # Variable Defined in run_pipeline.sh
-# empirical_dog_breed="german_shepherd" # Variable Defined in run_pipeline.sh
-export empirical_preprocessed_data_basename="${empirical_dog_breed}_filtered"
+# empirical_breed="german_shepherd" # Variable Defined in run_pipeline.sh
+export empirical_preprocessed_data_basename="${empirical_breed}_filtered"
 # empirical_geneticmap_filetype_raw_data=.map
 empirical_geneticmap_filetype_raw_data=.bim
-autosomal_chromosomes_species="1-38"
+# empirical_autosomal_chromosomes="1-38" # Variable Defined in run_pipeline.sh
+
+# Extract the start and end of the chromosome range (e.g., "1-19")
+start_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f1)
+end_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f2)
+
+# Calculate the number of chromosomes in the range
+num_chromosomes=$((end_chromosome - start_chromosome + 1))
+
+# empirical_species="dog" # Variable Defined in run_pipeline.sh
+# Define species-specific options
+if [[ "$empirical_species" == "dog" ]]; then
+    species_flag="--dog"
+else
+    species_flag="--chr-set $num_chromosomes"
+fi
 
 
 ####################################  
@@ -39,14 +48,14 @@ cd $HOME
 # Defining input directory
 # data_dir=$HOME/data # Variable Defined in run_pipeline.sh
 raw_data_dir=$data_dir/raw
-raw_empirical_breed_dir=$raw_data_dir/empirical/$empirical_dog_breed
+raw_empirical_breed_dir=$raw_data_dir/empirical/$empirical_breed
 
 #################################### 
 # Defining the output files
 #################################### 
 # Defining output directory
 preprocessed_data_dir=$data_dir/preprocessed
-preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
+preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_breed
 mkdir -p $preprocessed_empirical_breed_dir
 
 raw_empirical_breed_PCA_dir=$raw_empirical_breed_dir/PCA
@@ -70,7 +79,7 @@ mkdir -p $raw_empirical_breed_PCA_dir
 # --file $raw_empirical_breed_dir/$empirical_raw_data_basename \
 # --out $preprocessed_empirical_breed_dir/$empirical_preprocessed_data_basename \
 # --make-bed \
-# --dog \
+# $species_flag \
 # --geno 0.05 --mind 0.1 \
 # --maf 0.05 \
 # --pca 2
@@ -82,7 +91,7 @@ mkdir -p $raw_empirical_breed_PCA_dir
 # --file $raw_empirical_breed_dir/$empirical_raw_data_basename \
 # --out $preprocessed_empirical_breed_dir/$empirical_preprocessed_data_basename \
 # --make-bed \
-# --dog \
+# $species_flag \
 # --geno 0.05 --mind 0.1 \
 # --pca 2
 
@@ -92,9 +101,9 @@ plink \
 --bfile $raw_empirical_breed_dir/$empirical_raw_data_basename \
 --out $preprocessed_empirical_breed_dir/$empirical_preprocessed_data_basename \
 --make-bed \
---dog \
+$species_flag \
 --geno 0.05 --mind 0.1 \
---chr $autosomal_chromosomes_species \
+--chr $empirical_autosomal_chromosomes \
 --pca 2
 
 
@@ -111,7 +120,7 @@ echo "PLINK preprocessing completed"
 # plink \
 #   --file $raw_empirical_breed_dir/$empirical_raw_data_basename \
 #   --out $raw_empirical_breed_PCA_dir/$empirical_raw_data_basename \
-#   --dog \
+#   $species_flag \
 #   --pca 2
 
 # ¤¤¤¤ Use if the geneticmap is in .bim format
@@ -119,8 +128,8 @@ echo "PLINK preprocessing completed"
 plink \
   --bfile $raw_empirical_breed_dir/$empirical_raw_data_basename \
   --out $raw_empirical_breed_PCA_dir/$empirical_raw_data_basename \
-  --dog \
-  --chr $autosomal_chromosomes_species \
+  $species_flag \
+  --chr $empirical_autosomal_chromosomes \
   --pca 2
 
 

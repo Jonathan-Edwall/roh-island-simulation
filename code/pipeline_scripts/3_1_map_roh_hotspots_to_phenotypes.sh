@@ -4,7 +4,7 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# empirical_dog_breed="empirical_breed" # Defined in run_pipeline.sh
+# empirical_breed="empirical_breed" # Defined in run_pipeline.sh
 
 ####################################  
 # Defining the working directory
@@ -17,16 +17,13 @@ cd $HOME
 # Defining the input files
 #################################### 
 
-# Defining the path to the annotation file
-# data_dir=$HOME/data # Variable Defined in run_pipeline.sh
-preprocessed_data_dir=$data_dir/preprocessed
-preprocessed_phenotype_file_dir=$preprocessed_data_dir/empirical/omia_dog_phenotype_data
-#$preprocessed_phenotype_file_dir/all_dog_phenotypes.bed
-#$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_dog_phenotypes.bed
+# Defining the path to the phenotype file
+# omia_phenotypes_filepath # Variable Defined in run_pipeline.sh
+omia_phenotypes_dir=$(dirname "$omia_phenotypes_filepath")
 
 # results_dir=$HOME/results # Variable Defined in run_pipeline.sh
 ROH_hotspots_results_dir=$results_dir/ROH-Hotspots
-empirical_breed_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/$empirical_dog_breed
+empirical_breed_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/$empirical_breed
 
 echo "ROH hotspot directory: $empirical_breed_roh_hotspots_dir"
 
@@ -48,11 +45,6 @@ mkdir -p $phenotype_mapping_output_dir
 ###Output:
 #����������������������������������������������������������������������������
 
-#phenotype_file=$preprocessed_phenotype_file_dir/ALL_dog_phenotypes.bed
-#phenotype_file=$preprocessed_phenotype_file_dir/ALL_phenotypes_empirical_breed.bed
-phenotype_file=$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_any_breed.bed
-#phenotype_file=$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_empirical_breed.bed
-
 # Running intersect command for every chromosome ROH-hotspot file.
 for roh_hotspot_file in $empirical_breed_roh_hotspots_dir/*.bed; do
     echo "Processing file: $roh_hotspot_file"
@@ -61,7 +53,7 @@ for roh_hotspot_file in $empirical_breed_roh_hotspots_dir/*.bed; do
     # Run bedtools intersect-function        
     bedtools intersect \
     -wa -header \
-    -a "$phenotype_file" \
+    -a "$omia_phenotypes_filepath" \
     -b "$roh_hotspot_file" \
     > "$output_file"    
 done

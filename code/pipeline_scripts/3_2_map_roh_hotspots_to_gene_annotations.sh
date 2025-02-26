@@ -4,7 +4,7 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# empirical_dog_breed=labrador_retriever # Defined in run_pipeline.sh
+# empirical_breed=labrador_retriever # Defined in run_pipeline.sh
 
 ####################################  
 # Defining the working directory
@@ -17,14 +17,13 @@ cd $HOME
 # Defining the input files
 #################################### 
 
-# Defining the path to the annotation file
-# data_dir=$HOME/data # Variable Defined in run_pipeline.sh
-preprocessed_data_dir=$data_dir/preprocessed
-preprocessed_dog_gene_annotations_file_dir=$preprocessed_data_dir/empirical/dog_gene_annotations
+# Defining the path to the gene annotation file
+# gene_annotations_filepath # Variable Defined in run_pipeline.sh
+gene_annotations_dir=$(dirname "$gene_annotations_filepath")
 
 # results_dir=$HOME/results # Variable Defined in run_pipeline.sh
 ROH_hotspots_results_dir=$results_dir/ROH-Hotspots
-empirical_breed_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/$empirical_dog_breed
+empirical_breed_roh_hotspots_dir=$ROH_hotspots_results_dir/empirical/$empirical_breed
 
 echo "ROH hotspot directory: $empirical_breed_roh_hotspots_dir"
 
@@ -50,92 +49,42 @@ mkdir -p $gene_mapping_output_dir
 ###Output:
 #����������������������������������������������������������������������������
 
-#phenotype_file=$preprocessed_phenotype_file_dir/ALL_dog_phenotypes.bed
-#phenotype_file=$preprocessed_phenotype_file_dir/ALL_phenotypes_empirical_breed.bed
-# phenotype_file=$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_any_breed.bed
-#phenotype_file=$preprocessed_phenotype_file_dir/all_non_defect_phenotypes_empirical_breed.bed
+#!/bin/bash
 
-# compressed_gene_annotations_file=$preprocessed_dog_gene_annotations_file_dir/ncbiRefSeq.gtf.gz
-# canfam_reference_genome=True
-compressed_gene_annotations_file=$preprocessed_dog_gene_annotations_file_dir/canFam3.ncbiRefSeq.gtf.gz
-canfam_reference_genome=True
-# compressed_gene_annotations_file=$preprocessed_dog_gene_annotations_file_dir/Canis_lupus_familiaris.ROS_Cfam_1.0.112.gtf.gz
-# canfam_reference_genome=False
-
-
-# Uncompress the GTF file if it hasn't been uncompressed already
-uncompressed_gene_annotations_file=${compressed_gene_annotations_file%.gz}
-if [ ! -f "$uncompressed_gene_annotations_file" ]; then
-    echo "Unzipping $compressed_gene_annotations_file"
-    gunzip -k "$compressed_gene_annotations_file"
-fi
-# uncompressed_gene_annotations_file=${compressed_gene_annotations_file%.gz}
-# uncompressed_gene_annotations_file=$preprocessed_dog_gene_annotations_file_dir/transcripts_temp.gtf
-# uncompressed_gene_annotations_file=$preprocessed_dog_gene_annotations_file_dir/canFam3.ncbiRefSeq.gtf
-
-# uncompressed_gene_annotations_file=$preprocessed_dog_gene_annotations_file_dir/Canis_lupus_familiaris.ROS_Cfam_1.0.112.gtf
-
-
-if [ $canfam_reference_genome = True ]; then
-    # Create a temporary file with only transcript entries
-    # grep -P "\ttranscript\t" "$uncompressed_gene_annotations_file" > "$temp_transcript_file"
-    temp_transcript_file="${preprocessed_dog_gene_annotations_file_dir}/transcripts_temp.gtf"    
-
-    # sed 's/^chr//' $uncompressed_gene_annotations_file > $temp_transcript_file
-    # awk '{if($1 ~ /^chr/) $1 = substr($1, 4); print}' "$uncompressed_gene_annotations_file" > "$temp_transcript_file"
-    awk '$3 == "transcript" {if($1 ~ /^chr/) $1 = substr($1, 4); print $0}' OFS="\t" "$uncompressed_gene_annotations_file" > "$temp_transcript_file"
-    # awk  "$uncompressed_gene_annotations_file" | head
-
-
-
-    # Running intersect command for every chromosome ROH-hotspot file.
-    for roh_hotspot_file in $empirical_breed_roh_hotspots_dir/*.bed; do
-        # echo "i do get here, correct?"
-        # echo "Processing file: $roh_hotspot_file"
-        prefix=$(basename "$roh_hotspot_file" .bed) # Extracting basename without the .bed extension
-        output_file="${gene_mapping_output_dir}/${prefix}_gene_mapping.txt"
-        output_transcript_file="${gene_mapping_output_dir}/${prefix}_transcripts.txt"
-        output_gene_names_file="${gene_mapping_output_dir}/${prefix}_gene_names.txt"
-
-        # Run bedtools intersect-function        
-        bedtools intersect \
-        -wa \
-        -a "$temp_transcript_file" \
-        -b "$roh_hotspot_file" \
-        > "$output_file"
-
-        # Extract transcripts and gene names
-        awk '$3 == "transcript"' "$output_file" > "$output_transcript_file"
-        awk '$3 == "transcript" {print $13}' "$output_file" | uniq > "$output_gene_names_file"
-
-    done
-
-    # Remove the temporary files after processing
-    rm "$temp_transcript_file"
+# Determine if the file is compressed and set the correct filename
+if [[ "$gene_annotations_filepath" == *.gz ]]; then
+    uncompressed_gene_annotations_file="${gene_annotations_filepath%.gz}"
+    if [ ! -f "$uncompressed_gene_annotations_file" ]; then
+        echo "Unzipping $gene_annotations_filepath"
+        gunzip -k "$gene_annotations_filepath"
+    fi
 else
-    # Running intersect command for every chromosome ROH-hotspot file.
-    for roh_hotspot_file in $empirical_breed_roh_hotspots_dir/*.bed; do
-        echo "should never get here"
-        echo "Processing file: $roh_hotspot_file"
-        prefix=$(basename "$roh_hotspot_file" .bed) # Extracting basename without the .bed extension
-        output_file="${gene_mapping_output_dir}/${prefix}_gene_mapping.txt" 
-        output_transcript_file="${gene_mapping_output_dir}/${prefix}_transcripts.txt" 
-        output_gene_names_file="${gene_mapping_output_dir}/${prefix}_gene_names.txt" 
-
-        # Run bedtools intersect-function        
-        bedtools intersect \
-        -wa \
-        -a "$uncompressed_gene_annotations_file" \
-        -b "$roh_hotspot_file" \
-        > "$output_file"    
-
-        awk '$3 == "transcript"' $output_file > $output_transcript_file
-
-        awk '$3 == "transcript" {print $10}' $output_file | uniq > $output_gene_names_file
-
-    done
-
+    uncompressed_gene_annotations_file="$gene_annotations_filepath"
 fi
+
+# Define temp transcript file
+temp_transcript_file="${gene_annotations_dir}/transcripts_temp.gtf"
+
+# Process GTF file to extract transcript entries and remove 'chr' prefix
+awk '$3 == "transcript" {if($1 ~ /^chr/) $1 = substr($1, 4); print $0}' OFS="\t" "$uncompressed_gene_annotations_file" > "$temp_transcript_file"
+
+# Iterate through all ROH-hotspot files and run intersect
+for roh_hotspot_file in "$empirical_breed_roh_hotspots_dir"/*.bed; do
+    prefix=$(basename "$roh_hotspot_file" .bed)
+    output_file="${gene_mapping_output_dir}/${prefix}_gene_mapping.txt"
+    output_transcript_file="${gene_mapping_output_dir}/${prefix}_transcripts.txt"
+    output_gene_names_file="${gene_mapping_output_dir}/${prefix}_gene_names.txt"
+
+    # Run bedtools intersect function        
+    bedtools intersect -wa -a "$temp_transcript_file" -b "$roh_hotspot_file" > "$output_file"
+
+    # Extract transcripts and gene names
+    awk '$3 == "transcript"' "$output_file" > "$output_transcript_file"
+    awk '$3 == "transcript" {print $13}' "$output_file" | uniq > "$output_gene_names_file"
+done
+
+# Remove the temporary files after processing
+rm "$temp_transcript_file"
 
 
 # Ending the timer 

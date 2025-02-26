@@ -3,13 +3,36 @@
 # Start the script execution timer 
 script_start=$(date +%s)
 
-# Activate conda environment
-# conda_env_full_path="/home/martin/anaconda3/etc/profile.d/conda.sh"
-# source $conda_env_full_path  # Source Conda initialization script
-# conda activate plink
+# # Defining the path to the Conda initialization script
+# conda_setup_script_path="/home/jonteehh/pipeline/anaconda3/etc/profile.d/conda.sh"
+# # conda_setup_script_path=""
+# source $conda_setup_script_path  # Source Conda initialization script
+# # Activate the conda environment
+# conda activate roh_island_sim_env
+
+######################################  
+####### Defining parameter values #######
+######################################
 
 # # Boolean value to determine whether to run the selection simulation code
 # selection_simulation=TRUE # Defined in run_pipeline.sh
+
+# Extract the start and end of the chromosome range (e.g., "1-19")
+start_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f1)
+end_chromosome=$(echo $empirical_autosomal_chromosomes | cut -d'-' -f2)
+
+# Calculate the number of chromosomes in the range
+num_chromosomes=$((end_chromosome - start_chromosome + 1))
+
+# empirical_species="dog" # Variable Defined in run_pipeline.sh
+# Define species-specific options
+if [[ "$empirical_species" == "dog" ]]; then
+    species_flag="--dog"
+else
+    species_flag="--chr-set $num_chromosomes"
+fi
+
+
 
 
 ####################################  
@@ -30,10 +53,10 @@ preprocessed_data_dir=$data_dir/preprocessed
 #�������������
 #� Empirical �
 #�������������
-# empirical_dog_breed="german_shepherd" # Defined in run_pipeline.sh
-preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_dog_breed
-# empirical_preprocessed_data_basename="${empirical_dog_breed}_filtered" # Defined in 2_1_1_plink_preprocessing_empirical_data.sh
-empirical_preprocessed_data_basename="${empirical_dog_breed}_filtered" # Defined in 2_1_1_plink_preprocessing_empirical_data.sh
+# empirical_breed="german_shepherd" # Defined in run_pipeline.sh
+preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_breed
+# empirical_preprocessed_data_basename="${empirical_breed}_filtered" # Defined in 2_1_1_plink_preprocessing_empirical_data.sh
+empirical_preprocessed_data_basename="${empirical_breed}_filtered" # Defined in 2_1_1_plink_preprocessing_empirical_data.sh
 
 #�������������
 #� Simulated � 
@@ -52,7 +75,7 @@ simulated_plink_dir=$plink_output_dir/simulated
 #�������������
 #� Empirical �
 #�������������
-empirical_breed_plink_output_dir=$plink_output_dir/empirical/$empirical_dog_breed
+empirical_breed_plink_output_dir=$plink_output_dir/empirical/$empirical_breed
 mkdir -p $empirical_breed_plink_output_dir
 
 #�������������
@@ -94,8 +117,8 @@ if [ "$empirical_processing" = TRUE ]; then
     # Running --homozyg command for ROH computation
     plink \
     --bfile "$preprocessed_empirical_breed_dir/$empirical_preprocessed_data_basename" \
-    --out "$empirical_breed_plink_output_dir/${empirical_dog_breed}_ROH" \
-    --dog \
+    --out "$empirical_breed_plink_output_dir/${empirical_breed}_ROH" \
+    $species_flag \
     --homozyg \
     --homozyg-window-snp 50 \
     --homozyg-window-threshold 0.05 \
@@ -126,7 +149,7 @@ for simulation_file in $preprocessed_neutral_model_dir/*.bim; do
     plink \
      --bfile "${preprocessed_neutral_model_dir}/${simulation_name}" \
      --out "${simulated_neutral_model_plink_output_dir}/${simulation_name}_ROH" \
-     --dog \
+     $species_flag \
      --homozyg \
      --homozyg-window-snp 50 \
      --homozyg-window-threshold 0.05 \
@@ -155,7 +178,7 @@ if [ "$selection_simulation" = TRUE ]; then
         plink \
         --bfile "${preprocessed_selection_model_dir}/${simulation_name}" \
         --out "${simulated_selection_model_plink_output_dir}/${simulation_name}_ROH" \
-        --dog \
+        $species_flag \
         --homozyg \
         --homozyg-window-snp 50 \
         --homozyg-window-threshold 0.05 \

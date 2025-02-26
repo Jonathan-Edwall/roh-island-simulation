@@ -6,8 +6,8 @@ import pandas as pd
 import signal
 import sys
 
-HO_id = "test" # Name the Hyperparameter Optimization run
-number_of_trials=5
+HO_id = "" # Name the Hyperparameter Optimization run
+number_of_trials=100 # Define the number of trials to run
 HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
 
 # Dynamically determine the root directory one level up from the current script's directory

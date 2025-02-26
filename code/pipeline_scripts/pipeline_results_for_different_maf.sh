@@ -18,8 +18,8 @@ cd $HOME
 
 min_MAF_list=("No_MAF" "0.01" "0.05")
 # min_MAF_list=("No_MAF")
+# min_MAF_list=("0.01")
 
-# N_e=340 
 N_e=$n_individuals_breed_formation # Imported from run_pipeline.sh 
 ######################################  
 ####### Defining the INPUT files #######
@@ -43,8 +43,14 @@ for min_MAF_threshold in "${min_MAF_list[@]}"; do
     # Run the first script in the background
     (
         source $pipeline_scripts_dir/4_pipeline_Sweep_test.sh
-        # Run the second script after the first one completes
-        source $pipeline_scripts_dir/pipeline_result_summary.sh
+        if [ "$selection_simulation" = TRUE ]; then
+            # Run the second script after the first one completes
+            source $pipeline_scripts_dir/pipeline_result_summary.sh
+
+        else
+            echo "Skipping running the summary script since selection model was not simulated"
+        fi
+
     ) &
 
 done
