@@ -77,3 +77,5 @@ code/Windows OS scripts/Pipeline_Sams_HO_comparison - kopia.Rmd
 /data/raw/simulated - HO17_1_allele_copy
 /data/preprocessed/simulated - HO17_2_allele_copies
 /data/preprocessed/simulated - HO17_1_allele_copy
+code/Windows OS scripts/.Rhistory
+code/Windows OS scripts/*.html
