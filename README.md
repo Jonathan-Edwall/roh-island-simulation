@@ -18,7 +18,7 @@ Additionally, it is noteworthy that the pipeline currently only supports the sim
 
 To ensure that the population history of the simulated models aligns well with the empirical dataset, the repository includes hyperparameter optimization through the program Optuna, using a cost function developed in the Master's thesis project.
 
-[For more detailed information about the different parts of the pipeline, see the README file `/code` directory.](https://github.com/Jonathan-Edwall/roh-island-simulation/tree/main/code).
+[For more detailed information about the different parts of the pipeline, see the README file in the `/code` directory.](https://github.com/Jonathan-Edwall/roh-island-simulation/tree/main/code).
 
 ## Key Components of the Analysis Pipeline
 
