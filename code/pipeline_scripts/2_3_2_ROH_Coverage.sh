@@ -4,24 +4,19 @@
 # Start the timer 
 script_start=$(date +%s)
 
-# # Defining the path to the Conda initialization script
-# conda_setup_script_path="/home/jonteehh/pipeline/anaconda3/etc/profile.d/conda.sh"
-# # conda_setup_script_path=""
-# source $conda_setup_script_path  # Source Conda initialization script
-# # Activate the conda environment
-# conda activate roh_island_sim_env
-# /home/martin/anaconda3/envs/bedtools/bin/bedtools --version: bedtools v2.30.0  
 # bedtools coverage -h  # Documentation about the merge function
 
 ######################################  
 ####### Defining parameter values #######
 ######################################
 overlap_fraction=1.0 # 100 % of the genomic 100k bp-window ("a-file") needs to be overlapping with the roh-segment ("b-file") 
-# Max number of parallel jobs to run at a time during the individual coverage count
-max_parallel_jobs=$(nproc)
-# Max number of parallel jobs to run at a time during the population ROH-frequency count
-max_parallel_jobs_population_roh_freq=$(nproc)
 
+# Get the number of logical cores available
+cores=$(nproc)
+# Max number of parallel jobs to run at a time during the individual coverage count
+max_parallel_jobs=$((cores / 1))
+# Max number of parallel jobs to run at a time during the population ROH-frequency count
+max_parallel_jobs_population_roh_freq=$((cores / 1))
 
 # empirical_processing=FALSE # is imported from run_pipeline.sh! (the main script)
 # $n_individuals_breed_formation is imported from run_pipeline.sh! (the main script)
@@ -115,13 +110,10 @@ roh_frequencies_neutral_model_dir=$coverage_output_neutral_model_dir/pop_roh_fre
 # Creating a directory to store the output files in, if it does not already exist.
 mkdir -p $roh_frequencies_neutral_model_dir
 
-
 ##### Selection Model ##### 
-
 coverage_output_selection_model_dir=$simulated_bedtools_dir/selection_model
 # coverage_output_selection_model_dir=$simulated_bedtools_dir/selection_model/autosomes_100kb_window_size
 mkdir -p $coverage_output_selection_model_dir
-
 # Defining the directory where the ROH-frequency results for each simulated population will be stored
 roh_frequencies_selection_model_dir=$coverage_output_selection_model_dir/pop_roh_freq
 # Creating a directory to store the output files in, if it does not already exist.
@@ -133,10 +125,18 @@ mkdir -p $roh_frequencies_selection_model_dir
 ############################################################################################### 
 
 # To enhance the performance and reduce memory, a temporary window file is created only containing windows for the simulated chromosome.
-temp_window_file="$window_files_dir/temp_${empirical_species}_reference_assembly_simulated_chr_100kB_window_sizes.bed"
-species_reference_assembly_output_window_file=$window_files_dir/${empirical_species}_reference_assembly_autosome_windows_100kB_window_sizes.bed
 
-awk -v chr="$simulated_chr_number" 'NR == 1 || $1 == chr' "$species_reference_assembly_output_window_file" > $temp_window_file
+# Creating a temporary window file only containing the simulated chromosome.
+# If the physical length of the simulated models is based on a reference assembly, with lengths defined in 2_3_1_Window_file_creator_for_ROH_frequency_computation.sh, uncomment this block of code
+# temp_window_file="$window_files_dir/temp_${empirical_species}_reference_assembly_simulated_chr_100kB_window_sizes.bed"
+# species_reference_assembly_output_window_file=$window_files_dir/${empirical_species}_reference_assembly_autosome_windows_100kB_window_sizes.bed
+# awk -v chr="$simulated_chr_number" 'NR == 1 || $1 == chr' "$species_reference_assembly_output_window_file" > $temp_window_file
+
+# Creating a temporary window file only containing the simulated chromosome.
+# The physical length used as an upper limit in this window file is the equivalent physical length from the empirical dataset
+temp_window_file="$window_files_dir/temp_${empirical_species}_simulated_chr_100kB_window_sizes.bed"
+empirical_dataset_window_file="${window_files_dir}/${empirical_breed}_autosome_windows_100kB_window_sizes.bed"
+awk -v chr="$simulated_chr_number" 'NR == 1 || $1 == chr' "$empirical_dataset_window_file" > $temp_window_file
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 # Function: bedtools coverage
@@ -173,8 +173,6 @@ process_coverage_file() {
     # rm "$indv_roh_file"
 }
 
-
-
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Empirical Data  ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -200,7 +198,6 @@ else
     echo "Empirical data has been set to not be processed, since files have already been created."
 fi
 
-
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Neutral Model (Simulated) ¤¤¤¤ 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -221,7 +218,6 @@ for prefix in $simulation_prefixes_neutral_model; do
     done
     wait # Waiting for all coverage for a simulation prefix to be completed before deleting the corresponding input files.
     # rm $neutral_model_indv_bed_files_dir/${prefix}*.bed
-
 done
 
 # Wait for all background jobs to finish

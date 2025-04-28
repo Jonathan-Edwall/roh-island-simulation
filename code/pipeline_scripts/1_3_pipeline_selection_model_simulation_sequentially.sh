@@ -6,8 +6,6 @@ script_start=$(date +%s)
 # # Boolean value to determine whether to run the selection simulation code
 # selection_simulation=TRUE # Defined in run_pipeline.sh
 
-
-
 ####################################  
 # Defining the working directory
 #################################### 
@@ -16,17 +14,17 @@ script_start=$(date +%s)
 cd $HOME
 
 # pipeline_script_dir=$HOME/code/pipeline_scripts
+# Function to handle user interruption
+handle_interrupt() {
+    echo "Pipeline interrupted. Exiting."
+    # Could potentially clean up the files created up until the script termination here
+    exit 1
+}
+# Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
+trap 'handle_interrupt' SIGINT
 
 
-# # Function to handle user interruption
-# handle_interrupt() {
-#     echo "Pipeline interrupted. Exiting."
-#     # Could potentially clean up the files created up until the script termination here
-#     exit 1
-# }
 
-# # Trap the SIGINT signal (Ctrl+C) and call the handle_interrupt function
-# trap 'handle_interrupt' SIGINT
 
 #################################### 
 # Defining Simulation parameters
@@ -60,7 +58,9 @@ mkdir -p $variant_position_technical_replicate_dir # Creating a subdirectory for
 ###Output: 
 #����������������������������������������������������������������������������
 # Number of parallel jobs to run at a time
-# max_parallel_jobs_selection_sim=2 # Defined in run_pipeline.sh
+# max_parallel_jobs_selection_sim=8 # Defined in run_pipeline.sh
+
+rmd_script_full_path="${pipeline_scripts_dir}/1_3_selection_model_simulation.Rmd"
 
 # Function to run a single simulation for a specific selection coefficient
 run_simulation_sel_coefficients_sequentially() {
@@ -69,6 +69,7 @@ run_simulation_sel_coefficients_sequentially() {
     local selection_coefficient=$2
     local knit_document_check=$3 # Variable that controls the knitting of the .rmd file   
     export chr_simulated="$chr_simulated"
+    export model_chromosome_physical_length_bp="$model_chromosome_physical_length_bp"  #Variable defined in the main pipeline script!
     export Ne_burn_in="$Ne_burn_in"
     export nInd_founder_population="$nInd_founder_population"
     export Inbred_ancestral_population="$Inbred_ancestral_population"
@@ -79,23 +80,30 @@ run_simulation_sel_coefficients_sequentially() {
     export output_sim_files_basename="sim_${counter}_selection_model_s$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}"
     export output_dir_selection_simulation="$output_dir_selection_simulation"
     export selected_chr_snp_density_mb="$selected_chr_snp_density_mb"
+    export mutation_rate="$mutation_rate" 
     export Introduce_mutations="$Introduce_mutations"
     export fixation_threshold_causative_variant="$fixation_threshold_causative_variant"
     export selection_coefficient="$selection_coefficient"
+
+    export chr_specific_recombination_rate="$chr_specific_recombination_rate" # Variable defined in the main pipeline script! 
+    export model_chromosome_recombination_rate="$model_chromosome_recombination_rate" # Variable defined in the main pipeline script!
+    export average_recombination_rate="$average_recombination_rate" # Variable defined in the main pipeline script!
+
+
     # If running selection coefficient by selection coefficient (sequentially)
     # Create unique prune count and variant position files for each replicate
     export simulation_prune_count_file="${pruned_counts_technical_replicate_dir}/pruned_replicates_count_s$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}_rep${counter}.tsv"
     export simulation_status_file="${pruned_counts_technical_replicate_dir}/temp_sim_status_file$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}_rep${counter}.tsv"
     export variant_positions_file="${variant_position_technical_replicate_dir}/variant_position_s$(echo "$selection_coefficient" | sed 's/\.//')_${chr_simulated}_rep${counter}.tsv"
-    # export disappearance_threshold_value_to_terminate_script="$disappearance_threshold_value_to_terminate_script"
+
     # Create the simulation status file if it doesn't exist
     touch "$simulation_status_file"
     while true
     do
         if [ "$knit_document_check" -eq 1 ]; then
-            Rscript -e "rmarkdown::render('$pipeline_scripts_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd',quiet=TRUE)"
+            Rscript -e "rmarkdown::render('$rmd_script_full_path',quiet=TRUE)"
         else
-            Rscript -e "rmarkdown::render('$pipeline_scripts_dir/2-5_1_dogs_founder_pop_sim_selection_model.Rmd', run_pandoc=FALSE,quiet=TRUE)" # Run the .rmd script without knitting!
+            Rscript -e "rmarkdown::render('$rmd_script_full_path', run_pandoc=FALSE,quiet=TRUE)" # Run the .rmd script without knitting!
         fi
         exit_status=$?
 
@@ -176,6 +184,11 @@ if [ "$selection_simulation" = "TRUE" ]; then
         cat "${variant_position_technical_replicate_dir}/variant_position_s$(echo $selection_coefficient | sed 's/\.//')_${chr_simulated}"*  > $variant_positions_file
     done
     wait
+
+    # Removing the generated .knit.md file
+    knit_output_file="${rmd_script_full_path%.Rmd}.knit.md"
+    rm $knit_output_file
+
     # Ending the timer
     script_end=$(date +%s)
     script_runtime=$((script_end-script_start))

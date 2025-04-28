@@ -249,11 +249,15 @@ if [ -f "$output_file" ]; then
     # Remove "chr" prefix from the simulated chromosome (i.e chr3 becomes 3)
     chr_number=$(echo "$chr_simulated" | sed 's/chr//')
 
-    ### Extracting the SNP Density of the selected chromosome that will be simulated ###
+    ### Extracting reference values for the selected chromosome to be simulated ###
     # Step 1: Find the row where column 1 is equal to the chromosome number in $chr_number
     selected_row=$(awk -v chr="$chr_number" '$1 == chr' "$output_file")
     echo "selected_row: $selected_row"
-    # Step 2: Extract the SNP density value from the selected row
+
+    # Step 2: Extract the Physical chromosome length from the selected row
+    export model_chromosome_physical_length_bp=$(echo "$selected_row" | awk '{print $2}')
+
+    # Step 3: Extract the SNP density value from the selected row
     export selected_chr_preprocessed_snp_density_mb=$(echo "$selected_row" | awk '{print $5}')
 
 fi
@@ -261,7 +265,9 @@ fi
 # Output the sum
 echo "Total number of markers in the preprocessed empirical dataset: $num_markers_preprocessed_dataset"
 echo "Selected chromosome (chr$chr_number) has after the preprocessing the following SNP density per Mb: $selected_chr_preprocessed_snp_density_mb"
+echo "Selected reference physical chromosome length to use in the simulation models: $model_chromosome_physical_length_bp"
 echo "selected_chr_preprocessed_snp_density_mb in plink_preprocessing_empirical_data.sh: $selected_chr_preprocessed_snp_density_mb"
+
 
 # Ending the timer 
 script_end=$(date +%s)

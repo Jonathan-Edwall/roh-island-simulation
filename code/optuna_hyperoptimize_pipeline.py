@@ -6,8 +6,12 @@ import pandas as pd
 import signal
 import sys
 
-HO_id = "" # Name the Hyperparameter Optimization run
-number_of_trials=100 # Define the number of trials to run
+# Define the number of trials to run
+number_of_trials=100 
+
+# Name the Hyperparameter Optimization run
+HO_id = "Example_HO_run" 
+
 HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
 
 # Dynamically determine the root directory one level up from the current script's directory
@@ -93,7 +97,9 @@ def objective(trial):
         # log_failed_parameters(chr_simulated, Ne_burn_in, n_bottleneck,
         #                 n_generations_bottleneck, n_simulated_generations_breed_formation, n_individuals_breed_formation, reference_population_for_snp_chip)
         return float('inf')
-    
+
+
+
 # Create an Optuna study object
 study = optuna.create_study(direction='minimize')
 # Check if there already exists a file for the study

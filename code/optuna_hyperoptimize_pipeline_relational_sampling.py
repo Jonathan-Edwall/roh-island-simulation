@@ -8,9 +8,12 @@ import pandas as pd
 import signal
 import sys
 
-HO_id = "" # Name the Hyperparameter Optimization run
-number_of_trials=100 # Define the number of trials to run
+# Define the number of trials to run
+number_of_trials=100 
+# Name the Hyperparameter Optimization run
+HO_id = "Example_HO_run_relational_sampling" 
 HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
+
 # Dynamically determine the root directory one level up from the current script's directory
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 path_to_results_folder = f"{root_dir}/hyperoptimizer_results"

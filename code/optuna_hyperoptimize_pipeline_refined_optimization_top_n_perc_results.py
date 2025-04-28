@@ -6,15 +6,20 @@ import pandas as pd
 import signal
 import sys
 
-n_results=5 # Define the top n result to rerun
-HO_input_results_file = f"neutral_models_cost_function_results.tsv"
+# Define the number of trials to run (top n result to rerun)
+n_results=10 
+
+# Define the input hyperparameter optimization run
+input_HO_id = "Example_HO_run"  
+HO_input_results_file = f"neutral_models_cost_function_results_{input_HO_id}.tsv"
 # Dynamically determine the root directory one level up from the current script's directory
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 path_to_results_folder = f"{root_dir}/hyperoptimizer_results"
 
 HO_input_results_file_full_path = f"{path_to_results_folder}/{HO_input_results_file}"
 
-HO_id = "HO_top"
+# Name the new Hyperparameter Optimization run
+HO_id = "HO_top_n"
 HO_results_file = f"neutral_models_cost_function_results_{HO_id}.tsv"
 HO_results_file_full_path = f"{path_to_results_folder}/{HO_results_file}"
 

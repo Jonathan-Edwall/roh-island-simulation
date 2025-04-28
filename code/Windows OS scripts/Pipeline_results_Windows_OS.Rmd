@@ -29,7 +29,6 @@ repository_path <- file.path(YOUR_GITHUB_ROOT_DIRECTORY,"roh-island-simulation")
 # Defining Input parameters
 #################################### 
 ### Defining the Title ###
-# empirical_species <- "German Shepherd"
 empirical_breed <- "labrador_retriever"
 empirical_species <- paste(toupper(substring(unlist(strsplit(empirical_breed, "_")), 1, 1)),
                              substring(unlist(strsplit(empirical_breed, "_")), 2),
@@ -2011,8 +2010,7 @@ knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 ### 6.1.2: $F_{ROH}$ Comparison
 This section shows a plot comparing the population $F_{ROH}$ (y-axis) between each simulation type (x-axis) and the empirical data.
 
-The dashed horizontal red line represents the population $F_{ROH}$ for Labrador
-Retriever. The circle for each simulation type represents the point estimate $F_{ROH}$ across all 
+The dashed horizontal red line represents the population $F_{ROH}$ for `r empirical_species`. The circle for each simulation type represents the point estimate $F_{ROH}$ across all 
 simulations. The upper and lower error margins of these point estimates represents the lower
 and upper standard error-based confidence intervals with a confidence level of 95%. 
 ```{r 6.1.2: F_ROH comparison, echo = FALSE,warning = FALSE, results='asis'}

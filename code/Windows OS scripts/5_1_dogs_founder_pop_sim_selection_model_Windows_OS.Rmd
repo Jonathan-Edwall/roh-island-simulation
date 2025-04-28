@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-10-20"
+date: "2025-04-27"
 editor_options: 
   markdown: 
     wrap: 72
@@ -45,9 +45,16 @@ fixation_threshold_causative_variant <- 0.99
 disappearance_threshold_value_to_terminate_script <- 1
 
 # min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
-chr_simulated <- "chr1"
+chr_simulated <- "chr3"
 # Extract the chromosome number and convert and convert it to numeric
 chr_number <- as.numeric(sub("chr", "", chr_simulated))
+
+# Extracting the physical length of the model chromosome to be simulated
+model_chromosome_physical_length_bp <- 92479059 
+
+# Extracting the recombination rate of the simulated chromosome 
+model_chromosome_recombination_rate <- 0.69
+average_recombination_rate <- 1.0734
 
 # N_e_burn_in <- 250 # Ancestral Population
 N_e_burn_in <- 2130
@@ -67,6 +74,9 @@ n_indv_breed_formation <- 295
 Ref_pop_snp_chip <- "last_breed_formation_generation"
 # Ref_pop_snp_chip <- "last_bottleneck_generation"
 
+# Set the estimated mutation rate for the studies species.
+# By default, the estimated mutation rate for dogs by (Lindblad-Toh et al.2005), 1 × 10−8 mutations per base pair per generation, is used.
+mutation_rate <- 1*10^-8
 # introduce_mutations <- as.logical("FALSE")
 introduce_mutations <- as.logical("TRUE")
 
@@ -118,10 +128,12 @@ if (!dir.exists(image_output_dir)) {
 # # Verify the current working directory
 #getwd()
 ```
+
 ## Loading libraries
 ```{r library()}
 library(AlphaSimR)
 library(knitr)
+
 ```
 # 1: Creating founder Haplotypes
 ## 1.0: Defining physical chromosome lengths of model species
@@ -139,13 +151,13 @@ chromosome_lengths_bp <- c(
 "chr31" = 39901454, "chr32" = 40225481, "chr33" = 32139216, "chr34" = 42397973, "chr35" = 28051305, 
 "chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098	
 )
+
 ```
 ## 1.1 Genetic chromosome lengths
 ### 1.1.1 Defining recombination rates for the model species
 The used chromosomal recombination rates of the dog autosome comes from the canine linkage map produced by the paper Wong et al. 2010.
 The table from which the values comes from, can be found through this link:
 https://www.researchgate.net/figure/Physical-and-genetic-lengths-of-dog-chromosomes_tbl3_40453037
-
 ```{r}
 chromosome_recombination_rates_cM_Mb <- c(
 "chr1" = 0.68, "chr2" = 0.88, "chr3" =0.69, "chr4" = 0.75, "chr5" = 0.85, 
@@ -159,27 +171,31 @@ chromosome_recombination_rates_cM_Mb <- c(
 )
 
 ```
+
 ### 1.1.2 Defining physical chromosome lengths of model species
 ```{r}
 # Extracting the physical length of the simulated chromosome 
-model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
+# model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
 
 if (use_chromosome_specific_recombination_rate) {
   # Extracting the recombination rate of the simulated chromosome 
-  model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
+  # model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
   cat("Recombination rate:",model_chromosome_recombination_rate)
   # Computing the genetic length of the simulated chromosome 
   model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(model_chromosome_recombination_rate*10^-2)
    cat("Genetic Length in Morgan:",model_chromosome_genetic_length_morgan)
 } else {
   # Setting the average recombination rate for dogs.
-  average_recombination_rate <- 0.97
+  # average_recombination_rate <- 0.97
+  # average_recombination_rate <- mean(chromosome_recombination_rates_cM_Mb)
+  
   # Computing the genetic length of the simulated chromosome 
   model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(average_recombination_rate*10^-2)
   model_chromosome_genetic_length_morgan
 }
 
 ```
+
 ## 1.2: runMacs2() - Generating founder population
 `runMacs2` Parameters:
 
@@ -202,7 +218,7 @@ if (use_chromosome_specific_recombination_rate) {
 ```{r runMacs2()}
 #help(runMacs2)
 
-mutation_rate <- 1*10^-8
+# mutation_rate <- 1*10^-8
 n_bottleneck
 N_e_burn_in
 model_chromosome_physical_length_bp
@@ -224,6 +240,7 @@ founderGenomes <- runMacs2(nInd = n_bottleneck ,
 founderGenomes
 
 ```
+
 ## 1.3: SimParam() - Setting Global Simulation Parameters
 ```{r SimParam()}
 #help(SimParam)
@@ -241,6 +258,7 @@ tracked.
 ```{r SimParam$setTrackRec()}
 SP$setTrackRec(TRUE)
 ```
+
 ## 1.4: newPop() - Creating two separate populations for bottleneck event
 ```{r newPop()}
 # Generate the initial founder population
@@ -261,6 +279,7 @@ breed1_founders
 # cat("Population 2:\n")
 # breed2_founders
 ```
+
 # 2: Forward in time simulation
 ## 2.0: Defining Random Mating function (random_mating_bottleneck) - randCross()
 `randCross()` simulates random mating.
@@ -348,6 +367,7 @@ if (n_generations_bottleneck == 0) {
 cat("Extracting the final generation from the Bottleneck Scenario")
 last_bottleneck_generation
 ```
+
 ## 2.2: Adding SNPs to the last bottleneck generation - SimParam\$addSnpChip() 
 `SP$addSnpChip()` Randomly assigns eligible SNPs to a SNP chip.
 
@@ -823,9 +843,20 @@ if (run_chunks) {
   # It  will seem like they all belong to chromosome 1, like "1_21".
   # (will be useful if you one would simulate more chromosomes than one)
   map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
-  # ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
   
-  genetic_distance_morgan_column <- map_data$V3 / 100 # Extracting the genetic distance column of map_data (3rd column)
+  # ¤¤¤¤¤ .map-file Column 3: Correcting genetic distance column ¤¤¤¤¤
+  max_original_genetic_dist <- max(map_data$V3)
+  cat("Max genetic distance:",max_original_genetic_dist)
+  cat("Simulated Genetic length:",model_chromosome_genetic_length_morgan)
+  
+  if (ceiling(max_original_genetic_dist) > model_chromosome_genetic_length_morgan*80) {
+    genetic_distance_morgan_column <- map_data$V3 / 100 # Extracting the genetic distance column of map_data (3rd column) 
+  } else if (ceiling(max_original_genetic_dist) > model_chromosome_genetic_length_morgan*8) {
+     genetic_distance_morgan_column <- map_data$V3 / 10 # Extracting the genetic distance column of map_data (3rd column) 
+  } else {
+    genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column) 
+  }
+  # ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
   
   base_pair_position_column <- round( (genetic_distance_morgan_column/model_chromosome_genetic_length_morgan) * model_chromosome_physical_length_bp)
   
@@ -861,9 +892,13 @@ if (run_chunks) {
   cat("Causative variant:\n",causative_variant_SNP_ID)
   causative_variant_relative_SNP_POS
   cat("\n Relative postions of the causative variant:\n",causative_variant_relative_SNP_POS$pos)
+  cat("\n Simulated Genetic Length:",model_chromosome_genetic_length_morgan)
+  cat("\n Simulated Physical Length:",model_chromosome_physical_length_bp)
+
   
   causative_variant_SNP_pos_in_bp <- round( (causative_variant_relative_SNP_POS$pos/ model_chromosome_genetic_length_morgan) * model_chromosome_physical_length_bp)
-  causative_variant_SNP_pos_in_bp
+  cat("Phyiscal Position of the causative variant:",causative_variant_SNP_pos_in_bp)
+  
   # Check if the file exists
   if (file.exists(variant_positions_file)) {
       # Read the existing data from the file

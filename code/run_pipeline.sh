@@ -3,14 +3,8 @@
 ####################################  
 # Setting up the pipeline script
 #################################### 
-# Defining the path to the Conda initialization script
-conda_setup_script_path=""
-# conda_setup_script_path="/home/jonat/pipeline/anaconda3/etc/profile.d/conda.sh"
-source $conda_setup_script_path  # Source Conda initialization script
-# Activate the conda environment
-conda activate roh_island_sim_env
 # Defining the working directory
-# export HOME="/home/jonathan/pipeline/Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations"
+# export HOME="/home/jonathan/pipeline/roh-island-simulation"
 export HOME="$(dirname "$(dirname "$(realpath "$0")")")"
 
 export script_dir="$HOME/code"
@@ -20,73 +14,102 @@ remove_files_scripts_dir="$script_dir/remove_files_scripts"
 export data_dir="$HOME/data"
 export results_dir="$HOME/results"
 
-export gene_annotations_filepath="$data_dir/preprocessed/empirical/gene_annotations/canFam3.ncbiRefSeq.gtf.gz" 
-export omia_scraped_phenotypes_data_filepath="$data_dir/raw/empirical/omia_scraped_phene_data/OMIA_dog_phenotype_data_raw.csv"
-export omia_phenotypes_filepath="$data_dir/preprocessed/empirical/omia_phenotype_data/All_dog_phenotypes.bed"
-
 ######################################  
 ####### Defining parameter values #######
 ######################################
-export max_parallel_jobs_neutral_model_simulations=20
-export max_parallel_jobs_selection_sim=8 # 7 works
-export n_simulation_replicates=50
+# Set the number of technical replicates to be generated for each simulation scenario
+export n_simulation_replicates=20
 
-export empirical_breed="labrador_retriever"
-export empirical_raw_data_basename="LR_fs"
-# Set the species for the empirical dataset to determine which species-specific options will be applied during the preprocessing.
-export empirical_species="dog"
-# Defines the range of autosomal chromosomes to be used in the analysis. This value should be set according to the species being analyzed.  
-# The format follows PLINK's chromosome specification (e.g., "1-38" for dog). 
-export empirical_autosomal_chromosomes="1-38"
-# To list the Vertebrate Breed Ontology ID:s to use for associating phenotypes with the studied species, define it in
-# the  'vertebrate_breed_ontology_ids' variable below. If you wish to use more than one VBO ID, the ID:s should be commaseparated as in
-# the following example:  vertebrate_breed_ontology_ids="VBO_0200800,Unspecified".
-# In the following example, VBO_0200800 refers to Labrador Retriever Dog, while "Unspecified" is an option to associate phenotypes
-# with unknown (Unspecified) VBO ID to be able to be mapped to the studied species.
-# A straight forward way to find the VBO ID of theg studied species, is by using the link below and replace "Labrador Retriever" with the studied species.'
-#trieve the VBO ID for the studied breed/species, search on the following site: 
-# https://ontobee.org/search?ontology=VBO&keywords=labrador+retriever&submit=Search+terms
-export vertebrate_breed_ontology_ids="VBO_0200800,Unspecified" 
+# Get the number of logical cores available
+cores=$(nproc)
+# Set the maximum number of neutral model simulations to be run in parallel
+# The value is set by default as the amount of logical cores available, but can be manually altered.
+export max_parallel_jobs_neutral_model_simulations=$((cores / 1))
+# export max_parallel_jobs_neutral_model_simulations=20
+
+# Set the maximum number of selection model simulations to be run in parallel
+# The value is set by default as 1/4 of the amount of logical cores available, but can be manually altered.
+export max_parallel_jobs_selection_sim=$((cores / 4))
+# export max_parallel_jobs_selection_sim=8
 
 # Boolean value to determine whether to perform selection model simulations 
 export selection_simulation=TRUE # TRUE/FALSE
 export empirical_processing=TRUE # TRUE/FALSE
 
-export selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
-# export selection_coefficient_list=(0.4 0.5 0.6 0.7 0.8)
+
+#�����������������������������
+#� Selection Scenario Simulation Parameters �
+#�����������������������������
+# This variable defines the selection coefficients for the causative variant that will be simulated. A higher value indicates stronger selection. 
+# export selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+export selection_coefficient_list=(0.4 0.5 0.6 0.7 0.8)
+
+# This variable sets the "near-fixation threshold" for the allele of the causative variant.
+# By default, this threshold is set to an allele frequency of ≥ 99%.
 export fixation_threshold_causative_variant=0.99
-export allele_copies_threshold=1
+
+export allele_copies_threshold=1 # This variable sets an upper limit of allele copies present in the population for the sampled causative variant. 
 export Simulate_Hard_Sweep=TRUE # TRUE: Hard Sweep Simulation, FALSE: Soft Sweep Simulation
 # export Variant_One_Individual_Origin=TRUE #TRUE: Soft Sweep Scenario: The causative variant comes from one homozygous individual (Likely multi-origin soft sweep)
 export Variant_One_Individual_Origin=FALSE # FALSE: Soft Sweep Scenario: The causative variant doesnt come from one homozygous individual
 
-export Inbred_ancestral_population=FALSE # TRUE/FALSE
+#�����������������������������
+#� General Population History Parameters �
+#�����������������������������
+export Inbred_ancestral_population=FALSE # TRUE/FALSE. This variable determines if the founder individuals in the coalescent simulations (RunMacs) should be inbred.
 # Choose snp chip, either from "last_breed_formation_generation" or last_bottleneck_generation:
 # export reference_population_for_snp_chip="last_bottleneck_generation" # Creating the SNP chip based out of the final bottleneck scenario gen
 export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
-export Introduce_mutations=TRUE
+
+# Variable determining if new Random Mutations should be added to offsprings. If set to TRUE, the used mutation rate is defined by $mutation_rate
+export Introduce_mutations=TRUE # TRUE/FALSE
 
 # # # #### Population History Parameters ####
-# # export chr_specific_recombination_rate= # TRUE/FALSE
-# # export chr_simulated="chr3" # Define the empirical chromosome to simulate.
-# # export Ne_burn_in=2500
-# # export N_bottleneck=50 
-# # export nInd_founder_population=$N_bottleneck 
-# # export n_generations_bottleneck=5
-# # export n_simulated_generations_breed_formation=40 
-# # export n_individuals_breed_formation=200 
-
-# # #### Population History Parameters ####
+# chr_specific_recombination_rate: This parameter determines whether the modeled chromosome (selected by the Chr parameter), will use the chromosome-specific recombination rate of the modeled chromosome, or
+# the genomic average recombination rate for dogs (False). 
+# As a consequence, this parameter influences whether the simulation models are tailored to reflect the specific chromosome selected in Chr (True) or a more generic chromosome of the studied species(False).
 export chr_specific_recombination_rate=FALSE # TRUE/FALSE
-export chr_simulated="chr1"  # Define the empirical chromosome to simulate.
-export Ne_burn_in=3185
-export N_bottleneck=5 
-export nInd_founder_population=$N_bottleneck 
-export n_generations_bottleneck=1
-export n_simulated_generations_breed_formation=110 
-export n_individuals_breed_formation=330 
+export chr_simulated="chr3"  # Define the empirical chromosome to simulate.
+export Ne_burn_in=2500 # The effective population size of the ancestral ”burn-in” population
+export N_bottleneck=50 # The population size of the bottleneck generations during the simulated bottleneck scenario.
+export nInd_founder_population=$N_bottleneck # Number of founder individuals from the coalescent simulations.
+export n_generations_bottleneck=5 # The extent of the bottleneck scenario in terms of generations passed
+export n_simulated_generations_breed_formation=40 # The number of generations for the forward-in-time post-bottleneck breeding scenario
+export n_individuals_breed_formation=200 # The number of bred individuals per generation in the aforementioned breeding scenario
+
+# # # #### Population History Parameters ####
+# # chr_specific_recombination_rate: This parameter determines whether the modeled chromosome (selected by the Chr parameter), will use the chromosome-specific recombination rate of the modeled chromosome, or
+# # the genomic average recombination rate for dogs (False). 
+# # As a consequence, this parameter influences whether the simulation models are tailored to reflect the specific chromosome selected in Chr (True) or a more generic chromosome of the studied species(False).
+# export chr_specific_recombination_rate=FALSE # TRUE/FALSE
+# export chr_simulated="chr1"  # Define the empirical chromosome to simulate.
+# export Ne_burn_in=3185 # The effective population size of the ancestral ”burn-in” population
+# export N_bottleneck=5 # The population size of the bottleneck generations during the simulated bottleneck scenario.
+# export nInd_founder_population=$N_bottleneck # Number of founder individuals from the coalescent simulations.
+# export n_generations_bottleneck=1 # The extent of the bottleneck scenario in terms of generations passed
+# export n_simulated_generations_breed_formation=110 # The number of generations for the forward-in-time post-bottleneck breeding scenario
+# export n_individuals_breed_formation=330 # The number of bred individuals per generation in the aforementioned breeding scenario
 
 
+
+
+
+
+
+# -------------[ Load Configuration ]-------------
+CONFIG_FILE="$script_dir/config.sh"
+if [[ -f "$CONFIG_FILE" ]]; then
+    echo -e "${GREEN}[INFO]${NC} Loading configuration from ${CONFIG_FILE}"
+    source "$CONFIG_FILE"
+else
+    echo -e "${RED}[ERROR]${NC} Could not find config file at ${CONFIG_FILE}"
+    exit 1
+fi
+
+# If chr_specific_recombination_rate=FALSE, the mean recombination rate across all autosomal chromosomes will be used to determine the genetic length of the modeled chromosome:
+export average_recombination_rate=$(echo "scale=4; ($(IFS=+; echo "${chromosome_recombination_rates_cM_per_Mb[*]}")) / ${#chromosome_recombination_rates_cM_per_Mb[@]}" | bc)
+# If chr_specific_recombination_rate=TRUE, the chromosome specific recombination rate of the simulated chromosome will be used: 
+export model_chromosome_recombination_rate="${chromosome_recombination_rates_cM_per_Mb[${chr_simulated}]}"
 
 # Function to handle user interruption
 handle_interrupt() {
@@ -103,11 +126,13 @@ runtime_log="$script_dir/pipeline_runtime.txt"
 if [ -e "$runtime_log" ]; then
     rm "$runtime_log"
 fi
+
 # Start the timer 
 pipeline_start=$(date +%s)
 echo "Pipeline Runtimes:" > $runtime_log
 # Changing the working directory
 cd $HOME
+
 
 #���������������������
 #� Pipeline Run �
@@ -115,25 +140,27 @@ cd $HOME
 
 # Step 1 - Preprocessing the Emprical Dataset with PLINK
 # Note: 
-# To run Step 2 - Perform Neutral Model Simulations in AlphaSimR (2_1_1_plink_preprocessing_empirical_data.sh)
-# And Step 3 - Perform Selection Model Simulations in AlphaSimR (2_pipeline_selection_model_simulation_sequentially.sh)
-# This script will have to remain uncommented and be executed (2_1_1_plink_preprocessing_empirical_data.sh) to provide these AlphaSimR script with the SNP density ($selected_chr_snp_density_mb) to use
+# To run Step 2 - Perform Neutral Model Simulations in AlphaSimR (1_2_pipeline_neutral_model_simulation.sh)
+# And Step 3 - Perform Selection Model Simulations in AlphaSimR (1_3_pipeline_selection_model_simulation_sequentially.sh)
+# This script will have to remain uncommented and be executed (1_1_plink_preprocessing_empirical_data.sh) to provide these AlphaSimR script with the SNP density ($selected_chr_snp_density_mb) to use
 # for simulating the selected chromosome ($chr_simulated)
 step=1
-script_name="2_1_1_plink_preprocessing_empirical_data.sh"
+script_name="1_1_plink_preprocessing_empirical_data.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step1=$(date +%s)
 runtime_step1=$((end_step1-pipeline_start))
 echo "Step $step: $script_name Runtime: $runtime_step1 seconds" >> $runtime_log
 ((step++))
+export model_chromosome_physical_length_bp=$model_chromosome_physical_length_bp # Value imported from 1_1_plink_preprocessing_empirical_data.sh
 num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is used for the SNP chip in alphasimr
 # echo "num_markers_raw_empirical_dataset_scaling_factor: $num_markers_raw_empirical_dataset_scaling_factor"
 export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_density_mb * $num_markers_raw_empirical_dataset_scaling_factor" | bc)
 echo "selected_chr_snp_density_mb: $selected_chr_snp_density_mb"
 
+
 # Step 2 - Perform Neutral Model Simulations in AlphaSimR
-script_name="1_pipeline_neutral_model_simulation.sh"
+script_name="1_2_pipeline_neutral_model_simulation.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step2=$(date +%s)
@@ -142,7 +169,7 @@ echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
 ((step++))
 
 # Step 3 - Perform Selection Model Simulations in AlphaSimR
-script_name="2_pipeline_selection_model_simulation_sequentially.sh"
+script_name="1_3_pipeline_selection_model_simulation_sequentially.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step3=$(date +%s)
@@ -151,7 +178,7 @@ echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
 ((step++))        
 
 # Step 4 - Preprocessing the Simulated Datasets with PLINK
-script_name="2_1_1_plink_preprocessing_simulated_data.sh"
+script_name="2_1_plink_preprocessing_simulated_data.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step4=$(date +%s)
@@ -203,7 +230,6 @@ end_step9=$(date +%s)
 runtime_step9=$((end_step9-end_step8))
 echo "Step $step: $script_name Runtime: $runtime_step9 seconds" >> $runtime_log
 ((step++))
-
 
 # Step 10 - Detect ROH hotspots for all datasets
 script_name="3_pipeline_ROH_hotspot.sh"
@@ -261,7 +287,7 @@ echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
 
 # Step 16 - Perform Sweep test & Run the Pipeline Summarize script to generate a summarizing HTML-file of the pipeline run.
 # pipeline_results_for_different_maf.sh runs these scripts, with varying values of MAF:
-# * 4_pipeline_Sweep_test.sh
+# * 4_3_pipeline_Sweep_test.sh
 # * pipeline_result_summary.sh
 start_16=$(date +%s)
 script_name="pipeline_results_for_different_maf.sh"

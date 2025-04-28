@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3  
-date: "2024-10-17"
+date: "2025-04-27"
 editor_options: 
   markdown: 
     wrap: 72
@@ -49,9 +49,15 @@ if (!dir.exists(output_dir_simulation)) {
 #################################### 
 # min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 
-chr_simulated <- "chr3"
-# Extract the chromosome number and convert and convert it to numeric
+chr_simulated <- "chr3" 
+# Extracting the chromosome number and convert and convert it to numeric
 chr_number <- as.numeric(sub("chr", "", chr_simulated))
+# Extracting the physical length of the model chromosome to be simulated
+model_chromosome_physical_length_bp <- 92479059 
+
+# Extracting the recombination rate of the simulated chromosome 
+model_chromosome_recombination_rate <- 0.69
+average_recombination_rate <- 1.0734
 
 N_e_burn_in <- 125
 
@@ -69,6 +75,10 @@ n_indv_breed_formation <- 650
 
 Ref_pop_snp_chip <- "last_breed_formation_generation"
 # Ref_pop_snp_chip <- "last_bottleneck_generation"
+
+# Set the estimated mutation rate for the studies species.
+# By default, the estimated mutation rate for dogs by (Lindblad-Toh et al.2005), 1 × 10−8 mutations per base pair per generation, is used.
+mutation_rate <- 1*10^-8
 
 # introduce_mutations <- as.logical("FALSE")
 introduce_mutations <- as.logical("TRUE")
@@ -89,6 +99,7 @@ output_sim_files_basename <- paste0("Neutral_simulation_", chr_simulated)
 # # Verify the current working directory
 #getwd()
 ```
+
 ## Loading libraries
 ```{r library()}
 # Check and install AlphaSimR if it's not already installed
@@ -109,22 +120,26 @@ if (!require(rmarkdown)) {
 }
 library(rmarkdown)
 ```
+
 # 1: Creating founder Haplotypes
 ## 1.0: Defining physical chromosome lengths of model species
 Chromosome lengths of the dog autosome, derived from the canine reference assembly UU_Cfam_GSD_1.0,
 which can be found through this link:
 https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/
 ```{r}
+
 chromosome_lengths_bp <- c(
-"chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178	, "chr5" = 89562946, 
-"chr6" = 78113029	, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054, 
-"chr11" = 74805798, "chr12" = 72970719, "chr13" = 64299765, "chr14" = 61112200, "chr15" = 64676183, 
-"chr16" = 60362399, "chr17" = 65088165, "chr18" = 56472973, "chr19" = 55516201, "chr20" = 58627490, 
-"chr21" = 51742555, "chr22" = 61573679, "chr23" = 53134997, "chr24" = 48566227, "chr25" = 51730745, 
-"chr26" = 39257614, "chr27" = 46662488, "chr28" = 41733330, "chr29" = 42517134, "chr30" = 40643782, 
-"chr31" = 39901454, "chr32" = 40225481, "chr33" = 32139216, "chr34" = 42397973, "chr35" = 28051305, 
-"chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098	
+"chr1" = 123556469, "chr2" = 84979418, "chr3" = 92479059, "chr4" = 89535178	, "chr5" = 89562946,
+"chr6" = 78113029	, "chr7" = 81081596, "chr8" = 76405709, "chr9" = 61171909, "chr10" = 70643054,
+"chr11" = 74805798, "chr12" = 72970719, "chr13" = 64299765, "chr14" = 61112200, "chr15" = 64676183,
+"chr16" = 60362399, "chr17" = 65088165, "chr18" = 56472973, "chr19" = 55516201, "chr20" = 58627490,
+"chr21" = 51742555, "chr22" = 61573679, "chr23" = 53134997, "chr24" = 48566227, "chr25" = 51730745,
+"chr26" = 39257614, "chr27" = 46662488, "chr28" = 41733330, "chr29" = 42517134, "chr30" = 40643782,
+"chr31" = 39901454, "chr32" = 40225481, "chr33" = 32139216, "chr34" = 42397973, "chr35" = 28051305,
+"chr36" = 31223415, "chr37" = 30785915, "chr38" = 24803098
 )
+
+
 ```
 ## 1.1 Genetic chromosome lengths
 ### 1.1.1 Defining recombination rates for the model species
@@ -133,32 +148,34 @@ The table from which the values comes from, can be found through this link:
 https://www.researchgate.net/figure/Physical-and-genetic-lengths-of-dog-chromosomes_tbl3_40453037
 
 ```{r}
-chromosome_recombination_rates_cM_Mb <- c(
-"chr1" = 0.68, "chr2" = 0.88, "chr3" =0.69, "chr4" = 0.75, "chr5" = 0.85, 
-"chr6" = 0.71, "chr7" = 0.75 , "chr8" = 0.83, "chr9" = 1.11, "chr10" = 0.78, 
-"chr11" = 0.84, "chr12" = 0.87, "chr13" = 0.90, "chr14" = 0.89, "chr15" = 0.80, 
-"chr16" = 0.90, "chr17" = 0.89, "chr18" = 0.88, "chr19" = 0.93, "chr20" = 0.93, 
-"chr21" = 1.02, "chr22" = 0.84, "chr23" = 1.02, "chr24" = 1.13, "chr25" = 1.05, 
-"chr26" = 1.22, "chr27" = 1.18, "chr28" =1.31, "chr29" = 1.15, "chr30" = 1.36, 
-"chr31" = 1.29, "chr32" = 1.37, "chr33" = 1.53, "chr34" = 1.17, "chr35" = 2.15, 
-"chr36" = 1.54, "chr37" = 1.38, "chr38" = 2.22 	
-)
+# 
+# chromosome_recombination_rates_cM_Mb <- c(
+# "chr1" = 0.68, "chr2" = 0.88, "chr3" =0.69, "chr4" = 0.75, "chr5" = 0.85, 
+# "chr6" = 0.71, "chr7" = 0.75 , "chr8" = 0.83, "chr9" = 1.11, "chr10" = 0.78, 
+# "chr11" = 0.84, "chr12" = 0.87, "chr13" = 0.90, "chr14" = 0.89, "chr15" = 0.80, 
+# "chr16" = 0.90, "chr17" = 0.89, "chr18" = 0.88, "chr19" = 0.93, "chr20" = 0.93, 
+# "chr21" = 1.02, "chr22" = 0.84, "chr23" = 1.02, "chr24" = 1.13, "chr25" = 1.05, 
+# "chr26" = 1.22, "chr27" = 1.18, "chr28" =1.31, "chr29" = 1.15, "chr30" = 1.36, 
+# "chr31" = 1.29, "chr32" = 1.37, "chr33" = 1.53, "chr34" = 1.17, "chr35" = 2.15, 
+# "chr36" = 1.54, "chr37" = 1.38, "chr38" = 2.22 	
+# )
 
 ```
 ### 1.1.2 Defining physical chromosome lengths of model species
 ```{r}
-# Extracting the physical length of the simulated chromosome 
-model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
+# # Extracting the physical length of the simulated chromosome 
+# model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
 
 if (use_chromosome_specific_recombination_rate) {
   # Extracting the recombination rate of the simulated chromosome 
-  model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
+  # model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
   # Computing the genetic length of the simulated chromosome 
   model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(model_chromosome_recombination_rate*10^-2)
   model_chromosome_genetic_length_morgan
 } else {
   # Setting the average recombination rate for dogs.
-  average_recombination_rate <- 0.97
+  # average_recombination_rate <- 0.97
+  # average_recombination_rate <- mean(chromosome_recombination_rates_cM_Mb)
   # Computing the genetic length of the simulated chromosome 
   model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(average_recombination_rate*10^-2)
   model_chromosome_genetic_length_morgan
@@ -491,7 +508,7 @@ writePlink(last_random_mating_generation,simParam=SP, baseName=output_sim_files_
            use = "rand"
            )
 ```
-## 3.2: Convert distances to basepair in the .map file
+# 3.2: Convert distances to basepair in the .map file
 ```{r map-file PostProcessing}
 # Setting the working directory as the output directory
 setwd(output_dir_simulation)
@@ -511,9 +528,20 @@ map_data$V1 <- chr_number
 # (will be useful if you one would simulate more chromosomes than one)
 map_data$V2 <- gsub("^\\d+_", paste0(chr_number, "_"), map_data$V2)
 
+# ¤¤¤¤¤ .map-file Column 3: Correcting genetic distance column ¤¤¤¤¤
+max_original_genetic_dist <- max(map_data$V3)
+cat("Max genetic distance:",max_original_genetic_dist)
+cat("Simulated Genetic length:",model_chromosome_genetic_length_morgan)
+
+if (ceiling(max_original_genetic_dist) > model_chromosome_genetic_length_morgan*80) {
+  genetic_distance_morgan_column <- map_data$V3 / 100 # Extracting the genetic distance column of map_data (3rd column) 
+} else if (ceiling(max_original_genetic_dist) > model_chromosome_genetic_length_morgan*8) {
+   genetic_distance_morgan_column <- map_data$V3 / 10 # Extracting the genetic distance column of map_data (3rd column) 
+} else {
+  genetic_distance_morgan_column <- map_data$V3 # Extracting the genetic distance column of map_data (3rd column) 
+}
 
 # ¤¤¤¤¤ .map-file Column 4: Mapping correct bp-positions for the markers ¤¤¤¤¤
-genetic_distance_morgan_column <- map_data$V3 / 100 # Extracting the genetic distance column of map_data (3rd column) 
 base_pair_position_column <- round( (genetic_distance_morgan_column/model_chromosome_genetic_length_morgan) * model_chromosome_physical_length_bp)
 
 # Ensure no physical positions are 0, replacing 0 with 1

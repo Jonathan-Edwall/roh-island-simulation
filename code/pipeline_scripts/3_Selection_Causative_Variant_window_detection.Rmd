@@ -42,7 +42,7 @@ chr_number <- as.numeric(sub("chr", "", chr_simulated))
 # Defining the output dirs
 #################################### 
 output_dir <- Sys.getenv("output_dir") 
-output_variant_window_lengths_file <- Sys.getenv("output_variant_window_lengths_file") 
+technical_replicate_variant_window_length_file <- Sys.getenv("technical_replicate_variant_window_length_file") 
 # Set the working directory for notebook chunks
 knitr::opts_knit$set(root.dir = output_dir)
 # # Verify the current working directory
@@ -147,12 +147,13 @@ colnames(causative_variant_window_table_sorted) <- column_names
 write.table(causative_variant_window_table_sorted, file = filename, quote = FALSE, col.names = TRUE, row.names = FALSE, sep = "\t")
 ```
 
-#4: Export Window Lengths
+# 4: Export Window Lengths
 ```{r}
+
 # Check if the file exists
-if (file.exists(output_variant_window_lengths_file)) {
+if (file.exists(technical_replicate_variant_window_length_file)) {
     # Read the existing data from the file
-    causative_variant_window_lengths_table <- read.table(output_variant_window_lengths_file, header = FALSE, sep = "\t")
+    causative_variant_window_lengths_table <- read.table(technical_replicate_variant_window_length_file, header = FALSE, sep = "\t")
 } else {
     # Create an empty data frame if the file does not exist
     causative_variant_window_lengths_table <- data.frame(V1 = character(), V2 = integer())
@@ -176,5 +177,7 @@ column_names <- c("#Simulation name", "Length (bp)")
 colnames(causative_variant_window_lengths_table) <- column_names
 
 # Write the updated data back to the file
-write.table(causative_variant_window_lengths_table, file = output_variant_window_lengths_file, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+write.table(causative_variant_window_lengths_table, file = technical_replicate_variant_window_length_file, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+
+
 ```

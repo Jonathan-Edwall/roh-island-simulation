@@ -109,7 +109,7 @@ omia_phenotypes_filepath <- Sys.getenv("omia_phenotypes_filepath")
 
 omia_scraped_phenotypes_data_filepath <- Sys.getenv("omia_scraped_phenotypes_data_filepath") 
 
-vertebrate_breed_ontology_ids <- Sys.getenv("vertebrate_breed_ontology_ids") # Identifying phenotypes labeled as either related to "Labrador retriever dog" or "unidentified breed"
+vertebrate_breed_ontology_ids <- Sys.getenv("vertebrate_breed_ontology_ids") # Identifying phenotypes labeled as either related to "Labrador retriever dog" or "unidentified breed" (if vertebrate_breed_ontology_ids="VBO_0200800,Unspecified")
 
 ### Gene Detection ###
 Empirical_data_hotspot_gene_mapping_dir <- Sys.getenv("Empirical_data_hotspot_gene_mapping_dir")
@@ -1975,8 +1975,8 @@ knitr::kable(ROH_hotspot_threshold_values_sorted, row.names = FALSE)
 ### 6.1.2: $F_{ROH}$ Comparison
 This section shows a plot comparing the population $F_{ROH}$ (y-axis) between each simulation type (x-axis) and the empirical data.
 
-The dashed horizontal red line represents the population $F_{ROH}$ for Labrador
-Retriever. The circle for each simulation type represents the point estimate $F_{ROH}$ across all 
+
+The dashed horizontal red line represents the population $F_{ROH}$ for `r empirical_species`. The circle for each simulation type represents the point estimate $F_{ROH}$ across all 
 simulations. The upper and lower error margins of these point estimates represents the lower
 and upper standard error-based confidence intervals with a confidence level of 95%. 
 ```{r 6.1.2: F_ROH comparison, echo = FALSE,warning = FALSE, results='asis'}

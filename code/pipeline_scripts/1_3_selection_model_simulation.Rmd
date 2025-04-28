@@ -1,14 +1,9 @@
 ---
-title: "Selection Scenario simulation for Dogs in AlphaSimR"
-output:
-  html_document:
+output: 
+  html_document: 
     toc: true
-    toc_depth: 3  
-date: "2024-10-20"
-editor_options: 
-  markdown: 
-    wrap: 72
 ---
+
 # 0: Preparation
 ## Defining the output directory & the chromosome to be simulated
 ```{r setup, warning=FALSE, error = FALSE}
@@ -41,9 +36,19 @@ use_chromosome_specific_recombination_rate <- as.logical(Sys.getenv("chr_specifi
 # min_MAF <- 0.05 #(minimum allowed Minor Allele Frequency for each SNP)
 chr_simulated <- Sys.getenv("chr_simulated")
 chr_simulated
-# Extract the chromosome number and convert and convert it to numeric
+
+# Extracting the chromosome number and convert and convert it to numeric
 chr_number <- as.numeric(sub("chr", "", chr_simulated))
 
+# Extracting the physical length of the model chromosome to be simulated
+model_chromosome_physical_length_bp <- as.numeric(Sys.getenv("model_chromosome_physical_length_bp"))
+model_chromosome_physical_length_bp
+
+# Extracting the recombination rate of the simulated chromosome 
+model_chromosome_recombination_rate <- as.numeric(Sys.getenv("model_chromosome_recombination_rate"))
+model_chromosome_recombination_rate
+average_recombination_rate <- as.numeric(Sys.getenv("average_recombination_rate"))
+average_recombination_rate
 # N_e_burn_in <- 2500 # Ancestral population
 N_e_burn_in <- as.numeric(Sys.getenv("Ne_burn_in")) # Ancestral population
 
@@ -66,8 +71,15 @@ n_indv_breed_formation
 
 Ref_pop_snp_chip <- Sys.getenv("reference_population_for_snp_chip")
 Ref_pop_snp_chip
+
+# Set the estimated mutation rate for the studies species.
+# By default, the estimated mutation rate for dogs by (Lindblad-Toh et al.2005), 1 × 10−8 mutations per base pair per generation, is used.
+mutation_rate <- as.numeric(Sys.getenv("mutation_rate"))
+mutation_rate
+
 introduce_mutations <- as.logical(Sys.getenv("Introduce_mutations"))
 introduce_mutations
+
 snp_density_Mb <- as.numeric(Sys.getenv("selected_chr_snp_density_mb")) 
 snp_density_Mb
 
@@ -97,6 +109,20 @@ Sys.getenv()
 # # Verify the current working directory
 #getwd()
 ```
+
+---
+title: "Selection Scenario simulation for Dogs in AlphaSimR"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3  
+date: "`r Sys.Date()`"
+editor_options: 
+  markdown: 
+    wrap: 72
+    
+---
+
 ## Loading libraries
 ```{r library()}
 library(AlphaSimR)
@@ -126,39 +152,43 @@ The table from which the values comes from, can be found through this link:
 https://www.researchgate.net/figure/Physical-and-genetic-lengths-of-dog-chromosomes_tbl3_40453037
 
 ```{r}
-chromosome_recombination_rates_cM_Mb <- c(
-"chr1" = 0.68, "chr2" = 0.88, "chr3" =0.69, "chr4" = 0.75, "chr5" = 0.85, 
-"chr6" = 0.71, "chr7" = 0.75 , "chr8" = 0.83, "chr9" = 1.11, "chr10" = 0.78, 
-"chr11" = 0.84, "chr12" = 0.87, "chr13" = 0.90, "chr14" = 0.89, "chr15" = 0.80, 
-"chr16" = 0.90, "chr17" = 0.89, "chr18" = 0.88, "chr19" = 0.93, "chr20" = 0.93, 
-"chr21" = 1.02, "chr22" = 0.84, "chr23" = 1.02, "chr24" = 1.13, "chr25" = 1.05, 
-"chr26" = 1.22, "chr27" = 1.18, "chr28" =1.31, "chr29" = 1.15, "chr30" = 1.36, 
-"chr31" = 1.29, "chr32" = 1.37, "chr33" = 1.53, "chr34" = 1.17, "chr35" = 2.15, 
-"chr36" = 1.54, "chr37" = 1.38, "chr38" = 2.22 	
-)
+
+# chromosome_recombination_rates_cM_Mb <- c(
+# "chr1" = 0.68, "chr2" = 0.88, "chr3" =0.69, "chr4" = 0.75, "chr5" = 0.85, 
+# "chr6" = 0.71, "chr7" = 0.75 , "chr8" = 0.83, "chr9" = 1.11, "chr10" = 0.78, 
+# "chr11" = 0.84, "chr12" = 0.87, "chr13" = 0.90, "chr14" = 0.89, "chr15" = 0.80, 
+# "chr16" = 0.90, "chr17" = 0.89, "chr18" = 0.88, "chr19" = 0.93, "chr20" = 0.93, 
+# "chr21" = 1.02, "chr22" = 0.84, "chr23" = 1.02, "chr24" = 1.13, "chr25" = 1.05, 
+# "chr26" = 1.22, "chr27" = 1.18, "chr28" =1.31, "chr29" = 1.15, "chr30" = 1.36, 
+# "chr31" = 1.29, "chr32" = 1.37, "chr33" = 1.53, "chr34" = 1.17, "chr35" = 2.15, 
+# "chr36" = 1.54, "chr37" = 1.38, "chr38" = 2.22 	
+# )
 
 ```
-### 1.1.2 Defining physical chromosome lengths of model species
+### 1.1.2 Defining the genetic length of the modeled chromosome
 ```{r}
-# Extracting the physical length of the simulated chromosome 
-model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
+# # Extracting the physical length of the simulated chromosome 
+# model_chromosome_physical_length_bp <- chromosome_lengths_bp[chr_simulated]
 
 if (use_chromosome_specific_recombination_rate) {
   # Extracting the recombination rate of the simulated chromosome 
-  model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
-  cat("Recombination rate:",model_chromosome_recombination_rate)
+  # model_chromosome_recombination_rate <- chromosome_recombination_rates_cM_Mb[chr_simulated]
+  
   # Computing the genetic length of the simulated chromosome 
   model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(model_chromosome_recombination_rate*10^-2)
-   cat("Genetic Length in Morgan:",model_chromosome_genetic_length_morgan)
+  model_chromosome_genetic_length_morgan
 } else {
   # Setting the average recombination rate for dogs.
-  average_recombination_rate <- 0.97
+  # average_recombination_rate <- 0.97
+  # average_recombination_rate <- mean(chromosome_recombination_rates_cM_Mb)
+
   # Computing the genetic length of the simulated chromosome 
   model_chromosome_genetic_length_morgan <- (model_chromosome_physical_length_bp*10^-6)*(average_recombination_rate*10^-2)
   model_chromosome_genetic_length_morgan
 }
 
 ```
+
 ## 1.2: runMacs2() - Generating founder population
 `runMacs2` Parameters:
 
@@ -181,7 +211,7 @@ if (use_chromosome_specific_recombination_rate) {
 ```{r runMacs2()}
 #help(runMacs2)
 
-mutation_rate <- 1*10^-8
+# mutation_rate <- 1*10^-8
 n_bottleneck
 N_e_burn_in
 model_chromosome_physical_length_bp

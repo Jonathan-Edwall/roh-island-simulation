@@ -10,11 +10,12 @@ script_start=$(date +%s)
 # Defining the header of the output file
 header="#CHR\tPOS1\tPOS2"
 
+# Get the number of logical cores available
+cores=$(nproc)
 # Max number of parallel jobs to run at a time when creating individual hom files
-max_parallel_jobs_create_indv_hom_files=$(nproc)
-
+max_parallel_jobs_create_indv_hom_files=$((cores / 1))
 # Max number of parallel jobs to run at a time when creating individual bed files
-max_parallel_jobs_make_indv_bed=$(nproc)
+max_parallel_jobs_make_indv_bed=$((cores / 1))
 
 ####################################  
 # Defining the working directory

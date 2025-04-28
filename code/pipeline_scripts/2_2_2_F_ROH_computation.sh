@@ -8,8 +8,11 @@ script_start=$(date +%s)
 ######################################  
 ####### Defining parameter values #######
 ######################################
-# Max number of parallel jobs to run at a time 
-max_parallel_jobs=$(nproc)
+# Get the number of logical cores available
+cores=$(nproc)
+# Set the maximum number of parallel jobs to run at a time 
+max_parallel_jobs=$((cores / 1))
+
 
 # Defining the header of the output file
 autosome_lengths_header="#Chromosome\tLength(bp)\tLength(KB)"

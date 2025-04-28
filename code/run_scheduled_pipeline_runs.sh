@@ -11,30 +11,62 @@ remove_files_scripts_dir="$script_dir/remove_files_scripts"
 ######################################  
 ####### Defining parameter values #######
 ######################################
-# Boolean value to determine whether to perform selection model simulations 
-export selection_simulation=TRUE # TRUE/FALSE
-export empirical_processing=TRUE # TRUE/FALSE
+# Set the number of technical replicates to be generated for each simulation scenario
+export n_simulation_replicates=20
 
-export max_parallel_jobs_neutral_model_simulations=30
-export max_parallel_jobs_selection_sim=7 # 8
-export n_simulation_replicates=50 # 50
+# Get the number of logical cores available
+cores=$(nproc)
+# Set the maximum number of neutral model simulations to be run in parallel
+# The value is set by default as the amount of logical cores available, but can be manually altered.
+export max_parallel_jobs_neutral_model_simulations=$((cores / 1))
+# export max_parallel_jobs_neutral_model_simulations=20
+
+# Set the maximum number of selection model simulations to be run in parallel
+# The value is set by default as 1/4 of the amount of logical cores available, but can be manually altered.
+export max_parallel_jobs_selection_sim=$((cores / 4))
+# export max_parallel_jobs_selection_sim=8
 
 # Boolean value to determine whether to perform selection model simulations 
 export selection_simulation=TRUE
 export empirical_processing=TRUE
 
-# export selection_coefficient_list=(0.075 0.1 0.125 0.15 0.2 0.3 0.4 0.5 0.6 0.7 0.8)
+#�����������������������������
+#� Selection Scenario Simulation Parameters �
+#�����������������������������
+# This variable defines the selection coefficients for the causative variant that will be simulated. A higher value indicates stronger selection. 
+# export selection_coefficient_list=(0.2 0.3 0.4 0.5 0.6 0.7 0.8)
 export selection_coefficient_list=(0.4 0.5 0.6 0.7 0.8)
+
+# This variable sets the "near-fixation threshold" for the allele of the causative variant.
+# By default, this threshold is set to an allele frequency of ≥ 99%.
 export fixation_threshold_causative_variant=0.99
 
-export Inbred_ancestral_population=FALSE # TRUE or FALSE
-export nInd_founder_population=$N_bottleneck # 50 or 100
+#�����������������������������
+#� General Population History Parameters �
+#�����������������������������
+export Inbred_ancestral_population=FALSE # TRUE/FALSE. This variable determines if the founder individuals in the coalescent simulations (RunMacs) should be inbred.
 export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
-export Introduce_mutations=TRUE
 
-####################################  
-# Defining the input files
-#################################### 
+# Variable determining if new Random Mutations should be added to offsprings. If set to TRUE, the used mutation rate is defined by $mutation_rate
+export Introduce_mutations=TRUE # TRUE/FALSE
+
+export nInd_founder_population=$N_bottleneck # Number of founder individuals from the coalescent simulations.
+
+# -------------[ Load Configuration ]-------------
+CONFIG_FILE="$script_dir/config.sh"
+if [[ -f "$CONFIG_FILE" ]]; then
+    echo -e "${GREEN}[INFO]${NC} Loading configuration from ${CONFIG_FILE}"
+    source "$CONFIG_FILE"
+else
+    echo -e "${RED}[ERROR]${NC} Could not find config file at ${CONFIG_FILE}"
+    exit 1
+fi
+
+# If chr_specific_recombination_rate=FALSE, the mean recombination rate across all autosomal chromosomes will be used to determine the genetic length of the modeled chromosome:
+export average_recombination_rate=$(echo "scale=4; ($(IFS=+; echo "${chromosome_recombination_rates_cM_per_Mb[*]}")) / ${#chromosome_recombination_rates_cM_per_Mb[@]}" | bc)
+# If chr_specific_recombination_rate=TRUE, the chromosome specific recombination rate of the simulated chromosome will be used: 
+export model_chromosome_recombination_rate="${chromosome_recombination_rates_cM_per_Mb[${chr_simulated}]}"
+
 # Function to handle user interruption
 handle_interrupt() {
     echo "Pipeline interrupted. Exiting."
@@ -54,31 +86,37 @@ echo "Pipeline Runtimes:" > $runtime_log
 # Changing the working directory
 cd $HOME
 
+# source $conda_setup_script_path  # Source Conda initialization script
+# # Activate the conda environment
+# conda activate roh_island_sim_env
+
 #���������������������
 #� Pipeline Run �
 #���������������������
 
 # Step 1 - Preprocessing the Emprical Dataset with PLINK
 # Note: 
-# To run Step 2 - Perform Neutral Model Simulations in AlphaSimR (2_1_1_plink_preprocessing_empirical_data.sh)
-# And Step 3 - Perform Selection Model Simulations in AlphaSimR (2_pipeline_selection_model_simulation_sequentially.sh)
-# This script will have to remain uncommented and be executed (2_1_1_plink_preprocessing_empirical_data.sh) to provide these AlphaSimR script with the SNP density ($selected_chr_snp_density_mb) to use
+# To run Step 2 - Perform Neutral Model Simulations in AlphaSimR (1_2_pipeline_neutral_model_simulation.sh)
+# And Step 3 - Perform Selection Model Simulations in AlphaSimR (1_3_pipeline_selection_model_simulation_sequentially.sh)
+# This script will have to remain uncommented and be executed (1_1_plink_preprocessing_empirical_data.sh) to provide these AlphaSimR script with the SNP density ($selected_chr_snp_density_mb) to use
 # for simulating the selected chromosome ($chr_simulated)
 step=1
-script_name="2_1_1_plink_preprocessing_empirical_data.sh"
+script_name="1_1_plink_preprocessing_empirical_data.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step1=$(date +%s)
 runtime_step1=$((end_step1-pipeline_start))
 echo "Step $step: $script_name Runtime: $runtime_step1 seconds" >> $runtime_log
 ((step++))
+export model_chromosome_physical_length_bp=$model_chromosome_physical_length_bp # Value imported from 1_1_plink_preprocessing_empirical_data.sh
 num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is used for the SNP chip in alphasimr
 # echo "num_markers_raw_empirical_dataset_scaling_factor: $num_markers_raw_empirical_dataset_scaling_factor"
 export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_density_mb * $num_markers_raw_empirical_dataset_scaling_factor" | bc)
 echo "selected_chr_snp_density_mb: $selected_chr_snp_density_mb"
 
+
 # Step 2 - Perform Neutral Model Simulations in AlphaSimR
-script_name="1_pipeline_neutral_model_simulation.sh"
+script_name="1_2_pipeline_neutral_model_simulation.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step2=$(date +%s)
@@ -87,7 +125,7 @@ echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
 ((step++))
 
 # Step 3 - Perform Selection Model Simulations in AlphaSimR
-script_name="2_pipeline_selection_model_simulation_sequentially.sh"
+script_name="1_3_pipeline_selection_model_simulation_sequentially.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step3=$(date +%s)
@@ -96,7 +134,7 @@ echo "Step $step: $script_name Runtime: $runtime_step3 seconds" >> $runtime_log
 ((step++))        
 
 # Step 4 - Preprocessing the Simulated Datasets with PLINK
-script_name="2_1_1_plink_preprocessing_simulated_data.sh"
+script_name="2_1_plink_preprocessing_simulated_data.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step4=$(date +%s)
@@ -148,7 +186,6 @@ end_step9=$(date +%s)
 runtime_step9=$((end_step9-end_step8))
 echo "Step $step: $script_name Runtime: $runtime_step9 seconds" >> $runtime_log
 ((step++))
-
 
 # Step 10 - Detect ROH hotspots for all datasets
 script_name="3_pipeline_ROH_hotspot.sh"
@@ -206,7 +243,7 @@ echo "Step $step: $script_name Runtime: $runtime_step15 seconds" >> $runtime_log
 
 # Step 16 - Perform Sweep test & Run the Pipeline Summarize script to generate a summarizing HTML-file of the pipeline run.
 # pipeline_results_for_different_maf.sh runs these scripts, with varying values of MAF:
-# * 4_pipeline_Sweep_test.sh
+# * 4_3_pipeline_Sweep_test.sh
 # * pipeline_result_summary.sh
 start_16=$(date +%s)
 script_name="pipeline_results_for_different_maf.sh"

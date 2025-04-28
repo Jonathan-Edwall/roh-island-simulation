@@ -7,22 +7,15 @@ script_start=$(date +%s)
 # Defining the working directory
 #################################### 
 
-# HOME=/home/jonathan
 cd $HOME
 
 ######################################  
 ####### Defining parameter values #######
 ######################################
-# Max number of parallel jobs to run at a time 
-# max_parallel_jobs=$(printf "%.0f" $(( $(nproc) / 2 )))
-max_parallel_jobs=1
-
-# export use_MAF_pruning=TRUE
-# export use_MAF_pruning=FALSE
-# export <=0.01
-
-# export empirical_breed="german_shepherd"
-# empirical_breed="empirical_breed" # Defined in run_pipeline.sh
+# Get the number of logical cores available
+cores=$(nproc)
+# Set the maximum number of parallel jobs to run at a time 
+max_parallel_jobs=$((cores / 2))
 
 ######################################  
 ####### Defining the INPUT files #######
@@ -96,6 +89,8 @@ mkdir -p $causative_variant_H_e_dir
 ##############################################################################################  
 ############ RESULTS ###########################################################################
 ##############################################################################################
+rmd_script_full_path="${pipeline_scripts_dir}/4_3_1_selective_sweep_test_expected_heterozygosity.Rmd"
+
 # Function to run the R Markdown script for a given simulation scenario
 H_e_calculation() {
     local simulation_scenario=$1
@@ -128,9 +123,9 @@ H_e_calculation() {
     
     # Render the R Markdown document with the current simulation scenario
     if [ "$knit_document_check" -eq 1 ]; then
-        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/4-4_3_selective_sweep_test_expected_heterozygosity.Rmd')"
+        Rscript -e "rmarkdown::render('$rmd_script_full_path')"
     else
-        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/4-4_3_selective_sweep_test_expected_heterozygosity.Rmd', run_pandoc=FALSE)" # Run the .rmd script without knitting!
+        Rscript -e "rmarkdown::render('$rmd_script_full_path', run_pandoc=FALSE)" # Run the .rmd script without knitting!
     fi         
 
 
@@ -209,13 +204,19 @@ if [ "$selection_simulation" = TRUE ]; then
     export selection_model_causative_variant_windows_dir="$selection_model_causative_variant_windows_dir"
     export causative_windows_allele_freq_dir="$causative_windows_allele_freq_dir"
 
+    causative_variant_H_e_calc_script_full_path="$pipeline_scripts_dir/4_3_2_causative_windows_expected_heterozygosity.Rmd"
     # Modify the pipeline_result_summary.sh script call to include the MAF status suffix in the output file name
-    output_file="$pipeline_scripts_dir/4-4_4_causative_windows_expected_heterozygosity_${MAF_status_suffix}.html"
+    output_file="${causative_variant_H_e_calc_script_full_path%.Rmd}_${MAF_status_suffix}.html"
     # Render the R Markdown document with the current input bed file
-    Rscript -e "rmarkdown::render('$pipeline_scripts_dir/4-4_4_causative_windows_expected_heterozygosity.Rmd', output_file = '$output_file')"
+    Rscript -e "rmarkdown::render('$causative_variant_H_e_calc_script_full_path', output_file = '$output_file')"
+
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
 fi
+
+# Removing the generated .knit.md file
+knit_output_file="${rmd_script_full_path%.Rmd}.knit.md"
+rm $knit_output_file
 
 # Ending the timer 
 script_end=$(date +%s)

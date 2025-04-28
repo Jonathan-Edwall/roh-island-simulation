@@ -40,11 +40,12 @@ for min_MAF_threshold in "${min_MAF_list[@]}"; do
         export min_MAF=0
     fi
 
-    # Run the first script in the background
     (
-        source $pipeline_scripts_dir/4_pipeline_Sweep_test.sh
+        # Performing Sweep test with markers below the current MAF threshold pruned prior to the sweep test
+        source $pipeline_scripts_dir/4_3_pipeline_Sweep_test.sh
+
         if [ "$selection_simulation" = TRUE ]; then
-            # Run the second script after the first one completes
+            # Running the Pipeline Summarize script to generate a summarizing HTML-file of the pipeline run
             source $pipeline_scripts_dir/pipeline_result_summary.sh
 
         else

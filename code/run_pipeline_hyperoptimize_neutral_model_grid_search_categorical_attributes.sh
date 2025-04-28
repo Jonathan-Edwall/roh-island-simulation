@@ -3,14 +3,8 @@
 ####################################  
 # Setting up the pipeline script
 #################################### 
-# Defining the path to the Conda initialization script
-conda_setup_script_path=""
-# conda_setup_script_path="/home/jonat/pipeline/anaconda3/etc/profile.d/conda.sh"
-source $conda_setup_script_path  # Source Conda initialization script
-# Activate the conda environment
-conda activate roh_island_sim_env
 # Defining the working directory
-# export HOME="/home/jonathan/pipeline/Computational-modelling-of-genomic-inbreeding-and-roh-islands-in-extremely-small-populations"
+# export HOME="/home/jonathan/pipeline/roh-island-simulation"
 export HOME="$(dirname "$(dirname "$(realpath "$0")")")"
 
 export script_dir="$HOME/code"
@@ -20,31 +14,31 @@ remove_files_scripts_dir="$script_dir/remove_files_scripts"
 export data_dir="$HOME/data_HO"
 export results_dir="$HOME/results_HO"
 export hyperoptimizer_results_dir="$HOME/hyperoptimizer_results" 
+
 ######################################  
 ####### Defining parameter values #######
 ######################################
-export max_parallel_jobs_neutral_model_simulations=20
+# Set the number of technical replicates to be generated for the simulated neutral model
 export n_simulation_replicates=20
-# export n_simulation_replicates=5
 
-export empirical_breed="labrador_retriever"
-export empirical_data_basename="LR_fs"
-# Set the species for the empirical dataset to determine which species-specific options will be applied during the preprocessing.
-export empirical_species="dog"
-# Defines the range of autosomal chromosomes to be used in the analysis. This value should be set according to the species being analyzed.  
-# The format follows PLINK's chromosome specification (e.g., "1-38" for dog). 
-export empirical_autosomal_chromosomes="1-38"
+# Get the number of logical cores available
+cores=$(nproc)
+# Set the maximum number of neutral model simulations to be run in parallel
+# The value is set by default as the amount of logical cores available, but can be manually altered.
+export max_parallel_jobs_neutral_model_simulations=$((cores / 1))
 
+export selection_simulation=FALSE # Leave Unchanged for Hyperparameter Optimization
+export empirical_processing=FALSE # Leave Unchanged for Hyperparameter Optimization
 
 #���������������������
 #� Hyperoptimization parameters �
 #���������������������
-export selection_simulation=FALSE # Leave Unchanged for Hyperparameter Optimization
-export empirical_processing=FALSE # Leave Unchanged for Hyperparameter Optimization
-
-export Inbred_ancestral_population=FALSE
-export reference_population_for_snp_chip="last_breed_formation_generation" 
-export Introduce_mutations=TRUE
+export Inbred_ancestral_population=FALSE # TRUE/FALSE. This variable determines if the founder individuals in the coalescent simulations (RunMacs) should be inbred.
+# Choose snp chip, either from "last_breed_formation_generation" or last_bottleneck_generation:
+# export reference_population_for_snp_chip="last_bottleneck_generation" # Creating the SNP chip based out of the final bottleneck scenario gen
+export reference_population_for_snp_chip="last_breed_formation_generation" # Creating the SNP chip based out of the final breed formation scenario gen
+# Variable determining if new Random Mutations should be added to offsprings. If set to TRUE, the used mutation rate is defined by $mutation_rate
+export Introduce_mutations=TRUE # TRUE/FALSE
 
 # # Get parameters from command line arguments for the hyperoptimization
 export HO_results_file=$1
@@ -59,15 +53,35 @@ export chr_specific_recombination_rate=$8
 # # export reference_population_for_snp_chip=$7
 # # export Introduce_mutations=${10}
 
-# export HO_results_file="neutral_models_cost_function_results_HO_german_shepherd.tsv"
-# export chr_simulated="chr38" # "chr28" or "chr1"
-# export Ne_burn_in=250
-# export nInd_founder_population=50 # 50 or 100
-# export N_bottleneck=30 # [30,40,50,60,70]
-# export n_generations_bottleneck=5
-# export n_simulated_generations_breed_formation=5 # [40,45,50,55,60,65,70]
-# export n_individuals_breed_formation=100 # [40-70]
-# export chr_specific_recombination_rate=TRUE
+
+# # export HO_results_file="neutral_models_cost_function_results_HO_labrador_retriever.tsv"
+# export chr_simulated="chr1"  # Define the empirical chromosome to simulate.
+# export Ne_burn_in=3185 # The effective population size of the ancestral ”burn-in” population
+# export N_bottleneck=5 # The population size of the bottleneck generations during the simulated bottleneck scenario.
+# export nInd_founder_population=$N_bottleneck # Number of founder individuals from the coalescent simulations.
+# export n_generations_bottleneck=1 # The extent of the bottleneck scenario in terms of generations passed
+# export n_simulated_generations_breed_formation=110 # The number of generations for the forward-in-time post-bottleneck breeding scenario
+# export n_individuals_breed_formation=330 # The number of bred individuals per generation in the aforementioned breeding scenario
+# # chr_specific_recombination_rate: This parameter determines whether the modeled chromosome (selected by the Chr parameter), will use the chromosome-specific recombination rate of the modeled chromosome, or
+# # the genomic average recombination rate for dogs (False). 
+# # As a consequence, this parameter influences whether the simulation models are tailored to reflect the specific chromosome selected in Chr (True) or a more generic chromosome of the studied species(False).
+# export chr_specific_recombination_rate=FALSE # TRUE/FALSE
+
+# -------------[ Load Configuration ]-------------
+CONFIG_FILE="$script_dir/config.sh"
+if [[ -f "$CONFIG_FILE" ]]; then
+    echo -e "${GREEN}[INFO]${NC} Loading configuration from ${CONFIG_FILE}"
+    source "$CONFIG_FILE"
+else
+    echo -e "${RED}[ERROR]${NC} Could not find config file at ${CONFIG_FILE}"
+    exit 1
+fi
+
+# If chr_specific_recombination_rate=FALSE, the mean recombination rate across all autosomal chromosomes will be used to determine the genetic length of the modeled chromosome:
+export average_recombination_rate=$(echo "scale=4; ($(IFS=+; echo "${chromosome_recombination_rates_cM_per_Mb[*]}")) / ${#chromosome_recombination_rates_cM_per_Mb[@]}" | bc)
+# If chr_specific_recombination_rate=TRUE, the chromosome specific recombination rate of the simulated chromosome will be used: 
+export model_chromosome_recombination_rate="${chromosome_recombination_rates_cM_per_Mb[${chr_simulated}]}"
+
 
 # Function to handle user interruption
 handle_interrupt() {
@@ -90,12 +104,17 @@ pipeline_start=$(date +%s)
 echo "Pipeline Runtimes:" > $runtime_log
 cd $HOME
 
+# conda_setup_script_path="/home/jonat/pipeline/anaconda3/etc/profile.d/conda.sh" # Variable defined in config.sh
+source $conda_setup_script_path  # Source Conda initialization script
+# Activate the conda environment
+conda activate roh_island_sim_env
+
 #���������������������
 #� Pipeline Run �
 #���������������������
 # Step 1 - Extracting the corresponding SNP density for the chromosome to be simulated, from the empirical dataset
 step=1
-script_name="2_1_1_plink_preprocessing_empirical_data.sh"
+script_name="1_1_plink_preprocessing_empirical_data.sh"
 preprocessed_data_dir=$data_dir/preprocessed
 preprocessed_empirical_breed_dir=$preprocessed_data_dir/empirical/$empirical_breed
 output_file="${preprocessed_empirical_breed_dir}/${empirical_breed}_filtered_autosome_lengths_and_marker_density.tsv"
@@ -107,8 +126,12 @@ if [ -f "$output_file" ]; then
     ### Extracting the SNP Density of the selected chromosome that will be simulated ###
     # Step 1: Find the row where column 1 is equal to the chromosome number in $chr_number
     selected_row=$(awk -v chr="$chr_num" '$1 == chr' "$output_file")
-    # Step 2: Extract the SNP density value from the selected row
+    # Step 2: Extract the Physical chromosome length from the selected row
+    export model_chromosome_physical_length_bp=$(echo "$selected_row" | awk '{print $2}')
+
+    # Step 3: Extract the SNP density value from the selected row
     selected_chr_preprocessed_snp_density_mb=$(echo "$selected_row" | awk '{print $5}')
+
 fi
 num_markers_raw_empirical_dataset_scaling_factor=1 # Works good if minSnpFreq is used for the SNP chip in alphasimr
 export selected_chr_snp_density_mb=$(echo "$selected_chr_preprocessed_snp_density_mb * $num_markers_raw_empirical_dataset_scaling_factor" | bc)
@@ -119,7 +142,7 @@ echo "Step $step: Empirical data preprocessing Runtime: $runtime_step1 seconds" 
 ((step++))
 
 # Step 2 - Perform Neutral Model Simulations in AlphaSimR
-script_name="1_pipeline_neutral_model_simulation.sh"
+script_name="1_2_pipeline_neutral_model_simulation.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step2=$(date +%s)
@@ -128,7 +151,7 @@ echo "Step $step: $script_name Runtime: $runtime_step2 seconds" >> $runtime_log
 ((step++))
 
 # Step 3 - Preprocessing the Simulated Datasets with PLINK
-script_name="2_1_1_plink_preprocessing_simulated_data.sh"
+script_name="2_1_plink_preprocessing_simulated_data.sh"
 echo "Step $step: Running $script_name"
 source "$pipeline_scripts_dir/$script_name"
 end_step3=$(date +%s)

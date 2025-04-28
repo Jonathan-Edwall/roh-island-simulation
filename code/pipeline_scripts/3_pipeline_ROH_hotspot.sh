@@ -4,12 +4,14 @@
 # Start the timer 
 script_start=$(date +%s)
 
+######################################  
+####### Defining parameter values #######
+######################################
 
-# Max number of parallel jobs to run at a time 
-# max_parallel_jobs=$(nproc)
-max_parallel_jobs=$(printf "%.0f" $(( $(nproc) / 2 )))
-
-
+# Get the number of logical cores available
+cores=$(nproc)
+# Set the maximum number of parallel jobs to run at a time 
+max_parallel_jobs=$((cores / 2))
 
 ####################################  
 # Defining the working directory
@@ -109,6 +111,7 @@ mkdir -p $roh_hotspots_freq_selection_model_dir # Creating subdirectory if it do
 ##############################################################################################  
 ############ RESULTS ###########################################################################
 ############################################################################################## 
+rmd_script_full_path="${pipeline_scripts_dir}/3_ROH_hotspots_identification.Rmd"
 
 #¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 #¤¤¤¤ Empirical Data  ¤¤¤¤ 
@@ -128,8 +131,7 @@ if [ "$empirical_processing" = TRUE ]; then
         export roh_hotspots_freq_directory="$roh_hotspots_freq_empirical_breed_dir"
         export simulation_processing=FALSE
         # Render the R Markdown document with the current input bed file
-        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd')"
-        # Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd', run_pandoc=FALSE)"
+        Rscript -e "rmarkdown::render('$rmd_script_full_path')"
     done
     wait
     echo "ROH-Hotspots detected for $empirical_breed"
@@ -159,10 +161,9 @@ process_roh_hotspots() {
     export autosome_roh_freq_directory="$autosome_roh_freq_simulation_model_dir"  # Adjust as needed
     export roh_hotspots_freq_directory="$roh_hotspots_freq_simulation_model_dir"  # Adjust as needed
     if [ "$knit_document_check" -eq 1 ]; then
-        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd')"
+        Rscript -e "rmarkdown::render('$rmd_script_full_path')"
     else
-        # Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd'), run_pandoc=FALSE)" # Run the .rmd script without knitting!
-        Rscript -e "rmarkdown::render('$pipeline_scripts_dir/3-2_3_ROH_hotspots_identification.Rmd', run_pandoc=FALSE)"
+        Rscript -e "rmarkdown::render('$rmd_script_full_path', run_pandoc=FALSE)"
     fi         
 
 }
@@ -231,6 +232,11 @@ if [ "$selection_simulation" = TRUE ]; then
 else
     echo "Selection simulation is set to FALSE. Skipping the selection model processing."
 fi
+
+# Removing the generated .knit.md file
+knit_output_file="${rmd_script_full_path%.Rmd}.knit.md"
+rm $knit_output_file
+
 # Ending the timer 
 script_end=$(date +%s)
 # Calculating the runtime of the script

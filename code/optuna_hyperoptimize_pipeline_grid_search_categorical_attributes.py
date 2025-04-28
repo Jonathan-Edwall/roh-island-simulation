@@ -6,7 +6,9 @@ import pandas as pd
 import signal
 import sys
 
+# Define the input hyperparameter optimization run
 HO_id = f"HO_grid_search_top_1_perc_results"
+
 # Dynamically determine the root directory one level up from the current script's directory
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 path_to_results_folder = f"{root_dir}/hyperoptimizer_results"

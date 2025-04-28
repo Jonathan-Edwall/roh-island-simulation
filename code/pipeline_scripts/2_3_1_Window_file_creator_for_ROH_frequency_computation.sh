@@ -57,12 +57,11 @@ mkdir -p $window_files_dir
 #�������������
 #� Empirical �
 #�������������
-empirical_breed_output_window_file=$window_files_dir/"${empirical_breed}_autosome_windows_100kB_window_sizes.bed"
-
+empirical_dataset_output_window_file="${window_files_dir}/${empirical_breed}_autosome_windows_100kB_window_sizes.bed"
 if [ "$empirical_processing" = TRUE ]; then
     # Remove the existing output file if it exists
-    if [ -e "$empirical_breed_output_window_file" ]; then
-        rm "$empirical_breed_output_window_file"
+    if [ -e "$empirical_dataset_output_window_file" ]; then
+        rm "$empirical_dataset_output_window_file"
     fi
 else
     echo "Empirical data has been set to not be processed, since files have already been created."
@@ -85,7 +84,7 @@ fi
 #�������������
 if [ "$empirical_processing" = TRUE ]; then
     # Write the header to the output file
-    echo -e "#Chromosome\tStart\tEnd" > $empirical_breed_output_window_file
+    echo -e "#Chromosome\tStart\tEnd" > $empirical_dataset_output_window_file
     # Read the input file $empirical_breed_autosome_lengths_file line by line, skipping the first line
     sed 1d "$empirical_breed_autosome_lengths_file" | while IFS=$'\t' read -r line; do
         chrom=$(echo "$line" | cut -f1)
@@ -98,7 +97,7 @@ if [ "$empirical_processing" = TRUE ]; then
                 window_end=$length_bp
             fi
             # Append the window to the output file
-            echo -e "$chrom\t$window_start\t$window_end" >> "$empirical_breed_output_window_file"
+            echo -e "$chrom\t$window_start\t$window_end" >> "$empirical_dataset_output_window_file"
             # Move to the next window position
             ((window_start += window_size_bp))
         done
@@ -108,8 +107,8 @@ else
     echo ""
 fi
 # Sort the output file by genomic coordinates
-sort -k1,1n -k2,2n -o "$empirical_breed_output_window_file" "$empirical_breed_output_window_file"
-echo "Window file written to $empirical_breed_output_window_file"
+sort -k1,1n -k2,2n -o "$empirical_dataset_output_window_file" "$empirical_dataset_output_window_file"
+echo "Window file written to $empirical_dataset_output_window_file"
 
 #����������������������������������
 #� Creation of the 100kbp window files based on    �
