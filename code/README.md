@@ -36,7 +36,7 @@ More specifically the following settings must be specified:
 - **`chromosome_recombination_rates_cM_per_Mb`**: Specifies the chromosome specific recombination rates for the studied species
 - **`gene_annotations_filepath`**: Path to the gene annotation file to be used for mapping genes to the identified empirical ROH hotspot regions.
 - **`omia_scraped_phenotypes_data_filepath`** & **`omia_phenotypes_filepath`**: OMIA Phenotype annotation files to be used in the mapping of ROH hotspots to phenotypes. The former refers to the scraped (raw) phenotype file from OMIA, while the latter refers to the OMIA phenotype .bed file.
-  -  **Note:** Premade phenotypes files exists for the study of dogs, cat, chicken, pig, gray wolf and taurine cattle (last updated 2025-04-24). These can be found in `data/preprocessed/empirical/omia_scraped_phene_data` and `data/preprocessed/empirical/omia_phenotype_data/` respectively. 
+  -  **Note:** Premade phenotypes files exists for the study of dogs, cat, chicken, pig, gray wolf and taurine cattle (last updated 2025-02-24). These can be found in `data/preprocessed/empirical/omia_scraped_phene_data` and `data/preprocessed/empirical/omia_phenotype_data/` respectively. 
 - **`vertebrate_breed_ontology_ids`**: A list of Vertebrate Breed Ontology ID:s to use for associating phenotypes with the studied species.
 
 More detailed information about these variables can be found in the `config.sh` script which also includes example inputs based on the analysis of Labrador retriever dogs.
